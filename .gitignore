@@ -1,3 +1,5 @@
+# Project: Trio App
+
 # Dependencies
 node_modules/
 package-lock.json
@@ -12,18 +14,27 @@ build/
 # Logs
 *.log
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+server/scripts/*.txt
+server/scripts/*.json
+!server/scripts/seedData.js
 
-# OS specific
-.DS_Store
-Thumbs.db
-
-# IDE specific
-.vscode/
-.idea/
+# Puppeteer & Browser Profiles
+.cache/
+chrome-stealth-profile/
+server/chrome-stealth-profile/
+server/browser_data/
+browser_data/
+.local-chromium/
 
 # Database
 server/prisma/dev.db
 server/prisma/dev.db-journal
+server/emlak22.db
+server/emlak22.db-journal
 
-# Puppeteer
-.cache/puppetter/
+# OS specific
+.DS_Store
+Thumbs.db
+Desktop.ini
