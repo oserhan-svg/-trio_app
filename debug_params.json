@@ -1,0 +1,7 @@
+{
+  "params": {
+    "id": "3"
+  },
+  "url": "/3/properties",
+  "baseUrl": "/api/clients"
+}

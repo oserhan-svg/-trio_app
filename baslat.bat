@@ -1,0 +1,6 @@
+@echo off
+echo Emlak Takip Sistemi Baslatiliyor...
+echo Lutfen bekleyin...
+cd server
+npm run dev
+pause

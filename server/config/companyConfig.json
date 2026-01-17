@@ -1,0 +1,17 @@
+{
+  "companyName": "Trio Emlak Gayrimenkul",
+  "companyLogo": "/logo.png",
+  "companyAddress": "Ali Çetinkaya Mah. Abdi İpekçi Cad. No:15/A Ayvalık Balıkesir",
+  "companyPhone": "0533 378 68 94",
+  "companyPhone2": "0552 473 10 21",
+  "companyEmail": "trio.emlak.ayvalik@gmail.com",
+  "companyWebsite": "trioemlak.com",
+  "consultants": [
+    {
+      "name": "Gayrimenkul Danışmanı",
+      "phone": "0533 378 68 94",
+      "email": "trio.emlak.ayvalik@gmail.com",
+      "title": "Emlak Danışmanı"
+    }
+  ]
+}

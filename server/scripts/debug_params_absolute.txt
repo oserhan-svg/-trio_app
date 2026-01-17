@@ -1,0 +1,15 @@
+Time: 2026-01-16T14:04:37.962Z
+Params: {"id":"3"}
+Body: {"propertyId":236,"status":"suggested"}
+URL: /api/clients/3/properties
+
+Time: 2026-01-16T14:04:41.204Z
+Params: {"id":"3"}
+Body: {"propertyId":238,"status":"suggested"}
+URL: /api/clients/3/properties
+
+Time: 2026-01-16T14:19:18.091Z
+Params: {"id":"3"}
+Body: {"propertyId":164,"status":"suggested"}
+URL: /api/clients/3/properties
+
