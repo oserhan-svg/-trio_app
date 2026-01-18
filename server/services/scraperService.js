@@ -173,6 +173,27 @@ async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = '
                     });
                 }
 
+                // Cloudflare / Bot Protection Check
+                try {
+                    const pageTitle = await page.title();
+                    if (pageTitle.includes('Bir dakika') || pageTitle.includes('Just a moment') || pageTitle.includes('Attention Required')) {
+                        console.log('🛡️ Cloudflare/Security Check detected. Initiating evasion protocols...');
+
+                        // 1. Wait for auto-resolve (often 5-10s)
+                        await new Promise(r => setTimeout(r, 15000));
+
+                        // 2. Simple interaction simulation
+                        try {
+                            await page.mouse.move(100, 100);
+                            await page.mouse.move(200, 200);
+                        } catch (ev) { }
+
+                        console.log('🛡️ Evasion wait complete. Checking if we passed...');
+                    }
+                } catch (err) {
+                    console.log('Error checking for Cloudflare:', err.message);
+                } // Continue to selector wait regardless
+
                 // Smart Wait: Wait for specific elements instead of static sleep
                 try {
                     await page.waitForSelector('.listing-item', { timeout: CONFIG.timeouts.element });
