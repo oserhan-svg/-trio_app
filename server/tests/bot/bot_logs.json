@@ -1,19 +1,5 @@
 [
   {
-    "timestamp": "2026-01-18T13:12:52.887Z",
-    "action": "Login",
-    "status": "SUCCESS",
-    "duration": "3032ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T13:12:54.862Z",
-    "action": "Navigate Dashboard",
-    "status": "SUCCESS",
-    "duration": "1972ms",
-    "error": null
-  },
-  {
     "timestamp": "2026-01-18T13:13:00.547Z",
     "action": "Navigate Properties",
     "status": "SUCCESS",
@@ -6998,5 +6984,19 @@
     "status": "SUCCESS",
     "duration": "12782ms",
     "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:44:41.192Z",
+    "action": "Login",
+    "status": "SUCCESS",
+    "duration": "2457ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:44:43.038Z",
+    "action": "Cycle Error",
+    "status": "FAILED",
+    "duration": "0ms",
+    "error": "Navigating frame was detached"
   }
 ]

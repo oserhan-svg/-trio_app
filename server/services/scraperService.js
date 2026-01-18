@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer-extra');
-const { createStealthBrowser, configureStealthPage, humanizePage } = require('./browserFactory');
+const { createStealthBrowser, configureStealthPage, humanizePage, saveBrowserState } = require('./browserFactory');
 const cron = require('node-cron');
 const prisma = require('../db');
 
@@ -257,6 +257,8 @@ async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = '
                 // Smart Wait: Wait for specific elements instead of static sleep
                 try {
                     await page.waitForSelector('.listing-item', { timeout: 30000 });
+                    // Session is valid, save cookies for next time
+                    await saveBrowserState(page);
                 } catch (e) {
                     console.log(`⚠️ Timeout waiting for listings on page ${pageNum}.`);
 
