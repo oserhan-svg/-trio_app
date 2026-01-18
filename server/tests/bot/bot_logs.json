@@ -1,33 +1,5 @@
 [
   {
-    "timestamp": "2026-01-18T12:46:59.064Z",
-    "action": "Navigate Clients",
-    "status": "SUCCESS",
-    "duration": "2065ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T12:46:59.066Z",
-    "action": "Full Cycle",
-    "status": "SUCCESS",
-    "duration": "12935ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T12:47:32.686Z",
-    "action": "Login",
-    "status": "SUCCESS",
-    "duration": "2624ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T12:47:34.071Z",
-    "action": "Navigate Dashboard",
-    "status": "SUCCESS",
-    "duration": "1382ms",
-    "error": null
-  },
-  {
     "timestamp": "2026-01-18T12:47:39.740Z",
     "action": "Navigate Properties",
     "status": "SUCCESS",
@@ -6998,5 +6970,33 @@
     "status": "SUCCESS",
     "duration": "12454ms",
     "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:32:39.320Z",
+    "action": "Login",
+    "status": "SUCCESS",
+    "duration": "2339ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:32:41.453Z",
+    "action": "Navigate Dashboard",
+    "status": "SUCCESS",
+    "duration": "2130ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:32:42.486Z",
+    "action": "Navigate Properties",
+    "status": "SUCCESS",
+    "duration": "1031ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:32:42.490Z",
+    "action": "Cycle Error",
+    "status": "FAILED",
+    "duration": "0ms",
+    "error": "Protocol error (Page.navigate): Session closed. Most likely the page has been closed."
   }
 ]
