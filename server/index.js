@@ -44,7 +44,7 @@ app.use('/api/agenda', require('./routes/agendaRoutes'));
 app.use('/api/performance', require('./routes/performanceRoutes'));
 
 // Start Scraper Scheduler
-startScheduler();
+// startScheduler();
 
 app.get('/', (req, res) => {
     res.send('Emlak Takip API Running');

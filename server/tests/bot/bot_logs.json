@@ -1,250 +1,5 @@
 [
   {
-    "timestamp": "2026-01-18T11:49:55.698Z",
-    "action": "Login",
-    "status": "SUCCESS",
-    "duration": "2325ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T11:49:57.859Z",
-    "action": "Navigate Dashboard",
-    "status": "SUCCESS",
-    "duration": "2159ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T11:50:04.961Z",
-    "action": "Navigate Properties",
-    "status": "SUCCESS",
-    "duration": "7101ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T11:50:07.056Z",
-    "action": "Navigate Clients",
-    "status": "SUCCESS",
-    "duration": "2093ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T11:50:07.058Z",
-    "action": "Full Cycle",
-    "status": "SUCCESS",
-    "duration": "14363ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T11:50:40.342Z",
-    "action": "Login",
-    "status": "SUCCESS",
-    "duration": "2326ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T11:50:41.306Z",
-    "action": "Navigate Dashboard",
-    "status": "SUCCESS",
-    "duration": "962ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T11:50:46.991Z",
-    "action": "Navigate Properties",
-    "status": "SUCCESS",
-    "duration": "5683ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T11:50:48.196Z",
-    "action": "Navigate Clients",
-    "status": "SUCCESS",
-    "duration": "1204ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T11:50:48.197Z",
-    "action": "Full Cycle",
-    "status": "SUCCESS",
-    "duration": "10896ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T11:51:21.449Z",
-    "action": "Login",
-    "status": "SUCCESS",
-    "duration": "2216ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T11:51:23.593Z",
-    "action": "Navigate Dashboard",
-    "status": "SUCCESS",
-    "duration": "2142ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T11:51:30.674Z",
-    "action": "Navigate Properties",
-    "status": "SUCCESS",
-    "duration": "7080ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T11:51:32.761Z",
-    "action": "Navigate Clients",
-    "status": "SUCCESS",
-    "duration": "2085ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T11:51:32.764Z",
-    "action": "Full Cycle",
-    "status": "SUCCESS",
-    "duration": "14269ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T11:52:34.857Z",
-    "action": "Cycle Error",
-    "status": "FAILED",
-    "duration": "0ms",
-    "error": "Navigation timeout of 30000 ms exceeded"
-  },
-  {
-    "timestamp": "2026-01-18T11:53:36.987Z",
-    "action": "Cycle Error",
-    "status": "FAILED",
-    "duration": "0ms",
-    "error": "Navigation timeout of 30000 ms exceeded"
-  },
-  {
-    "timestamp": "2026-01-18T11:54:39.041Z",
-    "action": "Cycle Error",
-    "status": "FAILED",
-    "duration": "0ms",
-    "error": "Navigation timeout of 30000 ms exceeded"
-  },
-  {
-    "timestamp": "2026-01-18T11:55:41.138Z",
-    "action": "Cycle Error",
-    "status": "FAILED",
-    "duration": "0ms",
-    "error": "Navigation timeout of 30000 ms exceeded"
-  },
-  {
-    "timestamp": "2026-01-18T11:56:43.392Z",
-    "action": "Cycle Error",
-    "status": "FAILED",
-    "duration": "0ms",
-    "error": "Navigation timeout of 30000 ms exceeded"
-  },
-  {
-    "timestamp": "2026-01-18T11:57:45.861Z",
-    "action": "Cycle Error",
-    "status": "FAILED",
-    "duration": "0ms",
-    "error": "Navigation timeout of 30000 ms exceeded"
-  },
-  {
-    "timestamp": "2026-01-18T11:58:49.022Z",
-    "action": "Cycle Error",
-    "status": "FAILED",
-    "duration": "0ms",
-    "error": "Navigation timeout of 30000 ms exceeded"
-  },
-  {
-    "timestamp": "2026-01-18T11:59:52.290Z",
-    "action": "Cycle Error",
-    "status": "FAILED",
-    "duration": "0ms",
-    "error": "Navigation timeout of 30000 ms exceeded"
-  },
-  {
-    "timestamp": "2026-01-18T12:00:26.261Z",
-    "action": "Login",
-    "status": "SUCCESS",
-    "duration": "2730ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T12:00:28.413Z",
-    "action": "Navigate Dashboard",
-    "status": "SUCCESS",
-    "duration": "2151ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T12:00:35.523Z",
-    "action": "Navigate Properties",
-    "status": "SUCCESS",
-    "duration": "7109ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T12:00:37.667Z",
-    "action": "Navigate Clients",
-    "status": "SUCCESS",
-    "duration": "2143ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T12:00:37.713Z",
-    "action": "Full Cycle",
-    "status": "SUCCESS",
-    "duration": "15115ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T12:01:11.063Z",
-    "action": "Login",
-    "status": "SUCCESS",
-    "duration": "2352ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T12:01:12.040Z",
-    "action": "Navigate Dashboard",
-    "status": "SUCCESS",
-    "duration": "976ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T12:01:18.640Z",
-    "action": "Navigate Properties",
-    "status": "SUCCESS",
-    "duration": "6599ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T12:01:20.781Z",
-    "action": "Navigate Clients",
-    "status": "SUCCESS",
-    "duration": "2140ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T12:01:20.783Z",
-    "action": "Full Cycle",
-    "status": "SUCCESS",
-    "duration": "12751ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T12:01:54.164Z",
-    "action": "Login",
-    "status": "SUCCESS",
-    "duration": "2388ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T12:01:55.138Z",
-    "action": "Navigate Dashboard",
-    "status": "SUCCESS",
-    "duration": "973ms",
-    "error": null
-  },
-  {
     "timestamp": "2026-01-18T12:02:00.833Z",
     "action": "Navigate Properties",
     "status": "SUCCESS",
@@ -6998,5 +6753,250 @@
     "status": "FAILED",
     "duration": "0ms",
     "error": "Navigating frame was detached"
+  },
+  {
+    "timestamp": "2026-01-18T15:02:02.414Z",
+    "action": "Login",
+    "status": "SUCCESS",
+    "duration": "2285ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:02:03.741Z",
+    "action": "Navigate Dashboard",
+    "status": "SUCCESS",
+    "duration": "1321ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:02:09.407Z",
+    "action": "Navigate Properties",
+    "status": "SUCCESS",
+    "duration": "5664ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:02:11.262Z",
+    "action": "Navigate Clients",
+    "status": "SUCCESS",
+    "duration": "1853ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:02:11.265Z",
+    "action": "Full Cycle",
+    "status": "SUCCESS",
+    "duration": "11815ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:03:12.300Z",
+    "action": "Cycle Error",
+    "status": "FAILED",
+    "duration": "0ms",
+    "error": "Navigation timeout of 30000 ms exceeded"
+  },
+  {
+    "timestamp": "2026-01-18T15:03:46.035Z",
+    "action": "Login",
+    "status": "SUCCESS",
+    "duration": "2365ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:03:48.139Z",
+    "action": "Navigate Dashboard",
+    "status": "SUCCESS",
+    "duration": "2096ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:03:53.829Z",
+    "action": "Navigate Properties",
+    "status": "SUCCESS",
+    "duration": "5685ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:03:55.923Z",
+    "action": "Navigate Clients",
+    "status": "SUCCESS",
+    "duration": "2088ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:03:55.928Z",
+    "action": "Full Cycle",
+    "status": "SUCCESS",
+    "duration": "13041ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:04:29.239Z",
+    "action": "Login",
+    "status": "SUCCESS",
+    "duration": "2391ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:04:30.543Z",
+    "action": "Navigate Dashboard",
+    "status": "SUCCESS",
+    "duration": "1301ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:04:33.055Z",
+    "action": "Navigate Properties",
+    "status": "SUCCESS",
+    "duration": "2510ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:04:33.060Z",
+    "action": "Cycle Error",
+    "status": "FAILED",
+    "duration": "0ms",
+    "error": "Protocol error (Page.navigate): Session closed. Most likely the page has been closed."
+  },
+  {
+    "timestamp": "2026-01-18T15:05:06.426Z",
+    "action": "Login",
+    "status": "SUCCESS",
+    "duration": "2429ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:05:07.739Z",
+    "action": "Navigate Dashboard",
+    "status": "SUCCESS",
+    "duration": "1309ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:05:13.409Z",
+    "action": "Navigate Properties",
+    "status": "SUCCESS",
+    "duration": "5668ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:05:15.503Z",
+    "action": "Navigate Clients",
+    "status": "SUCCESS",
+    "duration": "2088ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:05:15.508Z",
+    "action": "Full Cycle",
+    "status": "SUCCESS",
+    "duration": "12208ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:05:48.754Z",
+    "action": "Login",
+    "status": "SUCCESS",
+    "duration": "2351ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:05:50.844Z",
+    "action": "Navigate Dashboard",
+    "status": "SUCCESS",
+    "duration": "2087ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:05:57.912Z",
+    "action": "Navigate Properties",
+    "status": "SUCCESS",
+    "duration": "7066ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:06:00.014Z",
+    "action": "Navigate Clients",
+    "status": "SUCCESS",
+    "duration": "2097ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:06:00.020Z",
+    "action": "Full Cycle",
+    "status": "SUCCESS",
+    "duration": "14305ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:06:33.194Z",
+    "action": "Login",
+    "status": "SUCCESS",
+    "duration": "2286ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:06:35.296Z",
+    "action": "Navigate Dashboard",
+    "status": "SUCCESS",
+    "duration": "2098ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:06:42.370Z",
+    "action": "Navigate Properties",
+    "status": "SUCCESS",
+    "duration": "7070ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:06:44.082Z",
+    "action": "Navigate Clients",
+    "status": "SUCCESS",
+    "duration": "1710ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:06:44.088Z",
+    "action": "Full Cycle",
+    "status": "SUCCESS",
+    "duration": "13871ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:07:17.260Z",
+    "action": "Login",
+    "status": "SUCCESS",
+    "duration": "2297ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:07:19.386Z",
+    "action": "Navigate Dashboard",
+    "status": "SUCCESS",
+    "duration": "2121ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:07:25.056Z",
+    "action": "Navigate Properties",
+    "status": "SUCCESS",
+    "duration": "5667ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:07:27.129Z",
+    "action": "Navigate Clients",
+    "status": "SUCCESS",
+    "duration": "2070ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:07:27.131Z",
+    "action": "Full Cycle",
+    "status": "SUCCESS",
+    "duration": "12863ms",
+    "error": null
   }
 ]
