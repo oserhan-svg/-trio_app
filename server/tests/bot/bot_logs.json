@@ -1,40 +1,5 @@
 [
   {
-    "timestamp": "2026-01-18T12:48:14.661Z",
-    "action": "Login",
-    "status": "SUCCESS",
-    "duration": "2335ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T12:48:16.237Z",
-    "action": "Navigate Dashboard",
-    "status": "SUCCESS",
-    "duration": "1574ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T12:48:21.846Z",
-    "action": "Navigate Properties",
-    "status": "SUCCESS",
-    "duration": "5608ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T12:48:23.028Z",
-    "action": "Navigate Clients",
-    "status": "SUCCESS",
-    "duration": "1181ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T12:48:23.030Z",
-    "action": "Full Cycle",
-    "status": "SUCCESS",
-    "duration": "11577ms",
-    "error": null
-  },
-  {
     "timestamp": "2026-01-18T12:48:56.592Z",
     "action": "Login",
     "status": "SUCCESS",
@@ -6998,5 +6963,40 @@
     "status": "FAILED",
     "duration": "0ms",
     "error": "Protocol error (Page.navigate): Target closed"
+  },
+  {
+    "timestamp": "2026-01-18T15:33:51.227Z",
+    "action": "Login",
+    "status": "SUCCESS",
+    "duration": "2380ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:33:52.561Z",
+    "action": "Navigate Dashboard",
+    "status": "SUCCESS",
+    "duration": "1331ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:33:58.235Z",
+    "action": "Navigate Properties",
+    "status": "SUCCESS",
+    "duration": "5671ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:34:00.312Z",
+    "action": "Navigate Clients",
+    "status": "SUCCESS",
+    "duration": "2074ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:34:00.317Z",
+    "action": "Full Cycle",
+    "status": "SUCCESS",
+    "duration": "12150ms",
+    "error": null
   }
 ]
