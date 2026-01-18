@@ -17,6 +17,7 @@ const clientPropertyController = require('../controllers/clientPropertyControlle
 
 // Generic CRUD routes (list and create don't conflict)
 router.get('/', clientController.getClients);
+router.get('/recent-matches', clientController.getRecentMatches);
 router.post('/', validate(clientSchema), clientController.createClient);
 
 // Demand Routes (these use /demands/:id, not /:id/demands, so no conflict)

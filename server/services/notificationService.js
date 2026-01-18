@@ -33,4 +33,39 @@ const sendNewListingNotification = async (property) => {
     }
 };
 
-module.exports = { sendNewListingNotification };
+const sendMatchNotification = async (client, property, matchQuality) => {
+    try {
+        if (!client.email) return;
+
+        const mailOptions = {
+            from: 'TrioApp Concierge <noreply@emlaktakip.com>',
+            to: client.email,
+            subject: `✨ Sizin İçin Yeni Bir İlan Bulduk! (Uyum: %${matchQuality})`,
+            html: `
+                <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 12px; max-width: 600px; margin: auto;">
+                    <h2 style="color: #059669;">Sayın ${client.name},</h2>
+                    <p>Kriterlerinize <strong>%${matchQuality}</strong> oranında uyum sağlayan mükemmel bir fırsat yakaladık!</p>
+                    
+                    <div style="background-color: #f0fdf4; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                        <h3 style="margin-top: 0; color: #065f46;">${property.neighborhood}, ${property.district}</h3>
+                        <p style="font-size: 20px; font-weight: bold; color: #059669; margin: 10px 0;">${parseFloat(property.price).toLocaleString('tr-TR')} ₺</p>
+                        <p style="color: #374151; margin: 5px 0;">${property.rooms} | ${property.size_m2} m²</p>
+                    </div>
+
+                    <p style="color: #6b7280; font-size: 14px;">Danışmanınız bu ilanı sizin için inceledi ve önerilenler listenize ekledi.</p>
+                    
+                    <div style="text-align: center; margin-top: 25px;">
+                        <a href="${property.url}" style="background-color: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">İlanı İnceleyin</a>
+                    </div>
+                </div>
+            `
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log(`📧 Match alert sent to ${client.name} (%${matchQuality})`);
+    } catch (error) {
+        console.error('❌ Match notification failed:', error);
+    }
+};
+
+module.exports = { sendNewListingNotification, sendMatchNotification };

@@ -18,7 +18,7 @@ const normalizeNeighborhood = (name) => {
     return clean + ' Mah.';
 };
 const { sendNewListingNotification } = require('./notificationService');
-const { findMatches } = require('./matchService');
+const { findMatchesForProperty } = require('./matchingService');
 const { checkOpportunity } = require('./analyticsService');
 
 // URLs Configuration
@@ -320,6 +320,7 @@ async function saveListings(listings) {
     if (listings.length === 0) return;
     console.log(`Saving ${listings.length} listings to DB...`);
 
+    const { sendMatchNotification } = require('./notificationService');
     for (const item of listings) {
         const { external_id, title, price, url, district, neighborhood, rooms, size_m2, listing_date, listing_type, category, seller_type, seller_name } = item;
 
@@ -378,7 +379,30 @@ async function saveListings(listings) {
                 // Run analytics check for opportunity
                 await checkOpportunity(newProp);
 
-                // Notify if needed
+                // --- AGENTIC CLIENT MATCHING (PHASE 13) ---
+                const matches = await findMatchesForProperty(newProp);
+                for (const match of matches) {
+                    if (match.match_quality >= 80) { // High quality threshold for auto-concierge
+                        try {
+                            // 1. Save to client's potential list
+                            await prisma.savedProperty.create({
+                                data: {
+                                    client_id: match.client.id,
+                                    property_id: newProp.id,
+                                    status: 'concierge', // Mark as auto-matched
+                                    notes: `Otomatik Eşleşme (%${match.match_quality})`
+                                }
+                            });
+                            // 2. Notify Client
+                            await sendMatchNotification(match.client, newProp, match.match_quality);
+                        } catch (matchErr) {
+                            console.error('Auto-match save error:', matchErr.message);
+                        }
+                    }
+                }
+                // -------------------------------------------
+
+                // Notify Admin
                 await sendNewListingNotification(newProp);
             }
         } catch (dbErr) {

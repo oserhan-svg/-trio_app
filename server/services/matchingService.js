@@ -1,16 +1,72 @@
 const prisma = require('../db');
 
 /**
- * Compare two strings for fuzzy match (case insensitive)
+ * Calculates a match score (0-100) between a property and a demand criteria.
+ * Weights: 
+ * - Price: 40 pts
+ * - Neighborhood: 30 pts
+ * - Rooms: 20 pts
+ * - District: 10 pts
  */
-const isMatch = (source, target) => {
-    if (!source || !target) return true; // If criteria missing, assume match (broad search)
-    return source.toLowerCase().includes(target.toLowerCase()) ||
-        target.toLowerCase().includes(source.toLowerCase());
+const calculateMatchScore = (property, demand) => {
+    let score = 0;
+    const reasons = [];
+
+    // 1. Price Score (40 pts)
+    const price = parseFloat(property.price);
+    if (!demand.min_price && !demand.max_price) {
+        score += 40;
+    } else {
+        const min = demand.min_price || 0;
+        const max = demand.max_price || Infinity;
+
+        if (price >= min && price <= max) {
+            score += 40; // Perfect match
+        } else if (price <= max * 1.05) { // Within 5% flexibility
+            score += 30;
+            reasons.push('Bütçenin %5 üzerinde');
+        } else if (price <= max * 1.10) { // Within 10% flexibility
+            score += 15;
+            reasons.push('Bütçenin %10 üzerinde');
+        }
+    }
+
+    // 2. Neighborhood Score (30 pts)
+    if (!demand.neighborhood) {
+        score += 30; // Broad matches get full points for location if not specified
+    } else if (property.neighborhood && property.neighborhood.toLowerCase().includes(demand.neighborhood.toLowerCase())) {
+        score += 30;
+    } else {
+        reasons.push('Mahalle uyumsuz');
+    }
+
+    // 3. Rooms Score (20 pts)
+    if (!demand.rooms) {
+        score += 20;
+    } else if (property.rooms && property.rooms.includes(demand.rooms)) {
+        score += 20;
+    } else {
+        reasons.push('Oda sayısı farklı');
+    }
+
+    // 4. District Score (10 pts)
+    if (!demand.district) {
+        score += 10;
+    } else if (property.district && property.district.toLowerCase().includes(demand.district.toLowerCase())) {
+        score += 10;
+    }
+
+    return {
+        score,
+        isViable: score >= 60, // A "viable" match should have at least 60% compliance
+        reasons
+    };
 };
 
+/**
+ * Finds all properties matching a client's demands
+ */
 const findMatchesForClient = async (clientId) => {
-    // 1. Get Client and Demands
     const client = await prisma.client.findUnique({
         where: { id: parseInt(clientId) },
         include: { demands: true }
@@ -18,62 +74,56 @@ const findMatchesForClient = async (clientId) => {
 
     if (!client || !client.demands.length) return [];
 
-    let allMatches = [];
+    // For efficiency, we fetch all active properties and score them
+    // In a massive DB, we'd use filters, but for Ayvalık scale (~5-10k listings), 
+    // in-memory scoring allows for sophisticated logic (like 5% budget flexibility).
+    const properties = await prisma.property.findMany({
+        where: { listing_type: 'sale' }, // Usually matches are for buyers
+        orderBy: { created_at: 'desc' },
+        take: 200 // Only check latest 200 for speed
+    });
 
-    // 2. Iterate each demand
+    const allMatches = [];
+
     for (const demand of client.demands) {
-        // Build dynamic query
-        const where = { AND: [] };
-
-        // Price Criteria (Budget)
-        if (demand.max_price) {
-            where.AND.push({ price: { lte: demand.max_price } });
-        }
-        if (demand.min_price) {
-            where.AND.push({ price: { gte: demand.min_price } });
-        }
-
-        // Location Criteria (Fuzzy)
-        // Since SQL 'contains' is simple, we might need a broader fetch and filter in JS if complex,
-        // but for now, let's try direct DB filtering for efficiency.
-        if (demand.neighborhood) {
-            where.AND.push({
-                neighborhood: { contains: demand.neighborhood, mode: 'insensitive' }
-            });
-        }
-        if (demand.district) {
-            where.AND.push({
-                district: { contains: demand.district, mode: 'insensitive' }
-            });
-        }
-
-        // Room Criteria (Exact text match often fails, so we use contains)
-        if (demand.rooms) {
-            where.AND.push({
-                rooms: { contains: demand.rooms, mode: 'insensitive' }
-            });
-        }
-
-        // Fetch candidates
-        const candidates = await prisma.property.findMany({
-            where,
-            orderBy: { created_at: 'desc' },
-            take: 50 // Limit matches per demand
+        properties.forEach(prop => {
+            const { score, isViable, reasons } = calculateMatchScore(prop, demand);
+            if (isViable) {
+                allMatches.push({
+                    ...prop,
+                    match_quality: score,
+                    match_reasons: reasons
+                });
+            }
         });
-
-        // Add metadata
-        const matchesWithScore = candidates.map(p => ({
-            ...p,
-            matchReason: `Matches budget ${demand.max_price ? '< ' + demand.max_price : ''} and location ${demand.neighborhood || 'Any'}`
-        }));
-
-        allMatches = [...allMatches, ...matchesWithScore];
     }
 
-    // Deduplicate by ID
-    const uniqueMatches = Array.from(new Map(allMatches.map(item => [item.id, item])).values());
-
-    return uniqueMatches;
+    // Deduplicate and sort by score
+    return Array.from(new Map(allMatches.map(p => [p.id, p])).values())
+        .sort((a, b) => b.match_quality - a.match_quality);
 };
 
-module.exports = { findMatchesForClient };
+/**
+ * Finds all clients matching a single property (used during scraping)
+ */
+const findMatchesForProperty = async (property) => {
+    const activeDemands = await prisma.demand.findMany({
+        include: { client: true }
+    });
+
+    const matches = [];
+    activeDemands.forEach(demand => {
+        const { score, isViable } = calculateMatchScore(property, demand);
+        if (isViable) {
+            matches.push({
+                client: demand.client,
+                match_quality: score,
+                demand_id: demand.id
+            });
+        }
+    });
+
+    return matches;
+};
+
+module.exports = { findMatchesForClient, findMatchesForProperty, calculateMatchScore };

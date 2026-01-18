@@ -14,6 +14,28 @@ const getClientMatches = async (req, res) => {
     }
 };
 
+const getRecentMatches = async (req, res) => {
+    try {
+        const user = req.user;
+        const matches = await prisma.savedProperty.findMany({
+            where: {
+                status: 'concierge',
+                client: user.role !== 'admin' ? { consultant_id: user.id } : {}
+            },
+            include: {
+                client: true,
+                property: true
+            },
+            orderBy: { added_at: 'desc' },
+            take: 10
+        });
+        jsonBigInt(res, matches);
+    } catch (error) {
+        console.error('Recent Matches Error:', error);
+        res.status(500).json({ error: 'Error fetching recent matches' });
+    }
+};
+
 
 // Get all clients with their demands (Filtered by Role)
 const getClients = async (req, res) => {
@@ -186,4 +208,4 @@ const deleteDemand = async (req, res) => {
     }
 };
 
-module.exports = { getClients, getClient, createClient, updateClient, addDemand, deleteClient, getClientMatches, updateDemand, deleteDemand };
+module.exports = { getClients, getClient, createClient, updateClient, addDemand, deleteClient, getClientMatches, getRecentMatches, updateDemand, deleteDemand };
