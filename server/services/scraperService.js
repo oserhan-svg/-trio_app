@@ -385,7 +385,7 @@ async function saveListings(listings) {
                     if (match.match_quality >= 80) { // High quality threshold for auto-concierge
                         try {
                             // 1. Save to client's potential list
-                            await prisma.savedProperty.create({
+                            await prisma.clientProperty.create({
                                 data: {
                                     client_id: match.client.id,
                                     property_id: newProp.id,

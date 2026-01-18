@@ -17,7 +17,7 @@ const getClientMatches = async (req, res) => {
 const getRecentMatches = async (req, res) => {
     try {
         const user = req.user;
-        const matches = await prisma.savedProperty.findMany({
+        const matches = await prisma.clientProperty.findMany({
             where: {
                 status: 'concierge',
                 client: user.role !== 'admin' ? { consultant_id: user.id } : {}

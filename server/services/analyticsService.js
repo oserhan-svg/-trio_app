@@ -30,6 +30,37 @@ const getMarketStats = async () => {
     };
 };
 
+const getSupplyDemandStats = async () => {
+    // 1. Get Property Counts (Supply)
+    const demandStats = await prisma.demand.groupBy({
+        by: ['neighborhood'],
+        _count: { id: true }
+    });
+
+    // 2. Get Listing Counts (Supply)
+    const propertyStats = await prisma.property.groupBy({
+        by: ['neighborhood'],
+        _count: { id: true },
+        where: { listing_type: 'sale' }
+    });
+
+    const neighborhoods = [...new Set([
+        ...demandStats.map(d => d.neighborhood),
+        ...propertyStats.map(p => p.neighborhood)
+    ])].filter(Boolean);
+
+    return neighborhoods.map(n => {
+        const demand = demandStats.find(d => d.neighborhood === n)?._count.id || 0;
+        const supply = propertyStats.find(p => p.neighborhood === n)?._count.id || 0;
+        return {
+            name: n,
+            supply,
+            demand,
+            ratio: demand > 0 ? (supply / demand).toFixed(1) : supply // High ratio = Supply heavy, Low ratio = Demand heavy
+        };
+    }).sort((a, b) => b.demand - a.demand);
+};
+
 const checkOpportunity = async (property) => {
     if (!property.neighborhood || !property.price) return false;
 
@@ -224,4 +255,4 @@ const scoreProperty = (property, statsMap, history = []) => {
     };
 };
 
-module.exports = { getMarketStats, checkOpportunity, getNeighborhoodStatsMap, scoreProperty, calculateROI };
+module.exports = { getMarketStats, checkOpportunity, getNeighborhoodStatsMap, scoreProperty, calculateROI, getSupplyDemandStats };

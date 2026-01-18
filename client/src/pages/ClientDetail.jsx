@@ -459,9 +459,12 @@ const ClientDetail = () => {
                                                     <FileText size={12} /> Sayfa
                                                 </button>
                                                 <span className={`text-xs px-2 py-1 rounded flex-1 text-center font-medium ${p.status === 'liked' ? 'bg-green-100 text-green-700' :
-                                                    p.status === 'rejected' ? 'bg-red-50 text-red-700' : 'bg-gray-100 text-gray-600'
+                                                    p.status === 'rejected' ? 'bg-red-50 text-red-700' :
+                                                        p.status === 'concierge' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'
                                                     }`}>
-                                                    {p.status === 'liked' ? 'Beğendi' : p.status === 'rejected' ? 'İlgilenmedi' : 'Önerildi'}
+                                                    {p.status === 'liked' ? 'Beğendi' :
+                                                        p.status === 'rejected' ? 'İlgilenmedi' :
+                                                            p.status === 'concierge' ? `Concierge %${p.match_quality || 85}` : 'Önerildi'}
                                                 </span>
                                             </div>
                                         </div>
