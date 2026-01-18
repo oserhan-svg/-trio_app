@@ -333,11 +333,10 @@ async function saveListings(listings) {
             if (existingProp) {
                 // Update price if changed
                 if (parseFloat(existingProp.price) !== parseFloat(price)) {
-                    await prisma.propertyUpdate.create({
+                    await prisma.propertyHistory.create({
                         data: {
                             property_id: existingProp.id,
-                            old_price: existingProp.price,
-                            new_price: price,
+                            price: price,
                             change_type: parseFloat(price) < parseFloat(existingProp.price) ? 'price_decrease' : 'price_increase'
                         }
                     });
