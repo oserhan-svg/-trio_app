@@ -29,6 +29,7 @@ const CATEGORIES = [
         name: 'Satılık Daire',
         hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-satilik/daire',
         sahibinden: 'https://www.sahibinden.com/satilik-daire/balikesir-ayvalik',
+        emlakjet: 'https://www.emlakjet.com/satilik-daire/balikesir-ayvalik/',
         type: 'sale',
         category: 'daire'
     },
@@ -36,6 +37,7 @@ const CATEGORIES = [
         name: 'Satılık Villa',
         hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-satilik/villa',
         sahibinden: 'https://www.sahibinden.com/satilik-villa/balikesir-ayvalik',
+        emlakjet: 'https://www.emlakjet.com/satilik-villa/balikesir-ayvalik/',
         type: 'sale',
         category: 'villa'
     },
@@ -43,6 +45,7 @@ const CATEGORIES = [
         name: 'Satılık Müstakil Ev',
         hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-satilik/mustakil-ev',
         sahibinden: 'https://www.sahibinden.com/satilik-mustakil-ev/balikesir-ayvalik',
+        emlakjet: 'https://www.emlakjet.com/satilik-mustakil-ev/balikesir-ayvalik/',
         type: 'sale',
         category: 'mustakil'
     },
@@ -50,6 +53,7 @@ const CATEGORIES = [
         name: 'Kiralık Daire',
         hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-kiralik/daire',
         sahibinden: 'https://www.sahibinden.com/kiralik-daire/balikesir-ayvalik',
+        emlakjet: 'https://www.emlakjet.com/kiralik-daire/balikesir-ayvalik/',
         type: 'rent',
         category: 'daire'
     },
@@ -57,6 +61,7 @@ const CATEGORIES = [
         name: 'Satılık Arsa',
         hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-satilik-arsa',
         sahibinden: 'https://www.sahibinden.com/satilik-arsa/balikesir-ayvalik',
+        emlakjet: 'https://www.emlakjet.com/satilik-arsa/balikesir-ayvalik/',
         type: 'sale',
         category: 'land'
     },
@@ -64,6 +69,7 @@ const CATEGORIES = [
         name: 'Satılık İşyeri',
         hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-satilik-isyeri',
         sahibinden: 'https://www.sahibinden.com/satilik-is-yeri/balikesir-ayvalik',
+        emlakjet: 'https://www.emlakjet.com/satilik-isyeri/balikesir-ayvalik/',
         type: 'sale',
         category: 'commercial'
     }
@@ -111,6 +117,16 @@ async function scrapeProperties(provider = 'all') {
             }
         }
 
+        if (provider === 'all' || provider === 'emlakjet') {
+            for (const cat of CATEGORIES) {
+                console.log(`Targeting Emlakjet Category: ${cat.name}`);
+                await scrapeEmlakjet(page, cat.emlakjet, cat.category);
+
+                // Randomized delay
+                await new Promise(r => setTimeout(r, 5000 + Math.random() * 5000));
+            }
+        }
+
         if (provider === 'all' || provider === 'sahibinden') {
             for (const cat of CATEGORIES) {
                 console.log(`Targeting Sahibinden Category: ${cat.name}`);
@@ -144,132 +160,147 @@ async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = '
         const pageUrl = `${url}?page=${pageNum}`;
         console.log(`Navigating to Hepsiemlak Page ${pageNum}: ${pageUrl}`);
 
-        try {
-            await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
-            await new Promise(r => setTimeout(r, 2000 + Math.random() * 2000));
+        let retryCount = 0;
+        const maxRetries = 2;
+        let pageSuccess = false;
 
-            const listings = await page.evaluate((forcedSellerType) => {
-                const items = document.querySelectorAll('.listing-item');
-                const data = [];
-                items.forEach(item => {
-                    const id = item.id;
-                    if (!id) return;
+        while (retryCount <= maxRetries && !pageSuccess) {
+            try {
+                if (retryCount > 0) {
+                    console.log(`🔄 Retrying page ${pageNum} (Attempt ${retryCount + 1})...`);
+                    await page.reload({ waitUntil: 'domcontentloaded' });
+                } else {
+                    await page.goto(pageUrl, {
+                        waitUntil: pageNum === 1 ? 'networkidle2' : 'domcontentloaded',
+                        timeout: 45000
+                    });
+                }
 
-                    const titleEl = item.querySelector('.list-view-title h3') || item.querySelector('.list-view-title');
-                    const priceEl = item.querySelector('.list-view-price');
-                    const locationEl = item.querySelector('.list-view-location');
-                    const urlEl = item.querySelector('a.card-link');
-                    const imgEl = item.querySelector('img');
-                    const dateEl = item.querySelector('.list-view-date');
+                await new Promise(r => setTimeout(r, 2000 + Math.random() * 3000));
 
-                    let title = titleEl?.innerText.trim() || imgEl?.getAttribute('alt') || 'İsimsiz İlan';
+                const listings = await page.evaluate((forcedSellerType, category) => {
+                    const items = document.querySelectorAll('.listing-item');
+                    const data = [];
+                    items.forEach(item => {
+                        const id = item.id;
+                        if (!id) return;
 
-                    let price = 0;
-                    if (priceEl) {
-                        const raw = priceEl.innerText.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, '');
-                        price = parseFloat(raw) || 0;
-                    }
+                        const titleEl = item.querySelector('.list-view-title h3') || item.querySelector('.list-view-title');
+                        const priceEl = item.querySelector('.list-view-price');
+                        const locationEl = item.querySelector('.list-view-location');
+                        const urlEl = item.querySelector('a.card-link');
+                        const imgEl = item.querySelector('img');
+                        const dateEl = item.querySelector('.list-view-date');
 
-                    let district = '';
-                    let neighborhood = '';
-                    if (locationEl) {
-                        const parts = locationEl.innerText.split('/').map(s => s.trim());
-                        if (parts.length > 1) district = parts[1];
-                        if (parts.length > 2) {
-                            let rawNeighborhood = parts[2];
-                            let clean = rawNeighborhood.replace(/\s+Mahallesi/i, '').replace(/\s+Mah\.?/i, '').replace(/\s+Mh\.?/i, '').trim();
-                            neighborhood = clean + ' Mah.';
+                        let title = titleEl?.innerText.trim() || imgEl?.getAttribute('alt') || 'İsimsiz İlan';
+
+                        let price = 0;
+                        if (priceEl) {
+                            const raw = priceEl.innerText.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, '');
+                            price = parseFloat(raw) || 0;
                         }
-                    }
 
-                    const url = urlEl ? 'https://www.hepsiemlak.com' + urlEl.getAttribute('href') : '';
+                        let district = '';
+                        let neighborhood = '';
+                        if (locationEl) {
+                            const parts = locationEl.innerText.split('/').map(s => s.trim());
+                            if (parts.length > 1) district = parts[1];
+                            if (parts.length > 2) {
+                                let rawNeighborhood = parts[2];
+                                let clean = rawNeighborhood.replace(/\s+Mahallesi/i, '').replace(/\s+Mah\.?/i, '').replace(/\s+Mh\.?/i, '').trim();
+                                neighborhood = clean + ' Mah.';
+                            }
+                        }
 
-                    let size_m2 = 0;
-                    let rooms = '';
-                    const textContent = item.innerText;
-                    const m2Match = textContent.match(/(\d+)\s*m²/);
-                    if (m2Match) size_m2 = parseInt(m2Match[1]);
-                    const roomMatch = textContent.match(/(\d+\s*\+\s*\d+)/);
-                    if (roomMatch) rooms = roomMatch[1].replace(/\s/g, ''); // Normalize to "2+1"
+                        const url = urlEl ? 'https://www.hepsiemlak.com' + urlEl.getAttribute('href') : '';
 
-                    let listing_date = null;
-                    if (dateEl) {
-                        const dateText = dateEl.innerText.trim();
-                        const parts = dateText.match(/(\d{2})-(\d{2})-(\d{4})/);
-                        if (parts) {
-                            listing_date = `${parts[3]}-${parts[2]}-${parts[1]}`;
+                        let size_m2 = 0;
+                        let rooms = '';
+                        const textContent = item.innerText;
+                        const m2Match = textContent.match(/(\d+)\s*m²/);
+                        if (m2Match) size_m2 = parseInt(m2Match[1]);
+                        const roomMatch = textContent.match(/(\d+\s*\+\s*\d+)/);
+                        if (roomMatch) rooms = roomMatch[1].replace(/\s/g, ''); // Normalize to "2+1"
+
+                        let listing_date = null;
+                        if (dateEl) {
+                            const dateText = dateEl.innerText.trim();
+                            const parts = dateText.match(/(\d{2})-(\d{2})-(\d{4})/);
+                            if (parts) {
+                                listing_date = `${parts[3]}-${parts[2]}-${parts[1]}`;
+                            } else {
+                                const now = new Date();
+                                if (dateText.toLowerCase() === 'bugün') listing_date = now.toISOString().split('T')[0];
+                                else if (dateText.toLowerCase() === 'dün') {
+                                    now.setDate(now.getDate() - 1);
+                                    listing_date = now.toISOString().split('T')[0];
+                                }
+                            }
+                        }
+
+                        // Seller Type Detection (Hepsiemlak)
+                        let seller_type = forcedSellerType || 'office';
+                        let seller_name = 'Bilinmiyor';
+
+                        if (!forcedSellerType) {
+                            const ownerInfoEl = item.querySelector('.listing-card--owner-info');
+                            if (ownerInfoEl) {
+                                const infoText = ownerInfoEl.innerText.trim();
+                                seller_name = infoText; // Save the office/seller name
+
+                                const lowerInfo = infoText.toLowerCase();
+                                if (lowerInfo.includes('sahibinden')) {
+                                    seller_type = 'owner';
+                                } else if (lowerInfo.includes('banka')) {
+                                    seller_type = 'bank';
+                                } else if (lowerInfo.includes('inşaat') || lowerInfo.includes('proje')) {
+                                    seller_type = 'construction';
+                                }
+                            } else {
+                                if (item.innerText.toLowerCase().includes('sahibinden satılık')) {
+                                    seller_type = 'owner';
+                                    seller_name = 'Sahibinden';
+                                }
+                            }
                         } else {
-                            const now = new Date();
-                            if (dateText.toLowerCase() === 'bugün') listing_date = now.toISOString().split('T')[0];
-                            else if (dateText.toLowerCase() === 'dün') {
-                                now.setDate(now.getDate() - 1);
-                                listing_date = now.toISOString().split('T')[0];
-                            }
+                            // If forced type is owner, name is Sahibinden
+                            if (forcedSellerType === 'owner') seller_name = 'Sahibinden';
                         }
-                    }
 
-                    // Seller Type Detection (Hepsiemlak)
-                    let seller_type = forcedSellerType || 'office';
-                    let seller_name = 'Bilinmiyor';
+                        // Listing Type Detection
+                        let listing_type = 'sale';
+                        if (url.toLowerCase().includes('kiralik')) listing_type = 'rent';
 
-                    if (!forcedSellerType) {
-                        const ownerInfoEl = item.querySelector('.listing-card--owner-info');
-                        if (ownerInfoEl) {
-                            const infoText = ownerInfoEl.innerText.trim();
-                            seller_name = infoText; // Save the office/seller name
+                        data.push({ external_id: id, title, price, url, district, neighborhood, rooms, size_m2, listing_date, seller_type, seller_name, listing_type, category });
+                    });
+                    return data;
+                }, forcedSellerType, category);
 
-                            const lowerInfo = infoText.toLowerCase();
-                            if (lowerInfo.includes('sahibinden')) {
-                                seller_type = 'owner';
-                            } else if (lowerInfo.includes('banka')) {
-                                seller_type = 'bank';
-                            } else if (lowerInfo.includes('inşaat') || lowerInfo.includes('proje')) {
-                                seller_type = 'construction';
-                            }
-                        } else {
-                            if (item.innerText.toLowerCase().includes('sahibinden satılık')) {
-                                seller_type = 'owner';
-                                seller_name = 'Sahibinden';
-                            }
-                        }
-                    } else {
-                        // If forced type is owner, name is Sahibinden
-                        if (forcedSellerType === 'owner') seller_name = 'Sahibinden';
-                    }
-
-                    // Listing Type Detection
-                    let listing_type = 'sale';
-                    if (url.toLowerCase().includes('kiralik')) listing_type = 'rent';
-
-                    data.push({ external_id: id, title, price, url, district, neighborhood, rooms, size_m2, listing_date, seller_type, seller_name, listing_type, category });
-                });
-                return data;
-            }, forcedSellerType, category);
-
-            if (listings.length === 0) {
-                hasNextPage = false;
-            } else {
-                const newIds = listings.map(l => l.external_id);
-                const existingIds = new Set(allListings.map(l => l.external_id));
-                const isDuplicatePage = newIds.every(id => existingIds.has(id));
-
-                if (isDuplicatePage && allListings.length > 0) {
-                    console.log('Duplicate page detected. Stopping Hepsiemlak scrape.');
+                if (listings.length === 0) {
                     hasNextPage = false;
                 } else {
-                    console.log(`Found ${listings.length} listings.`);
-                    allListings = [...allListings, ...listings];
-                    pageNum++;
+                    const newIds = listings.map(l => l.external_id);
+                    const existingIds = new Set(allListings.map(l => l.external_id));
+                    const isDuplicatePage = newIds.every(id => existingIds.has(id));
+
+                    if (isDuplicatePage && allListings.length > 0) {
+                        console.log('Duplicate page detected. Stopping Hepsiemlak scrape.');
+                        hasNextPage = false;
+                    } else {
+                        console.log(`Found ${listings.length} listings.`);
+                        allListings = [...allListings, ...listings];
+                        pageNum++;
+                    }
                 }
+
+            } catch (e) {
+                console.log(`Error on page ${pageNum}: ${e.message}`);
+                hasNextPage = false;
             }
-
-        } catch (e) {
-            console.log(`Error on page ${pageNum}: ${e.message}`);
-            hasNextPage = false;
         }
-    }
 
-    await saveListings(allListings);
+        await saveListings(allListings);
+    }
 }
 
 async function saveListings(listings) {
@@ -277,91 +308,161 @@ async function saveListings(listings) {
     console.log(`Saving ${listings.length} listings to DB...`);
 
     for (const item of listings) {
-        const { external_id, title, price, url, district, neighborhood, rooms, size_m2, listing_date, listing_type, category } = item;
+        const { external_id, title, price, url, district, neighborhood, rooms, size_m2, listing_date, listing_type, category, seller_type, seller_name } = item;
 
-        // Check if property exists
-        const existingProp = await prisma.property.findUnique({
-            where: { external_id: external_id }
-        });
+        try {
+            // Check if property exists
+            const existingProp = await prisma.property.findUnique({
+                where: { external_id: external_id }
+            });
 
-        if (!existingProp) {
-            try {
+            if (existingProp) {
+                // Update price if changed
+                if (parseFloat(existingProp.price) !== parseFloat(price)) {
+                    await prisma.propertyUpdate.create({
+                        data: {
+                            property_id: existingProp.id,
+                            old_price: existingProp.price,
+                            new_price: price,
+                            change_type: parseFloat(price) < parseFloat(existingProp.price) ? 'price_decrease' : 'price_increase'
+                        }
+                    });
+
+                    await prisma.property.update({
+                        where: { id: existingProp.id },
+                        data: {
+                            price: price,
+                            last_scraped: new Date()
+                        }
+                    });
+                } else {
+                    await prisma.property.update({
+                        where: { id: existingProp.id },
+                        data: { last_scraped: new Date() }
+                    });
+                }
+            } else {
+                // Create new property
                 const newProp = await prisma.property.create({
                     data: {
                         external_id,
                         title,
-                        price: price.toString(),
+                        price,
                         url,
                         district,
                         neighborhood,
                         rooms,
                         size_m2,
-                        seller_type: item.seller_type || 'office',
+                        listing_date: listing_date ? new Date(listing_date) : new Date(),
+                        seller_type: seller_type || 'office',
+                        seller_name: seller_name || 'Bilinmiyor',
                         listing_type: listing_type || 'sale',
-                        category: category || 'residential',
-                        building_age: item.building_age || null,
-                        heating_type: item.heating_type || null,
-                        floor_location: item.floor_location || null,
-                        listing_date: listing_date ? new Date(listing_date) : null,
+                        category: category || 'daire',
                         last_scraped: new Date()
                     }
                 });
 
-                await prisma.propertyHistory.create({
-                    data: {
-                        property_id: newProp.id,
-                        price: price.toString(),
-                        change_type: 'initial'
-                    }
-                });
-            } catch (err) {
-                console.error(`ERROR creating property ${external_id}:`, err.message);
-                continue;
+                // Run analytics check for opportunity
+                await checkOpportunity(newProp);
+
+                // Notify if needed
+                await sendNewListingNotification(newProp);
             }
-
-            const matches = await findMatches(item);
-            if (matches.length > 0) {
-                // console.log(`🎯 CRM Match found! ${matches.length} clients are interested.`);
-            }
-
-        } else {
-            await prisma.property.update({
-                where: { id: existingProp.id },
-                data: {
-                    title,
-                    url,
-                    district,
-                    neighborhood,
-                    rooms,
-                    size_m2,
-                    seller_type: item.seller_type || existingProp.seller_type,
-                    listing_type: listing_type || existingProp.listing_type,
-                    category: category || existingProp.category,
-                    building_age: item.building_age || existingProp.building_age,
-                    heating_type: item.heating_type || existingProp.heating_type,
-                    floor_location: item.floor_location || existingProp.floor_location,
-                    listing_date: listing_date ? new Date(listing_date) : null,
-                    last_scraped: new Date()
-                }
-            });
-
-            if (parseFloat(existingProp.price) !== price) {
-                await prisma.propertyHistory.create({
-                    data: {
-                        property_id: existingProp.id,
-                        price: price.toString(),
-                        change_type: price > parseFloat(existingProp.price) ? 'price_increase' : 'price_decrease'
-                    }
-                });
-
-                await prisma.property.update({
-                    where: { id: existingProp.id },
-                    data: { price: price.toString() }
-                });
-            }
+        } catch (dbErr) {
+            console.error(`Database Error for ${external_id}:`, dbErr.message);
         }
     }
-    console.log('Finished saving listings.');
+}
+
+async function scrapeEmlakjet(page, url, category = 'residential') {
+    console.log(`--- Scraping Emlakjet (${url}) [Category: ${category}] ---`);
+    let allListings = [];
+    let pageNum = 1;
+    let hasNextPage = true;
+
+    while (hasNextPage && pageNum <= 3) {
+        const pageUrl = pageNum === 1 ? url : `${url}${pageNum}`;
+        console.log(`Navigating to Emlakjet Page ${pageNum}: ${pageUrl}`);
+
+        try {
+            await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: 45000 });
+            await new Promise(r => setTimeout(r, 3000 + Math.random() * 3000));
+
+            const listings = await page.evaluate((category) => {
+                const items = document.querySelectorAll('a[class*="styles_wrapper__"]');
+                const data = [];
+
+                items.forEach(item => {
+                    const titleEl = item.querySelector('h3');
+                    const spans = Array.from(item.querySelectorAll('span'));
+                    const priceEl = spans.find(s => s.innerText.includes('TL'));
+                    const locationEl = spans.find(s => s.innerText.includes('Ayvalık - '));
+                    const detailsEl = Array.from(item.querySelectorAll('div')).find(s => s.innerText.includes('m²'));
+
+                    if (!titleEl || !priceEl) return;
+
+                    const url = item.href;
+                    const idMatch = url.match(/-(\d+)\/?$/) || url.match(/-(\d+)(?:\.html)?$/);
+                    const id = idMatch ? idMatch[1] : url.split('-').pop();
+
+                    let title = titleEl.innerText.trim();
+                    let price = parseFloat(priceEl.innerText.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, '')) || 0;
+
+                    let district = 'Ayvalık';
+                    let neighborhood = '';
+                    if (locationEl) {
+                        const parts = locationEl.innerText.split('-').map(s => s.trim());
+                        if (parts.length > 1) {
+                            neighborhood = parts[1].replace(/\s+Mahallesi/i, '').replace(/\s+Mah\.?/i, '').replace(/\s+Mh\.?/i, '').trim() + ' Mah.';
+                        }
+                    }
+
+                    let size_m2 = 0;
+                    let rooms = '';
+                    if (detailsEl) {
+                        const text = detailsEl.innerText;
+                        const parts = text.split('|').map(s => s.trim());
+                        const m2Part = parts.find(p => p.includes('m²'));
+                        if (m2Part) size_m2 = parseInt(m2Part.replace(/[^\d]/g, '')) || 0;
+                        const roomMatch = text.match(/\d\s*\+\s*\d/);
+                        if (roomMatch) rooms = roomMatch[0].replace(/\s/g, '');
+                    }
+
+                    data.push({
+                        external_id: 'ej-' + id,
+                        title,
+                        price,
+                        url,
+                        district,
+                        neighborhood,
+                        rooms,
+                        size_m2,
+                        listing_date: new Date().toISOString().split('T')[0],
+                        seller_type: 'office',
+                        seller_name: 'Emlakjet',
+                        listing_type: url.includes('kiralik') ? 'rent' : 'sale',
+                        category
+                    });
+                });
+                return data;
+            }, category);
+
+            if (listings.length === 0) {
+                hasNextPage = false;
+            } else {
+                console.log(`Found ${listings.length} listings on page ${pageNum}.`);
+                allListings = [...allListings, ...listings];
+                pageNum++;
+            }
+        } catch (err) {
+            console.error(`Emlakjet Page ${pageNum} Error:`, err.message);
+            hasNextPage = false;
+        }
+    }
+
+    if (allListings.length > 0) {
+        await saveListings(allListings);
+    }
 }
 
 const startScheduler = () => {

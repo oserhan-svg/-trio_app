@@ -1,22 +1,36 @@
-FROM ghcr.io/puppeteer/puppeteer:latest
+# Dockerfile for Backend Service
+FROM node:18-alpine
 
-USER root
+# Install dependencies for Puppeteer (Stealth browser needs these on Linux)
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont \
+    git
+
+# Set Puppeteer to use the installed Chromium
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm install
 
 # Copy source code
 COPY . .
 
-# Ensure permissions for the pptruser
-RUN chown -R pptruser:pptruser /app
+# Generate Prisma Client
+RUN npx prisma generate
 
-# Run as non-privileged user
-USER pptruser
-
+# Expose API port
 EXPOSE 5000
+
+# Start command
 CMD ["npm", "start"]

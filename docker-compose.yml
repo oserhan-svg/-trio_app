@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./server
+    container_name: emlak22_backend
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - DATABASE_URL=postgresql://user:password@db:5432/emlak22
+      - JWT_SECRET=your_very_secret_key_here
+    volumes:
+      - ./server/browser_data:/app/browser_data
+      - ./chrome-stealth-profile:/app/chrome-stealth-profile
+    depends_on:
+      - db
+    networks:
+      - emlak_network
+
+  frontend:
+    build: ./client
+    container_name: emlak22_frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - emlak_network
+
+  db:
+    image: postgres:15-alpine
+    container_name: emlak22_db
+    restart: always
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=emlak22
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - emlak_network
+
+networks:
+  emlak_network:
+    driver: bridge
+
+volumes:
+  postgres_data:

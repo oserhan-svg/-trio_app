@@ -50,11 +50,21 @@ async function createStealthBrowser(options = {}) {
         '--disable-domain-reliability',
         '--disable-sync',
         '--no-default-browser-check',
-        '--no-first-run'
+        '--no-first-run',
+        '--remote-debugging-port=9222'
     ];
 
-    if (proxy) {
-        launchArgs.push(`--proxy-server=${proxy}`);
+    let finalProxy = proxy;
+    if (!finalProxy && scraperConfig.stealth.useProxy) {
+        if (scraperConfig.stealth.proxyList && scraperConfig.stealth.proxyList.length > 0) {
+            finalProxy = scraperConfig.stealth.proxyList[Math.floor(Math.random() * scraperConfig.stealth.proxyList.length)];
+        } else if (scraperConfig.stealth.proxyUrl) {
+            finalProxy = scraperConfig.stealth.proxyUrl;
+        }
+    }
+
+    if (finalProxy) {
+        launchArgs.push(`--proxy-server=${finalProxy}`);
     }
 
     // Ensure user data dir exists
@@ -89,21 +99,81 @@ async function configureStealthPage(page) {
         Object.defineProperty(navigator, 'webdriver', { get: () => false });
     });
 
-    // 4. Randomize Hardware Concurrency & Memory
+    // 4. Randomize Hardware Concurrency, Memory & Touch
     await page.evaluateOnNewDocument(() => {
-        const cores = [4, 8, 12, 16];
+        const cores = [2, 4, 8, 12, 16];
         const memories = [4, 8, 16, 32];
-        Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => cores[Math.floor(Math.random() * cores.length)] });
-        Object.defineProperty(navigator, 'deviceMemory', { get: () => memories[Math.floor(Math.random() * memories.length)] });
+        const touchPoints = [0, 5, 10]; // 0 for most desktops, 5/10 for touch screens
+
+        const selectedCores = cores[Math.floor(Math.random() * cores.length)];
+        const selectedMemory = memories[Math.floor(Math.random() * memories.length)];
+        const selectedTouch = touchPoints[Math.floor(Math.random() * touchPoints.length)];
+
+        Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => selectedCores });
+        Object.defineProperty(navigator, 'deviceMemory', { get: () => selectedMemory });
+        Object.defineProperty(navigator, 'maxTouchPoints', { get: () => selectedTouch });
+
+        // Randomize Screen Color Depth
+        Object.defineProperty(screen, 'colorDepth', { get: () => 24 });
+        Object.defineProperty(screen, 'pixelDepth', { get: () => 24 });
     });
 
-    // 5. Load Cookies if available
+    // 4.1 Screen Orientation Simulation
+    await page.evaluateOnNewDocument(() => {
+        if (window.screen && window.screen.orientation) {
+            const types = ['landscape-primary', 'landscape-secondary'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            Object.defineProperty(window.screen.orientation, 'type', { get: () => type });
+            Object.defineProperty(window.screen.orientation, 'angle', { get: () => 0 });
+        }
+    });
+
+    // 5. Add Advanced Client Hints (Anti-Bot evasion for Chrome)
+    const isMobile = randomUA.includes('Mobile');
+    const platform = randomUA.includes('Windows') ? 'Windows' :
+        randomUA.includes('Macintosh') ? 'macOS' :
+            randomUA.includes('Linux') ? 'Linux' : 'Chrome OS';
+
+    await page.setExtraHTTPHeaders({
+        'Accept-Language': 'tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Sec-Ch-Ua': '"Google Chrome";v="124", "Chromium";v="124", "Not-A.Brand";v="24"',
+        'Sec-Ch-Ua-Mobile': isMobile ? '?1' : '?0',
+        'Sec-Ch-Ua-Platform': `"${platform}"`,
+        'Upgrade-Insecure-Requests': '1'
+    });
+
+    // 6. Mask Canvas & WebGL (Anti-Fingerprinting)
+    await page.evaluateOnNewDocument(() => {
+        // Canvas Masking
+        const originalToDataURL = HTMLCanvasElement.prototype.toDataURL;
+        HTMLCanvasElement.prototype.toDataURL = function (type) {
+            const context = this.getContext('2d');
+            if (context) {
+                // Add tiny invisible noise
+                const originalFillStyle = context.fillStyle;
+                context.fillStyle = 'rgba(255, 255, 255, 0.01)';
+                context.fillRect(0, 0, 1, 1);
+                context.fillStyle = originalFillStyle;
+            }
+            return originalToDataURL.apply(this, arguments);
+        };
+
+        // WebGL Masking (Small buffer noise)
+        const originalGetParameter = WebGLRenderingContext.prototype.getParameter;
+        WebGLRenderingContext.prototype.getParameter = function (parameter) {
+            const value = originalGetParameter.apply(this, arguments);
+            // Slightly modify unmaskable params if they match specific IDs (e.g. renderer)
+            if (parameter === 37446) return value + ' (Optimized)'; // UNMASKED_RENDERER_WEBGL
+            return value;
+        };
+    });
+
+    // 7. Load Cookies if available
     if (fs.existsSync(scraperConfig.paths.cookies)) {
         try {
             const cookiesString = fs.readFileSync(scraperConfig.paths.cookies);
             const cookies = JSON.parse(cookiesString);
             await page.setCookie(...cookies);
-            // console.log('🍪 Loaded ' + cookies.length + ' cookies.');
         } catch (e) {
             console.error('⚠️ Failed to load cookies:', e.message);
         }
@@ -141,8 +211,55 @@ async function humanizePage(page) {
             const distance = Math.floor(Math.random() * 400) + 100;
             window.scrollBy(0, distance);
             await new Promise(r => setTimeout(r, 200 + Math.random() * 300));
-            window.scrollBy(0, -Math.floor(distance / 2));
+            // Small scroll back to simulate natural reading correction
+            if (Math.random() > 0.7) {
+                window.scrollBy(0, -Math.floor(distance / 3));
+            }
         });
+    };
+
+    /**
+     * Simulates natural mouse movements to a target using Bezier curves
+     */
+    page.mouseMoveOrganic = async (x, y) => {
+        try {
+            const startX = page.mouse._x || 0;
+            const startY = page.mouse._y || 0;
+
+            // Generate control points for Bezier curve
+            const cp1x = startX + (x - startX) * Math.random();
+            const cp1y = startY + (y - startY) * Math.random();
+            const cp2x = startX + (x - startX) * Math.random();
+            const cp2y = startY + (y - startY) * Math.random();
+
+            const steps = 25 + Math.floor(Math.random() * 25);
+            for (let i = 0; i <= steps; i++) {
+                const t = i / steps;
+                const curX = (1 - t) ** 3 * startX + 3 * (1 - t) ** 2 * t * cp1x + 3 * (1 - t) * t ** 2 * cp2x + t ** 3 * x;
+                const curY = (1 - t) ** 3 * startY + 3 * (1 - t) ** 2 * t * cp1y + 3 * (1 - t) * t ** 2 * cp2y + t ** 3 * y;
+
+                await page.mouse.move(curX, curY);
+                if (i % 5 === 0) await page.randomWait(10, 30);
+            }
+            // Final micro-adjustment
+            await page.mouse.move(x + (Math.random() - 0.5) * 2, y + (Math.random() - 0.5) * 2);
+        } catch (e) {
+            // Silently fail if mouse move is impossible
+        }
+    };
+
+    /**
+     * Move to element with organic curve
+     */
+    page.moveToElement = async (selector) => {
+        const element = await page.$(selector);
+        if (!element) return;
+        const box = await element.boundingBox();
+        if (!box) return;
+
+        const targetX = box.x + box.width / 2;
+        const targetY = box.y + box.height / 2;
+        await page.mouseMoveOrganic(targetX, targetY);
     };
 }
 

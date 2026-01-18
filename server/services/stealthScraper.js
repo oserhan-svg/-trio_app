@@ -34,6 +34,37 @@ async function checkBlock(page) {
 }
 
 /**
+ * Performs side quests to build a trust-worthy browsing history
+ */
+async function performSideQuest(page) {
+    const sideQuests = [
+        'https://www.trthaber.com/',
+        'https://tr.wikipedia.org/wiki/Ayval%C4%B1k',
+        'https://www.google.com.tr/search?q=ayval%C4%B1k+hava+durumu'
+    ];
+
+    const target = sideQuests[Math.floor(Math.random() * sideQuests.length)];
+    console.log(`🧭 Performing Side-Quest: ${target}`);
+
+    try {
+        await page.goto(target, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        await page.randomWait(3000, 7000);
+        await page.randomScroll();
+        if (Math.random() > 0.5) {
+            // Click a random link on side-quest page
+            const links = await page.$$('a');
+            if (links.length > 5) {
+                const randomLink = links[Math.floor(Math.random() * 10)];
+                await randomLink.click().catch(() => { });
+                await page.randomWait(2000, 4000);
+            }
+        }
+    } catch (e) {
+        console.log(`⚠️ Side-Quest partial fail: ${e.message}`);
+    }
+}
+
+/**
  * Performs organic warmup behaviors
  */
 async function organicWarmup(page) {
@@ -50,7 +81,8 @@ async function organicWarmup(page) {
 
         const searchBox = await page.$('textarea[name="q"]') || await page.$('input[name="q"]');
         if (searchBox) {
-            await searchBox.type('sahibinden satılık', { delay: 100 });
+            const queries = ['sahibinden satılık', 'ayvalık emlak', 'sahibinden kiralık'];
+            await searchBox.type(queries[Math.floor(Math.random() * queries.length)], { delay: 100 });
             await page.keyboard.press('Enter');
             await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 10000 }).catch(() => { });
 
@@ -106,11 +138,38 @@ async function scrapeSahibindenStealth(url, forcedSellerType = null) {
 
             // Navigate with random delay
             if (page.url() !== pageUrl) {
+                // Before navigating, move mouse randomly
+                await page.mouseMoveOrganic('body');
                 await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: scraperConfig.timeouts.pageLoad });
             }
 
-            await checkBlock(page);
+            // Enhanced block checking
+            try {
+                const title = await page.title();
+                if (title.includes('Access Denied') || title.includes('Olağandışı')) {
+                    console.log('🛑 Forbidden/Access Denied detected!');
+                    await rebootProfile();
+                    throw new Error('403_BLOCK_REBOOT');
+                }
+                await checkBlock(page);
+            } catch (blockErr) {
+                if (blockErr.message === '403_BLOCK_REBOOT') throw blockErr;
+            }
+
+            // Occasionally perform side-quest to stay "human"
+            if (pageNum > 0 && pageNum % 2 === 0) {
+                await performSideQuest(page);
+                // Return to original target
+                console.log('🏡 Returning to target page...');
+                await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: scraperConfig.timeouts.pageLoad });
+                await page.randomWait(2000, 4000);
+            }
+
+            // Random scroll to simulate browsing
             await page.randomScroll();
+
+            // Random mouse jitter near some elements
+            await page.mouseMoveOrganic('.searchResultsItem');
 
             const selector = scraperConfig.selectors.listingRow || '.searchResultsItem';
 
@@ -241,6 +300,10 @@ async function scrapeSahibindenStealth(url, forcedSellerType = null) {
         return allListings;
 
     } catch (err) {
+        if (err.message === '403_BLOCK_REBOOT') {
+            console.log('🔄 Restarting scrape after profile reboot...');
+            return await scrapeSahibindenStealth(url, forcedSellerType);
+        }
         console.error('❌ Scrape Failed:', err.message);
         throw err;
     } finally {
@@ -251,11 +314,8 @@ async function scrapeSahibindenStealth(url, forcedSellerType = null) {
 // Exported for backward compatibility but using new factory
 async function getOrLaunchBrowser() {
     const { createStealthBrowser } = require('./browserFactory');
-    // Try connecting first (if we have a mechanism to know port, else just launch new one which creates singleton-like behavior if managed well, but for now we follow the new pattern: creating a persistent instance or connecting to debug port 9222 if manual)
-
-    // For now, let's stick to the existing "Connect or Launch" logic but use our new factory for the launch part
     const puppeteer = require('puppeteer-extra');
-    const { spawn } = require('child_process');
+    const path = require('path');
     const fs = require('fs');
 
     try {
@@ -263,11 +323,34 @@ async function getOrLaunchBrowser() {
         return await puppeteer.connect({ browserURL: 'http://127.0.0.1:9222', defaultViewport: null });
     } catch (err) {
         console.log('⚠️ Existing Chrome 9222 not found. Launching optimized browser...');
-        // Use our new factory
         return await require('./browserFactory').createStealthBrowser({
             headless: false,
             proxy: scraperConfig.stealth.useProxy ? scraperConfig.stealth.proxyUrl : null
         });
+    }
+}
+
+async function rebootProfile() {
+    console.log('🔄 DETECTED PERSISTENT BLOCK: Rebooting Profile...');
+    const userDataDir = scraperConfig.paths.userDataDir;
+    try {
+        // We delete everything EXCEPT the cookies file to maintain some session if possible, 
+        // but often Sahibinden blocks the profile fingerprint itself.
+        if (fs.existsSync(userDataDir)) {
+            const files = fs.readdirSync(userDataDir);
+            for (const file of files) {
+                if (file !== 'cookies.json') {
+                    const fullPath = path.join(userDataDir, file);
+                    if (fs.lstatSync(fullPath).isDirectory()) {
+                        fs.rmSync(fullPath, { recursive: true, force: true });
+                    } else {
+                        fs.unlinkSync(fullPath);
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        console.error('⚠️ Profile reboot failed:', e.message);
     }
 }
 

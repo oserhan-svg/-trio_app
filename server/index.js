@@ -47,6 +47,23 @@ app.get('/', (req, res) => {
     res.send('Emlak Takip API Running');
 });
 
+// Database Initialization Helper
+const { execSync } = require('child_process');
+async function initDb() {
+    console.log('--- Starting Database Initialization ---');
+    try {
+        console.log('Running prisma db push...');
+        execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit' });
+        console.log('Running admin creation script...');
+        require('./scripts/createAdminPrisma');
+        console.log('Database Initialization Complete.');
+    } catch (error) {
+        console.error('Database Initialization Failed:', error.message);
+    }
+}
+
+initDb();
+
 const prisma = require('./db');
 app.get('/test-db', async (req, res) => {
     try {

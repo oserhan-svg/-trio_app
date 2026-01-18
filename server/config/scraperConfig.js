@@ -27,8 +27,12 @@ module.exports = {
     },
     stealth: {
         rotateUserAgents: true,
-        useProxy: false, // Proxy kullanmak için bunu true yapın
-        proxyUrl: '', // Örn: 'http://user:pass@ip:port' veya 'http://ip:port'
+        useProxy: false,
+        proxyUrl: '',
+        proxyList: [
+            // 'http://user:pass@ip:port',
+            // 'http://ip:port'
+        ],
         maxRetries: 3
     }
 };

@@ -1,9 +1,9 @@
-const { scrapeProperties } = require('./services/scraperService');
+const { scrapeProperties } = require('../services/scraperService');
 
 (async () => {
     console.log("🚀 Manually triggering scraper...");
     try {
-        await scrapeProperties('hepsiemlak'); // Start with Hepsiemlak as it is more stable
+        await scrapeProperties('sahibinden'); // Focus on the most difficult anti-bot target
     } catch (e) {
         console.error("Scraper failed:", e);
     }

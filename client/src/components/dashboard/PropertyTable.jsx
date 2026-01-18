@@ -32,14 +32,22 @@ const PropertyTable = ({ properties, onViewDetail }) => {
                             } else if (prop.url?.includes('sahibinden')) {
                                 source = 'Sahibinden';
                                 sourceClass = 'bg-yellow-100 text-yellow-800';
+                            } else if (prop.url?.includes('emlakjet')) {
+                                source = 'Emlakjet';
+                                sourceClass = 'bg-blue-100 text-blue-800';
                             }
 
                             return (
                                 <tr key={prop.id} className={`hover:bg-gray-50 transition-colors ${!isRecent ? 'opacity-60 bg-gray-50' : ''}`}>
                                     <td className="px-6 py-4 font-medium text-gray-900 truncate max-w-xs" title={prop.title}>
-                                        {prop.title}
+                                        <div className="font-semibold text-gray-900">{prop.title}</div>
+                                        {prop.seller_name && (
+                                            <div className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                                                <span className="truncate">{prop.seller_name}</span>
+                                            </div>
+                                        )}
                                     </td>
-                                    <td className="px-6 py-4 text-emerald-600 font-bold">
+                                    <td className="px-6 py-4 text-emerald-600 font-bold whitespace-nowrap">
                                         ₺{parseFloat(prop.price).toLocaleString()}
                                     </td>
                                     <td className="px-6 py-4">{prop.size_m2 ? `${prop.size_m2} m²` : '-'}</td>
