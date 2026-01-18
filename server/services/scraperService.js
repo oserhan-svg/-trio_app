@@ -275,6 +275,10 @@ async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = '
                         } catch (ev) { }
 
                         console.log('🛡️ Evasion wait complete. Checking if we passed...');
+
+                        // Force reload target URL to ensure we are on the right page
+                        console.log(`🔄 Reloading target URL to apply cookies: ${pageUrl}`);
+                        await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
                     }
                 } catch (err) {
                     console.log('Error checking for Cloudflare:', err.message);
