@@ -98,14 +98,54 @@ async function createStealthBrowser(options = {}) {
 
         console.log('Production environment detected. Searching for Chrome...');
 
-        // Use glob to find Chrome
-        const glob = require('glob');
-        for (const pattern of possiblePaths) {
-            const matches = glob.sync(pattern);
-            if (matches.length > 0) {
-                launchOptions.executablePath = matches[0];
-                console.log('✓ Using Chrome executable:', matches[0]);
-                break;
+        const fs = require('fs');
+
+        // Function to recursively find a file
+        function findChrome(startPath) {
+            if (!fs.existsSync(startPath)) return null;
+
+            try {
+                const files = fs.readdirSync(startPath);
+                for (const file of files) {
+                    const filePath = path.join(startPath, file);
+                    const stat = fs.statSync(filePath);
+
+                    if (stat.isDirectory()) {
+                        // Look for chrome-linux64 directory specifically
+                        if (file === 'chrome-linux64') {
+                            const chromePath = path.join(filePath, 'chrome');
+                            if (fs.existsSync(chromePath)) {
+                                return chromePath;
+                            }
+                        }
+                        const result = findChrome(filePath);
+                        if (result) return result;
+                    }
+                }
+            } catch (e) {
+                // Ignore access errors
+            }
+            return null;
+        }
+
+        console.log('Searching for Chrome executable manually (recursive)...');
+        // Start searching from puppeteer's .local-chromium
+        const startPaths = [
+            path.join(__dirname, '../node_modules/puppeteer/.local-chromium'),
+            path.join(__dirname, '../../node_modules/puppeteer/.local-chromium'),
+            '/opt/render/project/src/server/node_modules/puppeteer/.local-chromium'
+        ];
+
+        for (const searchDir of startPaths) {
+            if (fs.existsSync(searchDir)) {
+                console.log('Searching in:', searchDir);
+                const found = findChrome(searchDir);
+                if (found) {
+                    launchOptions.executablePath = found;
+                    console.log('✓ Found Chrome executable at:', found);
+                    try { fs.chmodSync(found, '755'); } catch (e) { }
+                    break;
+                }
             }
         }
 

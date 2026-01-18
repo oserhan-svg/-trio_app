@@ -1,26 +1,5 @@
 [
   {
-    "timestamp": "2026-01-18T11:32:57.832Z",
-    "action": "Navigate Clients",
-    "status": "SUCCESS",
-    "duration": "1217ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T11:32:57.833Z",
-    "action": "Full Cycle",
-    "status": "SUCCESS",
-    "duration": "13978ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T11:33:31.219Z",
-    "action": "Login",
-    "status": "SUCCESS",
-    "duration": "2348ms",
-    "error": null
-  },
-  {
     "timestamp": "2026-01-18T11:33:35.280Z",
     "action": "Navigate Dashboard",
     "status": "SUCCESS",
@@ -6997,6 +6976,27 @@
     "action": "Navigate Dashboard",
     "status": "SUCCESS",
     "duration": "1966ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:50:36.895Z",
+    "action": "Navigate Properties",
+    "status": "SUCCESS",
+    "duration": "5788ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:50:38.986Z",
+    "action": "Navigate Clients",
+    "status": "SUCCESS",
+    "duration": "2088ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:50:38.991Z",
+    "action": "Full Cycle",
+    "status": "SUCCESS",
+    "duration": "13065ms",
     "error": null
   }
 ]
