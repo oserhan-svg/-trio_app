@@ -221,8 +221,9 @@ async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = '
                     if (pageTitle.includes('Bir dakika') || pageTitle.includes('Just a moment') || pageTitle.includes('Attention Required')) {
                         console.log('🛡️ Cloudflare/Security Check detected. Initiating evasion protocols...');
 
-                        // 1. Wait for auto-resolve (often 5-10s)
-                        await new Promise(r => setTimeout(r, 15000));
+                        // 1. Wait for auto-resolve or manual click
+                        await solveCloudflareChallenge(page);
+                        await new Promise(r => setTimeout(r, 8000));
 
                         // 2. Simple interaction simulation
                         try {
