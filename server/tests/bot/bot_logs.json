@@ -1,54 +1,5 @@
 [
   {
-    "timestamp": "2026-01-18T12:34:59.171Z",
-    "action": "Full Cycle",
-    "status": "SUCCESS",
-    "duration": "12051ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T12:35:33.041Z",
-    "action": "Login",
-    "status": "SUCCESS",
-    "duration": "2697ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T12:35:37.099Z",
-    "action": "Navigate Dashboard",
-    "status": "SUCCESS",
-    "duration": "4057ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T12:35:42.787Z",
-    "action": "Navigate Properties",
-    "status": "SUCCESS",
-    "duration": "5687ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T12:35:44.037Z",
-    "action": "Navigate Clients",
-    "status": "SUCCESS",
-    "duration": "1248ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T12:35:44.039Z",
-    "action": "Full Cycle",
-    "status": "SUCCESS",
-    "duration": "14550ms",
-    "error": null
-  },
-  {
-    "timestamp": "2026-01-18T12:36:18.082Z",
-    "action": "Login",
-    "status": "SUCCESS",
-    "duration": "2810ms",
-    "error": null
-  },
-  {
     "timestamp": "2026-01-18T12:36:22.123Z",
     "action": "Navigate Dashboard",
     "status": "SUCCESS",
@@ -6998,5 +6949,54 @@
     "status": "SUCCESS",
     "duration": "12216ms",
     "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:27:43.918Z",
+    "action": "Login",
+    "status": "SUCCESS",
+    "duration": "2365ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:27:45.258Z",
+    "action": "Navigate Dashboard",
+    "status": "SUCCESS",
+    "duration": "1336ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:27:50.919Z",
+    "action": "Navigate Properties",
+    "status": "SUCCESS",
+    "duration": "5658ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:27:53.001Z",
+    "action": "Navigate Clients",
+    "status": "SUCCESS",
+    "duration": "2078ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:27:53.004Z",
+    "action": "Full Cycle",
+    "status": "SUCCESS",
+    "duration": "12378ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:28:26.555Z",
+    "action": "Login",
+    "status": "SUCCESS",
+    "duration": "2361ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T15:28:28.080Z",
+    "action": "Cycle Error",
+    "status": "FAILED",
+    "duration": "0ms",
+    "error": "Navigating frame was detached"
   }
 ]
