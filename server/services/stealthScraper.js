@@ -103,8 +103,9 @@ async function organicWarmup(page) {
     }
 }
 
-async function scrapeSahibindenStealth(url, forcedSellerType = null) {
-    console.log(`🕵️ Stealth Scraper Starting for: ${url}`);
+async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 'residential') {
+    const { saveListings } = require('./scraperService');
+    console.log(`🕵️ Stealth Scraper Starting for: ${url} [Category: ${category}]`);
 
     let browser;
     try {
@@ -269,12 +270,16 @@ async function scrapeSahibindenStealth(url, forcedSellerType = null) {
                         seller_name = 'Sahibinden';
                     } else if (lowerText.includes('banka')) {
                         seller_type = 'bank';
+                        seller_name = 'Banka';
+                    } else {
+                        // Attempt to extract store name from search results
+                        const storeEl = row.querySelector('.searchResultsStoreName') ||
+                            row.querySelector('a.searchResultsStoreLabel') ||
+                            row.querySelector('img[alt][title]');
+                        if (storeEl) {
+                            seller_name = storeEl.innerText?.trim() || storeEl.getAttribute('alt') || storeEl.getAttribute('title') || 'Kurumsal';
+                        }
                     }
-
-                    // Attempt to extract store name if available in list view (often hard)
-                    // But if it's a store page, we might know it? No context here.
-                    // For now, if office, we leave as 'Bilinmiyor' unless we can find a clearer selector.
-                    // In real Sahibinden list, store name isn't always visible in the row without expanding.
 
                     data.push({ external_id: id, title, price, url: fullUrl, location, district, neighborhood, seller_type, seller_name, rooms, size_m2 });
                 });
@@ -286,6 +291,12 @@ async function scrapeSahibindenStealth(url, forcedSellerType = null) {
             if (pageListings.length === 0) {
                 hasNextPage = false;
             } else {
+                console.log(`🎉 Page ${pageNum + 1} extracted ${pageListings.length} listings. Saving progress...`);
+
+                // Enrich and Save progressively
+                const enriched = pageListings.map(l => ({ ...l, category }));
+                await saveListings(enriched);
+
                 allListings = [...allListings, ...pageListings];
                 pageNum++;
                 // Save state progressively
@@ -302,7 +313,7 @@ async function scrapeSahibindenStealth(url, forcedSellerType = null) {
     } catch (err) {
         if (err.message === '403_BLOCK_REBOOT') {
             console.log('🔄 Restarting scrape after profile reboot...');
-            return await scrapeSahibindenStealth(url, forcedSellerType);
+            return await scrapeSahibindenStealth(url, forcedSellerType, category);
         }
         console.error('❌ Scrape Failed:', err.message);
         throw err;
@@ -369,7 +380,25 @@ async function scrapeSahibindenDetails(url, existingPage = null) {
         }
 
         await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+
+        // 403 Check and Reboot
+        const title = await page.title();
+        if (title.includes('Access Denied') || title.includes('Olağandışı')) {
+            console.log('🛑 Forbidden/Access Denied detected in Detail Page!');
+            await rebootProfile();
+            throw new Error('403_BLOCK_REBOOT');
+        }
+
         await checkBlock(page);
+
+        // Human Jitter: Random mouse moves and hovers
+        await page.mouseMoveOrganic('body');
+        const hovers = await page.$$('.classifiedInfoList li');
+        if (hovers.length > 0) {
+            const randomLi = hovers[Math.floor(Math.random() * Math.min(hovers.length, 5))];
+            const box = await randomLi.boundingBox();
+            if (box) await page.mouseMoveOrganic(box.x + box.width / 2, box.y + box.height / 2);
+        }
 
         // Random wait to simulate reading
         await page.randomWait(2000, 5000);
@@ -430,6 +459,10 @@ async function scrapeSahibindenDetails(url, existingPage = null) {
         return data;
 
     } catch (error) {
+        if (error.message === '403_BLOCK_REBOOT') {
+            console.log('🔄 Restarting detail scrape after profile reboot...');
+            return await scrapeSahibindenDetails(url);
+        }
         console.error('❌ Detail Scrape Failed:', error.message);
         throw error;
     } finally {

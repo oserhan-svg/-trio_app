@@ -10,6 +10,7 @@ import HeatmapView from '../components/HeatmapView';
 
 import toast from 'react-hot-toast';
 import MobileNav from '../components/MobileNav';
+import MarketHealthWidget from '../components/dashboard/MarketHealthWidget';
 
 const Dashboard = () => {
     const navigate = useNavigate();
@@ -29,21 +30,12 @@ const Dashboard = () => {
         seller_type: 'all',
         opportunity_filter: '',
         category: 'all',
-        listingType: 'all'
+        listingType: 'all',
+        sort: 'newest'
     });
 
     const [meta, setMeta] = useState({ page: 1, totalPages: 1 });
 
-    useEffect(() => {
-        fetchAllData(filters);
-    }, [fetchAllData]); // filters is passed as arg, but if we want it to run on mount, we call it with initial filters. 
-    // Wait, if I add fetchAllData to dep, and fetchAllData doesn't depend on filters, then it's fine.
-    // But fetchAllData depends on navigate.
-    // The previous code called fetchAllData() with NO args, which defaults to `filters` state (closure).
-    // In my useCallback version, I made the default `filters` depend on closure? No, `currentFilters = filters`.
-    // If I put `filters` in the argument default value, it creates a closure dependency!
-    // I should remove the default value from useCallback and pass it explicitly from useEffect.
-    // Let's modify the useEffect call.
 
     const fetchAllData = React.useCallback(async (currentFilters, page = 1, append = false) => {
         setLoading(true);
@@ -61,6 +53,7 @@ const Dashboard = () => {
             if (currentFilters.opportunity_filter) params.append('opportunity_filter', currentFilters.opportunity_filter);
             if (currentFilters.category && currentFilters.category !== 'all') params.append('category', currentFilters.category);
             if (currentFilters.listingType && currentFilters.listingType !== 'all') params.append('listingType', currentFilters.listingType);
+            if (currentFilters.sort) params.append('sort', currentFilters.sort);
 
             // Parallel fetch for properties and stats
             // Only fetch stats on initial load (page 1) to save bandwidth
@@ -99,6 +92,10 @@ const Dashboard = () => {
             setLoading(false);
         }
     }, [navigate]); // Added dependencies (filters is passed as arg, so not needed in dependency unless used from closure)
+
+    useEffect(() => {
+        fetchAllData(filters);
+    }, [fetchAllData]);
 
     const handleLoadMore = () => {
         if (meta.page < meta.totalPages) {
@@ -140,8 +137,13 @@ const Dashboard = () => {
     };
 
     const [user] = useState(() => {
-        const stored = localStorage.getItem('user');
-        return stored ? JSON.parse(stored) : null;
+        try {
+            const stored = localStorage.getItem('user');
+            return stored ? JSON.parse(stored) : null;
+        } catch (e) {
+            console.error('User parsing failed:', e);
+            return null;
+        }
     });
 
     return (
@@ -186,6 +188,9 @@ const Dashboard = () => {
 
             {/* Main Content */}
             <main className="p-3 md:p-6 max-w-7xl mx-auto space-y-4 md:space-y-6">
+
+                {/* Market Health Indicators */}
+                <MarketHealthWidget data={properties} />
 
                 {/* Stats Header now includes Rental Widget */}
                 <DashboardStatsHeader properties={properties} stats={stats} />
@@ -276,6 +281,30 @@ const Dashboard = () => {
                         <button type="submit" className="bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition flex items-center justify-center translate-y-[-1px]">
                             <Search size={20} />
                         </button>
+                    </div>
+
+                    {/* Quick Sort Options */}
+                    <div className="col-span-full flex flex-wrap items-center gap-3 pt-2 border-t border-gray-50">
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Sıralama:</span>
+                        {[
+                            { id: 'newest', label: 'En Yeni' },
+                            { id: 'score', label: 'En İyi Fırsat' },
+                            { id: 'deviation', label: 'En Kelepir (%)' },
+                            { id: 'price_asc', label: 'En Ucuz' },
+                            { id: 'price_desc', label: 'En Pahalı' }
+                        ].map(s => (
+                            <button
+                                key={s.id}
+                                type="button"
+                                onClick={() => handleFilterChange({ target: { name: 'sort', value: s.id } })}
+                                className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${filters.sort === s.id
+                                    ? 'bg-blue-600 text-white shadow-md'
+                                    : 'bg-white text-gray-500 border border-gray-200 hover:border-blue-300'
+                                    }`}
+                            >
+                                {s.label}
+                            </button>
+                        ))}
                     </div>
                 </form>
 

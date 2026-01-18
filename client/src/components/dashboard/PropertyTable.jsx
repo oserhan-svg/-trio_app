@@ -91,7 +91,7 @@ const PropertyTable = ({ properties, onViewDetail }) => {
                         })}
                         {properties.length === 0 && (
                             <tr>
-                                <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
+                                <td colSpan="9" className="px-6 py-8 text-center text-gray-500">
                                     Henüz veri bulunmuyor. Scraper'ı çalıştırın veya filtreleri genişletin.
                                 </td>
                             </tr>

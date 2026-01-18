@@ -22,8 +22,13 @@ const ConsultantPanel = () => {
     const [showAddClientMatch, setShowAddClientMatch] = useState(false); // Trigger for ClientTracking
 
     const [user] = useState(() => {
-        const stored = localStorage.getItem('user');
-        return stored ? JSON.parse(stored) : null;
+        try {
+            const stored = localStorage.getItem('user');
+            return stored ? JSON.parse(stored) : null;
+        } catch (e) {
+            console.error('User parsing failed:', e);
+            return null;
+        }
     });
 
     const panelTitle = user?.role === 'admin' ? 'Admin Paneli' : 'Danışman Paneli';

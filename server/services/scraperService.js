@@ -131,10 +131,7 @@ async function scrapeProperties(provider = 'all') {
             for (const cat of CATEGORIES) {
                 console.log(`Targeting Sahibinden Category: ${cat.name}`);
                 const { scrapeSahibindenStealth } = require('./stealthScraper');
-                const listings = await scrapeSahibindenStealth(cat.sahibinden);
-                // Enrich listings with category before saving
-                const enrichedListings = listings.map(l => ({ ...l, category: cat.category }));
-                await saveListings(enrichedListings);
+                await scrapeSahibindenStealth(cat.sahibinden, null, cat.category);
 
                 // Add randomized delay
                 await new Promise(r => setTimeout(r, 10000 + Math.random() * 10000));
@@ -176,7 +173,19 @@ async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = '
                     });
                 }
 
-                await new Promise(r => setTimeout(r, 2000 + Math.random() * 3000));
+                // Smart Wait: Wait for specific elements instead of static sleep
+                try {
+                    await page.waitForSelector('.listing-item', { timeout: 15000 });
+                } catch (e) {
+                    console.log(`⚠️ Timeout waiting for listings on page ${pageNum}. End of results?`);
+                    hasNextPage = false;
+                    break;
+                }
+
+                await page.evaluate(async () => {
+                    window.scrollBy(0, 500); // Small nudge to trigger lazy loads
+                    await new Promise(r => setTimeout(r, 500));
+                });
 
                 const listings = await page.evaluate((forcedSellerType, category) => {
                     const items = document.querySelectorAll('.listing-item');
@@ -287,20 +296,24 @@ async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = '
                         console.log('Duplicate page detected. Stopping Hepsiemlak scrape.');
                         hasNextPage = false;
                     } else {
-                        console.log(`Found ${listings.length} listings.`);
+                        console.log(`Found ${listings.length} listings. Saving progress...`);
+                        await saveListings(listings); // Progressive Save
                         allListings = [...allListings, ...listings];
                         pageNum++;
                     }
                 }
 
+                pageSuccess = true; // Mark attempt successful
+
             } catch (e) {
                 console.log(`Error on page ${pageNum}: ${e.message}`);
-                hasNextPage = false;
+                retryCount++;
+                if (retryCount > maxRetries) hasNextPage = false;
             }
         }
-
-        await saveListings(allListings);
     }
+
+    return allListings;
 }
 
 async function saveListings(listings) {
@@ -386,7 +399,17 @@ async function scrapeEmlakjet(page, url, category = 'residential') {
 
         try {
             await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: 45000 });
-            await new Promise(r => setTimeout(r, 3000 + Math.random() * 3000));
+
+            // Smart Wait
+            try {
+                await page.waitForSelector('a[class*="styles_wrapper__"]', { timeout: 15000 });
+            } catch (e) {
+                console.log(`⚠️ Timeout waiting for Emlakjet listings on page ${pageNum}.`);
+                hasNextPage = false;
+                break;
+            }
+
+            await new Promise(r => setTimeout(r, 1000 + Math.random() * 2000));
 
             const listings = await page.evaluate((category) => {
                 const items = document.querySelectorAll('a[class*="styles_wrapper__"]');
@@ -439,7 +462,7 @@ async function scrapeEmlakjet(page, url, category = 'residential') {
                         size_m2,
                         listing_date: new Date().toISOString().split('T')[0],
                         seller_type: 'office',
-                        seller_name: 'Emlakjet',
+                        seller_name: item.querySelector('div[class*="styles_tagWrapper__"]') ? 'Emlakjet' : (item.querySelector('div[class*="styles_officeName__"]')?.innerText.trim() || 'Emlak Ofisi'),
                         listing_type: url.includes('kiralik') ? 'rent' : 'sale',
                         category
                     });
@@ -450,7 +473,8 @@ async function scrapeEmlakjet(page, url, category = 'residential') {
             if (listings.length === 0) {
                 hasNextPage = false;
             } else {
-                console.log(`Found ${listings.length} listings on page ${pageNum}.`);
+                console.log(`Found ${listings.length} listings on page ${pageNum}. Saving progress...`);
+                await saveListings(listings); // Progressive Save
                 allListings = [...allListings, ...listings];
                 pageNum++;
             }
@@ -460,9 +484,7 @@ async function scrapeEmlakjet(page, url, category = 'residential') {
         }
     }
 
-    if (allListings.length > 0) {
-        await saveListings(allListings);
-    }
+    return allListings;
 }
 
 const startScheduler = () => {
@@ -561,4 +583,4 @@ async function scrapeDetails(url) {
     }
 }
 
-module.exports = { scrapeProperties, startScheduler, scrapeDetails };
+module.exports = { scrapeProperties, startScheduler, scrapeDetails, saveListings };
