@@ -100,7 +100,39 @@ const createClient = async (req, res) => {
     }
 };
 
-// ... (skip addDemand/deleteClient)
+// Add a demand for a client
+const addDemand = async (req, res) => {
+    const { id } = req.params;
+    const { min_price, max_price, rooms, district, neighborhood } = req.body;
+    try {
+        const demand = await prisma.demand.create({
+            data: {
+                client_id: parseInt(id),
+                min_price: min_price ? parseFloat(min_price) : null,
+                max_price: max_price ? parseFloat(max_price) : null,
+                rooms,
+                district,
+                neighborhood
+            }
+        });
+        res.json(demand);
+    } catch (error) {
+        console.error('Error adding demand:', error);
+        res.status(500).json({ error: 'Error adding demand' });
+    }
+};
+
+// Delete a client
+const deleteClient = async (req, res) => {
+    const { id } = req.params;
+    try {
+        await prisma.client.delete({ where: { id: parseInt(id) } });
+        res.json({ message: 'Client deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting client:', error);
+        res.status(500).json({ error: 'Error deleting client' });
+    }
+};
 
 // Update a client
 const updateClient = async (req, res) => {
