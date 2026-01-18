@@ -177,7 +177,15 @@ async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = '
                 try {
                     await page.waitForSelector('.listing-item', { timeout: CONFIG.timeouts.element });
                 } catch (e) {
-                    console.log(`⚠️ Timeout waiting for listings on page ${pageNum}. End of results?`);
+                    console.log(`⚠️ Timeout waiting for listings on page ${pageNum}.`);
+                    try {
+                        const title = await page.title();
+                        const bodyText = await page.evaluate(() => document.body.innerText.substring(0, 300).replace(/\n/g, ' '));
+                        console.log(`DEBUG VIEW - Title: ${title}`);
+                        console.log(`DEBUG VIEW - Body: ${bodyText}...`);
+                    } catch (err) {
+                        console.log('Could not get debug info.');
+                    }
                     hasNextPage = false;
                     break;
                 }
