@@ -5563,5 +5563,404 @@
     "status": "SUCCESS",
     "duration": "1345ms",
     "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:16:38.938Z",
+    "action": "Navigate Properties",
+    "status": "SUCCESS",
+    "duration": "5662ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:16:41.009Z",
+    "action": "Navigate Clients",
+    "status": "SUCCESS",
+    "duration": "2069ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:16:41.011Z",
+    "action": "Full Cycle",
+    "status": "SUCCESS",
+    "duration": "12176ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:17:14.599Z",
+    "action": "Login",
+    "status": "SUCCESS",
+    "duration": "2351ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:17:15.935Z",
+    "action": "Navigate Dashboard",
+    "status": "SUCCESS",
+    "duration": "1333ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:17:21.615Z",
+    "action": "Navigate Properties",
+    "status": "SUCCESS",
+    "duration": "5677ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:17:23.684Z",
+    "action": "Navigate Clients",
+    "status": "SUCCESS",
+    "duration": "2067ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:17:23.689Z",
+    "action": "Full Cycle",
+    "status": "SUCCESS",
+    "duration": "12196ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:17:57.073Z",
+    "action": "Login",
+    "status": "SUCCESS",
+    "duration": "2496ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:17:59.182Z",
+    "action": "Navigate Dashboard",
+    "status": "SUCCESS",
+    "duration": "2105ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:18:06.260Z",
+    "action": "Navigate Properties",
+    "status": "SUCCESS",
+    "duration": "7076ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:18:08.352Z",
+    "action": "Navigate Clients",
+    "status": "SUCCESS",
+    "duration": "2089ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:18:08.354Z",
+    "action": "Full Cycle",
+    "status": "SUCCESS",
+    "duration": "14487ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:18:41.729Z",
+    "action": "Login",
+    "status": "SUCCESS",
+    "duration": "2342ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:18:43.304Z",
+    "action": "Navigate Dashboard",
+    "status": "SUCCESS",
+    "duration": "1568ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:18:48.920Z",
+    "action": "Navigate Properties",
+    "status": "SUCCESS",
+    "duration": "5614ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:18:50.990Z",
+    "action": "Navigate Clients",
+    "status": "SUCCESS",
+    "duration": "2067ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:18:50.993Z",
+    "action": "Full Cycle",
+    "status": "SUCCESS",
+    "duration": "12423ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:19:24.250Z",
+    "action": "Login",
+    "status": "SUCCESS",
+    "duration": "2316ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:19:26.420Z",
+    "action": "Navigate Dashboard",
+    "status": "SUCCESS",
+    "duration": "2166ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:19:32.080Z",
+    "action": "Navigate Properties",
+    "status": "SUCCESS",
+    "duration": "5658ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:19:33.840Z",
+    "action": "Navigate Clients",
+    "status": "SUCCESS",
+    "duration": "1756ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:19:33.842Z",
+    "action": "Full Cycle",
+    "status": "SUCCESS",
+    "duration": "12649ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:20:07.142Z",
+    "action": "Login",
+    "status": "SUCCESS",
+    "duration": "2337ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:20:08.485Z",
+    "action": "Navigate Dashboard",
+    "status": "SUCCESS",
+    "duration": "1337ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:20:14.707Z",
+    "action": "Navigate Properties",
+    "status": "SUCCESS",
+    "duration": "6220ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:20:16.781Z",
+    "action": "Navigate Clients",
+    "status": "SUCCESS",
+    "duration": "2071ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:20:16.785Z",
+    "action": "Full Cycle",
+    "status": "SUCCESS",
+    "duration": "12694ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:20:50.250Z",
+    "action": "Login",
+    "status": "SUCCESS",
+    "duration": "2497ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:20:51.580Z",
+    "action": "Navigate Dashboard",
+    "status": "SUCCESS",
+    "duration": "1327ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:20:57.250Z",
+    "action": "Navigate Properties",
+    "status": "SUCCESS",
+    "duration": "5668ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:20:59.320Z",
+    "action": "Navigate Clients",
+    "status": "SUCCESS",
+    "duration": "2068ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:20:59.325Z",
+    "action": "Full Cycle",
+    "status": "SUCCESS",
+    "duration": "12252ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:21:32.633Z",
+    "action": "Login",
+    "status": "SUCCESS",
+    "duration": "2374ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:21:33.970Z",
+    "action": "Navigate Dashboard",
+    "status": "SUCCESS",
+    "duration": "1334ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:21:35.760Z",
+    "action": "Navigate Properties",
+    "status": "SUCCESS",
+    "duration": "1788ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:21:35.764Z",
+    "action": "Cycle Error",
+    "status": "FAILED",
+    "duration": "0ms",
+    "error": "Protocol error (Page.navigate): Session closed. Most likely the page has been closed."
+  },
+  {
+    "timestamp": "2026-01-18T14:22:09.452Z",
+    "action": "Login",
+    "status": "SUCCESS",
+    "duration": "2484ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:22:11.561Z",
+    "action": "Navigate Dashboard",
+    "status": "SUCCESS",
+    "duration": "2101ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:22:17.228Z",
+    "action": "Navigate Properties",
+    "status": "SUCCESS",
+    "duration": "5665ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:22:19.324Z",
+    "action": "Navigate Clients",
+    "status": "SUCCESS",
+    "duration": "2091ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:22:19.329Z",
+    "action": "Full Cycle",
+    "status": "SUCCESS",
+    "duration": "13273ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:22:52.662Z",
+    "action": "Login",
+    "status": "SUCCESS",
+    "duration": "2393ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:22:54.557Z",
+    "action": "Navigate Dashboard",
+    "status": "SUCCESS",
+    "duration": "1890ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:23:02.214Z",
+    "action": "Navigate Properties",
+    "status": "SUCCESS",
+    "duration": "7653ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:23:04.280Z",
+    "action": "Navigate Clients",
+    "status": "SUCCESS",
+    "duration": "2063ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:23:04.283Z",
+    "action": "Full Cycle",
+    "status": "SUCCESS",
+    "duration": "14764ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:23:37.460Z",
+    "action": "Login",
+    "status": "SUCCESS",
+    "duration": "2311ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:23:38.805Z",
+    "action": "Navigate Dashboard",
+    "status": "SUCCESS",
+    "duration": "1338ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:23:44.484Z",
+    "action": "Navigate Properties",
+    "status": "SUCCESS",
+    "duration": "5674ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:23:46.577Z",
+    "action": "Navigate Clients",
+    "status": "SUCCESS",
+    "duration": "2088ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:23:46.579Z",
+    "action": "Full Cycle",
+    "status": "SUCCESS",
+    "duration": "12108ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:24:19.945Z",
+    "action": "Login",
+    "status": "SUCCESS",
+    "duration": "2338ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:24:21.269Z",
+    "action": "Navigate Dashboard",
+    "status": "SUCCESS",
+    "duration": "1321ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:24:26.903Z",
+    "action": "Navigate Properties",
+    "status": "SUCCESS",
+    "duration": "5630ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:24:28.971Z",
+    "action": "Navigate Clients",
+    "status": "SUCCESS",
+    "duration": "2065ms",
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-18T14:24:28.973Z",
+    "action": "Full Cycle",
+    "status": "SUCCESS",
+    "duration": "12077ms",
+    "error": null
   }
 ]

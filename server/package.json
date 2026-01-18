@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "echo 'No build step needed'",
     "start": "node index.js",
+    "postinstall": "npx puppeteer browsers install chrome",
     "dev": "concurrently \"npm run start\" \"cd ../client && npm run dev\""
   },
   "keywords": [],

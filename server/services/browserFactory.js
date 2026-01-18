@@ -84,17 +84,32 @@ async function createStealthBrowser(options = {}) {
         ignoreDefaultArgs: ['--enable-automation']
     };
 
-    // On production (Render), Chrome is installed to a specific cache path
+    // On production (Render), Chrome is installed via postinstall to node_modules
     const isRenderEnv = process.env.NODE_ENV === 'production' || process.env.RENDER || process.env.PORT;
     if (isRenderEnv) {
         const path = require('path');
-        const cachePath = '/opt/render/.cache/puppeteer/chrome/linux-143.0.7499.192/chrome-linux64/chrome';
-        console.log('Production environment detected. Checking for Chrome at:', cachePath);
-        if (fs.existsSync(cachePath)) {
-            launchOptions.executablePath = cachePath;
-            console.log('✓ Using Render Chrome executable:', cachePath);
-        } else {
-            console.log('✗ Chrome not found at expected path. Puppeteer will use default.');
+        // Try multiple possible locations
+        const possiblePaths = [
+            path.join(__dirname, '../node_modules/puppeteer/.local-chromium/linux-*/chrome-linux/chrome'),
+            path.join(__dirname, '../../node_modules/puppeteer/.local-chromium/linux-*/chrome-linux/chrome'),
+            '/opt/render/project/src/server/node_modules/puppeteer/.local-chromium/linux-*/chrome-linux/chrome'
+        ];
+
+        console.log('Production environment detected. Searching for Chrome...');
+
+        // Use glob to find Chrome
+        const glob = require('glob');
+        for (const pattern of possiblePaths) {
+            const matches = glob.sync(pattern);
+            if (matches.length > 0) {
+                launchOptions.executablePath = matches[0];
+                console.log('✓ Using Chrome executable:', matches[0]);
+                break;
+            }
+        }
+
+        if (!launchOptions.executablePath) {
+            console.log('✗ Chrome not found. Trying Puppeteer default...');
         }
     }
 
