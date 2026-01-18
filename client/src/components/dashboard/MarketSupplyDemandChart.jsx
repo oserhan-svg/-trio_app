@@ -45,7 +45,7 @@ const MarketSupplyDemandChart = () => {
                 </div>
             </div>
 
-            <div className="flex-1 min-h-[300px]">
+            <div className="h-[350px]">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                         data={data}

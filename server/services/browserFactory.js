@@ -25,8 +25,9 @@ const VIEWPORTS = [
  * Creates a highly stealthy browser instance
  */
 async function createStealthBrowser(options = {}) {
+    const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER;
     const {
-        headless = false, // Default to FALSE for better stealth
+        headless = isProduction ? 'new' : false, // Headless in production
         proxy = null,
         userDataDir = scraperConfig.paths.userDataDir
     } = options;
@@ -51,7 +52,10 @@ async function createStealthBrowser(options = {}) {
         '--disable-sync',
         '--no-default-browser-check',
         '--no-first-run',
-        '--remote-debugging-port=9222'
+        '--remote-debugging-port=9222',
+        '--disable-gpu', // Recommended for headless
+        '--disable-dev-shm-usage', // Recommended for Docker/Render
+        '--shm-size=1gb'
     ];
 
     let finalProxy = proxy;

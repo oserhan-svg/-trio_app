@@ -335,7 +335,6 @@ async function getOrLaunchBrowser() {
     } catch (err) {
         console.log('⚠️ Existing Chrome 9222 not found. Launching optimized browser...');
         return await require('./browserFactory').createStealthBrowser({
-            headless: false,
             proxy: scraperConfig.stealth.useProxy ? scraperConfig.stealth.proxyUrl : null
         });
     }
