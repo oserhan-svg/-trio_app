@@ -32,6 +32,39 @@ const analyticsRoutes = require('./routes/analyticsRoutes');
 const imageRoutes = require('./routes/imageRoutes');
 const propertyListingRoutes = require('./routes/propertyListingRoutes');
 const { startScheduler } = require('./services/scraperService');
+// DEBUG: Find where Chrome is hiding
+const fs = require('fs');
+const path = require('path');
+
+function walkDir(dir, callback) {
+    if (!fs.existsSync(dir)) return;
+    fs.readdirSync(dir).forEach(f => {
+        let dirPath = path.join(dir, f);
+        let isDirectory = fs.statSync(dirPath).isDirectory();
+        if (isDirectory) {
+            walkDir(dirPath, callback);
+        } else {
+            callback(path.join(dir, f));
+        }
+    });
+}
+
+try {
+    console.log('--- DEBUG: SEARCHING FOR CHROME ---');
+    const startPath = path.join(__dirname, 'node_modules/puppeteer');
+    if (fs.existsSync(startPath)) {
+        walkDir(startPath, (filePath) => {
+            if (filePath.includes('chrome') && !filePath.includes('.d.ts')) {
+                console.log('FOUND:', filePath);
+            }
+        });
+    } else {
+        console.log('node_modules/puppeteer does not exist!');
+    }
+    console.log('--- DEBUG END ---');
+} catch (e) {
+    console.log('Debug Error:', e.message);
+}
 
 app.use('/api/auth', authRoutes);
 app.use('/api/properties', propertyRoutes);
