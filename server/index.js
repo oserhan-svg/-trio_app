@@ -48,12 +48,16 @@ app.get('/', (req, res) => {
 });
 
 // Database Initialization Helper
-const { execSync } = require('child_process');
+const { exec } = require('child_process');
+const util = require('util');
+const execPromise = util.promisify(exec);
+
 async function initDb() {
     console.log('--- Starting Database Initialization ---');
     try {
         console.log('Running prisma db push...');
-        execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit' });
+        // Using exec instead of execSync to avoid blocking the event loop
+        await execPromise('npx prisma db push --accept-data-loss');
         console.log('Running admin creation script...');
         const createAdmin = require('./scripts/createAdminPrisma');
         await createAdmin();
