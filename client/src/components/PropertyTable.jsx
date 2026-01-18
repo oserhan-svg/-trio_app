@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ExternalLink, FileSpreadsheet, Instagram, Eye, ChevronLeft, ChevronRight, FileText, TrendingDown } from 'lucide-react';
+import { ExternalLink, FileSpreadsheet, Instagram, Eye, ChevronLeft, ChevronRight, FileText, TrendingDown, Home } from 'lucide-react';
 import api from '../services/api';
 
 const PropertyTable = ({ properties }) => {
@@ -94,8 +94,144 @@ const PropertyTable = ({ properties }) => {
                 </div>
             </div>
 
-            <div className="overflow-x-auto flex-1">
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4 p-4 bg-gray-100">
+                {currentData.length > 0 ? (
+                    currentData.map((prop) => (
+                        <div key={prop.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 space-y-3 relative">
+                            {/* Image & Header Container */}
+                            <div className="flex gap-3">
+                                {/* Thumbnail */}
+                                <div className="w-24 h-24 bg-gray-200 rounded-md flex-shrink-0 overflow-hidden relative">
+                                    {prop.images && prop.images.length > 0 ? (
+                                        <img
+                                            src={prop.images[0]}
+                                            alt={prop.title}
+                                            loading="lazy"
+                                            decoding="async"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                            <Home size={24} />
+                                        </div>
+                                    )}
+                                    {prop.has_recent_price_drop && (
+                                        <div className="absolute top-1 left-1 bg-green-100 text-green-700 text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm flex items-center gap-0.5">
+                                            <TrendingDown size={10} />
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Content */}
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex justify-between items-start mb-1">
+                                        <div className="flex items-center gap-2">
+                                            {prop.url.includes('hepsiemlak') && (
+                                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-red-600 text-white shadow-sm">
+                                                    Hepsiemlak
+                                                </span>
+                                            )}
+                                            {prop.url.includes('sahibinden') && (
+                                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-yellow-400 text-black shadow-sm">
+                                                    Sahibinden
+                                                </span>
+                                            )}
+                                            {prop.seller_name && prop.seller_name !== 'Bilinmiyor' && (
+                                                <span className={`text-[9px] px-1.5 py-0.5 rounded border ${prop.seller_type === 'owner' ? 'bg-orange-50 text-orange-700 border-orange-100' : 'bg-gray-50 text-gray-600 border-gray-200'}`}>
+                                                    {prop.seller_name}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="text-right whitespace-nowrap pl-1">
+                                            <div className="font-bold text-blue-600 text-sm">
+                                                {(parseFloat(prop.price) / 1000).toLocaleString('tr-TR')}k
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 leading-tight mb-1">{prop.title}</h3>
+
+                                    <div className="text-xs text-gray-500">
+                                        {prop.district} / {prop.neighborhood}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Opportunity Badge */}
+                            {prop.opportunity_label && prop.opportunity_label !== 'Normal' && prop.opportunity_label !== 'Veri Yok' && (
+                                <div className={`inline-flex items-center px-2 py-1 rounded text-xs font-bold w-full justify-center
+                                ${prop.opportunity_label.includes('Kelepir') ? 'bg-green-600 text-white' :
+                                        prop.opportunity_label.includes('Fırsat') ? 'bg-green-100 text-green-800' :
+                                            prop.opportunity_label.includes('Uygun') ? 'bg-blue-50 text-blue-700' :
+                                                prop.opportunity_label.includes('pahalı') || prop.opportunity_label.includes('Yüksek') ? 'bg-red-50 text-red-600' : 'bg-gray-100 text-gray-600'}`}>
+                                    {prop.opportunity_label}
+                                    {prop.deviation > 0 && ` (%${prop.deviation})`}
+                                </div>
+                            )}
+
+                            {/* Key Stats Grid */}
+                            <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 border-t border-b border-gray-100 py-2">
+                                <div>
+                                    <span className="block text-gray-400 text-[10px]">Konum</span>
+                                    {prop.district} / {prop.neighborhood}
+                                </div>
+                                <div>
+                                    <span className="block text-gray-400 text-[10px]">Özellikler</span>
+                                    {prop.rooms} • {prop.size_m2}m²
+                                </div>
+                                <div>
+                                    <span className="block text-gray-400 text-[10px]">Kat / Yaş</span>
+                                    {prop.floor_location} | {prop.building_age} Yıl
+                                </div>
+                                <div>
+                                    <span className="block text-gray-400 text-[10px]">Tahmini Kira</span>
+                                    {prop.roi ? `${prop.roi.estimatedMonthlyRent.toLocaleString('tr-TR')} TL` : '-'}
+                                </div>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="flex gap-2 pt-1">
+                                <Link
+                                    to={`/property/${prop.id}`}
+                                    className="flex-1 bg-blue-50 text-blue-700 hover:bg-blue-100 py-2 rounded text-center text-sm font-medium flex items-center justify-center gap-1"
+                                >
+                                    <Eye size={16} /> Detay
+                                </Link>
+                                <a
+                                    href={prop.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="px-3 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded flex items-center justify-center"
+                                >
+                                    <ExternalLink size={16} />
+                                </a>
+                                <button
+                                    onClick={() => handleGenerateStory(prop.id)}
+                                    className="px-3 bg-pink-50 text-pink-600 hover:bg-pink-100 rounded flex items-center justify-center"
+                                >
+                                    <Instagram size={16} />
+                                </button>
+                                <button
+                                    onClick={() => navigate(`/property-listing/${prop.id}`)}
+                                    className="px-3 bg-purple-50 text-purple-600 hover:bg-purple-100 rounded flex items-center justify-center"
+                                >
+                                    <FileText size={16} />
+                                </button>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <div className="text-center py-10 text-gray-500">
+                        Bu filtreleme kriterlerine uygun ilan bulunamadı.
+                    </div>
+                )}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto flex-1">
                 <table className="min-w-full divide-y divide-gray-200" id="property-table-top">
+                    {/* ... (keep existing desktop Thead and Tbody) */}
                     <thead className="bg-gray-50 sticky top-0 z-10 shadow-sm">
                         <tr>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tarih</th>

@@ -28,25 +28,25 @@ const PropertyListingPublic = () => {
     };
 
     useEffect(() => {
+        const fetchListing = async () => {
+            try {
+                const response = await api.get(`/listings/token/${token}`);
+                const data = response.data;
+                setProperty(data.property);
+                setListingInfo(data.listing);
+                if (data.property.images && data.property.images.length > 0) {
+                    setSelectedImage(data.property.images[0]);
+                }
+                setLoading(false);
+            } catch (error) {
+                console.error('Error fetching listing:', error);
+                setError(error.message || 'İlan bilgileri alınamadı');
+                setLoading(false);
+            }
+        };
+
         fetchListing();
     }, [token]);
-
-    const fetchListing = async () => {
-        try {
-            const response = await api.get(`/listings/token/${token}`);
-            const data = response.data;
-            setProperty(data.property);
-            setListingInfo(data.listing);
-            if (data.property.images && data.property.images.length > 0) {
-                setSelectedImage(data.property.images[0]);
-            }
-            setLoading(false);
-        } catch (error) {
-            console.error('Error fetching listing:', error);
-            setError(error.message || 'İlan bilgileri alınamadı');
-            setLoading(false);
-        }
-    };
 
     const handlePrint = () => {
         window.print();
@@ -132,6 +132,7 @@ const PropertyListingPublic = () => {
                                 <img
                                     src={selectedImage || property.images[0]}
                                     alt={property.title}
+                                    fetchPriority="high"
                                     className="w-full h-[400px] object-cover rounded-lg shadow-md cursor-pointer"
                                     onClick={() => window.open(selectedImage || property.images[0], '_blank')}
                                     onError={(e) => { e.target.src = 'https://via.placeholder.com/800x600?text=Resim+Yüklenemedi'; }}
@@ -144,6 +145,7 @@ const PropertyListingPublic = () => {
                                         key={idx}
                                         src={img}
                                         alt={`Thumbnail ${idx + 1}`}
+                                        loading="lazy"
                                         className={`w-24 h-24 object-cover rounded-md cursor-pointer border-2 transition-all flex-shrink-0 ${selectedImage === img ? 'border-blue-600 opacity-100' : 'border-transparent opacity-70 hover:opacity-100'}`}
                                         onClick={() => setSelectedImage(img)}
                                     />
@@ -158,6 +160,7 @@ const PropertyListingPublic = () => {
                                     key={idx}
                                     src={img}
                                     alt={`${property.title} - Fotoğraf ${idx + 1}`}
+                                    loading="lazy"
                                     className="w-full h-32 object-cover rounded-lg"
                                 />
                             ))}

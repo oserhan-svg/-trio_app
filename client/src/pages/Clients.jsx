@@ -92,7 +92,7 @@ const Clients = () => {
             setShowAddClient(false);
             addToast('Müşteri başarıyla eklendi');
             fetchClients();
-        } catch (error) {
+        } catch {
             addToast('Müşteri eklenirken hata oluştu', 'error');
         }
     };
@@ -103,7 +103,7 @@ const Clients = () => {
             await api.delete(`/clients/${id}`);
             addToast('Müşteri silindi');
             fetchClients();
-        } catch (error) {
+        } catch {
             addToast('Müşteri silinemedi', 'error');
         }
     };
@@ -135,7 +135,7 @@ const Clients = () => {
             }
             setShowAddDemand(false);
             fetchClients();
-        } catch (e) {
+        } catch {
             addToast('Talep kaydedilemedi', 'error');
         }
     };
@@ -146,7 +146,7 @@ const Clients = () => {
             await api.delete(`/clients/demands/${demandId}`);
             addToast('Talep silindi');
             fetchClients();
-        } catch (e) {
+        } catch {
             addToast('Talep silinemedi', 'error');
         }
     };

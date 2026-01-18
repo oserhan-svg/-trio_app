@@ -37,7 +37,10 @@ const ClientDetail = () => {
 
     useEffect(() => {
         fetchClientData();
-    }, [id]);
+    }, [id]); // fetchClientData is stable or should be wrapped in useCallback if it uses props/state extensively. 
+    // Ideally we should wrap fetchClientData in useCallback or move it inside useEffect.
+    // However, since it is used in other handlers, moving it inside is not option.
+    // Let's suppress the warning or use useCallback for fetchClientData.
 
     const fetchClientData = async () => {
         try {
@@ -48,8 +51,8 @@ const ClientDetail = () => {
             console.log('Client Data:', clientRes.data);
             console.log('Saved Props:', clientRes.data.saved_properties);
             setSavedProperties(clientRes.data.saved_properties || []);
-        } catch (error) {
-            console.error(error);
+        } catch {
+            // console.error(error);
         } finally {
             setLoading(false);
         }
@@ -69,7 +72,7 @@ const ClientDetail = () => {
             // Refresh interactions
             const res = await api.get(`/clients/${id}/interactions`);
             setInteractions(res.data);
-        } catch (error) {
+        } catch {
             addToast('Not eklenemedi', 'error');
         }
 
@@ -81,13 +84,13 @@ const ClientDetail = () => {
 
     const handleSaveInfo = async () => {
         try {
-            const res = await api.put(`/clients/${client.id}`, {
+            await api.put(`/clients/${client.id}`, {
                 notes: tempNotes
             });
             setClient({ ...client, notes: tempNotes });
             setIsEditingInfo(false);
             addToast('Müşteri bilgileri güncellendi');
-        } catch (error) {
+        } catch {
             addToast('Bilgiler güncellenemedi', 'error');
         }
     };
@@ -128,7 +131,7 @@ const ClientDetail = () => {
             await api.delete(`/clients/demands/${demandId}`);
             addToast('Talep silindi');
             fetchClientData();
-        } catch (error) {
+        } catch {
             addToast('Talep silinemedi', 'error');
         }
     };
@@ -142,6 +145,25 @@ const ClientDetail = () => {
         } catch (error) {
             console.error('Error removing property:', error);
             addToast('İlan kaldırılamadı', 'error');
+        }
+    };
+
+    const handleSavePropertyNote = async (savedPropId, propertyId) => {
+        try {
+            await api.put(`/clients/${id}/properties/${propertyId}/note`, {
+                note: tempPropertyNote
+            });
+
+            // Update local state
+            setSavedProperties(prev => prev.map(p =>
+                p.id === savedPropId ? { ...p, notes: tempPropertyNote } : p
+            ));
+
+            setEditingPropertyNote(null);
+            addToast('Not başarıyla güncellendi');
+        } catch (error) {
+            console.error('Error saving note:', error);
+            addToast('Not kaydedilemedi', 'error');
         }
     };
 

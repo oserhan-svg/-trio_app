@@ -9,6 +9,7 @@ import DashboardStatsHeader from '../components/DashboardStatsHeader';
 import HeatmapView from '../components/HeatmapView';
 
 import toast from 'react-hot-toast';
+import MobileNav from '../components/MobileNav';
 
 const Dashboard = () => {
     const navigate = useNavigate();
@@ -34,10 +35,17 @@ const Dashboard = () => {
     const [meta, setMeta] = useState({ page: 1, totalPages: 1 });
 
     useEffect(() => {
-        fetchAllData();
-    }, []);
+        fetchAllData(filters);
+    }, [fetchAllData]); // filters is passed as arg, but if we want it to run on mount, we call it with initial filters. 
+    // Wait, if I add fetchAllData to dep, and fetchAllData doesn't depend on filters, then it's fine.
+    // But fetchAllData depends on navigate.
+    // The previous code called fetchAllData() with NO args, which defaults to `filters` state (closure).
+    // In my useCallback version, I made the default `filters` depend on closure? No, `currentFilters = filters`.
+    // If I put `filters` in the argument default value, it creates a closure dependency!
+    // I should remove the default value from useCallback and pass it explicitly from useEffect.
+    // Let's modify the useEffect call.
 
-    const fetchAllData = async (currentFilters = filters, page = 1, append = false) => {
+    const fetchAllData = React.useCallback(async (currentFilters, page = 1, append = false) => {
         setLoading(true);
         try {
             const params = new URLSearchParams();
@@ -90,7 +98,7 @@ const Dashboard = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [navigate]); // Added dependencies (filters is passed as arg, so not needed in dependency unless used from closure)
 
     const handleLoadMore = () => {
         if (meta.page < meta.totalPages) {
@@ -137,9 +145,9 @@ const Dashboard = () => {
     });
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            {/* Navbar */}
-            <nav className="bg-white shadow-sm px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+        <div className="min-h-screen bg-gray-100 pb-20 md:pb-0"> {/* Added padding bottom for mobile if needed */}
+            {/* Desktop Navbar */}
+            <nav className="hidden md:flex bg-white shadow-sm px-6 py-4 justify-between items-center sticky top-0 z-50">
                 <div className="flex items-center gap-2">
                     <span className="text-2xl font-bold text-blue-600">TrioApp</span>
                     <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">v2.1</span>
@@ -165,14 +173,25 @@ const Dashboard = () => {
                 </div>
             </nav>
 
+            {/* Mobile Navbar */}
+            <div className="md:hidden bg-white shadow-sm px-4 py-3 sticky top-0 z-50 flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                    <MobileNav user={user} handleScrape={handleScrape} handleLogout={handleLogout} propertiesCount={properties.length} />
+                    <span className="text-xl font-bold text-blue-600 ml-2">TrioApp</span>
+                </div>
+                <div className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded">
+                    {properties.length} İlan
+                </div>
+            </div>
+
             {/* Main Content */}
-            <main className="p-6 max-w-7xl mx-auto space-y-6">
+            <main className="p-3 md:p-6 max-w-7xl mx-auto space-y-4 md:space-y-6">
 
                 {/* Stats Header now includes Rental Widget */}
                 <DashboardStatsHeader properties={properties} stats={stats} />
 
                 {/* Filters */}
-                <form onSubmit={handleSearch} className="bg-white p-4 rounded-lg shadow-sm grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-end relative z-40">
+                <form onSubmit={handleSearch} className="bg-white p-4 rounded-lg shadow-sm grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-end relative z-40">
                     <div>
                         <label className="block text-xs font-medium text-gray-700 mb-1">İlan Türü</label>
                         <select name="listingType" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" value={filters.listingType} onChange={handleFilterChange}>

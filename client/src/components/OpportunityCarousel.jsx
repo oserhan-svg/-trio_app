@@ -74,7 +74,13 @@ const OpportunityCarousel = ({ compact = false }) => {
                         {/* Compact Image */}
                         <div className={`${compact ? 'w-24' : 'w-24'} h-full bg-gray-100 flex-shrink-0 relative overflow-hidden border-r border-gray-100`}>
                             {prop.images && prop.images.length > 0 ? (
-                                <img src={prop.images[0]} alt={prop.title} className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-500" />
+                                <img
+                                    src={prop.images[0]}
+                                    alt={prop.title}
+                                    loading="lazy"
+                                    decoding="async"
+                                    className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-500"
+                                />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center">
                                     <Home size={20} className="text-gray-300" />

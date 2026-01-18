@@ -75,19 +75,19 @@ const PropertyListingPage = () => {
     };
 
     useEffect(() => {
+        const fetchProperty = async () => {
+            try {
+                const response = await api.get(`/properties/${propertyId}`);
+                setProperty(response.data);
+                setLoading(false);
+            } catch (error) {
+                console.error('Error fetching property:', error);
+                setLoading(false);
+            }
+        };
+
         fetchProperty();
     }, [propertyId]);
-
-    const fetchProperty = async () => {
-        try {
-            const response = await api.get(`/properties/${propertyId}`);
-            setProperty(response.data);
-            setLoading(false);
-        } catch (error) {
-            console.error('Error fetching property:', error);
-            setLoading(false);
-        }
-    };
 
     const handleGenerateListing = async () => {
         try {
@@ -193,6 +193,7 @@ const PropertyListingPage = () => {
                                 <img
                                     src={selectedImage || property.images[0]}
                                     alt={property.title}
+                                    fetchPriority="high"
                                     className="w-full h-[400px] object-cover rounded-lg shadow-md cursor-pointer"
                                     onClick={() => window.open(selectedImage || property.images[0], '_blank')}
                                     onError={(e) => { e.target.src = 'https://via.placeholder.com/800x600?text=Resim+Yüklenemedi'; }}
@@ -205,6 +206,7 @@ const PropertyListingPage = () => {
                                         key={idx}
                                         src={img}
                                         alt={`Thumbnail ${idx + 1}`}
+                                        loading="lazy"
                                         className={`w-24 h-24 object-cover rounded-md cursor-pointer border-2 transition-all flex-shrink-0 ${selectedImage === img ? 'border-blue-600 opacity-100' : 'border-transparent opacity-70 hover:opacity-100'}`}
                                         onClick={() => setSelectedImage(img)}
                                     />
@@ -219,6 +221,7 @@ const PropertyListingPage = () => {
                                     key={idx}
                                     src={img}
                                     alt={`${property.title} - Fotoğraf ${idx + 1}`}
+                                    loading="lazy"
                                     className="w-full h-32 object-cover rounded-lg"
                                 />
                             ))}

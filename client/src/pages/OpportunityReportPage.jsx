@@ -96,7 +96,7 @@ const OpportunityReportPage = () => {
 
                 {/* Grid */}
                 <div className="grid grid-cols-2 gap-8">
-                    {properties.map((p, index) => (
+                    {properties.map((p) => (
                         <div key={p.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm break-inside-avoid">
                             {/* Image & Score Header */}
                             <div className="h-48 bg-gray-100 relative overflow-hidden">

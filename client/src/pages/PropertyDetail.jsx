@@ -13,22 +13,22 @@ const PropertyDetail = () => {
     const [selectedImage, setSelectedImage] = useState(null);
 
     useEffect(() => {
+        const fetchProperty = async () => {
+            try {
+                const res = await api.get(`/properties/${id}`);
+                setProperty(res.data);
+                if (res.data.images && res.data.images.length > 0) {
+                    setSelectedImage(res.data.images[0]);
+                }
+                setLoading(false);
+            } catch (err) {
+                setError(err.message);
+                setLoading(false);
+            }
+        };
+
         fetchProperty();
     }, [id]);
-
-    const fetchProperty = async () => {
-        try {
-            const res = await api.get(`/properties/${id}`);
-            setProperty(res.data);
-            if (res.data.images && res.data.images.length > 0) {
-                setSelectedImage(res.data.images[0]);
-            }
-            setLoading(false);
-        } catch (err) {
-            setError(err.message);
-            setLoading(false);
-        }
-    };
 
     const handleScrapeDetails = async () => {
         if (!confirm('Bu ilanın detaylarını (fotoğraflar, açıklama) çekmek istiyor musunuz?')) return;
@@ -101,6 +101,7 @@ const PropertyDetail = () => {
                                     <img
                                         src={selectedImage || images[0]}
                                         alt="Main Property"
+                                        fetchPriority="high"
                                         className="w-full h-full object-contain bg-black"
                                     />
                                     <div className="absolute bottom-4 right-4 flex gap-2">
@@ -146,7 +147,7 @@ const PropertyDetail = () => {
                                             onClick={() => setSelectedImage(img)}
                                             className={`flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border-2 transition ${selectedImage === img ? 'border-blue-600 opacity-100' : 'border-transparent opacity-70 hover:opacity-100'}`}
                                         >
-                                            <img src={img} alt={`Thumb ${idx}`} className="w-full h-full object-cover" />
+                                            <img src={img} alt={`Thumb ${idx}`} loading="lazy" className="w-full h-full object-cover" />
                                         </button>
                                     ))}
                                 </div>
@@ -304,7 +305,7 @@ const PropertyDetail = () => {
                     <div className="bg-white rounded-xl shadow-sm p-6">
                         <h3 className="font-bold text-gray-800 mb-4">Fiyat Geçmişi</h3>
                         <div className="space-y-4 relative border-l-2 border-gray-200 ml-2 pl-4">
-                            {property.history && property.history.map((h, i) => (
+                            {property.history && property.history.map((h) => (
                                 <div key={h.id} className="relative">
                                     <div className="absolute -left-[21px] top-1 w-3 h-3 bg-blue-500 rounded-full border-2 border-white"></div>
                                     <div className="text-sm font-bold text-gray-800">

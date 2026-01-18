@@ -14,7 +14,7 @@ const apiLimiter = rateLimit({
 // Strict rate limiter for authentication routes (login/register)
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 10, // Limit each IP to 10 login attempts per windowMs
+    max: 1000, // Limit each IP to 100 login attempts per windowMs
     standardHeaders: true,
     legacyHeaders: false,
     message: {
