@@ -257,8 +257,9 @@ async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = '
                         console.log(`DEBUG VIEW - Title: ${title}`);
 
                         if (title.includes('Bir dakika') || title.includes('Just a moment') || bodyText.includes('Doğrulanıyor')) {
-                            console.log('🛡️ Cloudflare detected during timeout. Waiting 30s for clearance...');
-                            await new Promise(r => setTimeout(r, 30000));
+                            console.log('🛡️ Cloudflare detected during timeout. Attempting to bypass...');
+                            await solveCloudflareChallenge(page);
+                            await new Promise(r => setTimeout(r, 15000));
 
                             console.log('🔄 Restarting loop to check if resolved...');
                             // Force a retry of this page
