@@ -55,7 +55,8 @@ async function initDb() {
         console.log('Running prisma db push...');
         execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit' });
         console.log('Running admin creation script...');
-        require('./scripts/createAdminPrisma');
+        const createAdmin = require('./scripts/createAdminPrisma');
+        await createAdmin();
         console.log('Database Initialization Complete.');
     } catch (error) {
         console.error('Database Initialization Failed:', error.message);

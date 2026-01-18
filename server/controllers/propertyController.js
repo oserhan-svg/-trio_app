@@ -15,7 +15,7 @@ const upgradeImages = (images) => {
 
 const getProperties = async (req, res) => {
     try {
-        const { minPrice, maxPrice, rooms, district, opportunity_filter, category, listingType, seller_type } = req.query;
+        const { minPrice, maxPrice, rooms, district, opportunity_filter, category, listingType, seller_type, sort } = req.query;
 
         const where = { AND: [] };
 
@@ -138,31 +138,39 @@ const getProperties = async (req, res) => {
 
                 // Auto-Sort: Best Opportunities First
                 // Criteria: Score (Desc) -> Deviation (Desc) -> Price (Asc)
-                propertiesWithScore.sort((a, b) => {
-                    if ((b.opportunity_score || 0) !== (a.opportunity_score || 0)) {
-                        return (b.opportunity_score || 0) - (a.opportunity_score || 0); // Higher score first
-                    }
-                    if ((b.deviation || 0) !== (a.deviation || 0)) {
-                        return (b.deviation || 0) - (a.deviation || 0); // Higher deviation first
-                    }
-                    return a.price - b.price; // Cheaper first
-                });
-            }
-        } catch (analyticsErr) {
-            console.error('DEBUG: Analytics Service Failed:', analyticsErr.message);
+            });
         }
 
-        try {
-            jsonBigInt(res, propertiesWithScore);
-        } catch (jsonErr) {
-            console.error('CRITICAL: JSON Serialization Failed:', jsonErr);
-            res.status(500).json({ error: 'JSON Serialization Error: ' + jsonErr.message });
+            // Universal Sorting
+            if (sort === 'score') {
+            propertiesWithScore.sort((a, b) => (b.opportunity_score || 0) - (a.opportunity_score || 0));
+        } else if (sort === 'price_asc') {
+            propertiesWithScore.sort((a, b) => a.price - b.price);
+        } else if (sort === 'price_desc') {
+            propertiesWithScore.sort((a, b) => b.price - a.price);
+        } else if (sort === 'deviation') {
+            propertiesWithScore.sort((a, b) => (b.deviation || 0) - (a.deviation || 0));
+        } else if (sort === 'newest') {
+            propertiesWithScore.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        } else if (req.query.opportunity_filter) {
+            // Default sorting for opportunity filter if no explicit sort
+            propertiesWithScore.sort((a, b) => (b.opportunity_score || 0) - (a.opportunity_score || 0));
         }
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Server error' });
+    } catch (analyticsErr) {
+        console.error('DEBUG: Analytics Service Failed:', analyticsErr.message);
     }
+
+    try {
+        jsonBigInt(res, propertiesWithScore);
+    } catch (jsonErr) {
+        console.error('CRITICAL: JSON Serialization Failed:', jsonErr);
+        res.status(500).json({ error: 'JSON Serialization Error: ' + jsonErr.message });
+    }
+
+} catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+}
 };
 
 const getPropertyHistory = async (req, res) => {

@@ -1,5 +1,5 @@
 const prisma = require('../db');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 async function createAdmin() {
     try {
@@ -20,12 +20,10 @@ async function createAdmin() {
             }
         });
 
-        console.log('Admin user created/updated:', user);
+        console.log('Admin user created/updated:', user.email);
     } catch (e) {
-        console.error(e);
-    } finally {
-        await prisma.$disconnect();
+        console.error('Admin Creation Error:', e.message);
     }
 }
 
-createAdmin();
+module.exports = createAdmin;
