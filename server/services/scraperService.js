@@ -199,14 +199,26 @@ async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = '
                     await page.waitForSelector('.listing-item', { timeout: CONFIG.timeouts.element });
                 } catch (e) {
                     console.log(`⚠️ Timeout waiting for listings on page ${pageNum}.`);
+
+                    // Check if it's Cloudflare
                     try {
                         const title = await page.title();
                         const bodyText = await page.evaluate(() => document.body.innerText.substring(0, 300).replace(/\n/g, ' '));
                         console.log(`DEBUG VIEW - Title: ${title}`);
-                        console.log(`DEBUG VIEW - Body: ${bodyText}...`);
+
+                        if (title.includes('Bir dakika') || title.includes('Just a moment') || bodyText.includes('Doğrulanıyor')) {
+                            console.log('🛡️ Cloudflare detected during timeout. Waiting 30s for clearance...');
+                            await new Promise(r => setTimeout(r, 30000));
+
+                            console.log('🔄 Restarting loop to check if resolved...');
+                            // Force a retry of this page
+                            retryCount++;
+                            continue;
+                        }
                     } catch (err) {
                         console.log('Could not get debug info.');
                     }
+
                     hasNextPage = false;
                     break;
                 }
