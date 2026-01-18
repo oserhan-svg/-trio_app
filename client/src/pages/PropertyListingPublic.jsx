@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { Download, MapPin, Phone, Mail, Globe, Eye } from 'lucide-react';
+import api from '../services/api';
 
 const PropertyListingPublic = () => {
     const { token } = useParams();
@@ -32,11 +33,8 @@ const PropertyListingPublic = () => {
 
     const fetchListing = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/listings/token/${token}`);
-            if (!response.ok) {
-                throw new Error('İlan bulunamadı veya süresi dolmuş');
-            }
-            const data = await response.json();
+            const response = await api.get(`/listings/token/${token}`);
+            const data = response.data;
             setProperty(data.property);
             setListingInfo(data.listing);
             if (data.property.images && data.property.images.length > 0) {
@@ -45,7 +43,7 @@ const PropertyListingPublic = () => {
             setLoading(false);
         } catch (error) {
             console.error('Error fetching listing:', error);
-            setError(error.message);
+            setError(error.message || 'İlan bilgileri alınamadı');
             setLoading(false);
         }
     };

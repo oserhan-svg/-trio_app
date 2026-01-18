@@ -13,6 +13,8 @@ model User {
   password_hash String
   role          String   // 'admin' or 'consultant'
   clients       Client[]
+  agenda_items  AgendaItem[]
+  properties    Property[] @relation("UserProperties")
   created_at    DateTime @default(now())
 
   @@map("users")
@@ -37,12 +39,27 @@ model Property {
   listing_date   DateTime?
   last_scraped   DateTime?         @default(now())
   created_at     DateTime          @default(now())
+  listing_type   String            @default("sale") // 'sale' or 'rent'
+  category       String            @default("residential") // 'residential', 'commercial', 'land'
+  building_age   String?           // e.g., '0', '5-10', '21-25'
+  heating_type   String?           // e.g., 'Klima', 'Doğalgaz'
+  floor_location String?           // e.g., '2. Kat', 'Bahçe Katı'
+  assigned_user_id Int?
+  assigned_user  User?             @relation("UserProperties", fields: [assigned_user_id], references: [id])
   history        PropertyHistory[]
   client_properties ClientProperty[]
   listings       PropertyListing[]
+  agenda_items   AgendaItem[]
 
   @@index([external_id])
   @@index([last_scraped])
+  @@index([price])
+  @@index([category])
+  @@index([listing_type])
+  @@index([seller_type])
+  @@index([rooms])
+  @@index([district])
+  @@index([neighborhood])
   @@map("properties")
 }
 
@@ -71,6 +88,7 @@ model Client {
   demands     Demand[]
   interactions Interaction[]
   saved_properties ClientProperty[]
+  agenda_items  AgendaItem[]
 
   @@map("clients")
 }
@@ -136,4 +154,24 @@ model SystemSetting {
   updated_at DateTime @default(now())
   
   @@map("system_settings")
+}
+
+model AgendaItem {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  start_at    DateTime
+  end_at      DateTime?
+  type        String   // 'meeting', 'call', 'showing', 'task', 'note'
+  status      String   @default("pending") // 'pending', 'completed', 'cancelled'
+  user_id     Int
+  user        User     @relation(fields: [user_id], references: [id])
+  is_global   Boolean  @default(false)
+  client_id   Int?
+  client      Client?  @relation(fields: [client_id], references: [id], onDelete: SetNull)
+  property_id Int?
+  property    Property? @relation(fields: [property_id], references: [id], onDelete: SetNull)
+  created_at  DateTime @default(now())
+
+  @@map("agenda_items")
 }

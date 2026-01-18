@@ -23,5 +23,6 @@ router.get('/export', authenticateToken, exportPropertiesToExcel);
 router.get('/:id', authenticateToken, getPropertyById); // Move basic detail fetch here too
 router.post('/:id/scrape-details', authenticateToken, scrapePropertyDetails);
 router.get('/:id/history', authenticateToken, getPropertyHistory);
+router.put('/:id/assign', authenticateToken, require('../controllers/propertyController').assignProperty);
 
 module.exports = router;

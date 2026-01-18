@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Calculator, Calendar, TrendingUp, Info } from 'lucide-react';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
+import PriceInput from '../ui/PriceInput';
 
 const CapitalGainsCalculator = ({ onBack }) => {
     // Constants for 2024 (Can be updated)
@@ -28,6 +29,10 @@ const CapitalGainsCalculator = ({ onBack }) => {
 
     const handleChange = (e) => {
         setValues({ ...values, [e.target.id]: e.target.value });
+    };
+
+    const handlePriceChange = (id, val) => {
+        setValues({ ...values, [id]: val });
     };
 
     const calculate = (e) => {
@@ -144,20 +149,32 @@ const CapitalGainsCalculator = ({ onBack }) => {
                                 id="purchaseDate" type="date" label="Alış Tarihi"
                                 value={values.purchaseDate} onChange={handleChange} required
                             />
-                            <Input
-                                id="purchasePrice" type="number" label="Alış Bedeli (TL)"
-                                value={values.purchasePrice} onChange={handleChange} required
-                            />
+                            <div className="space-y-1">
+                                <label className="block text-sm font-medium text-gray-700">Alış Bedeli (TL)</label>
+                                <PriceInput
+                                    id="purchasePrice"
+                                    placeholder="Örn: 1.000.000"
+                                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    value={values.purchasePrice}
+                                    onChange={(val) => handlePriceChange('purchasePrice', val)}
+                                />
+                            </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <Input
                                 id="saleDate" type="date" label="Satış Tarihi"
                                 value={values.saleDate} onChange={handleChange} required
                             />
-                            <Input
-                                id="salePrice" type="number" label="Satış Bedeli (TL)"
-                                value={values.salePrice} onChange={handleChange} required
-                            />
+                            <div className="space-y-1">
+                                <label className="block text-sm font-medium text-gray-700">Satış Bedeli (TL)</label>
+                                <PriceInput
+                                    id="salePrice"
+                                    placeholder="Örn: 5.000.000"
+                                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    value={values.salePrice}
+                                    onChange={(val) => handlePriceChange('salePrice', val)}
+                                />
+                            </div>
                         </div>
 
                         <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
@@ -183,10 +200,16 @@ const CapitalGainsCalculator = ({ onBack }) => {
                             </div>
                         </div>
 
-                        <Input
-                            id="expenses" type="number" label="Masraflar (Tapu Harcı vs.)"
-                            value={values.expenses} onChange={handleChange}
-                        />
+                        <div className="space-y-1">
+                            <label className="block text-sm font-medium text-gray-700">Masraflar (Tapu Harcı vs.)</label>
+                            <PriceInput
+                                id="expenses"
+                                placeholder="Örn: 50.000"
+                                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                value={values.expenses}
+                                onChange={(val) => handlePriceChange('expenses', val)}
+                            />
+                        </div>
 
                         <Button type="submit" className="w-full">
                             Hesapla

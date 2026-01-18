@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { MapPin, Calendar, Home, Ruler, ExternalLink, ArrowLeft, RefreshCw, Image as ImageIcon } from 'lucide-react';
+import { MapPin, Calendar, Home, Ruler, ExternalLink, ArrowLeft, RefreshCw, Image as ImageIcon, MessageCircle } from 'lucide-react';
 import api from '../services/api';
 
 const PropertyDetail = () => {
@@ -43,6 +43,22 @@ const PropertyDetail = () => {
         } finally {
             setScraping(false);
         }
+    };
+
+    const getWhatsAppLink = (phone, title) => {
+        if (!phone) return null;
+        // Basic cleanup: remove spaces, parens, dashes, generic text
+        let p = phone.replace(/\D/g, '');
+
+        // Ensure TR country code if missing
+        if (p.length === 10 && p.startsWith('5')) p = '90' + p;
+        else if (p.length === 11 && p.startsWith('0')) p = '9' + p;
+
+        // If still not valid (e.g. empty or landline without code), return null
+        if (p.length < 10) return null;
+
+        const text = encodeURIComponent(`Merhaba, "${title}" başlıklı ilanınız için yazıyorum. Detaylı bilgi alabilir miyim?`);
+        return `https://wa.me/${p}?text=${text}`;
     };
 
     if (loading) return <div className="min-h-screen flex items-center justify-center">Yükleniyor...</div>;
@@ -197,7 +213,7 @@ const PropertyDetail = () => {
                                 <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 font-bold">
                                     {(property.seller_name || property.seller_type || '?')[0].toUpperCase()}
                                 </div>
-                                <div>
+                                <div className="flex-1">
                                     <div className="font-semibold text-sm text-gray-900">
                                         {property.seller_name || (property.seller_type === 'owner' ? 'Sahibinden' : 'Emlak Ofisi')}
                                     </div>
@@ -205,6 +221,17 @@ const PropertyDetail = () => {
                                         {property.seller_phone || 'Telefon Gizli'}
                                     </div>
                                 </div>
+                                {property.seller_phone && getWhatsAppLink(property.seller_phone, property.title) && (
+                                    <a
+                                        href={getWhatsAppLink(property.seller_phone, property.title)}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full transition-colors shadow-sm"
+                                        title="WhatsApp ile Mesaj Gönder"
+                                    >
+                                        <MessageCircle size={20} />
+                                    </a>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -239,6 +266,24 @@ const PropertyDetail = () => {
                                     {property.listing_date ? new Date(property.listing_date).toLocaleDateString('tr-TR') : '-'}
                                 </span>
                             </div>
+                            {property.building_age && (
+                                <div className="flex items-center justify-between p-2 bg-gray-50 rounded border-l-4 border-blue-400">
+                                    <div className="flex items-center gap-2 text-gray-600 font-medium">Bina Yaşı</div>
+                                    <span className="font-semibold">{property.building_age}</span>
+                                </div>
+                            )}
+                            {property.heating_type && (
+                                <div className="flex items-center justify-between p-2 bg-gray-50 rounded border-l-4 border-orange-400">
+                                    <div className="flex items-center gap-2 text-gray-600 font-medium">Isınma</div>
+                                    <span className="font-semibold">{property.heating_type}</span>
+                                </div>
+                            )}
+                            {property.floor_location && (
+                                <div className="flex items-center justify-between p-2 bg-gray-50 rounded border-l-4 border-green-400">
+                                    <div className="flex items-center gap-2 text-gray-600 font-medium">Kat</div>
+                                    <span className="font-semibold">{property.floor_location}</span>
+                                </div>
+                            )}
                         </div>
 
                         {features.length > 0 && (

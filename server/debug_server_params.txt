@@ -1,0 +1,17 @@
+{}
+{}
+{}
+{}
+{"seller_type":"owner","opportunity_filter":"bargain","category":"daire","listingType":"sale"}
+{"seller_type":"owner","opportunity_filter":"price_drop","category":"daire","listingType":"sale"}
+{}
+{}
+{}
+{}
+{"opportunity_filter":"price_drop","listingType":"sale"}
+{"seller_type":"owner","opportunity_filter":"price_drop","listingType":"sale"}
+{}
+{}
+{}
+{}
+{"seller_type":"owner","opportunity_filter":"price_drop","category":"daire","listingType":"sale"}

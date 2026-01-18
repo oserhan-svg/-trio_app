@@ -1,519 +1,361 @@
-const puppeteer = require('puppeteer-extra');
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-puppeteer.use(StealthPlugin());
-puppeteer.use(StealthPlugin());
-const path = require('path');
-const { spawn } = require('child_process');
-const fs = require('fs');
+const { createStealthBrowser, saveBrowserState, humanizePage } = require('./browserFactory');
+const scraperConfig = require('../config/scraperConfig');
 
+/**
+ * Checks for known blocking pages/titles
+ */
+async function checkBlock(page) {
+    try {
+        const title = await page.title();
+        const content = await page.evaluate(() => document.body.innerText).catch(() => '');
 
-// Critical: Use a persistent profile to save cookies/solver state
+        const isBlocked = scraperConfig.selectors.blockIndicators.some(indicator =>
+            title.includes(indicator) || content.includes(indicator)
+        );
+
+        if (isBlocked) {
+            console.log('🛑 DETECTED BLOCK! Waiting for manual intervention...');
+            process.stdout.write('\x07'); // Bell sound
+
+            // Wait until block clears
+            await page.waitForFunction((indicators) => {
+                const t = document.title;
+                const b = document.body.innerText;
+                return !indicators.some(i => t.includes(i) || b.includes(i));
+            }, { timeout: 0, polling: 2000 }, scraperConfig.selectors.blockIndicators);
+
+            console.log('✅ Block cleared! Resuming...');
+            await saveBrowserState(page); // Save trust after solving
+            await new Promise(r => setTimeout(r, 2000));
+        }
+    } catch (e) {
+        // Ignore errors during block check (e.g. navigation)
+    }
+}
+
+/**
+ * Performs organic warmup behaviors
+ */
+async function organicWarmup(page) {
+    if (page.url().includes('sahibinden.com')) {
+        console.log('♻️ Already on target domain, skipping warmup.');
+        return;
+    }
+
+    console.log('🌍 Performing Organic Warmup...');
+    try {
+        await page.goto('https://www.google.com.tr', { waitUntil: 'domcontentloaded' });
+        await humanizePage(page);
+        await page.randomWait(1000, 2000);
+
+        const searchBox = await page.$('textarea[name="q"]') || await page.$('input[name="q"]');
+        if (searchBox) {
+            await searchBox.type('sahibinden satılık', { delay: 100 });
+            await page.keyboard.press('Enter');
+            await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 10000 }).catch(() => { });
+
+            // Random scroll on search results
+            await page.randomScroll();
+
+            // Click a result if possible, else go direct
+            const link = await page.$('a[href*="sahibinden.com"]');
+            if (link) {
+                await Promise.all([
+                    page.waitForNavigation({ timeout: 60000 }).catch(() => { }),
+                    link.click()
+                ]);
+            }
+        }
+    } catch (e) {
+        console.log('⚠️ Warmup partial fail, proceeding:', e.message);
+    }
+}
 
 async function scrapeSahibindenStealth(url, forcedSellerType = null) {
     console.log(`🕵️ Stealth Scraper Starting for: ${url}`);
-    if (forcedSellerType) console.log(`👉 Forcing Seller Type: ${forcedSellerType}`);
 
-    // 1. Get or Launch Browser
     let browser;
     try {
         browser = await getOrLaunchBrowser();
-    } catch (e) {
-        console.error('❌ Browser Init Failed:', e);
-        throw e;
-    }
+        if (!browser) throw new Error('Browser initialization failed.');
 
-    try {
         const pages = await browser.pages();
-        // Try to find an existing Sahibinden tab to reuse (Better for session continuity)
         let page = pages.find(p => p.url().includes('sahibinden.com'));
 
         if (page) {
             console.log('♻️ Reusing existing Sahibinden tab!');
             await page.bringToFront();
+            await humanizePage(page); // Re-attach utilities
         } else {
             console.log('📄 Opening new tab...');
             page = await browser.newPage();
             try { await page.setViewport({ width: 1920, height: 1080 }); } catch (e) { }
+            await humanizePage(page);
+            await organicWarmup(page);
         }
 
-        console.log('Navigating...');
+        let allListings = [];
+        let pageNum = 0;
+        const maxPages = 5;
+        let hasNextPage = true;
 
-        // Organic Navigation Strategy: Go via Google if not already on Sahibinden
-        const currentUrl = page.url();
-        if (!currentUrl.includes('sahibinden.com')) {
-            console.log('🌍 Organic Mode: Entering via Google Search...');
+        while (hasNextPage && pageNum < maxPages) {
+            const offset = pageNum * 20;
+            const pageUrl = url.includes('?') ? `${url}&pagingOffset=${offset}` : `${url}?pagingOffset=${offset}`;
+            console.log(`📍 Page ${pageNum + 1}: Visiting ${pageUrl}`);
+
+            // Navigate with random delay
+            if (page.url() !== pageUrl) {
+                await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: scraperConfig.timeouts.pageLoad });
+            }
+
+            await checkBlock(page);
+            await page.randomScroll();
+
+            const selector = scraperConfig.selectors.listingRow || '.searchResultsItem';
+
+            // Wait for table or list items
             try {
-                await page.goto('https://www.google.com.tr', { waitUntil: 'domcontentloaded' });
-                await new Promise(r => setTimeout(r, 1000));
-
-                // Type search
-                const searchBox = await page.$('textarea[name="q"]') || await page.$('input[name="q"]');
-                if (searchBox) {
-                    await searchBox.type('sahibinden', { delay: 150 });
-                    await page.keyboard.press('Enter');
-                    await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 10000 }).catch(() => { });
-
-                    // Click first result (usually sahibinden.com)
-                    const firstResult = await page.waitForSelector('h3', { timeout: 5000 }).catch(() => null);
-                    if (firstResult) {
-                        console.log('👉 Clicking Google Result...');
-                        await firstResult.click();
-                        // Wait for some load
-                        await new Promise(r => setTimeout(r, 3000));
-                    }
-                }
+                await page.waitForFunction(() =>
+                    document.querySelectorAll('.searchResultsItem').length > 0 ||
+                    document.querySelectorAll('.classified:not(.header)').length > 0
+                    , { timeout: scraperConfig.timeouts.element });
             } catch (e) {
-                console.log('⚠️ Google warmup failed, falling back to direct navigation:', e.message);
-            }
-        }
-
-        // Now navigate to the specific target URL
-        if (page.url() !== url) {
-            console.log(`📍 Going to target URL: ${url}`);
-            await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
-        }
-
-        console.log('Waiting for network idle / challenge...');
-
-        // ANTI-BOT PAUSE MECHANISM
-        const checkBlock = async () => {
-            const title = await page.title();
-            const content = await page.evaluate(() => document.body.innerText);
-            if (title.includes('Olağan dışı') ||
-                title.includes('Unusual access') ||
-                title.includes('Just a moment') || // Cloudflare
-                title.includes('Human') || // Verify you are human
-                content.includes('Olağan dışı erişim') ||
-                content.includes('Olağan dışı erişim tespit ettik') ||
-                content.includes('bilgisayar ağı') ||
-                content.includes('Basılı tutun') || // Press and Hold
-                content.includes('Verify you are human')
-            ) {
-                console.log('🛑 BLOKLANDI! (Olağan dışı erişim / Cloudflare)');
-                console.log('👉 LÜTFEN AÇIK OLAN CHROME PENCERESİNDEN DOĞRULAMAYI ELLE YAPIN.');
-                console.log('⏳ Robot bekliyor... (Ekranda "Devam Et" vs varsa basın)');
-                process.stdout.write('\x07'); // System Beep to alert user
-
-                // Wait indefinitely until the block is gone
-                await page.waitForFunction(() => {
-                    const t = document.title;
-                    const b = document.body.innerText;
-                    return !t.includes('Olağan dışı') &&
-                        !t.includes('Unusual') &&
-                        !t.includes('Just a moment') &&
-                        !t.includes('Human') &&
-                        !b.includes('Olağan dışı erişim tespit ettik') &&
-                        !b.includes('Basılı tutun');
-                }, { timeout: 0, polling: 3000 });
-
-                console.log('✅ Blok çözüldü! Devam ediliyor...');
-                await new Promise(r => setTimeout(r, 2000));
-            }
-        };
-
-        try {
-            await checkBlock(); // Initial check
-
-            const title = await page.title();
-            if (title.includes('Just a moment') || title.includes('Cloudflare') || title.includes('Human')) {
-                console.log('⚠️ Challenge detected. Waiting for manual interaction...');
-                console.log('👉 USER ACTION: Please complete the Cloudflare verification on screen!');
-
-                // Wait for navigation or title change indicating success
-                await page.waitForFunction(() => !document.title.includes('Just a moment') && !document.title.includes('Cloudflare'), { timeout: 600000 });
-                await checkBlock(); // Check again after Cloudflare
+                console.log('❌ Listings not found (Timeout). End of results?');
+                break;
             }
 
-            // Final check before trying to parse
-            await checkBlock();
-        } catch (e) { }
+            // Extract Data
+            const pageListings = await page.evaluate((forcedType, selector) => {
+                // Check if we are in Store Mode (div.classified)
+                const storeItems = document.querySelectorAll('.classified:not(.header)');
+                if (storeItems.length > 0) {
+                    // Store Mode Extraction
+                    const data = [];
+                    storeItems.forEach(row => {
+                        const urlEl = row.querySelector('.info .title a') || row.querySelector('.image a');
+                        if (!urlEl) return;
 
-        try {
-            console.log('Checking for table...');
-            await page.waitForSelector('#searchResultsTable', { timeout: 30000 });
-            console.log('✅ Table found!');
-        } catch (e) {
-            console.log('❌ Table NOT found independently. Maybe manual interaction needed?');
-            await new Promise(r => setTimeout(r, 5000));
-        }
+                        const title = urlEl.innerText.trim();
+                        const fullUrl = urlEl.href;
+                        const idMatch = fullUrl.match(/-(\d+)\/detay/);
+                        const id = idMatch ? idMatch[1] : null; // Fallback if no ID found
+                        if (!id) return;
 
-        const listings = await page.evaluate((forcedType) => {
-            const rows = document.querySelectorAll('#searchResultsTable tbody tr.searchResultsItem');
-            const data = [];
+                        const priceEl = row.querySelector('.price');
+                        let price = 0;
+                        if (priceEl) {
+                            const raw = priceEl.innerText.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, '');
+                            price = parseFloat(raw) || 0;
+                        }
 
-            rows.forEach(row => {
-                const id = row.getAttribute('data-id');
-                if (!id) return;
+                        // Location is harder in this view, often textContent or specific class. 
+                        // We can leave blank or try to parse text.
+                        const location = '';
 
-                const urlEl = row.querySelector('a.classifiedTitle');
-                const title = urlEl?.innerText.trim() || 'No Title';
-                const href = urlEl?.getAttribute('href');
-                const fullUrl = href ? 'https://www.sahibinden.com' + href : '';
-
-                const priceEl = row.querySelector('.searchResultsPriceValue div');
-                let price = 0;
-                if (priceEl) {
-                    const raw = priceEl.innerText.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, '');
-                    price = parseFloat(raw) || 0;
+                        data.push({ external_id: id, title, price, url: fullUrl, location, district: '', neighborhood: '', seller_type: 'office', rooms: '', size_m2: 0 });
+                    });
+                    return data;
                 }
 
-                const locationEl = row.querySelector('.searchResultsLocationValue');
-                let location = locationEl ? locationEl.innerText.replace(/\n/g, ' ').trim() : '';
+                // Standard Search Mode Extraction
+                const rows = document.querySelectorAll(selector);
+                const data = [];
+                rows.forEach(row => {
+                    const id = row.getAttribute('data-id');
+                    if (!id) return;
 
-                let district = '';
-                let neighborhood = '';
+                    const urlEl = row.querySelector('a.classifiedTitle');
+                    const title = urlEl?.innerText.trim() || 'No Title';
+                    const href = urlEl?.getAttribute('href');
+                    const fullUrl = href ? 'https://www.sahibinden.com' + href : '';
 
-                if (location) {
-                    const parts = location.split('/').map(s => s.trim());
-                    // Example: Balıkesir / Ayvalık / Ali Çetinkaya Mh.
-                    if (parts.length >= 2) district = parts[1];
-                    if (parts.length >= 3) {
-                        let raw = parts[2];
-                        // Normalize "Mh", "Mahallesi" -> "Mah."
-                        raw = raw.replace(/\s+Mahallesi/i, '').replace(/\s+Mah\.?/i, '').replace(/\s+Mh\.?/i, '').trim();
-                        neighborhood = raw + ' Mah.';
+                    const priceEl = row.querySelector('.searchResultsPriceValue div');
+                    let price = 0;
+                    if (priceEl) {
+                        const raw = priceEl.innerText.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, '');
+                        price = parseFloat(raw) || 0;
                     }
-                }
 
-                // Extra Data Extraction (Rooms, m2, Date)
-                let size_m2 = 0;
-                let rooms = '';
-                let listing_date = null;
-                const fullText = row.innerText;
-                const textToSearch = fullText + ' ' + title;
+                    const locationEl = row.querySelector('.searchResultsLocationValue');
+                    let location = locationEl ? locationEl.innerText.replace(/\n/g, ' ').trim() : '';
+                    let district = '';
+                    let neighborhood = '';
 
-                // M2
-                const m2Match = textToSearch.match(/(\d+)\s*m[²2]/i);
-                if (m2Match) size_m2 = parseInt(m2Match[1]);
-
-                // Rooms
-                const roomsMatch = textToSearch.match(/(\d+\+\d+)|(Stüdyo)/i);
-                if (roomsMatch) rooms = roomsMatch[0].replace(/\s/g, '');
-
-                // Date
-                const dateEl = row.querySelector('.searchResultsDateValue');
-                if (dateEl) {
-                    const dateText = dateEl.innerText.trim().replace(/\n/g, ' ');
-                    const months = {
-                        'Ocak': '01', 'Şubat': '02', 'Mart': '03', 'Nisan': '04', 'Mayıs': '05', 'Haziran': '06',
-                        'Temmuz': '07', 'Ağustos': '08', 'Eylül': '09', 'Ekim': '10', 'Kasım': '11', 'Aralık': '12'
-                    };
-                    const dayMatch = dateText.match(/(\d+)\s+([a-zA-ZçğıöşüÇĞİÖŞÜ]+)/);
-                    if (dayMatch) {
-                        const day = dayMatch[1].padStart(2, '0');
-                        const monthName = dayMatch[2];
-                        const month = months[monthName] || '01';
-                        const year = new Date().getFullYear();
-                        listing_date = `${year}-${month}-${day}`;
+                    if (location) {
+                        const parts = location.split('/').map(s => s.trim());
+                        if (parts.length >= 2) district = parts[1];
+                        if (parts.length >= 3) {
+                            let raw = parts[2];
+                            raw = raw.replace(/\s+Mahallesi/i, '').replace(/\s+Mah\.?/i, '').replace(/\s+Mh\.?/i, '').trim();
+                            neighborhood = raw + ' Mah.';
+                        }
                     }
-                }
 
-                let seller_type = forcedType || 'office';
+                    const fullText = row.innerText + ' ' + title;
+                    let size_m2 = 0;
+                    const m2Match = fullText.match(/(\d+)\s*m[²2]/i);
+                    if (m2Match) size_m2 = parseInt(m2Match[1]);
 
-                if (!forcedType) {
+                    let rooms = '';
+                    const roomsMatch = fullText.match(/(\d+\+\d+)|(Stüdyo)/i);
+                    if (roomsMatch) rooms = roomsMatch[0].replace(/\s/g, '');
+
+                    let seller_type = forcedType || 'office';
+                    let seller_name = 'Bilinmiyor';
+
                     const lowerText = fullText.toLowerCase();
                     if (lowerText.includes('sahibinden') || lowerText.includes('bireysel')) {
                         seller_type = 'owner';
+                        seller_name = 'Sahibinden';
+                    } else if (lowerText.includes('banka')) {
+                        seller_type = 'bank';
                     }
-                    if (lowerText.includes('emlak ofisi') || lowerText.includes('kurumsal')) seller_type = 'office';
-                    if (lowerText.includes('bankadan')) seller_type = 'bank';
-                    if (lowerText.includes('inşaat firması')) seller_type = 'construction';
+
+                    // Attempt to extract store name if available in list view (often hard)
+                    // But if it's a store page, we might know it? No context here.
+                    // For now, if office, we leave as 'Bilinmiyor' unless we can find a clearer selector.
+                    // In real Sahibinden list, store name isn't always visible in the row without expanding.
+
+                    data.push({ external_id: id, title, price, url: fullUrl, location, district, neighborhood, seller_type, seller_name, rooms, size_m2 });
+                });
+                return data;
+            }, forcedSellerType, selector);
+
+            console.log(`🎉 Page ${pageNum + 1} extracted ${pageListings.length} listings.`);
+
+            if (pageListings.length === 0) {
+                hasNextPage = false;
+            } else {
+                allListings = [...allListings, ...pageListings];
+                pageNum++;
+                // Save state progressively
+                await saveBrowserState(page);
+
+                if (pageNum < maxPages) {
+                    await page.randomWait(3000, 6000);
                 }
-
-                data.push({ external_id: id, title, price, url: fullUrl, location, district, neighborhood, seller_type, rooms, size_m2, listing_date });
-            });
-            return data;
-        }, forcedSellerType);
-
-        console.log(`🎉 Extracted ${listings.length} listings.`);
-        return listings;
-
-    } catch (err) {
-        console.error('Scrape Failed:', err);
-        if (err.message.includes('connect') || err.message.includes('Target closed')) {
-            throw new Error('Chrome bağlantısı koptu. Lütfen "start_chrome_master.bat" dosyasını çalıştırın.');
-        }
-        throw err;
-    } finally {
-        if (browser) {
-            try {
-                // IMPORTANT: Disconnect lets the browser stay open. 
-                // We NEVER want to close the master browser or its pages automatically.
-                await browser.disconnect();
-                console.log('🔌 Disconnected from Master Chrome (Browser stays open)');
-            } catch (e) {
-                console.log('⚠️ Disconnect warning:', e.message);
             }
         }
+
+        return allListings;
+
+    } catch (err) {
+        console.error('❌ Scrape Failed:', err.message);
+        throw err;
+    } finally {
+        if (browser) await browser.disconnect();
     }
 }
 
-async function scrapeSahibindenDetails(url) {
-    console.log(`--- Scraping Sahibinden Details (${url}) ---`);
-    let browser;
+// Exported for backward compatibility but using new factory
+async function getOrLaunchBrowser() {
+    const { createStealthBrowser } = require('./browserFactory');
+    // Try connecting first (if we have a mechanism to know port, else just launch new one which creates singleton-like behavior if managed well, but for now we follow the new pattern: creating a persistent instance or connecting to debug port 9222 if manual)
+
+    // For now, let's stick to the existing "Connect or Launch" logic but use our new factory for the launch part
     const puppeteer = require('puppeteer-extra');
-    const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-    puppeteer.use(StealthPlugin());
-
-    // 1. Get or Launch Browser
-    try {
-        browser = await getOrLaunchBrowser();
-    } catch (e) {
-        console.error('❌ Browser Init Failed:', e);
-        throw e;
-    }
-
-    // 2. Setup Page
-    const pages = await browser.pages();
-    let page = pages.find(p => p.url().includes('sahibinden.com'));
-
-    if (page) {
-        console.log('♻️ Reusing existing Sahibinden tab for Details!');
-        await page.bringToFront();
-    } else {
-        console.log('📄 Opening new tab for Details...');
-        page = await browser.newPage();
-        try { await page.setViewport({ width: 1920, height: 1080 }); } catch (e) { }
-    }
-
-    // ANTI-BOT PAUSE MECHANISM FOR DETAILS
-    const checkBlock = async () => {
-        try {
-            const title = await page.title();
-            const content = await page.evaluate(() => document.body.innerText).catch(() => '');
-
-            // console.log('DEBUG: Title:', title); // Too noisy
-
-            if (title.includes('Olağan dışı') ||
-                title.includes('Unusual access') ||
-                title.includes('Just a moment') || // Cloudflare
-                title.includes('Human') || // Verify you are human
-                content.includes('Olağan dışı erişim') ||
-                content.includes('Olağan dışı erişim tespit ettik') ||
-                content.includes('bilgisayar ağı') ||
-                content.includes('Basılı tutun') || // Press and Hold
-                content.includes('Verify you are human')
-            ) {
-                console.log('🛑 DETAY SAYFASI BLOKLANDI! (Olağan dışı erişim / Cloudflare)');
-                console.log('👉 LÜTFEN AÇIK OLAN CHROME PENCERESİNDEN DOĞRULAMAYI ELLE YAPIN.');
-                console.log('⏳ Robot bekliyor... (Ekranda "Devam Et" vs varsa basın)');
-                process.stdout.write('\x07'); // System Beep to alert user
-
-                // Wait indefinitely until the block is gone
-                await page.waitForFunction(() => {
-                    const t = document.title;
-                    const b = document.body.innerText;
-                    return !t.includes('Olağan dışı') &&
-                        !t.includes('Unusual') &&
-                        !t.includes('Just a moment') &&
-                        !t.includes('Human') &&
-                        !b.includes('Olağan dışı erişim tespit ettik') &&
-                        !b.includes('Basılı tutun');
-                }, { timeout: 0, polling: 3000 });
-
-                console.log('✅ Blok çözüldü! Devam ediliyor...');
-                await new Promise(r => setTimeout(r, 2000));
-            }
-        } catch (e) {
-            // CheckBlock failed
-        }
-    };
-
-    const waitRandom = (min, max) => new Promise(r => setTimeout(r, min + Math.random() * (max - min)));
+    const { spawn } = require('child_process');
+    const fs = require('fs');
 
     try {
-        await checkBlock(); // Initial check
+        // FAST path: Connect to existing debugger
+        return await puppeteer.connect({ browserURL: 'http://127.0.0.1:9222', defaultViewport: null });
+    } catch (err) {
+        console.log('⚠️ Existing Chrome 9222 not found. Launching optimized browser...');
+        // Use our new factory
+        return await require('./browserFactory').createStealthBrowser({
+            headless: false,
+            proxy: scraperConfig.stealth.useProxy ? scraperConfig.stealth.proxyUrl : null
+        });
+    }
+}
 
-        // Attempt to switch to details tab or ensure we are on the right URL
-        // Attempt to switch to details tab or ensure we are on the right URL
-        if (page.url() !== url) {
-            // If we are already on Sahibinden, simulate "reading" time before clicking next
-            if (page.url().includes('sahibinden.com')) {
-                console.log('⏳ Simulating human delay before navigating to details...');
-                await waitRandom(3000, 6000);
-            } else {
-                // Set Referer to look like we came from Google
-                console.log('🌍 Setting Google Referer...');
-                await page.setExtraHTTPHeaders({ 'Referer': 'https://www.google.com/' });
-            }
-
-            await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+async function scrapeSahibindenDetails(url, existingPage = null) {
+    console.log(`🔎 Scraping Sahibinden Details: ${url}`);
+    let browser;
+    let page;
+    try {
+        if (existingPage) {
+            page = existingPage;
+        } else {
+            console.log('📄 Opening new detail tab (No existing page provided)');
+            browser = await getOrLaunchBrowser();
+            page = await browser.newPage();
+            await humanizePage(page);
         }
 
-        await checkBlock(); // Check after navigation
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+        await checkBlock(page);
 
-        console.log('⏳ WAITING FOR LISTING DATA...');
+        // Random wait to simulate reading
+        await page.randomWait(2000, 5000);
 
-        // Wait up to 10 minutes for the user to get to the listing page content
+        // Wait for key elements
         try {
-            await page.waitForSelector('#classifiedDescription', { timeout: 600000 }); // 10 mins
-        } catch (e) {
-            console.log('Timed out waiting for listing content. Checking for block again...');
+            await page.waitForSelector('.classifiedInfo', { timeout: 5000 });
+        } catch (e) { }
 
-            // CAPTURE ERROR SCREENSHOT
-            const fs = require('fs');
-            const screenshotPath = require('path').join(__dirname, '..', '..', 'error_screenshot.png');
-            await page.screenshot({ path: screenshotPath, fullPage: true });
-            console.log(`📸 Screenshot saved to: ${screenshotPath}`);
-
-            await checkBlock(); // Late block check
-            throw new Error('İlan detayları 10 dakika içinde görüntülenemedi. (Ekran görüntüsü kaydedildi)');
-        }
-
-        // Check for 404 / Removed Listing (Quick check after selector found or timeout)
-        try {
-            const bodyText = await page.evaluate(() => document.body.innerText);
-            if (bodyText.includes('Aradığınız sayfa artık bulunamıyor') || bodyText.includes('yayında olmayan')) {
-                throw new Error('İlan yayından kaldırılmış veya URL geçersiz.');
-            }
-        } catch (e) { if (e.message.includes('İlan yayından')) throw e; }
-
-        const details = await page.evaluate(() => {
+        const data = await page.evaluate(() => {
             const description = document.querySelector('#classifiedDescription')?.innerText.trim() || '';
 
-            // Images logic
+            // Images
             const images = [];
-            const potentialImages = [
-                ...document.querySelectorAll('.mega-photo-thumnail img'), // Yes, they sometimes have this typo
-                ...document.querySelectorAll('.mega-photo-thumbnail img'),
-                ...document.querySelectorAll('.thmb img'),
-                ...document.querySelectorAll('.classifiedDetailMainPhoto img')
-            ];
+            document.querySelectorAll('.classifiedDetailMainPhoto img').forEach(img => images.push(img.src));
+            document.querySelectorAll('.megaPhoto img').forEach(img => images.push(img.getAttribute('data-source') || img.src));
 
-            potentialImages.forEach(img => {
-                if (img.src && !img.src.includes('pixel') && !img.src.includes('blank')) {
-                    let highRes = img.src.replace('thmb_', '').replace('x5_', '');
-                    if (!images.includes(highRes)) images.push(highRes);
-                }
-            });
-
-            // Features (Classified Info List) parsing for structured data
+            // Features
             const features = [];
-            const infoMap = {};
+            document.querySelectorAll('.uiBox.selected').forEach(li => features.push(li.innerText.trim()));
 
-            const featureEls = document.querySelectorAll('.classifiedInfoList li');
-            featureEls.forEach(li => {
-                const text = li.innerText.trim();
-                features.push(text);
+            // Extract Attributes
+            const infoMap = {};
+            document.querySelectorAll('.classifiedInfoList li').forEach(li => {
                 const label = li.querySelector('strong')?.innerText.trim();
                 const value = li.querySelector('span')?.innerText.trim();
-                if (label && value) {
-                    infoMap[label] = value;
-                }
+                if (label && value) infoMap[label] = value;
             });
 
-            // Extract structured fields
-            let size_m2 = 0;
-            if (infoMap['m² (Brüt)']) size_m2 = parseInt(infoMap['m² (Brüt)'].replace('.', '')) || 0;
-            if (!size_m2 && infoMap['m² (Net)']) size_m2 = parseInt(infoMap['m² (Net)'].replace('.', '')) || 0;
+            // Seller Info
+            const seller_name = document.querySelector('.username-info-area h5')?.innerText.trim() ||
+                document.querySelector('.user-info-module .u-name')?.innerText.trim() ||
+                'Dosya Sahibi';
 
-            let rooms = infoMap['Oda Sayısı'] || null;
-            let building_age = infoMap['Bina Yaşı'] || null;
-            let floor_location = infoMap['Bulunduğu Kat'] || null;
+            const seller_phone = document.querySelector('.pretty-phone-part')?.innerText.trim() || '';
 
-            // Location
-            let district = null;
-            let neighborhood = null;
-            const breadcrumbs = Array.from(document.querySelectorAll('.classifiedInfo h2 a')).map(a => a.innerText.trim());
-            if (breadcrumbs.length >= 2) district = breadcrumbs[1];
-            if (breadcrumbs.length >= 3) {
-                let raw = breadcrumbs[2];
-                raw = raw.replace(/\s+Mahallesi/i, '').replace(/\s+Mah\.?/i, '').replace(/\s+Mh\.?/i, '').trim();
-                neighborhood = raw + ' Mah.';
-            }
-
-            let seller_name = null;
-            const sellerNameEl = document.querySelector('.username-info-area h5');
-            if (sellerNameEl) seller_name = sellerNameEl.innerText.trim();
-
-            return { description, images, features, size_m2, rooms, building_age, floor_location, district, neighborhood, seller_name };
+            return {
+                description,
+                images: [...new Set(images)],
+                features,
+                size_m2: parseInt(infoMap['m² (Brüt)'] || 0),
+                rooms: infoMap['Oda Sayısı'] || null,
+                heating_type: infoMap['Isıtma'] || null,
+                building_age: infoMap['Bina Yaşı'] || null,
+                floor_location: infoMap['Bulunduğu Kat'] || null,
+                seller_name,
+                seller_phone
+            };
         });
 
-        console.log(`✅ Extracted: ${details.description.substring(0, 30)}... | Images: ${details.images.length} | Features: ${details.features.length}`);
-
-        // Validation: If we got absolutely nothing, throw an error
-        if ((!details.description || details.description.length < 5) && details.images.length === 0) {
-            console.log('❌ Content seemed empty. Selectors might be wrong or page not fully loaded.');
-            throw new Error('İlan sayfasına erişildi ancak veri çekilemedi. Sayfa yapısı değişmiş olabilir.');
+        // Clean up data
+        if (data.images.length === 0) {
+            // Fallback for single image
+            const mainImg = await page.$eval('.classifiedDetailMainPhoto img', img => img.src).catch(() => null);
+            if (mainImg) data.images.push(mainImg);
         }
 
-        return details;
+        return data;
 
-    } catch (err) {
-        console.error('Detail Scrape Failed:', err);
-
-        // CRITICAL: Check for block even on error!
-        await checkBlock();
-
-        if (err.message.includes('connect') || err.message.includes('Target closed')) {
-            throw new Error('Chrome bağlantısı koptu. Lütfen "start_chrome_master.bat" dosyasını çalıştırın.');
-        }
-        throw err;
+    } catch (error) {
+        console.error('❌ Detail Scrape Failed:', error.message);
+        throw error;
     } finally {
-        if (browser) {
-            try {
-                await browser.disconnect();
-                console.log('🔌 Disconnected from Master Chrome (Browser stays open)');
-            } catch (e) { }
+        // Only close if we opened it and it's not the reusing logic
+        if (!existingPage && browser && (await browser.pages()).length > 2) {
+            const pages = await browser.pages();
+            await pages[pages.length - 1].close();
         }
     }
 }
 
-if (require.main === module) {
-    const TEST_URL = 'https://www.sahibinden.com/satilik-daire/balikesir-ayvalik-alicetinkaya-mh';
-    scrapeSahibindenStealth(TEST_URL);
-}
-
-async function getOrLaunchBrowser() {
-    try {
-        console.log('🔌 Connecting to Master Chrome (Port 9222)...');
-        // Try connecting first
-        const browser = await puppeteer.connect({
-            browserURL: 'http://127.0.0.1:9222',
-            defaultViewport: null
-        });
-        console.log('✅ Connected to existing Chrome!');
-        return browser;
-    } catch (err) {
-        console.log('⚠️ Existing Chrome not found. Auto-launching Master Chrome...');
-
-        // Path to Chrome - try common locations
-        const chromePaths = [
-            "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
-            "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
-        ];
-
-        const chromePath = chromePaths.find(p => fs.existsSync(p));
-
-        if (!chromePath) {
-            throw new Error('Chrome executable not found. Please install Chrome.');
-        }
-
-        // Launch Chrome Process
-        const userDataDir = "C:\\chrome-debug-profile";
-
-        // Spawn detached process so it stays alive even if node script ends
-        const chromeProcess = spawn(chromePath, [
-            '--remote-debugging-port=9222',
-            `--user-data-dir=${userDataDir}`,
-            '--no-first-run',
-            '--no-default-browser-check'
-        ], {
-            detached: true,
-            stdio: 'ignore'
-        });
-
-        chromeProcess.unref();
-
-        console.log('🚀 Chrome launched! Waiting for connection...');
-        await new Promise(r => setTimeout(r, 4000)); // Wait for Chrome to start
-
-        // Try connecting again
-        return await puppeteer.connect({
-            browserURL: 'http://127.0.0.1:9222',
-            defaultViewport: null
-        });
-    }
-}
-
-module.exports = { scrapeSahibindenStealth, scrapeSahibindenDetails, getOrLaunchBrowser };
+module.exports = { scrapeSahibindenStealth, getOrLaunchBrowser, scrapeSahibindenDetails };

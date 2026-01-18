@@ -1,5 +1,5 @@
-const { scrapeSahibindenStealth } = require('./services/stealthScraper');
-const prisma = require('./db');
+const { scrapeSahibindenStealth } = require('../services/stealthScraper');
+const prisma = require('../db');
 
 // Ali Çetinkaya
 const URL = 'https://www.sahibinden.com/satilik-daire/balikesir-ayvalik-alicetinkaya-mh';

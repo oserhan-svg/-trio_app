@@ -24,16 +24,48 @@ const { checkOpportunity } = require('./analyticsService');
 // URLs Configuration
 // ... (keep NEIGHBORHOODS)
 
-const NEIGHBORHOODS = [
+const CATEGORIES = [
     {
-        name: 'Ali Çetinkaya',
-        hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-ali-cetinkaya-satilik/daire',
-        sahibinden: 'https://www.sahibinden.com/satilik-daire/balikesir-ayvalik-alicetinkaya-mh'
+        name: 'Satılık Daire',
+        hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-satilik/daire',
+        sahibinden: 'https://www.sahibinden.com/satilik-daire/balikesir-ayvalik',
+        type: 'sale',
+        category: 'daire'
     },
     {
-        name: '150 Evler',
-        hepsiemlak: 'https://www.hepsiemlak.com/150-evler-satilik',
-        sahibinden: 'https://www.sahibinden.com/satilik-daire/balikesir-ayvalik-150-evler-mh'
+        name: 'Satılık Villa',
+        hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-satilik/villa',
+        sahibinden: 'https://www.sahibinden.com/satilik-villa/balikesir-ayvalik',
+        type: 'sale',
+        category: 'villa'
+    },
+    {
+        name: 'Satılık Müstakil Ev',
+        hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-satilik/mustakil-ev',
+        sahibinden: 'https://www.sahibinden.com/satilik-mustakil-ev/balikesir-ayvalik',
+        type: 'sale',
+        category: 'mustakil'
+    },
+    {
+        name: 'Kiralık Daire',
+        hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-kiralik/daire',
+        sahibinden: 'https://www.sahibinden.com/kiralik-daire/balikesir-ayvalik',
+        type: 'rent',
+        category: 'daire'
+    },
+    {
+        name: 'Satılık Arsa',
+        hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-satilik-arsa',
+        sahibinden: 'https://www.sahibinden.com/satilik-arsa/balikesir-ayvalik',
+        type: 'sale',
+        category: 'land'
+    },
+    {
+        name: 'Satılık İşyeri',
+        hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-satilik-isyeri',
+        sahibinden: 'https://www.sahibinden.com/satilik-is-yeri/balikesir-ayvalik',
+        type: 'sale',
+        category: 'commercial'
     }
 ];
 
@@ -61,27 +93,35 @@ async function scrapeProperties(provider = 'all') {
         // ... rest of the logic
 
         if (provider === 'all' || provider === 'hepsiemlak') {
-            for (const hood of NEIGHBORHOODS) {
-                console.log(`Targeting Hepsiemlak: ${hood.name}`);
+            for (const cat of CATEGORIES) {
+                console.log(`Targeting Hepsiemlak Category: ${cat.name}`);
 
                 // 1. Standard Scrape
-                await scrapeHepsiemlak(page, hood.hepsiemlak);
+                await scrapeHepsiemlak(page, cat.hepsiemlak, null, cat.category);
 
-                // 2. Owner Specific Scrape using the discovered URL pattern
-                if (hood.hepsiemlak.includes('satilik')) {
-                    const ownerUrl = hood.hepsiemlak.replace('satilik', 'satilik-sahibinden');
+                // 2. Owner Specific Scrape using the discovered URL pattern (Only for Sale)
+                if (cat.type === 'sale') {
+                    const ownerUrl = cat.hepsiemlak.replace('satilik', 'satilik-sahibinden');
                     console.log(`Targeting Hepsiemlak (Owner Tab): ${ownerUrl}`);
-                    await scrapeHepsiemlak(page, ownerUrl, 'owner');
+                    await scrapeHepsiemlak(page, ownerUrl, 'owner', cat.category);
                 }
+
+                // Add randomized delay between categories to be nice to servers
+                await new Promise(r => setTimeout(r, 5000 + Math.random() * 5000));
             }
         }
 
         if (provider === 'all' || provider === 'sahibinden') {
-            for (const hood of NEIGHBORHOODS) {
-                console.log(`Targeting Sahibinden: ${hood.name}`);
+            for (const cat of CATEGORIES) {
+                console.log(`Targeting Sahibinden Category: ${cat.name}`);
                 const { scrapeSahibindenStealth } = require('./stealthScraper');
-                const listings = await scrapeSahibindenStealth(hood.sahibinden);
-                await saveListings(listings);
+                const listings = await scrapeSahibindenStealth(cat.sahibinden);
+                // Enrich listings with category before saving
+                const enrichedListings = listings.map(l => ({ ...l, category: cat.category }));
+                await saveListings(enrichedListings);
+
+                // Add randomized delay
+                await new Promise(r => setTimeout(r, 10000 + Math.random() * 10000));
             }
         }
     } catch (error) {
@@ -94,13 +134,13 @@ async function scrapeProperties(provider = 'all') {
     }
 }
 
-async function scrapeHepsiemlak(page, url, forcedSellerType = null) {
-    console.log(`--- Scraping Hepsiemlak (${url}) [Forced Type: ${forcedSellerType || 'Auto'}] ---`);
+async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = 'residential') {
+    console.log(`--- Scraping Hepsiemlak (${url}) [Forced Type: ${forcedSellerType || 'Auto'}, Category: ${category}] ---`);
     let allListings = [];
     let pageNum = 1;
     let hasNextPage = true;
 
-    while (hasNextPage && pageNum <= 50) {
+    while (hasNextPage && pageNum <= 5) {
         const pageUrl = `${url}?page=${pageNum}`;
         console.log(`Navigating to Hepsiemlak Page ${pageNum}: ${pageUrl}`);
 
@@ -170,29 +210,41 @@ async function scrapeHepsiemlak(page, url, forcedSellerType = null) {
 
                     // Seller Type Detection (Hepsiemlak)
                     let seller_type = forcedSellerType || 'office';
+                    let seller_name = 'Bilinmiyor';
 
                     if (!forcedSellerType) {
                         const ownerInfoEl = item.querySelector('.listing-card--owner-info');
                         if (ownerInfoEl) {
-                            const infoText = ownerInfoEl.innerText.toLowerCase();
-                            if (infoText.includes('sahibinden')) {
+                            const infoText = ownerInfoEl.innerText.trim();
+                            seller_name = infoText; // Save the office/seller name
+
+                            const lowerInfo = infoText.toLowerCase();
+                            if (lowerInfo.includes('sahibinden')) {
                                 seller_type = 'owner';
-                            } else if (infoText.includes('banka')) {
+                            } else if (lowerInfo.includes('banka')) {
                                 seller_type = 'bank';
-                            } else if (infoText.includes('inşaat') || infoText.includes('proje')) {
+                            } else if (lowerInfo.includes('inşaat') || lowerInfo.includes('proje')) {
                                 seller_type = 'construction';
                             }
                         } else {
                             if (item.innerText.toLowerCase().includes('sahibinden satılık')) {
                                 seller_type = 'owner';
+                                seller_name = 'Sahibinden';
                             }
                         }
+                    } else {
+                        // If forced type is owner, name is Sahibinden
+                        if (forcedSellerType === 'owner') seller_name = 'Sahibinden';
                     }
 
-                    data.push({ external_id: id, title, price, url, district, neighborhood, rooms, size_m2, listing_date, seller_type });
+                    // Listing Type Detection
+                    let listing_type = 'sale';
+                    if (url.toLowerCase().includes('kiralik')) listing_type = 'rent';
+
+                    data.push({ external_id: id, title, price, url, district, neighborhood, rooms, size_m2, listing_date, seller_type, seller_name, listing_type, category });
                 });
                 return data;
-            }, forcedSellerType);
+            }, forcedSellerType, category);
 
             if (listings.length === 0) {
                 hasNextPage = false;
@@ -225,7 +277,7 @@ async function saveListings(listings) {
     console.log(`Saving ${listings.length} listings to DB...`);
 
     for (const item of listings) {
-        const { external_id, title, price, url, district, neighborhood, rooms, size_m2, listing_date } = item;
+        const { external_id, title, price, url, district, neighborhood, rooms, size_m2, listing_date, listing_type, category } = item;
 
         // Check if property exists
         const existingProp = await prisma.property.findUnique({
@@ -245,6 +297,11 @@ async function saveListings(listings) {
                         rooms,
                         size_m2,
                         seller_type: item.seller_type || 'office',
+                        listing_type: listing_type || 'sale',
+                        category: category || 'residential',
+                        building_age: item.building_age || null,
+                        heating_type: item.heating_type || null,
+                        floor_location: item.floor_location || null,
                         listing_date: listing_date ? new Date(listing_date) : null,
                         last_scraped: new Date()
                     }
@@ -277,7 +334,12 @@ async function saveListings(listings) {
                     neighborhood,
                     rooms,
                     size_m2,
-                    seller_type: item.seller_type || existingProp.seller_type, // Prefer checking actual type over keeping old? Hmm.
+                    seller_type: item.seller_type || existingProp.seller_type,
+                    listing_type: listing_type || existingProp.listing_type,
+                    category: category || existingProp.category,
+                    building_age: item.building_age || existingProp.building_age,
+                    heating_type: item.heating_type || existingProp.heating_type,
+                    floor_location: item.floor_location || existingProp.floor_location,
                     listing_date: listing_date ? new Date(listing_date) : null,
                     last_scraped: new Date()
                 }
@@ -323,8 +385,6 @@ async function scrapeDetails(url) {
         const { getOrLaunchBrowser } = require('./stealthScraper');
         browser = await getOrLaunchBrowser();
         const page = await browser.newPage();
-        // await configureStealthPage(page); // Not needed as master chrome is already stealthy? Or maybe good to keep if I had access to it, but getOrLaunchBrowser doesn't export it. 
-        // Actually, main page already does setViewport etc.
         await page.setViewport({ width: 1920, height: 1080 });
 
         await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
@@ -334,7 +394,6 @@ async function scrapeDetails(url) {
             const description = document.querySelector('.description-content')?.innerText.trim() || '';
 
             // Images
-            // Try different selectors
             let images = [];
             const gallery = document.querySelectorAll('.detail-gallery img');
             if (gallery.length > 0) {
@@ -343,40 +402,49 @@ async function scrapeDetails(url) {
                 const allImgs = document.querySelectorAll('.img-wrapper img');
                 allImgs.forEach(img => images.push(img.src));
             }
-            // Filter out small icons or base64 if needed, but for now grab all unique
+
             images = [...new Set(images)]
                 .filter(src => src.startsWith('http'))
                 .map(src => {
-                    // Hepsiemlak: Remove /mnresize/width/height/ to get full resolution
                     if (src.includes('hemlak.com') && src.includes('/mnresize/')) {
                         return src.replace(/\/mnresize\/\d+\/\d+\//, '/');
                     }
                     return src;
                 });
 
-            // Features (Spec List)
+            // Features
             const features = [];
-            const specs = document.querySelectorAll('.spec-item');
-            specs.forEach(s => features.push(s.innerText.trim().replace(/\n/g, ': ')));
+            document.querySelectorAll('.spec-item').forEach(item => {
+                features.push(item.innerText.replace(/\n/g, ': ').trim());
+            });
 
-            // Seller Info
-            let seller_name = null;
-            let seller_phone = null;
-            const firmBox = document.querySelector('.firm-box-inc');
-            if (firmBox) {
-                const nameEl = firmBox.querySelector('.firm-box--name');
-                if (nameEl) seller_name = nameEl.innerText.trim();
+            // Detailed Data Extraction
+            const infoMap = {};
+            document.querySelectorAll('.spec-item').forEach(item => {
+                const label = item.querySelector('.spec-item-label')?.innerText.trim();
+                const value = item.querySelector('.spec-item-value')?.innerText.trim();
+                if (label && value) infoMap[label] = value;
+            });
 
-                // Try to find phone
-                const phoneLink = document.querySelector('.phone-wrapper a');
-                if (phoneLink) seller_phone = phoneLink.href.replace('tel:', '');
-            } else {
-                // Owner check
-                const ownerName = document.querySelector('.owner-info span');
-                if (ownerName) seller_name = ownerName.innerText.trim();
-            }
+            let building_age = infoMap['Bina Yaşı'] || null;
+            let heating_type = infoMap['Isınma Tipi'] || null;
+            let floor_location = infoMap['Bulunduğu Kat'] || null;
+            let size_m2 = parseInt(infoMap['Brüt Metrekare'] || infoMap['Metrekare'] || 0);
+            let rooms = infoMap['Oda + Salon Sayısı'] || null;
+            let district = null; // Usually taken from listing list, but could parse breadcrumb
+            let neighborhood = null;
 
-            return { description, images, features, seller_name, seller_phone };
+            // Seller Info Extraction
+            // Try Agent Profile Card
+            const seller_name = document.querySelector('.firm-card-name')?.innerText.trim() ||
+                document.querySelector('.owner-info h5')?.innerText.trim() ||
+                'Bilinmiyor';
+
+            // Phone can be tricky as it's often hidden or click-to-reveal. 
+            // We check for visible numbers or static elements.
+            const seller_phone = document.querySelector('.phone-number')?.innerText.trim() || null;
+
+            return { description, images, features, seller_name, seller_phone, building_age, heating_type, floor_location, size_m2, rooms };
         });
 
         return data;
@@ -385,7 +453,10 @@ async function scrapeDetails(url) {
         console.error('Hepsiemlak Detail Scrape Error:', e);
         throw e;
     } finally {
-        if (browser) await browser.disconnect();
+        if (browser) {
+            const pages = await browser.pages();
+            if (pages.length > 2) await pages[pages.length - 1].close();
+        }
     }
 }
 

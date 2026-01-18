@@ -1,26 +1,20 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../db');
 
-async function check() {
+async function checkSellerTypes() {
     try {
-        const nullCount = await prisma.property.count({ where: { seller_type: null } });
-        const ownerCount = await prisma.property.count({ where: { seller_type: 'owner' } });
-        const officeCount = await prisma.property.count({ where: { seller_type: 'office' } }); // literal 'office'
-        const otherCount = await prisma.property.count({
-            where: {
-                AND: [
-                    { seller_type: { not: 'owner' } },
-                    { seller_type: { not: 'office' } },
-                    { seller_type: { not: null } }
-                ]
-            }
+        const stats = await prisma.property.groupBy({
+            by: ['seller_type'],
+            _count: { id: true }
         });
+        console.log('Seller Type Distribution:', stats);
 
-        console.log('--- Seller Type Distribution ---');
-        console.log(`NULL: ${nullCount}`);
-        console.log(`Owner: ${ownerCount}`);
-        console.log(`Office: ${officeCount}`);
-        console.log(`Other: ${otherCount}`);
+        // Sample check for 'owner' listings
+        const owners = await prisma.property.findMany({
+            where: { seller_type: 'owner' },
+            take: 5,
+            select: { id: true, title: true, seller_name: true }
+        });
+        console.log('\nSample Owner Listings:', owners);
 
     } catch (e) {
         console.error(e);
@@ -29,4 +23,4 @@ async function check() {
     }
 }
 
-check();
+checkSellerTypes();

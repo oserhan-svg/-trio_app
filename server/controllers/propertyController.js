@@ -15,10 +15,28 @@ const upgradeImages = (images) => {
 
 const getProperties = async (req, res) => {
     try {
-        const { minPrice, maxPrice, rooms, district, opportunity_filter } = req.query;
-        // console.log('Incoming params:', req.query); // Reduced log spam
+        const { minPrice, maxPrice, rooms, district, opportunity_filter, category, listingType, seller_type } = req.query;
 
         const where = { AND: [] };
+
+        if (category && category !== 'all') {
+            const catLower = category.toLowerCase();
+            if (catLower === 'daire') {
+                where.AND.push({
+                    category: { in: ['daire', 'residential', 'Daire'] }
+                });
+            } else {
+                where.AND.push({ category: category });
+            }
+        }
+
+        if (listingType && listingType !== 'all') {
+            where.AND.push({ listing_type: listingType });
+        }
+
+        if (seller_type && seller_type !== 'all') {
+            where.AND.push({ seller_type: seller_type });
+        }
 
         if (minPrice) {
             where.AND.push({ price: { gte: parseFloat(minPrice) } });
@@ -26,29 +44,42 @@ const getProperties = async (req, res) => {
         if (maxPrice) {
             where.AND.push({ price: { lte: parseFloat(maxPrice) } });
         }
-        // Room filtering is now handled in JS post-fetch for better accuracy with non-standard formats
+        if (rooms && rooms !== 'Tümü' && rooms !== '') {
+            // DB-Level Room Filtering
+            const normalized = rooms.trim().replace(/\s/g, ''); // e.g. "2+1"
 
-        if (district) {
-            where.AND.push({
-                OR: [
-                    { district: { contains: district, mode: 'insensitive' } },
-                    { neighborhood: { contains: district, mode: 'insensitive' } },
-                    { title: { contains: district, mode: 'insensitive' } }
-                ]
-            });
-        }
-
-        if (req.query.source) {
-            where.AND.push({
-                url: { contains: req.query.source, mode: 'insensitive' }
-            });
-        }
-
-        if (req.query.seller_type && req.query.seller_type !== 'all') {
-            if (req.query.seller_type === 'owner') {
-                where.AND.push({ seller_type: 'owner' });
+            // Special cases
+            if (normalized === '4+') {
+                where.AND.push({
+                    OR: [
+                        { rooms: { startsWith: '4' } },
+                        { rooms: { startsWith: '5' } },
+                        { rooms: { startsWith: '6' } },
+                        { rooms: { startsWith: '7' } },
+                        { rooms: { startsWith: '8' } },
+                        { rooms: { startsWith: '9' } },
+                        { rooms: { startsWith: '10' } }
+                    ]
+                });
+            } else if (normalized === '5+') {
+                where.AND.push({
+                    OR: [
+                        { rooms: { startsWith: '5' } },
+                        { rooms: { startsWith: '6' } },
+                        { rooms: { startsWith: '7' } },
+                        { rooms: { startsWith: '8' } },
+                        { rooms: { startsWith: '9' } },
+                        { rooms: { startsWith: '10' } },
+                        { rooms: { startsWith: '11' } },
+                        { rooms: { startsWith: '12' } }
+                    ]
+                });
             } else {
-                where.AND.push({ seller_type: { not: 'owner' } });
+                // Standard Case: "2+1", "3+1", etc.
+                // We use 'contains' to be safe against spaces like "2 + 1", or exact match if clean
+                where.AND.push({
+                    rooms: { startsWith: normalized } // Most reliable based on analysis
+                });
             }
         }
 
@@ -65,34 +96,8 @@ const getProperties = async (req, res) => {
             images: upgradeImages(p.images)
         }));
 
-        // Secondary JS filter for rooms to ensure absolute accuracy with non-standard strings
-        // ... (room filtering code skipped for brevity, keeps existing logic) ...
-
-        // Wait, I need to keep the room filtering logic here, but I can't just skip lines in replacement tool.
-        // It's safer to just modify the findMany call and the mapping loop separately if they were far apart, 
-        // but here I'm replacing a block.
-        // Let's rewrite the block carefully.
-
-        // Secondary JS filter for rooms
+        // JS Room Filtering Removed - Now handled in DB
         let filteredProperties = propertiesWithHighResImages;
-        if (rooms && rooms !== 'Tümü' && rooms !== '') {
-            const normalizedFilter = rooms.trim().replace(/\s/g, '+');
-            filteredProperties = propertiesWithHighResImages.filter(p => {
-                // ... reusing existing logic ...
-                const rawRoom = (p.rooms || '').trim();
-                const roomStr = rawRoom.replace(/\s/g, '');
-                const match = roomStr.match(/^(\d+)/);
-                if (!match && !roomStr.toLowerCase().includes('stüdyo')) return false;
-                const propertyRooms = match ? parseInt(match[1]) : (roomStr.toLowerCase().includes('stüdyo') ? 1 : 0);
-
-                if (normalizedFilter === '5+') return propertyRooms >= 5;
-                else if (normalizedFilter === '4+') return propertyRooms === 4;
-                else {
-                    const filterTarget = parseInt(normalizedFilter.split('+')[0]);
-                    return propertyRooms === filterTarget;
-                }
-            });
-        }
 
         // Calculate Opportunity Scores
         let propertiesWithScore = filteredProperties;
@@ -121,7 +126,7 @@ const getProperties = async (req, res) => {
                 }
             });
 
-            // Post-Scoring Filter
+            // Post-Scoring Filter (Opportunity Filter)
             if (req.query.opportunity_filter) {
                 const filter = req.query.opportunity_filter;
                 propertiesWithScore = propertiesWithScore.filter(p => {
@@ -224,7 +229,9 @@ const scrapePropertyDetails = async (req, res) => {
                 ...(details.neighborhood && { neighborhood: details.neighborhood }),
                 ...(details.seller_name && { seller_name: details.seller_name }),
                 ...(details.seller_phone && { seller_phone: details.seller_phone }),
-                ...(details.seller_name && { seller_name: details.seller_name })
+                building_age: details.building_age || property.building_age,
+                heating_type: details.heating_type || property.heating_type,
+                floor_location: details.floor_location || property.floor_location
             }
         });
 
@@ -235,4 +242,23 @@ const scrapePropertyDetails = async (req, res) => {
     }
 };
 
-module.exports = { getProperties, getPropertyHistory, getPropertyById, scrapePropertyDetails };
+const assignProperty = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { consultant_id } = req.body; // use consultant_id to match client model naming convention if preferred, but schema uses assigned_user_id
+
+        const updated = await prisma.property.update({
+            where: { id: parseInt(id) },
+            data: {
+                assigned_user_id: consultant_id ? parseInt(consultant_id) : null
+            }
+        });
+
+        res.json(updated);
+    } catch (error) {
+        console.error('Assign Property Error:', error);
+        res.status(500).json({ error: 'Failed to assign property' });
+    }
+};
+
+module.exports = { getProperties, getPropertyHistory, getPropertyById, scrapePropertyDetails, assignProperty };

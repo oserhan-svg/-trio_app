@@ -1,17 +1,24 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Briefcase, Users, Calculator, Calendar, Plus } from 'lucide-react';
+import { ArrowLeft, Briefcase, Users, Calculator, Calendar, Plus, FileText, Radar } from 'lucide-react';
 import ClientTracking from '../components/crm/ClientTracking';
 import Button from '../components/ui/Button';
 
 import CapitalGainsCalculator from '../components/tools/CapitalGainsCalculator';
+import TitleDeedFeeCalculator from '../components/tools/TitleDeedFeeCalculator';
+import MortgageCalculator from '../components/tools/MortgageCalculator';
 import OpportunityListGenerator from '../components/apps/OpportunityListGenerator';
-import { LayoutGrid, TrendingUp } from 'lucide-react';
+import MarketRadar from '../components/apps/MarketRadar'; // New Import
+import PortfolioDashboard from '../components/admin/PortfolioDashboard';
+import Agenda from '../components/agenda/Agenda';
+import PerformanceDashboard from '../components/admin/PerformanceDashboard';
+import { LayoutGrid, TrendingUp, Wallet, BarChart2 } from 'lucide-react';
 
 const ConsultantPanel = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('clients'); // 'clients', 'apps', 'tools', 'agenda'
     const [activeTool, setActiveTool] = useState(null); // 'calculator-gain', etc.
+    const [activeApp, setActiveApp] = useState(null); // 'opportunity-generator'
     const [showAddClientMatch, setShowAddClientMatch] = useState(false); // Trigger for ClientTracking
 
     const [user] = useState(() => {
@@ -91,6 +98,19 @@ const ConsultantPanel = () => {
                         <Calendar size={18} />
                         Ajanda
                     </button>
+
+                    {user?.role === 'admin' && (
+                        <button
+                            onClick={() => setActiveTab('performance')}
+                            className={`pb-3 text-sm font-medium flex items-center gap-2 transition-all border-b-2 whitespace-nowrap ${activeTab === 'performance'
+                                ? 'border-orange-500 text-orange-600'
+                                : 'border-transparent text-gray-500 hover:text-gray-700'
+                                }`}
+                        >
+                            <BarChart2 size={18} />
+                            Performans
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -98,6 +118,10 @@ const ConsultantPanel = () => {
             <div className="max-w-7xl mx-auto p-6">
                 {activeTab === 'clients' && (
                     <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        {/* My Portfolio Stats */}
+                        <div className="mb-8">
+                            <PortfolioDashboard mode="mine" userId={user?.id} />
+                        </div>
                         <ClientTracking
                             isAddModalOpen={showAddClientMatch}
                             onCloseAddModal={() => setShowAddClientMatch(false)}
@@ -107,7 +131,39 @@ const ConsultantPanel = () => {
 
                 {activeTab === 'apps' && (
                     <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                        <OpportunityListGenerator />
+                        {activeApp === 'opportunity-generator' ? (
+                            <OpportunityListGenerator onBack={() => setActiveApp(null)} />
+                        ) : activeApp === 'market-radar' ? (
+                            <MarketRadar onBack={() => setActiveApp(null)} />
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {/* Opportunity Generator App Card */}
+                                <div
+                                    onClick={() => setActiveApp('opportunity-generator')}
+                                    className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center text-center hover:shadow-md transition-all cursor-pointer group hover:border-purple-300"
+                                >
+                                    <div className="w-14 h-14 bg-purple-50 rounded-full flex items-center justify-center text-purple-600 mb-4 group-hover:scale-110 transition-transform group-hover:bg-purple-100">
+                                        <FileText size={28} />
+                                    </div>
+                                    <h3 className="font-bold text-gray-800 mb-2 truncate w-full">Fırsat Bülteni Oluşturucu</h3>
+                                    <p className="text-sm text-gray-500 line-clamp-2">Danışmanlara göndermek için fırsat listesi hazırlayın.</p>
+                                    <span className="mt-4 text-xs bg-purple-600 text-white px-3 py-1 rounded-full font-medium">Yeni</span>
+                                </div>
+
+                                {/* Market Radar App Card */}
+                                <div
+                                    onClick={() => setActiveApp('market-radar')}
+                                    className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center text-center hover:shadow-md transition-all cursor-pointer group hover:border-rose-300"
+                                >
+                                    <div className="w-14 h-14 bg-rose-50 rounded-full flex items-center justify-center text-rose-600 mb-4 group-hover:scale-110 transition-transform group-hover:bg-rose-100">
+                                        <Radar size={28} />
+                                    </div>
+                                    <h3 className="font-bold text-gray-800 mb-2 truncate w-full">Fırsat Radarı</h3>
+                                    <p className="text-sm text-gray-500 line-clamp-2">Daire, Villa, Arsa ve Zeytinlik kategorilerinde en iyi fırsatları yakalayın.</p>
+                                    <span className="mt-4 text-xs bg-rose-600 text-white px-3 py-1 rounded-full font-medium">Popüler</span>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -115,6 +171,10 @@ const ConsultantPanel = () => {
                     <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
                         {activeTool === 'calculator-gain' ? (
                             <CapitalGainsCalculator onBack={() => setActiveTool(null)} />
+                        ) : activeTool === 'tapu-calculator' ? (
+                            <TitleDeedFeeCalculator onBack={() => setActiveTool(null)} />
+                        ) : activeTool === 'mortgage-calculator' ? (
+                            <MortgageCalculator onBack={() => setActiveTool(null)} />
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {/* Capital Gains Tool Card */}
@@ -130,14 +190,30 @@ const ConsultantPanel = () => {
                                     <span className="mt-4 text-xs bg-blue-600 text-white px-3 py-1 rounded-full font-medium">Yeni</span>
                                 </div>
 
-                                {/* Placeholder Tools */}
-                                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center text-center hover:shadow-md transition-shadow cursor-pointer group opacity-60">
-                                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 mb-4">
-                                        <Calculator size={24} />
+                                {/* Title Deed Fee Tool Card */}
+                                <div
+                                    onClick={() => setActiveTool('tapu-calculator')}
+                                    className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center text-center hover:shadow-md transition-all cursor-pointer group hover:border-emerald-300"
+                                >
+                                    <div className="w-14 h-14 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 mb-4 group-hover:scale-110 transition-transform group-hover:bg-emerald-100">
+                                        <Wallet size={28} />
+                                    </div>
+                                    <h3 className="font-bold text-gray-800 mb-2 truncate w-full">Tapu Harcı Hesapla</h3>
+                                    <p className="text-sm text-gray-500 line-clamp-2">Alıcı ve satıcı tapu harcı ile döner sermaye bedellerini görün.</p>
+                                    <span className="mt-4 text-xs bg-emerald-600 text-white px-3 py-1 rounded-full font-medium">Yeni</span>
+                                </div>
+
+                                {/* Mortgage Calculator Tool Card */}
+                                <div
+                                    onClick={() => setActiveTool('mortgage-calculator')}
+                                    className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center text-center hover:shadow-md transition-all cursor-pointer group hover:border-indigo-300"
+                                >
+                                    <div className="w-14 h-14 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600 mb-4 group-hover:scale-110 transition-transform group-hover:bg-indigo-100">
+                                        <Calculator size={28} />
                                     </div>
                                     <h3 className="font-bold text-gray-800 mb-2">Kredi Hesaplama</h3>
-                                    <p className="text-sm text-gray-500">Konut kredisi faiz ve ödeme planı hesaplayıcısı.</p>
-                                    <span className="mt-4 text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded">Yakında</span>
+                                    <p className="text-sm text-gray-500 line-clamp-2">Konut kredisi faiz ve ödeme planı hesaplayıcısı.</p>
+                                    <span className="mt-4 text-xs bg-indigo-600 text-white px-3 py-1 rounded-full font-medium">Yeni</span>
                                 </div>
 
                                 <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center text-center hover:shadow-md transition-shadow cursor-pointer group opacity-60">
@@ -154,9 +230,14 @@ const ConsultantPanel = () => {
                 )}
 
                 {activeTab === 'agenda' && (
-                    <div className="bg-white border-2 border-dashed border-gray-200 rounded-xl h-64 flex flex-col items-center justify-center text-gray-400">
-                        <Calendar size={48} className="mb-4 opacity-50" />
-                        <p>Ajanda modülü yapım aşamasında.</p>
+                    <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        <Agenda />
+                    </div>
+                )}
+
+                {activeTab === 'performance' && user?.role === 'admin' && (
+                    <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        <PerformanceDashboard />
                     </div>
                 )}
             </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Input from '../ui/Input';
+import PriceInput from '../ui/PriceInput';
 import Button from '../ui/Button';
 import { X } from 'lucide-react';
 
@@ -59,21 +60,27 @@ const AddDemandModal = ({ isOpen, onClose, onSave, clientName, initialData = nul
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
-                        <Input
-                            label="En Az Fiyat (TL)"
-                            type="number"
-                            placeholder="0"
-                            value={formData.min_price}
-                            onChange={e => setFormData({ ...formData, min_price: e.target.value })}
-                        />
-                        <Input
-                            label="En Çok Fiyat (TL)"
-                            type="number"
-                            placeholder="Örn: 5000000"
-                            value={formData.max_price}
-                            onChange={e => setFormData({ ...formData, max_price: e.target.value })}
-                            required={!initialData}
-                        />
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-sm font-medium text-gray-700">En Az Fiyat (TL)</label>
+                            <PriceInput
+                                id="min_price"
+                                placeholder="0"
+                                className="px-3 py-2 rounded-xl border border-gray-300 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm"
+                                value={formData.min_price}
+                                onChange={val => setFormData({ ...formData, min_price: val })}
+                            />
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-sm font-medium text-gray-700">En Çok Fiyat (TL)</label>
+                            <PriceInput
+                                id="max_price"
+                                placeholder="Örn: 5.000.000"
+                                className="px-3 py-2 rounded-xl border border-gray-300 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm"
+                                value={formData.max_price}
+                                onChange={val => setFormData({ ...formData, max_price: val })}
+                                required={!initialData}
+                            />
+                        </div>
                     </div>
 
                     <div className="flex flex-col gap-1.5">

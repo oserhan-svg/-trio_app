@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Map, List, LogOut, Search, Users, RefreshCw, FileText } from 'lucide-react';
 import api from '../services/api';
+import PriceInput from '../components/ui/PriceInput';
 import MapView from '../components/MapView';
 import PropertyTable from '../components/PropertyTable';
 import DashboardStatsHeader from '../components/DashboardStatsHeader';
@@ -25,17 +26,24 @@ const Dashboard = () => {
         district: '',
         source: '',
         seller_type: 'all',
-        opportunity_filter: ''
+        opportunity_filter: '',
+        category: 'all',
+        listingType: 'all'
     });
+
+    const [meta, setMeta] = useState({ page: 1, totalPages: 1 });
 
     useEffect(() => {
         fetchAllData();
     }, []);
 
-    const fetchAllData = async (currentFilters = filters) => {
+    const fetchAllData = async (currentFilters = filters, page = 1, append = false) => {
         setLoading(true);
         try {
             const params = new URLSearchParams();
+            params.append('page', page);
+            params.append('limit', 50);
+
             if (currentFilters.minPrice) params.append('minPrice', currentFilters.minPrice);
             if (currentFilters.maxPrice) params.append('maxPrice', currentFilters.maxPrice);
             if (currentFilters.rooms && currentFilters.rooms !== 'Tümü') params.append('rooms', currentFilters.rooms);
@@ -43,20 +51,40 @@ const Dashboard = () => {
             if (currentFilters.source) params.append('source', currentFilters.source);
             if (currentFilters.seller_type && currentFilters.seller_type !== 'all') params.append('seller_type', currentFilters.seller_type);
             if (currentFilters.opportunity_filter) params.append('opportunity_filter', currentFilters.opportunity_filter);
+            if (currentFilters.category && currentFilters.category !== 'all') params.append('category', currentFilters.category);
+            if (currentFilters.listingType && currentFilters.listingType !== 'all') params.append('listingType', currentFilters.listingType);
 
             // Parallel fetch for properties and stats
-            const [propRes, statRes] = await Promise.all([
-                api.get(`/properties?${params.toString()}`),
-                api.get('/analytics')
-            ]);
+            // Only fetch stats on initial load (page 1) to save bandwidth
+            const requests = [api.get(`/properties?${params.toString()}`)];
+            if (page === 1) requests.push(api.get('/analytics'));
 
-            setProperties(propRes.data);
-            setStats(statRes.data);
+            const responses = await Promise.all(requests);
+            const propRes = responses[0];
+
+            // Handle Pagination
+            if (propRes.data && propRes.data.data && Array.isArray(propRes.data.data)) {
+                if (append) {
+                    setProperties(prev => [...prev, ...propRes.data.data]);
+                } else {
+                    setProperties(propRes.data.data);
+                }
+                if (propRes.data.meta) setMeta(propRes.data.meta);
+            } else if (Array.isArray(propRes.data)) {
+                setProperties(propRes.data); // Legacy fallback
+            } else {
+                setProperties([]);
+            }
+
+            if (page === 1 && responses[1]) {
+                setStats(responses[1].data);
+            }
+
         } catch (error) {
             console.error('Error fetching data:', error);
             setErrorMsg(error.message + (error.response ? ` (${error.response.status})` : ''));
             if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-                localStorage.removeItem('token'); // Clear invalid token
+                localStorage.removeItem('token');
                 navigate('/login');
             }
         } finally {
@@ -64,9 +92,19 @@ const Dashboard = () => {
         }
     };
 
+    const handleLoadMore = () => {
+        if (meta.page < meta.totalPages) {
+            fetchAllData(filters, meta.page + 1, true);
+        }
+    };
+
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
         setFilters(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handlePriceFilterChange = (name, val) => {
+        setFilters(prev => ({ ...prev, [name]: val }));
     };
 
     const handleSearch = (e) => {
@@ -134,15 +172,46 @@ const Dashboard = () => {
                 <DashboardStatsHeader properties={properties} stats={stats} />
 
                 {/* Filters */}
-                <form onSubmit={handleSearch} className="bg-white p-4 rounded-lg shadow-sm grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 items-end relative z-40">
+                <form onSubmit={handleSearch} className="bg-white p-4 rounded-lg shadow-sm grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-end relative z-40">
+                    <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">İlan Türü</label>
+                        <select name="listingType" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" value={filters.listingType} onChange={handleFilterChange}>
+                            <option value="all">Tümü (Satılık/Kiralık)</option>
+                            <option value="sale">Satılık</option>
+                            <option value="rent">Kiralık</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">Kategori</label>
+                        <select name="category" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" value={filters.category} onChange={handleFilterChange}>
+                            <option value="all">Tümü (Daire/Villa/...)</option>
+                            <option value="daire">Daire</option>
+                            <option value="villa">Villa</option>
+                            <option value="mustakil">Müstakil Ev</option>
+                            <option value="land">Arsa</option>
+                            <option value="commercial">İşyeri</option>
+                        </select>
+                    </div>
                     {/* ... filter inputs ... */}
                     <div>
                         <label className="block text-xs font-medium text-gray-700 mb-1">En Az Fiyat</label>
-                        <input type="number" name="minPrice" placeholder="Örn: 1000000" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" value={filters.minPrice} onChange={handleFilterChange} />
+                        <PriceInput
+                            name="minPrice"
+                            placeholder="Örn: 1.000.000"
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={filters.minPrice}
+                            onChange={(val) => handlePriceFilterChange('minPrice', val)}
+                        />
                     </div>
                     <div>
                         <label className="block text-xs font-medium text-gray-700 mb-1">En Çok Fiyat</label>
-                        <input type="number" name="maxPrice" placeholder="Örn: 5000000" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" value={filters.maxPrice} onChange={handleFilterChange} />
+                        <PriceInput
+                            name="maxPrice"
+                            placeholder="Örn: 5.000.000"
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={filters.maxPrice}
+                            onChange={(val) => handlePriceFilterChange('maxPrice', val)}
+                        />
                     </div>
                     <div>
                         <label className="block text-xs font-medium text-gray-700 mb-1">Oda Sayısı</label>
@@ -193,19 +262,29 @@ const Dashboard = () => {
 
 
                 {/* Debug / Error Message */}
-                {(properties.length === 0 && !loading) && (
-                    <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                {/* Error Message */}
+                {errorMsg && (
+                    <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
                         <div className="flex">
                             <div className="ml-3">
-                                <p className="text-sm text-yellow-700">
-                                    Görüntülenecek ilan bulunamadı.
-                                    <br />
-                                    <strong>Sistem Mesajı:</strong> {errorMsg || 'Veri yok veya filtre sonucu boş.'}
-                                    <br />
-                                    (Veritabanı: {properties.length} / API: {loading ? 'Yükleniyor' : 'Hazır'})
+                                <p className="text-sm text-red-700">
+                                    <span className="font-bold">Bağlantı Hatası:</span> {errorMsg}
                                 </p>
                             </div>
                         </div>
+                    </div>
+                )}
+
+                {/* Empty State - No Results */}
+                {(!errorMsg && !loading && properties.length === 0) && (
+                    <div className="text-center py-12 bg-white rounded-lg border border-gray-200 border-dashed">
+                        <div className="mx-auto w-12 h-12 text-gray-400 mb-3">
+                            <Search size={48} />
+                        </div>
+                        <h3 className="text-lg font-medium text-gray-900">Sonuç Bulunamadı</h3>
+                        <p className="text-gray-500 max-w-sm mx-auto mt-1">
+                            Arama kriterlerinize uygun ilan bulunamadı. Filtreleri genişleterek tekrar deneyiniz.
+                        </p>
                     </div>
                 )}
 
@@ -227,9 +306,31 @@ const Dashboard = () => {
                     {loading ? (
                         <div className="text-center py-20 text-gray-500">Yükleniyor...</div>
                     ) : (
-                        viewMode === 'list' ? <PropertyTable properties={properties} /> :
-                            viewMode === 'map' ? <MapView properties={properties} /> :
+                        viewMode === 'list' ? (
+                            <>
+                                <PropertyTable properties={properties} />
+
+                                {/* Load More Button */}
+                                {meta.page < meta.totalPages && !loading && (
+                                    <div className="flex justify-center pt-6 pb-4">
+                                        <button
+                                            onClick={handleLoadMore}
+                                            className="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-md shadow-sm hover:bg-gray-50 transition flex items-center gap-2"
+                                        >
+                                            Daha Fazla Yükle ({properties.length} / {meta.total})
+                                        </button>
+                                    </div>
+                                )}
+                            </>
+                        ) : viewMode === 'map' ? (
+                            <div className="bg-white rounded-lg shadow-lg p-1 h-[600px]">
+                                <MapView properties={properties} />
+                            </div>
+                        ) : (
+                            <div className="bg-white rounded-lg shadow-lg p-1">
                                 <HeatmapView />
+                            </div>
+                        )
                     )}
                 </div>
             </main>

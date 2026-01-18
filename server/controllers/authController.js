@@ -30,4 +30,16 @@ const login = async (req, res) => {
     }
 };
 
-module.exports = { login };
+const getConsultants = async (req, res) => {
+    try {
+        const consultants = await prisma.user.findMany({
+            where: { role: 'consultant' },
+            select: { id: true, email: true }
+        });
+        res.json(consultants);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch consultants' });
+    }
+};
+
+module.exports = { login, getConsultants };

@@ -128,7 +128,14 @@ const PropertyTable = ({ properties }) => {
                                             )}
                                         </div>
                                         <div className="text-sm font-medium text-gray-900 line-clamp-1" title={prop.title}>{prop.title}</div>
-                                        <div className="text-xs text-gray-500">{prop.external_id}</div>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <span className="text-xs text-gray-500">{prop.external_id}</span>
+                                            {prop.seller_name && prop.seller_name !== 'Bilinmiyor' && (
+                                                <span className={`text-[10px] px-1.5 py-0.5 rounded border ${prop.seller_type === 'owner' ? 'bg-orange-50 text-orange-700 border-orange-100' : 'bg-gray-50 text-gray-600 border-gray-200'}`}>
+                                                    {prop.seller_name}
+                                                </span>
+                                            )}
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-600">
                                         <div className="flex items-center">
@@ -154,7 +161,14 @@ const PropertyTable = ({ properties }) => {
                                         {prop.neighborhood}, {prop.district}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                        {prop.rooms} • {prop.size_m2} m²
+                                        <div className="flex flex-col gap-0.5">
+                                            <div className="font-medium text-gray-700">{prop.rooms} • {prop.size_m2} m²</div>
+                                            <div className="text-[10px] text-gray-500 flex flex-wrap gap-1">
+                                                {prop.building_age && <span>{prop.building_age} Yıl</span>}
+                                                {prop.heating_type && <span>• {prop.heating_type}</span>}
+                                                {prop.floor_location && <span>• {prop.floor_location}</span>}
+                                            </div>
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                                         {prop.roi ? (

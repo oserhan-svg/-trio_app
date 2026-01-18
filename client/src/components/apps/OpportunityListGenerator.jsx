@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Check, Filter, Search, Printer } from 'lucide-react';
+import { FileText, Check, Filter, Search, Printer, ArrowLeft } from 'lucide-react';
 import api from '../../services/api';
 import Button from '../ui/Button';
 
-const OpportunityListGenerator = () => {
+const OpportunityListGenerator = ({ onBack }) => {
     const navigate = useNavigate();
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -17,26 +17,20 @@ const OpportunityListGenerator = () => {
 
     const fetchProperties = async () => {
         try {
-            const response = await api.get('/properties');
-            // Default Filter: High Score (>7) AND Owner AND Sahibinden
-            // But we allow user to see more if they want
+            // Fetch only owner listings directly from backend
+            const response = await api.get('/properties', {
+                params: { seller_type: 'owner' }
+            });
             const allProps = response.data;
 
-            // Pre-sort or pre-filter if needed, but let's just save all and filter in render for now
-            // Actually, let's filter for relevant ones to avoid overwhelming
-            const relevant = allProps.filter(p =>
-                p.seller_type === 'owner' &&
-                p.url.includes('sahibinden')
-            );
-
             // Sort by Opportunity Score Desc
-            relevant.sort((a, b) => (b.opportunity_score || 0) - (a.opportunity_score || 0));
+            allProps.sort((a, b) => (b.opportunity_score || 0) - (a.opportunity_score || 0));
 
-            setProperties(relevant);
+            setProperties(allProps);
 
             // Auto-select highly recommended ones (Score > 8)
             const autoSelect = new Set();
-            relevant.forEach(p => {
+            allProps.forEach(p => {
                 if (p.opportunity_score >= 8) autoSelect.add(p.id);
             });
             setSelectedIds(autoSelect);
@@ -87,6 +81,14 @@ const OpportunityListGenerator = () => {
             <div className="p-6 border-b border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div>
                     <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                        {onBack && (
+                            <button
+                                onClick={onBack}
+                                className="mr-2 p-1.5 rounded-full hover:bg-gray-100 text-gray-500 transition-colors"
+                            >
+                                <ArrowLeft size={18} />
+                            </button>
+                        )}
                         <FileText className="text-purple-600" />
                         Fırsat Bülteni Oluşturucu
                     </h2>
@@ -153,7 +155,7 @@ const OpportunityListGenerator = () => {
                                 </td>
                                 <td className="px-4 py-3 text-center">
                                     <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full font-bold text-xs ${p.opportunity_score >= 8 ? 'bg-emerald-100 text-emerald-700' :
-                                            p.opportunity_score >= 5 ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-600'
+                                        p.opportunity_score >= 5 ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-600'
                                         }`}>
                                         {p.opportunity_score}
                                     </span>

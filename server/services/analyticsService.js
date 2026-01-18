@@ -53,7 +53,16 @@ const NEIGHBORHOOD_COORDS = {
     'Namık Kemal': { lat: 39.3350, lng: 26.6450 }
 };
 
+let cachedStatsMap = null;
+let lastCacheTime = 0;
+const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+
 const getNeighborhoodStatsMap = async () => {
+    const now = Date.now();
+    if (cachedStatsMap && (now - lastCacheTime < CACHE_DURATION)) {
+        return cachedStatsMap;
+    }
+
     const { neighborhoods, districts } = await getMarketStats();
     const map = {};
 
@@ -64,15 +73,14 @@ const getNeighborhoodStatsMap = async () => {
         }
     });
 
-    // 2. Populate Districts (prefixed or separate lookup?)
-    // We will store them with a special prefix "DISTRICT:" to avoid collision
+    // 2. Populate Districts
     districts.forEach(s => {
         if (s.avgPricePerM2 > 0) {
             map[`DISTRICT:${s.name}`] = s.avgPricePerM2;
         }
     });
 
-    // Heatmap data (legacy support for now)
+    // Heatmap data
     const heatmapData = neighborhoods.map(s => {
         let coords = { lat: 39.3190, lng: 26.6970 };
         if (NEIGHBORHOOD_COORDS[s.name]) {
@@ -91,6 +99,11 @@ const getNeighborhoodStatsMap = async () => {
     });
 
     map._heatmapData = heatmapData;
+
+    // Update Cache
+    cachedStatsMap = map;
+    lastCacheTime = now;
+
     return map;
 };
 
@@ -110,6 +123,24 @@ const scoreProperty = (property, statsMap, history = []) => {
         return { score: 0, label: 'Veri Yok', comparisonBasis: 'None', comparisonPrice: 0 };
     }
 
+    // --- PRICE DROP CHECK ---
+    const hasRecentPriceDrop = !!(Array.isArray(history) && history.length > 0 && history.find(h =>
+        h.change_type === 'price_decrease' &&
+        new Date(h.changed_at) > new Date(new Date().setDate(new Date().getDate() - 30))
+    ));
+    // ------------------------
+
+    // STRICT OWNER FILTER: Only owner listings are eligible for opportunity scoring
+    if (property.seller_type !== 'owner') {
+        return {
+            score: 0,
+            label: 'Emlak Ofisi',
+            comparisonBasis: 'None',
+            comparisonPrice: 0,
+            hasRecentPriceDrop: hasRecentPriceDrop // Ensure this is returned
+        };
+    }
+
     let avgM2Price = statsMap[property.neighborhood];
     let comparisonBasis = 'Neighborhood';
 
@@ -120,26 +151,21 @@ const scoreProperty = (property, statsMap, history = []) => {
     }
 
     if (!avgM2Price) {
-        return { score: 5, label: 'Yetersiz Veri', comparisonBasis: 'None', comparisonPrice: 0 };
+        return {
+            score: 5,
+            label: 'Yetersiz Veri',
+            comparisonBasis: 'None',
+            comparisonPrice: 0,
+            hasRecentPriceDrop: hasRecentPriceDrop
+        };
     }
 
     const propertyM2Price = property.price / property.size_m2;
     let ratio = propertyM2Price / avgM2Price;
 
     // --- PRICE DROP BOOST ---
-    // If price dropped recently (last 30 days), it's a "Hot" opportunity
-    if (Array.isArray(history) && history.length > 0) {
-        const oneMonthAgo = new Date();
-        oneMonthAgo.setDate(oneMonthAgo.getDate() - 30);
-
-        const recentDrop = history.find(h =>
-            h.change_type === 'price_decrease' &&
-            new Date(h.changed_at) > oneMonthAgo
-        );
-
-        if (recentDrop) {
-            ratio *= 0.95; // 5% Boost score (making ratio smaller = better)
-        }
+    if (hasRecentPriceDrop) {
+        ratio *= 0.95; // 5% Boost score
     }
     // ------------------------
 
@@ -194,10 +220,7 @@ const scoreProperty = (property, statsMap, history = []) => {
         roi: calculateROI(property.price),
         comparisonBasis,
         comparisonPrice: Math.round(avgM2Price),
-        hasRecentPriceDrop: !!(Array.isArray(history) && history.length > 0 && history.find(h =>
-            h.change_type === 'price_decrease' &&
-            new Date(h.changed_at) > new Date(new Date().setDate(new Date().getDate() - 30))
-        ))
+        hasRecentPriceDrop: hasRecentPriceDrop
     };
 };
 

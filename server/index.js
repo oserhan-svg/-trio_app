@@ -16,6 +16,10 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 
+// Rate Limiting
+const { apiLimiter } = require('./middleware/rateLimiter');
+app.use('/api', apiLimiter); // Apply to all /api routes
+
 // Routes
 const authRoutes = require('./routes/authRoutes');
 const propertyRoutes = require('./routes/propertyRoutes');
@@ -32,6 +36,8 @@ app.use('/api/settings', require('./routes/settingRoutes')); // Register Setting
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/images', imageRoutes);
 app.use('/api/listings', propertyListingRoutes);
+app.use('/api/agenda', require('./routes/agendaRoutes'));
+app.use('/api/performance', require('./routes/performanceRoutes'));
 
 // Start Scraper Scheduler
 startScheduler();

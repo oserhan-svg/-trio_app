@@ -26,4 +26,21 @@ const demandSchema = Joi.object({
     neighborhood: Joi.string().optional().allow('')
 });
 
-module.exports = { clientSchema, demandSchema };
+const authSchema = Joi.object({
+    email: Joi.string().email().required().messages({
+        'string.email': 'Geçerli bir e-posta adresi giriniz.',
+        'any.required': 'E-posta alanı zorunludur.'
+    }),
+    password: Joi.string().min(6).required().messages({
+        'string.min': 'Şifre en az 6 karakter olmalıdır.',
+        'any.required': 'Şifre alanı zorunludur.'
+    })
+});
+
+const listingSchema = Joi.object({
+    propertyId: Joi.alternatives().try(Joi.number().integer(), Joi.string().regex(/^\d+$/)).required(),
+    title: Joi.string().max(200).optional().allow(null, ''),
+    description: Joi.string().max(5000).optional().allow(null, '')
+});
+
+module.exports = { clientSchema, demandSchema, authSchema, listingSchema };

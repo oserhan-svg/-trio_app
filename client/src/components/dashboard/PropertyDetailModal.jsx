@@ -1,23 +1,56 @@
 import React, { useEffect, useState } from 'react';
 import { X, Calendar, DollarSign, Ruler, Layout, MapPin } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import axios from 'axios';
+import api from '../../services/api';
 
 const PropertyDetailModal = ({ property, onClose }) => {
     const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [consultants, setConsultants] = useState([]);
+    const [user] = useState(() => JSON.parse(localStorage.getItem('user')));
 
     useEffect(() => {
         if (property?.id) {
             fetchHistory();
+            if (user?.role === 'admin') {
+                fetchConsultants();
+            }
         }
     }, [property]);
+
+    const fetchConsultants = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await api.get('/auth/consultants', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setConsultants(response.data);
+        } catch (err) {
+            console.error('Error fetching consultants:', err);
+        }
+    };
+
+    const handleAssign = async (consultantId) => {
+        try {
+            const token = localStorage.getItem('token');
+            await api.put(`/properties/${property.id}/assign`,
+                { consultant_id: consultantId },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            // In a real app, you'd probably want to refresh the property list or notify parent
+            // and update local state
+            property.assigned_user_id = consultantId ? parseInt(consultantId) : null;
+            alert('İlan danışmana başarıyla atandı.');
+        } catch (err) {
+            alert('Atama işlemi başarısız oldu.');
+        }
+    };
 
     const fetchHistory = async () => {
         try {
             const token = localStorage.getItem('token');
             // Note: Endpoint uses internal ID, make sure property.id is the internal one
-            const response = await axios.get(`http://localhost:5000/api/properties/${property.id}/history`, {
+            const response = await api.get(`/properties/${property.id}/history`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -65,6 +98,25 @@ const PropertyDetailModal = ({ property, onClose }) => {
                                 ₺{parseFloat(property.price).toLocaleString()}
                             </div>
                         </div>
+
+                        {/* Assignment Section for Admins */}
+                        {user?.role === 'admin' && (
+                            <div className="bg-white p-4 rounded-xl border border-orange-100 bg-orange-50/30">
+                                <span className="text-xs font-semibold text-orange-400 uppercase tracking-wider flex items-center gap-1">
+                                    <Users size={12} /> Danışman Ata
+                                </span>
+                                <select
+                                    value={property.assigned_user_id || ''}
+                                    onChange={(e) => handleAssign(e.target.value)}
+                                    className="mt-2 w-full p-2 text-sm border border-orange-200 rounded-lg bg-white focus:ring-2 focus:ring-orange-500 outline-none"
+                                >
+                                    <option value="">Atanmamış</option>
+                                    {consultants.map(c => (
+                                        <option key={c.id} value={c.id}>{c.email}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
 
                         <div className="space-y-4">
                             <div className="flex items-center gap-3 text-gray-700">
