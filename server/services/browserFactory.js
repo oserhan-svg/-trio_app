@@ -76,12 +76,26 @@ async function createStealthBrowser(options = {}) {
         fs.mkdirSync(userDataDir, { recursive: true });
     }
 
-    const browser = await puppeteer.launch({
+    // Explicitly set executablePath for Render environment
+    const launchOptions = {
         headless: headless,
         args: launchArgs,
         userDataDir: userDataDir,
         ignoreDefaultArgs: ['--enable-automation']
-    });
+    };
+
+    // On Render, Chrome is installed to a specific cache path
+    if (process.env.RENDER) {
+        const fs = require('fs');
+        const path = require('path');
+        const cachePath = '/opt/render/.cache/puppeteer/chrome/linux-143.0.7499.192/chrome-linux64/chrome';
+        if (fs.existsSync(cachePath)) {
+            launchOptions.executablePath = cachePath;
+            console.log('Using Render Chrome executable:', cachePath);
+        }
+    }
+
+    const browser = await puppeteer.launch(launchOptions);
 
     return browser;
 }
