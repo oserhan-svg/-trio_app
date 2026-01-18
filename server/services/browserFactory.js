@@ -88,11 +88,12 @@ async function createStealthBrowser(options = {}) {
     const isRenderEnv = process.env.NODE_ENV === 'production' || process.env.RENDER || process.env.PORT;
     if (isRenderEnv) {
         const path = require('path');
-        // Try multiple possible locations
+        // Try multiple possible locations based on observation
         const possiblePaths = [
-            path.join(__dirname, '../node_modules/puppeteer/.local-chromium/linux-*/chrome-linux/chrome'),
-            path.join(__dirname, '../../node_modules/puppeteer/.local-chromium/linux-*/chrome-linux/chrome'),
-            '/opt/render/project/src/server/node_modules/puppeteer/.local-chromium/linux-*/chrome-linux/chrome'
+            path.join(__dirname, '../node_modules/puppeteer/.local-chromium/chrome/linux-*/chrome-linux64/chrome'),
+            path.join(__dirname, '../node_modules/puppeteer/.local-chromium/linux-*/chrome-linux64/chrome'),
+            path.join(__dirname, '../../node_modules/puppeteer/.local-chromium/chrome/linux-*/chrome-linux64/chrome'),
+            '/opt/render/project/src/server/node_modules/puppeteer/.local-chromium/chrome/linux-*/chrome-linux64/chrome'
         ];
 
         console.log('Production environment detected. Searching for Chrome...');
