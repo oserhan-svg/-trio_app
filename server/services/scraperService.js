@@ -149,48 +149,58 @@ async function scrapeProperties(provider = 'all') {
 
 async function solveCloudflareChallenge(page) {
     try {
-        console.log('🛡️ Attempting to solve Cloudflare challenge...');
+        console.log('🛡️ Attempting to solve Cloudflare challenge (Frame Scan)...');
+        await new Promise(r => setTimeout(r, 3000)); // Wait for Turnstile to render
 
-        // Wait a bit for the challenge to load
-        await new Promise(r => setTimeout(r, 2000));
+        let solved = false;
 
-        // Click on the turnstile box if found (Shadow DOM support)
-        const clicked = await page.evaluate(async () => {
-            function findShadowElement(selector, root = document) {
-                const element = root.querySelector(selector);
-                if (element) return element;
-                const walkers = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, null, false);
-                while (walkers.nextNode()) {
-                    const node = walkers.currentNode;
-                    if (node.shadowRoot) {
-                        const found = findShadowElement(selector, node.shadowRoot);
-                        if (found) return found;
+        // 1. Scan all frames
+        const frames = page.frames();
+        console.log(`🛡️ Scanning ${frames.length} frames for Turnstile...`);
+
+        for (const frame of frames) {
+            try {
+                // Try to find the checkbox within the frame
+                const checkbox = await frame.$('input[type="checkbox"]');
+                const label = await frame.$('.ctp-checkbox-label');
+                const genericBox = await frame.$('#challenge-stage');
+
+                if (checkbox || label) {
+                    console.log(`🛡️ Found Turnstile checkbox in frame: ${frame.url()}`);
+                    const target = checkbox || label;
+                    await target.click();
+                    solved = true;
+                    break;
+                }
+            } catch (e) {
+                // Ignore frame access errors
+            }
+        }
+
+        // 2. Fallback: Blind click center if not found (often works for simple overlay)
+        if (!solved) {
+            console.log('🛡️ Semantic click failed. Trying visual fallback...');
+            try {
+                const box = await page.$('iframe[src*="challenges"]');
+                if (box) {
+                    const bb = await box.boundingBox();
+                    if (bb) {
+                        // Click center of iframe
+                        await page.mouse.click(bb.x + bb.width / 2, bb.y + bb.height / 2);
+                        console.log('🛡️ Clicked inside challenge iframe bounding box.');
+                        solved = true;
                     }
                 }
-                return null;
-            }
-
-            const challengeBox = findShadowElement('input[type="checkbox"]');
-
-            // Also try clicking the wrapper if checkbox is hidden
-            if (!challengeBox) {
-                const iframe = document.querySelector('iframe[src*="challenges"]');
-                if (iframe) return true;
-            }
-
-            if (challengeBox) {
-                challengeBox.click();
-                return true;
-            }
-            return false;
-        });
-
-        if (clicked) {
-            console.log('🛡️ Clicked Cloudflare/Turnstile checkbox!');
-            await new Promise(r => setTimeout(r, 5000)); // Wait for verification
-        } else {
-            console.log('🛡️ No clickable challenge found (passive wait).');
+            } catch (e) { }
         }
+
+        if (solved) {
+            console.log('🛡️ Interaction attempted. Waiting for reload...');
+            await new Promise(r => setTimeout(r, 8000));
+        } else {
+            console.log('🛡️ No challenge element confirmed.');
+        }
+
     } catch (e) {
         console.log('Error solving Cloudflare:', e.message);
     }
@@ -246,7 +256,7 @@ async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = '
 
                 // Smart Wait: Wait for specific elements instead of static sleep
                 try {
-                    await page.waitForSelector('.listing-item', { timeout: CONFIG.timeouts.element });
+                    await page.waitForSelector('.listing-item', { timeout: 30000 });
                 } catch (e) {
                     console.log(`⚠️ Timeout waiting for listings on page ${pageNum}.`);
 
