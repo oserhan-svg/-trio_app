@@ -147,6 +147,48 @@ async function scrapeProperties(provider = 'all') {
     }
 }
 
+async function solveCloudflareChallenge(page) {
+    try {
+        console.log('🛡️ Attempting to solve Cloudflare challenge...');
+
+        // Wait a bit for the challenge to load
+        await new Promise(r => setTimeout(r, 2000));
+
+        // Click on the turnstile box if found (Shadow DOM support)
+        const clicked = await page.evaluate(async () => {
+            function findShadowElement(selector, root = document) {
+                const element = root.querySelector(selector);
+                if (element) return element;
+                const walkers = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, null, false);
+                while (walkers.nextNode()) {
+                    const node = walkers.currentNode;
+                    if (node.shadowRoot) {
+                        const found = findShadowElement(selector, node.shadowRoot);
+                        if (found) return found;
+                    }
+                }
+                return null;
+            }
+
+            const challengeBox = findShadowElement('input[type="checkbox"]');
+            if (challengeBox) {
+                challengeBox.click();
+                return true;
+            }
+            return false;
+        });
+
+        if (clicked) {
+            console.log('🛡️ Clicked Cloudflare/Turnstile checkbox!');
+            await new Promise(r => setTimeout(r, 5000)); // Wait for verification
+        } else {
+            console.log('🛡️ No clickable challenge found (passive wait).');
+        }
+    } catch (e) {
+        console.log('Error solving Cloudflare:', e.message);
+    }
+}
+
 async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = 'residential') {
     console.log(`--- Scraping Hepsiemlak (${url}) [Forced Type: ${forcedSellerType || 'Auto'}, Category: ${category}] ---`);
     let allListings = [];
