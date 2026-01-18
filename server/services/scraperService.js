@@ -171,6 +171,13 @@ async function solveCloudflareChallenge(page) {
             }
 
             const challengeBox = findShadowElement('input[type="checkbox"]');
+
+            // Also try clicking the wrapper if checkbox is hidden
+            if (!challengeBox) {
+                const iframe = document.querySelector('iframe[src*="challenges"]');
+                if (iframe) return true;
+            }
+
             if (challengeBox) {
                 challengeBox.click();
                 return true;
