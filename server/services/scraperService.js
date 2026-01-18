@@ -149,8 +149,16 @@ async function scrapeProperties(provider = 'all') {
 
 async function solveCloudflareChallenge(page) {
     try {
-        console.log('🛡️ Attempting to solve Cloudflare challenge (Hybrid Scan)...');
-        await new Promise(r => setTimeout(r, 4000)); // Wait for Turnstile to render
+        console.log('🛡️ Attempting to solve Cloudflare challenge (Hybrid Scan + Wait)...');
+
+        // 0. Explicitly wait for the challenge iframe (Fixes "1 frame" issue)
+        try {
+            await page.waitForSelector('iframe[src*="cloudflare-if/"]', { timeout: 10000 });
+        } catch (e) {
+            try { await page.waitForSelector('iframe[src*="challenges"]', { timeout: 5000 }); } catch (e2) { }
+        }
+
+        await new Promise(r => setTimeout(r, 2000)); // Extra settle time
 
         let solved = false;
 
@@ -163,11 +171,8 @@ async function solveCloudflareChallenge(page) {
                 // Run Shadow DOM search INSIDE each frame
                 const foundInFrame = await frame.evaluate(() => {
                     function findShadowElement(selector, root = document) {
-                        // Direct child
                         const element = root.querySelector(selector);
                         if (element) return element;
-
-                        // Recursive check in shadow roots
                         const walkers = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, null, false);
                         while (walkers.nextNode()) {
                             const node = walkers.currentNode;
@@ -181,7 +186,6 @@ async function solveCloudflareChallenge(page) {
 
                     const challengeBox = findShadowElement('input[type="checkbox"]');
                     const label = findShadowElement('.ctp-checkbox-label');
-
                     const target = challengeBox || label;
                     if (target) {
                         target.click();
@@ -195,34 +199,33 @@ async function solveCloudflareChallenge(page) {
                     solved = true;
                     break;
                 }
-            } catch (e) {
-                // Ignore frame access errors (cross-origin restrictions might block evaluate on some frames)
-            }
-        }
-
-        // 2. Fallback: Blind click center if not found
-        if (!solved) {
-            console.log('🛡️ Semantic click failed. Trying visual fallback...');
-            try {
-                const box = await page.$('iframe[src*="challenges"]');
-                if (box) {
-                    const bb = await box.boundingBox();
-                    if (bb) {
-                        // Click center of iframe
-                        await page.mouse.click(bb.x + bb.width / 2, bb.y + bb.height / 2);
-                        console.log('🛡️ Clicked inside challenge iframe bounding box.');
-                        solved = true;
-                    }
-                }
             } catch (e) { }
         }
 
-        if (solved) {
-            console.log('🛡️ Interaction attempted. Waiting for reload...');
-            await new Promise(r => setTimeout(r, 8000));
-        } else {
-            console.log('🛡️ No challenge element confirmed.');
+        // 2. Fallback: Blind Keyboard Interaction (Tab + Space)
+        if (!solved) {
+            console.log('🛡️ Semantic click failed. Trying Keyboard Fallback (Tab+Space)...');
+            try {
+                // Focus on page
+                await page.click('body').catch(() => { });
+                await new Promise(r => setTimeout(r, 500));
+
+                // Press Tab a few times to reach the box
+                for (let i = 0; i < 3; i++) {
+                    await page.keyboard.press('Tab');
+                    await new Promise(r => setTimeout(r, 300));
+                }
+                // Press Space to toggle
+                await page.keyboard.press('Space');
+                console.log('🛡️ Sent Blind Keypress (Tab+Space).');
+                solved = true;
+            } catch (e) {
+                console.log('Keyboard fallback error:', e.message);
+            }
         }
+
+        console.log('🛡️ Interaction attempted. Waiting for reload...');
+        await new Promise(r => setTimeout(r, 8000));
 
     } catch (e) {
         console.log('Error solving Cloudflare:', e.message);
