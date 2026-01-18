@@ -62,7 +62,7 @@ async function initDb() {
     }
 }
 
-initDb();
+
 
 const prisma = require('./db');
 app.get('/test-db', async (req, res) => {
