@@ -80,4 +80,5 @@ app.use(errorHandler);
 // Start Server
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+    initDb(); // Run DB init after port is bound to satisfy Render's health check
 });

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx prisma db push --accept-data-loss && node scripts/createAdminPrisma.js && node index.js",
+    "start": "node index.js",
     "dev": "concurrently \"npm run start\" \"cd ../client && npm run dev\""
   },
   "keywords": [],
