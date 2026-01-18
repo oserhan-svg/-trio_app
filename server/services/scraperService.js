@@ -175,7 +175,7 @@ async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = '
 
                 // Smart Wait: Wait for specific elements instead of static sleep
                 try {
-                    await page.waitForSelector('.listing-item', { timeout: 15000 });
+                    await page.waitForSelector('.listing-item', { timeout: CONFIG.timeouts.element });
                 } catch (e) {
                     console.log(`⚠️ Timeout waiting for listings on page ${pageNum}. End of results?`);
                     hasNextPage = false;

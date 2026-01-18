@@ -2,9 +2,9 @@ const path = require('path');
 
 module.exports = {
     timeouts: {
-        pageLoad: 60000,
-        element: 15000,
-        navigation: 30000,
+        pageLoad: 90000,
+        element: 30000,
+        navigation: 60000,
         humanDelayMin: 2000,
         humanDelayMax: 5000
     },
