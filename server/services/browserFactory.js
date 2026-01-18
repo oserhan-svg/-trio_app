@@ -40,10 +40,10 @@ async function createStealthBrowser(options = {}) {
         '--ignore-certificate-errors',
         '--ignore-certificate-errors-spki-list',
         '--disable-blink-features=AutomationControlled',
-        '--disable-features=IsolateOrigins,site-per-process',
-        '--disable-site-isolation-trials',
-        '--disable-web-security',
-        '--allow-running-insecure-content',
+        // '--disable-features=IsolateOrigins,site-per-process', // Removed for stealth
+        // '--disable-site-isolation-trials', // Removed for stealth
+        // '--disable-web-security', // Removed for stealth
+        // '--allow-running-insecure-content', // Removed for stealth
         '--disable-notifications',
         '--disable-popup-blocking',
         // New anti-detection flags
@@ -216,7 +216,8 @@ async function configureStealthPage(page) {
         'Sec-Ch-Ua': '"Google Chrome";v="124", "Chromium";v="124", "Not-A.Brand";v="24"',
         'Sec-Ch-Ua-Mobile': isMobile ? '?1' : '?0',
         'Sec-Ch-Ua-Platform': `"${platform}"`,
-        'Upgrade-Insecure-Requests': '1'
+        'Upgrade-Insecure-Requests': '1',
+        'Referer': 'https://www.google.com/'
     });
 
     // 6. Mask Canvas & WebGL (Anti-Fingerprinting)
