@@ -73,7 +73,12 @@ const prisma = require('./db');
 app.get('/test-db', async (req, res) => {
     try {
         const userCount = await prisma.user.count();
-        res.json({ status: 'Database Connected', user_count: userCount });
+        const propertyCount = await prisma.property.count();
+        res.json({
+            status: 'Database Connected',
+            user_count: userCount,
+            property_count: propertyCount
+        });
     } catch (error) {
         res.status(500).json({ status: 'Database Error', error: error.message });
     }
