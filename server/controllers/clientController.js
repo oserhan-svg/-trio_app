@@ -73,8 +73,15 @@ const getClient = async (req, res) => {
 };
 
 // Create a new client (Assigned to Creator)
+const { stripHtml } = require('../utils/sanitize');
+
 const createClient = async (req, res) => {
-    const { name, phone, email, notes, type } = req.body;
+    let { name, phone, email, notes, type } = req.body;
+
+    // Sanitize inputs
+    name = stripHtml(name);
+    notes = stripHtml(notes);
+
     try {
         const client = await prisma.client.create({
             data: {
@@ -93,43 +100,17 @@ const createClient = async (req, res) => {
     }
 };
 
-// Add a demand to a client
-const addDemand = async (req, res) => {
-    const { clientId } = req.params;
-    const { min_price, max_price, rooms, district, neighborhood } = req.body;
-
-    try {
-        const demand = await prisma.demand.create({
-            data: {
-                client_id: parseInt(clientId),
-                min_price: min_price ? parseFloat(min_price) : null,
-                max_price: max_price ? parseFloat(max_price) : null,
-                rooms,
-                district,
-                neighborhood
-            }
-        });
-        res.json(demand);
-    } catch (error) {
-        res.status(500).json({ error: 'Error adding demand' });
-    }
-};
-
-// Delete a client
-const deleteClient = async (req, res) => {
-    const { id } = req.params;
-    try {
-        await prisma.client.delete({ where: { id: parseInt(id) } });
-        res.json({ message: 'Client deleted' });
-    } catch (error) {
-        res.status(500).json({ error: 'Error deleting client' });
-    }
-};
+// ... (skip addDemand/deleteClient)
 
 // Update a client
 const updateClient = async (req, res) => {
     const { id } = req.params;
-    const { name, phone, email, notes, type } = req.body;
+    let { name, phone, email, notes, type } = req.body;
+
+    // Sanitize inputs
+    if (name) name = stripHtml(name);
+    if (notes) notes = stripHtml(notes);
+
     try {
         const client = await prisma.client.update({
             where: { id: parseInt(id) },

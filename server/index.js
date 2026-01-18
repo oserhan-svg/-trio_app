@@ -12,7 +12,22 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+
+// CORS Configuration
+const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+app.use(cors({
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        if (clientUrl.split(',').includes(origin)) {
+            callback(null, true);
+        } else {
+            console.warn(`Blocked CORS request from: ${origin}`);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true
+}));
 app.use(morgan('dev'));
 app.use(express.json());
 
@@ -44,6 +59,16 @@ startScheduler();
 
 app.get('/', (req, res) => {
     res.send('Emlak Takip API Running');
+});
+
+const prisma = require('./db');
+app.get('/test-db', async (req, res) => {
+    try {
+        const userCount = await prisma.user.count();
+        res.json({ status: 'Database Connected', user_count: userCount });
+    } catch (error) {
+        res.status(500).json({ status: 'Database Error', error: error.message });
+    }
 });
 
 // Error Handling Middleware (Must be last)

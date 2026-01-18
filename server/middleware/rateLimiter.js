@@ -22,4 +22,15 @@ const authLimiter = rateLimit({
     }
 });
 
-module.exports = { apiLimiter, authLimiter };
+// Strict rate limiter for scraping actions (resource intensive)
+const scrapeLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 10, // Limit each IP to 10 scrape triggers per hour
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: {
+        error: 'Too many scrape requests, please try again later.'
+    }
+});
+
+module.exports = { apiLimiter, authLimiter, scrapeLimiter };

@@ -33,7 +33,6 @@
     "puppeteer": "^24.35.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
-    "sqlite3": "^5.1.7",
     "uuid": "^13.0.0"
   }
 }

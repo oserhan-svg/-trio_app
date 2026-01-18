@@ -4,9 +4,10 @@ const { getProperties, getPropertyHistory, getPropertyById, scrapePropertyDetail
 const { exportPropertiesToExcel } = require('../services/excelService');
 const { scrapeProperties } = require('../services/scraperService');
 const { authenticateToken } = require('../middleware/authMiddleware');
+const { scrapeLimiter } = require('../middleware/rateLimiter');
 
 // Scraper Trigger
-router.post('/scrape', authenticateToken, async (req, res) => {
+router.post('/scrape', authenticateToken, scrapeLimiter, async (req, res) => {
     try {
         console.log('Manual scrape triggered via API');
         // Run in background
@@ -21,7 +22,7 @@ router.post('/scrape', authenticateToken, async (req, res) => {
 router.get('/', authenticateToken, getProperties);
 router.get('/export', authenticateToken, exportPropertiesToExcel);
 router.get('/:id', authenticateToken, getPropertyById); // Move basic detail fetch here too
-router.post('/:id/scrape-details', authenticateToken, scrapePropertyDetails);
+router.post('/:id/scrape-details', authenticateToken, scrapeLimiter, scrapePropertyDetails);
 router.get('/:id/history', authenticateToken, getPropertyHistory);
 router.put('/:id/assign', authenticateToken, require('../controllers/propertyController').assignProperty);
 
