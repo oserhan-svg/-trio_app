@@ -276,8 +276,13 @@ async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = '
 
                         console.log('🛡️ Evasion wait complete. Checking if we passed...');
 
+
                         // Force reload target URL to ensure we are on the right page
                         console.log(`🔄 Reloading target URL to apply cookies: ${pageUrl}`);
+
+                        // Fix: Set Referer to same-origin to look natural
+                        await page.setExtraHTTPHeaders({ 'Referer': 'https://www.hepsiemlak.com/' });
+
                         await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
                     }
                 } catch (err) {
@@ -295,8 +300,9 @@ async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = '
                     // Check if it's Cloudflare
                     try {
                         const title = await page.title();
-                        const bodyText = await page.evaluate(() => document.body.innerText.substring(0, 300).replace(/\n/g, ' '));
+                        const bodyText = await page.evaluate(() => document.body.innerText.substring(0, 500).replace(/\n/g, ' '));
                         console.log(`DEBUG VIEW - Title: ${title}`);
+                        console.log(`DEBUG BODY: ${bodyText}`); // Added body dump
 
                         if (title.includes('Bir dakika') || title.includes('Just a moment') || bodyText.includes('Doğrulanıyor')) {
                             console.log('🛡️ Cloudflare detected during timeout. Attempting to bypass...');
