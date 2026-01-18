@@ -149,8 +149,8 @@ async function scrapeProperties(provider = 'all') {
 
 async function solveCloudflareChallenge(page) {
     try {
-        console.log('🛡️ Attempting to solve Cloudflare challenge (Frame Scan)...');
-        await new Promise(r => setTimeout(r, 3000)); // Wait for Turnstile to render
+        console.log('🛡️ Attempting to solve Cloudflare challenge (Hybrid Scan)...');
+        await new Promise(r => setTimeout(r, 4000)); // Wait for Turnstile to render
 
         let solved = false;
 
@@ -160,24 +160,47 @@ async function solveCloudflareChallenge(page) {
 
         for (const frame of frames) {
             try {
-                // Try to find the checkbox within the frame
-                const checkbox = await frame.$('input[type="checkbox"]');
-                const label = await frame.$('.ctp-checkbox-label');
-                const genericBox = await frame.$('#challenge-stage');
+                // Run Shadow DOM search INSIDE each frame
+                const foundInFrame = await frame.evaluate(() => {
+                    function findShadowElement(selector, root = document) {
+                        // Direct child
+                        const element = root.querySelector(selector);
+                        if (element) return element;
 
-                if (checkbox || label) {
-                    console.log(`🛡️ Found Turnstile checkbox in frame: ${frame.url()}`);
-                    const target = checkbox || label;
-                    await target.click();
+                        // Recursive check in shadow roots
+                        const walkers = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, null, false);
+                        while (walkers.nextNode()) {
+                            const node = walkers.currentNode;
+                            if (node.shadowRoot) {
+                                const found = findShadowElement(selector, node.shadowRoot);
+                                if (found) return found;
+                            }
+                        }
+                        return null;
+                    }
+
+                    const challengeBox = findShadowElement('input[type="checkbox"]');
+                    const label = findShadowElement('.ctp-checkbox-label');
+
+                    const target = challengeBox || label;
+                    if (target) {
+                        target.click();
+                        return true;
+                    }
+                    return false;
+                });
+
+                if (foundInFrame) {
+                    console.log(`🛡️ Found & Clicked Turnstile in frame: ${frame.url()}`);
                     solved = true;
                     break;
                 }
             } catch (e) {
-                // Ignore frame access errors
+                // Ignore frame access errors (cross-origin restrictions might block evaluate on some frames)
             }
         }
 
-        // 2. Fallback: Blind click center if not found (often works for simple overlay)
+        // 2. Fallback: Blind click center if not found
         if (!solved) {
             console.log('🛡️ Semantic click failed. Trying visual fallback...');
             try {
