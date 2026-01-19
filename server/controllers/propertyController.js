@@ -162,13 +162,25 @@ const getProperties = async (req, res) => {
                 propertiesWithScore.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
             } else if (sort === 'location_asc') {
                 propertiesWithScore.sort((a, b) => {
-                    const distCompare = a.district.localeCompare(b.district, 'tr');
-                    return distCompare !== 0 ? distCompare : a.neighborhood.localeCompare(b.neighborhood, 'tr');
+                    const distA = a.district || '';
+                    const distB = b.district || '';
+                    const distCompare = distA.localeCompare(distB, 'tr');
+                    if (distCompare !== 0) return distCompare;
+
+                    const neighA = a.neighborhood || '';
+                    const neighB = b.neighborhood || '';
+                    return neighA.localeCompare(neighB, 'tr');
                 });
             } else if (sort === 'location_desc') {
                 propertiesWithScore.sort((a, b) => {
-                    const distCompare = b.district.localeCompare(a.district, 'tr');
-                    return distCompare !== 0 ? distCompare : b.neighborhood.localeCompare(a.neighborhood, 'tr');
+                    const distA = a.district || '';
+                    const distB = b.district || '';
+                    const distCompare = distB.localeCompare(distA, 'tr');
+                    if (distCompare !== 0) return distCompare;
+
+                    const neighA = a.neighborhood || '';
+                    const neighB = b.neighborhood || '';
+                    return neighB.localeCompare(neighA, 'tr');
                 });
             } else if (req.query.opportunity_filter) {
                 // Default sorting for opportunity filter if no explicit sort
