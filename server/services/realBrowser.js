@@ -97,10 +97,34 @@ async function launchRealBrowser(options = {}) {
             ignoreAllFlags: false
         });
 
+        // Inject Cookies
+        await loadImportedCookies(page);
+
         return { browser, page };
     } catch (e) {
         console.error('❌ Failed to launch Real Browser:', e);
         throw e;
+    }
+}
+
+async function loadImportedCookies(page) {
+    const cookiePath = scraperConfig.paths.cookies;
+    if (fs.existsSync(cookiePath)) {
+        try {
+            console.log(`🍪 Loading imported cookies from: ${cookiePath}`);
+            const cookiesString = fs.readFileSync(cookiePath, 'utf8');
+            const cookies = JSON.parse(cookiesString);
+
+            // Filter valid cookies (domain/url matching is handled by browser, but we ensure format)
+            if (Array.isArray(cookies) && cookies.length > 0) {
+                await page.setCookie(...cookies);
+                console.log(`✅ ${cookies.length} cookies injected successfully.`);
+            }
+        } catch (e) {
+            console.error('⚠️ Failed to load imported cookies:', e.message);
+        }
+    } else {
+        console.log('ℹ️ No imported cookies found (manual_cookies.json not processed). Using clean session.');
     }
 }
 
