@@ -88,9 +88,6 @@ async function launchRealBrowser(options = {}) {
                 '--disable-gpu',
                 '--disable-gl-drawing-for-tests',
                 '--mute-audio',
-                '--no-zygote', // Saves memory but might be unstable
-                '--renderer-process-limit=1', // Limit processes
-                '--js-flags="--max-old-space-size=256"', // Limit V8 memory
                 '--window-size=1920,1080'
             ],
             customConfig: {
