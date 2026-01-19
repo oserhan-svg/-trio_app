@@ -189,7 +189,6 @@ async function solveCloudflareChallenge(page) {
             console.log('🛡️ Semantic click failed. Trying Text-Coordinate Fallback...');
             try {
                 // Find "Verify you are human" or "Doğrulanıyor" text
-                // Check if we can find text using xpath or evaluate
                 const textFoundCords = await page.evaluate(() => {
                     const allElements = document.querySelectorAll('*');
                     for (const el of allElements) {
@@ -345,7 +344,7 @@ async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = '
                     items.forEach(item => {
                         const id = item.id;
                         if (!id) return;
-                        // ... extraction logic same as before ...
+
                         const titleEl = item.querySelector('.list-view-title h3') || item.querySelector('.list-view-title');
                         const priceEl = item.querySelector('.list-view-price');
                         const locationEl = item.querySelector('.list-view-location');
@@ -507,26 +506,159 @@ async function saveListings(listings) {
     }
 }
 
-// ... (keep scrapeEmlakjet, startScheduler, scrapeDetails)
-
 async function scrapeEmlakjet(page, url, category = 'residential') {
-    // ... duplicate logic from previous, omitted for brevity but should be included or kept
-    // For this overwrite, I will restore minimal Emlakjet structure to prevent errors
-    console.log(`--- Scraping Emlakjet (${url}) ---`);
+    console.log(`--- Scraping Emlakjet (${url}) [Category: ${category}] ---`);
+    let allListings = [];
+    let pageNum = 1;
+    let hasNextPage = true;
+
+    while (hasNextPage && pageNum <= 3) {
+        const pageUrl = pageNum === 1 ? url : `${url}${pageNum}`;
+        console.log(`Navigating to Emlakjet Page ${pageNum}: ${pageUrl}`);
+
+        try {
+            await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: 45000 });
+
+            try {
+                await page.waitForSelector('a[class*="styles_wrapper__"]', { timeout: 15000 });
+            } catch (e) {
+                console.log(`⚠️ Timeout waiting for Emlakjet listings on page ${pageNum}.`);
+                hasNextPage = false;
+                break;
+            }
+
+            await new Promise(r => setTimeout(r, 1000 + Math.random() * 2000));
+
+            const listings = await page.evaluate((category) => {
+                const items = document.querySelectorAll('a[class*="styles_wrapper__"]');
+                const data = [];
+
+                items.forEach(item => {
+                    const titleEl = item.querySelector('h3');
+                    const spans = Array.from(item.querySelectorAll('span'));
+                    const priceEl = spans.find(s => s.innerText.includes('TL'));
+                    const locationEl = spans.find(s => s.innerText.includes('Ayvalık - '));
+                    const detailsEl = Array.from(item.querySelectorAll('div')).find(s => s.innerText.includes('m²'));
+
+                    if (!titleEl || !priceEl) return;
+
+                    const url = item.href;
+                    const idMatch = url.match(/-(\d+)\/?$/) || url.match(/-(\d+)(?:\.html)?$/);
+                    const id = idMatch ? idMatch[1] : url.split('-').pop();
+
+                    let title = titleEl.innerText.trim();
+                    let price = parseFloat(priceEl.innerText.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, '')) || 0;
+
+                    let district = 'Ayvalık';
+                    let neighborhood = '';
+                    if (locationEl) {
+                        const parts = locationEl.innerText.split('-').map(s => s.trim());
+                        if (parts.length > 1) {
+                            neighborhood = parts[1].replace(/\s+Mahallesi/i, '').replace(/\s+Mah\.?/i, '').replace(/\s+Mh\.?/i, '').trim() + ' Mah.';
+                        }
+                    }
+
+                    let size_m2 = 0;
+                    let rooms = '';
+                    if (detailsEl) {
+                        const text = detailsEl.innerText;
+                        const parts = text.split('|').map(s => s.trim());
+                        const m2Part = parts.find(p => p.includes('m²'));
+                        if (m2Part) size_m2 = parseInt(m2Part.replace(/[^\d]/g, '')) || 0;
+                        const roomMatch = text.match(/\d\s*\+\s*\d/);
+                        if (roomMatch) rooms = roomMatch[0].replace(/\s/g, '');
+                    }
+
+                    data.push({
+                        external_id: 'ej-' + id,
+                        title,
+                        price,
+                        url,
+                        district,
+                        neighborhood,
+                        rooms,
+                        size_m2,
+                        listing_date: new Date().toISOString().split('T')[0],
+                        seller_type: 'office',
+                        seller_name: item.querySelector('div[class*="styles_tagWrapper__"]') ? 'Emlakjet' : (item.querySelector('div[class*="styles_officeName__"]')?.innerText.trim() || 'Emlak Ofisi'),
+                        listing_type: url.includes('kiralik') ? 'rent' : 'sale',
+                        category
+                    });
+                });
+                return data;
+            }, category);
+
+            if (listings.length === 0) {
+                hasNextPage = false;
+            } else {
+                console.log(`Found ${listings.length} listings on page ${pageNum}. Saving progress...`);
+                await saveListings(listings);
+                allListings = [...allListings, ...listings];
+                pageNum++;
+            }
+        } catch (err) {
+            console.error(`Emlakjet Page ${pageNum} Error:`, err.message);
+            hasNextPage = false;
+        }
+    }
+    return allListings;
 }
-// Note: To save token count, I truncated Emlakjet. In full version I would include it. 
-// Re-inserting full Emlakjet code now to be safe.
-scrapeEmlakjet = async (page, url, category = 'residential') => {
-    // ... Full Emlakjet Logic
-    console.log(`Coming soon: Emlakjet`);
+
+const startScheduler = () => {
+    cron.schedule('0 */4 * * *', () => {
+        scrapeProperties('all');
+    });
+    console.log('Scraper scheduler started.');
 };
-// Actually I need to be careful with overwrite. I will paste the previous Emlakjet code.
 
 const { scrapeSahibindenDetails } = require('./stealthScraper');
 async function scrapeDetails(url) {
     if (url.includes('sahibinden.com')) return await scrapeSahibindenDetails(url);
     // Hepsiemlak detail logic...
-    return {};
+    console.log(`--- Scraping Hepsiemlak Details (${url}) ---`);
+    let browser;
+    try {
+        const { getOrLaunchBrowser } = require('./stealthScraper');
+        browser = await getOrLaunchBrowser();
+        const page = await browser.newPage();
+        await page.setViewport({ width: 1920, height: 1080 });
+
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+
+        const data = await page.evaluate(() => {
+            const description = document.querySelector('.description-content')?.innerText.trim() || '';
+            let images = [];
+            document.querySelectorAll('.detail-gallery img').forEach(img => images.push(img.src));
+            images = [...new Set(images)];
+            const features = [];
+            document.querySelectorAll('.spec-item').forEach(item => {
+                features.push(item.innerText.replace(/\n/g, ': ').trim());
+            });
+            const infoMap = {};
+            document.querySelectorAll('.spec-item').forEach(item => {
+                const label = item.querySelector('.spec-item-label')?.innerText.trim();
+                const value = item.querySelector('.spec-item-value')?.innerText.trim();
+                if (label && value) infoMap[label] = value;
+            });
+            let building_age = infoMap['Bina Yaşı'] || null;
+            let heating_type = infoMap['Isınma Tipi'] || null;
+            let floor_location = infoMap['Bulunduğu Kat'] || null;
+            let size_m2 = parseInt(infoMap['Brüt Metrekare'] || infoMap['Metrekare'] || 0);
+            let rooms = infoMap['Oda + Salon Sayısı'] || null;
+            const seller_name = document.querySelector('.firm-card-name')?.innerText.trim() || 'Bilinmiyor';
+            const seller_phone = document.querySelector('.phone-number')?.innerText.trim() || null;
+            return { description, images, features, seller_name, seller_phone, building_age, heating_type, floor_location, size_m2, rooms };
+        });
+        return data;
+    } catch (e) {
+        console.error('Hepsiemlak Detail Scrape Error:', e);
+        throw e;
+    } finally {
+        if (browser) {
+            const pages = await browser.pages();
+            if (pages.length > 2) await pages[pages.length - 1].close();
+        }
+    }
 }
 
 module.exports = { scrapeProperties, startScheduler, scrapeDetails, saveListings };
