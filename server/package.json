@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "echo 'No build step needed'",
     "start": "node index.js",
+    "login": "node scripts/login_mode.js",
     "postinstall": "npx puppeteer browsers install chrome",
     "dev": "concurrently \"npm run start\" \"cd ../client && npm run dev\""
   },
