@@ -192,10 +192,13 @@ async function solveCloudflareChallenge(page) {
                 const textFoundCords = await page.evaluate(() => {
                     const allElements = document.querySelectorAll('*');
                     for (const el of allElements) {
-                        if (el.innerText && (el.innerText.includes('Verify you are human') || el.innerText.includes('human') || el.innerText.includes('Doğrulanıyor'))) {
-                            const rect = el.getBoundingClientRect();
-                            if (rect.width > 0 && rect.height > 0) {
-                                return { x: rect.x, y: rect.y, w: rect.width, h: rect.height };
+                        if (el.innerText) {
+                            const text = el.innerText.toLowerCase();
+                            if (text.includes('verify you are human') || text.includes('human') || text.includes('doğrulanıyor') || text.includes('doğrulama') || text.includes('devam etmek')) {
+                                const rect = el.getBoundingClientRect();
+                                if (rect.width > 0 && rect.height > 0) {
+                                    return { x: rect.x, y: rect.y, w: rect.width, h: rect.height };
+                                }
                             }
                         }
                     }
