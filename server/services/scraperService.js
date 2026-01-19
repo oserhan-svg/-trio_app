@@ -236,194 +236,203 @@ async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = '
                     console.log(`🔄 Retrying page ${pageNum} (Attempt ${retryCount + 1})...`);
                     await page.reload({ waitUntil: 'domcontentloaded' });
                 } else {
-                    await page.goto(pageUrl, {
-                        waitUntil: pageNum === 1 ? 'networkidle2' : 'domcontentloaded',
-                        timeout: 45000
-                    });
-                }
-
-                // Cloudflare / Bot Protection Check
-                try {
-                    const pageTitle = await page.title();
-                    if (pageTitle.includes('Bir dakika') || pageTitle.includes('Just a moment') || pageTitle.includes('Attention Required')) {
-                        console.log('🛡️ Cloudflare/Security Check detected. Initiating evasion protocols...');
-
-                        await solveCloudflareChallenge(page);
-                        await new Promise(r => setTimeout(r, 8000));
-
-                        try {
-                            await page.mouse.move(100, 100);
-                            await page.mouse.move(200, 200);
-                        } catch (ev) { }
-
-                        console.log('🛡️ Evasion wait complete. Checking status...');
-
-                        const currentTitle = await page.title();
-                        console.log(`Current Title: ${currentTitle}`);
-
-                        const currentBody = await page.evaluate(() => document.body.innerText.toLowerCase());
-                        if (
-                            currentTitle.includes('Bir dakika') ||
-                            currentTitle.includes('Just a moment') ||
-                            currentTitle.includes('Attention Required') ||
-                            currentBody.includes('blocked') ||
-                            currentBody.includes('err_')
-                        ) {
-                            // Still blocked, try forced reload
-                            console.log(`⚠️ Still on Cloudflare page. Force reloading target URL: ${pageUrl}`);
-                            // Fix: Set Referer to same-origin to look natural
-                            await page.setExtraHTTPHeaders({ 'Referer': 'https://www.hepsiemlak.com/' });
-                            await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
-                        } else {
-                            console.log('✅ It seems we passed Cloudflare! Proceeding without reload.');
-                        }
-                    }
-                } catch (err) {
-                    console.log('Error checking for Cloudflare:', err.message);
-                }
-
-                // Smart Wait
-                try {
-                    await page.waitForSelector('.listing-item', { timeout: 30000 });
-                    await saveBrowserState(page);
-                } catch (e) {
-                    console.log(`⚠️ Timeout waiting for listings on page ${pageNum}.`);
-
-                    try {
-                        const title = await page.title();
-                        const bodyText = await page.evaluate(() => document.body.innerText.substring(0, 500).replace(/\n/g, ' '));
-                        console.log(`DEBUG VIEW - Title: ${title}`);
-                        console.log(`DEBUG BODY: ${bodyText}`);
-
-                        if (title.includes('Bir dakika') || title.includes('Just a moment') || bodyText.includes('Doğrulanıyor') || bodyText.includes('Verify')) {
-                            console.log('🛡️ Cloudflare detected during timeout. Attempting to bypass...');
-                            await solveCloudflareChallenge(page);
-                            await new Promise(r => setTimeout(r, 15000));
-
-                            console.log('🔄 Restarting loop to check if resolved...');
-                            retryCount++;
-                            continue;
-                        }
-                    } catch (err) {
-                        console.log('Could not get debug info.');
-                    }
-
-                    hasNextPage = false;
-                    break;
-                }
-
-                await page.evaluate(async () => {
-                    window.scrollBy(0, 500);
-                    await new Promise(r => setTimeout(r, 500));
-                });
-
-                const listings = await page.evaluate((forcedSellerType, category) => {
-                    const items = document.querySelectorAll('.listing-item');
-                    const data = [];
-                    items.forEach(item => {
-                        const id = item.id;
-                        if (!id) return;
-
-                        const titleEl = item.querySelector('.list-view-title h3') || item.querySelector('.list-view-title');
-                        const priceEl = item.querySelector('.list-view-price');
-                        const locationEl = item.querySelector('.list-view-location');
-                        const urlEl = item.querySelector('a.card-link');
-                        const imgEl = item.querySelector('img');
-                        const dateEl = item.querySelector('.list-view-date');
-
-                        let title = titleEl?.innerText.trim() || imgEl?.getAttribute('alt') || 'İsimsiz İlan';
-                        let price = 0;
-                        if (priceEl) {
-                            const raw = priceEl.innerText.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, '');
-                            price = parseFloat(raw) || 0;
-                        }
-                        let district = '';
-                        let neighborhood = '';
-                        if (locationEl) {
-                            const parts = locationEl.innerText.split('/').map(s => s.trim());
-                            if (parts.length > 1) district = parts[1];
-                            if (parts.length > 2) {
-                                let rawNeighborhood = parts[2];
-                                let clean = rawNeighborhood.replace(/\s+Mahallesi/i, '').replace(/\s+Mah\.?/i, '').replace(/\s+Mh\.?/i, '').trim();
-                                neighborhood = clean + ' Mah.';
-                            }
-                        }
-                        const url = urlEl ? 'https://www.hepsiemlak.com' + urlEl.getAttribute('href') : '';
-                        let size_m2 = 0;
-                        let rooms = '';
-                        const textContent = item.innerText;
-                        const m2Match = textContent.match(/(\d+)\s*m²/);
-                        if (m2Match) size_m2 = parseInt(m2Match[1]);
-                        const roomMatch = textContent.match(/(\d+\s*\+\s*\d+)/);
-                        if (roomMatch) rooms = roomMatch[1].replace(/\s/g, '');
-
-                        let listing_date = null;
-                        if (dateEl) {
-                            const dateText = dateEl.innerText.trim();
-                            const parts = dateText.match(/(\d{2})-(\d{2})-(\d{4})/);
-                            if (parts) {
-                                listing_date = `${parts[3]}-${parts[2]}-${parts[1]}`;
-                            } else {
-                                const now = new Date();
-                                if (dateText.toLowerCase() === 'bugün') listing_date = now.toISOString().split('T')[0];
-                                else if (dateText.toLowerCase() === 'dün') {
-                                    now.setDate(now.getDate() - 1);
-                                    listing_date = now.toISOString().split('T')[0];
-                                }
-                            }
-                        }
-
-                        let seller_type = forcedSellerType || 'office';
-                        let seller_name = 'Bilinmiyor';
-                        if (!forcedSellerType) {
-                            const ownerInfoEl = item.querySelector('.listing-card--owner-info');
-                            if (ownerInfoEl) {
-                                const infoText = ownerInfoEl.innerText.trim();
-                                seller_name = infoText;
-                                const lowerInfo = infoText.toLowerCase();
-                                if (lowerInfo.includes('sahibinden')) seller_type = 'owner';
-                                else if (lowerInfo.includes('banka')) seller_type = 'bank';
-                                else if (lowerInfo.includes('inşaat') || lowerInfo.includes('proje')) seller_type = 'construction';
-                            } else {
-                                if (item.innerText.toLowerCase().includes('sahibinden satılık')) {
-                                    seller_type = 'owner';
-                                    seller_name = 'Sahibinden';
-                                }
-                            }
-                        } else {
-                            if (forcedSellerType === 'owner') seller_name = 'Sahibinden';
-                        }
-                        let listing_type = 'sale';
-                        if (url.toLowerCase().includes('kiralik')) listing_type = 'rent';
-                        data.push({ external_id: id, title, price, url, district, neighborhood, rooms, size_m2, listing_date, seller_type, seller_name, listing_type, category });
-                    });
-                    return data;
-                }, forcedSellerType, category);
-
-                if (listings.length === 0) {
-                    hasNextPage = false;
-                } else {
-                    const newIds = listings.map(l => l.external_id);
-                    const existingIds = new Set(allListings.map(l => l.external_id));
-                    const isDuplicatePage = newIds.every(id => existingIds.has(id));
-                    if (isDuplicatePage && allListings.length > 0) {
-                        hasNextPage = false;
+                    // Use Organic Nav for the very first page visit to establish trust
+                    if (pageNum === 1) {
+                        console.log(`Navigating to Hepsiemlak Base via Google...`);
+                        await organicNav(page, pageUrl);
                     } else {
-                        console.log(`Found ${listings.length} listings. Saving progress...`);
-                        await saveListings(listings);
-                        allListings = [...allListings, ...listings];
-                        pageNum++;
+                        await page.goto(pageUrl, {
+                            waitUntil: 'domcontentloaded',
+                            timeout: scraperConfig.timeouts.pageLoad
+                        });
                     }
                 }
-                pageSuccess = true;
-            } catch (e) {
-                console.log(`Error on page ${pageNum}: ${e.message}`);
-                retryCount++;
-                if (retryCount > maxRetries) hasNextPage = false;
+                timeout: 45000
+            });
+        }
+
+        // Cloudflare / Bot Protection Check
+        try {
+            const pageTitle = await page.title();
+            if (pageTitle.includes('Bir dakika') || pageTitle.includes('Just a moment') || pageTitle.includes('Attention Required')) {
+                console.log('🛡️ Cloudflare/Security Check detected. Initiating evasion protocols...');
+
+                await solveCloudflareChallenge(page);
+                await new Promise(r => setTimeout(r, 8000));
+
+                try {
+                    await page.mouse.move(100, 100);
+                    await page.mouse.move(200, 200);
+                } catch (ev) { }
+
+                console.log('🛡️ Evasion wait complete. Checking status...');
+
+                const currentTitle = await page.title();
+                console.log(`Current Title: ${currentTitle}`);
+
+                const currentBody = await page.evaluate(() => document.body.innerText.toLowerCase());
+                if (
+                    currentTitle.includes('Bir dakika') ||
+                    currentTitle.includes('Just a moment') ||
+                    currentTitle.includes('Attention Required') ||
+                    currentBody.includes('blocked') ||
+                    currentBody.includes('err_')
+                ) {
+                    // Still blocked, try forced reload
+                    console.log(`⚠️ Still on Cloudflare page. Force reloading target URL: ${pageUrl}`);
+                    // Fix: Set Referer to same-origin to look natural
+                    await page.setExtraHTTPHeaders({ 'Referer': 'https://www.hepsiemlak.com/' });
+                    await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+                } else {
+                    console.log('✅ It seems we passed Cloudflare! Proceeding without reload.');
+                }
+            }
+        } catch (err) {
+            console.log('Error checking for Cloudflare:', err.message);
+        }
+
+        // Smart Wait
+        try {
+            await page.waitForSelector('.listing-item', { timeout: 30000 });
+            await saveBrowserState(page);
+        } catch (e) {
+            console.log(`⚠️ Timeout waiting for listings on page ${pageNum}.`);
+
+            try {
+                const title = await page.title();
+                const bodyText = await page.evaluate(() => document.body.innerText.substring(0, 500).replace(/\n/g, ' '));
+                console.log(`DEBUG VIEW - Title: ${title}`);
+                console.log(`DEBUG BODY: ${bodyText}`);
+
+                if (title.includes('Bir dakika') || title.includes('Just a moment') || bodyText.includes('Doğrulanıyor') || bodyText.includes('Verify')) {
+                    console.log('🛡️ Cloudflare detected during timeout. Attempting to bypass...');
+                    await solveCloudflareChallenge(page);
+                    await new Promise(r => setTimeout(r, 15000));
+
+                    console.log('🔄 Restarting loop to check if resolved...');
+                    retryCount++;
+                    continue;
+                }
+            } catch (err) {
+                console.log('Could not get debug info.');
+            }
+
+            hasNextPage = false;
+            break;
+        }
+
+        await page.evaluate(async () => {
+            window.scrollBy(0, 500);
+            await new Promise(r => setTimeout(r, 500));
+        });
+
+        const listings = await page.evaluate((forcedSellerType, category) => {
+            const items = document.querySelectorAll('.listing-item');
+            const data = [];
+            items.forEach(item => {
+                const id = item.id;
+                if (!id) return;
+
+                const titleEl = item.querySelector('.list-view-title h3') || item.querySelector('.list-view-title');
+                const priceEl = item.querySelector('.list-view-price');
+                const locationEl = item.querySelector('.list-view-location');
+                const urlEl = item.querySelector('a.card-link');
+                const imgEl = item.querySelector('img');
+                const dateEl = item.querySelector('.list-view-date');
+
+                let title = titleEl?.innerText.trim() || imgEl?.getAttribute('alt') || 'İsimsiz İlan';
+                let price = 0;
+                if (priceEl) {
+                    const raw = priceEl.innerText.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, '');
+                    price = parseFloat(raw) || 0;
+                }
+                let district = '';
+                let neighborhood = '';
+                if (locationEl) {
+                    const parts = locationEl.innerText.split('/').map(s => s.trim());
+                    if (parts.length > 1) district = parts[1];
+                    if (parts.length > 2) {
+                        let rawNeighborhood = parts[2];
+                        let clean = rawNeighborhood.replace(/\s+Mahallesi/i, '').replace(/\s+Mah\.?/i, '').replace(/\s+Mh\.?/i, '').trim();
+                        neighborhood = clean + ' Mah.';
+                    }
+                }
+                const url = urlEl ? 'https://www.hepsiemlak.com' + urlEl.getAttribute('href') : '';
+                let size_m2 = 0;
+                let rooms = '';
+                const textContent = item.innerText;
+                const m2Match = textContent.match(/(\d+)\s*m²/);
+                if (m2Match) size_m2 = parseInt(m2Match[1]);
+                const roomMatch = textContent.match(/(\d+\s*\+\s*\d+)/);
+                if (roomMatch) rooms = roomMatch[1].replace(/\s/g, '');
+
+                let listing_date = null;
+                if (dateEl) {
+                    const dateText = dateEl.innerText.trim();
+                    const parts = dateText.match(/(\d{2})-(\d{2})-(\d{4})/);
+                    if (parts) {
+                        listing_date = `${parts[3]}-${parts[2]}-${parts[1]}`;
+                    } else {
+                        const now = new Date();
+                        if (dateText.toLowerCase() === 'bugün') listing_date = now.toISOString().split('T')[0];
+                        else if (dateText.toLowerCase() === 'dün') {
+                            now.setDate(now.getDate() - 1);
+                            listing_date = now.toISOString().split('T')[0];
+                        }
+                    }
+                }
+
+                let seller_type = forcedSellerType || 'office';
+                let seller_name = 'Bilinmiyor';
+                if (!forcedSellerType) {
+                    const ownerInfoEl = item.querySelector('.listing-card--owner-info');
+                    if (ownerInfoEl) {
+                        const infoText = ownerInfoEl.innerText.trim();
+                        seller_name = infoText;
+                        const lowerInfo = infoText.toLowerCase();
+                        if (lowerInfo.includes('sahibinden')) seller_type = 'owner';
+                        else if (lowerInfo.includes('banka')) seller_type = 'bank';
+                        else if (lowerInfo.includes('inşaat') || lowerInfo.includes('proje')) seller_type = 'construction';
+                    } else {
+                        if (item.innerText.toLowerCase().includes('sahibinden satılık')) {
+                            seller_type = 'owner';
+                            seller_name = 'Sahibinden';
+                        }
+                    }
+                } else {
+                    if (forcedSellerType === 'owner') seller_name = 'Sahibinden';
+                }
+                let listing_type = 'sale';
+                if (url.toLowerCase().includes('kiralik')) listing_type = 'rent';
+                data.push({ external_id: id, title, price, url, district, neighborhood, rooms, size_m2, listing_date, seller_type, seller_name, listing_type, category });
+            });
+            return data;
+        }, forcedSellerType, category);
+
+        if (listings.length === 0) {
+            hasNextPage = false;
+        } else {
+            const newIds = listings.map(l => l.external_id);
+            const existingIds = new Set(allListings.map(l => l.external_id));
+            const isDuplicatePage = newIds.every(id => existingIds.has(id));
+            if (isDuplicatePage && allListings.length > 0) {
+                hasNextPage = false;
+            } else {
+                console.log(`Found ${listings.length} listings. Saving progress...`);
+                await saveListings(listings);
+                allListings = [...allListings, ...listings];
+                pageNum++;
             }
         }
+        pageSuccess = true;
+    } catch (e) {
+        console.log(`Error on page ${pageNum}: ${e.message}`);
+        retryCount++;
+        if (retryCount > maxRetries) hasNextPage = false;
     }
-    return allListings;
+}
+    }
+return allListings;
 }
 
 async function saveListings(listings) {
