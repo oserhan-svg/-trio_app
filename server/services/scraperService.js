@@ -73,13 +73,23 @@ const { findMatchesForProperty } = require('./matchingService');
 const { checkOpportunity } = require('./analyticsService');
 
 // URLs Configuration
+// URLs Configuration (Expanded for Full Coverage)
 const CATEGORIES = [
+    // --- KONUT (RESIDENTIAL) ---
     {
         name: 'Satılık Daire',
         hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-satilik/daire',
         sahibinden: 'https://www.sahibinden.com/satilik-daire/balikesir-ayvalik',
         emlakjet: 'https://www.emlakjet.com/satilik-daire/balikesir-ayvalik/',
         type: 'sale',
+        category: 'daire'
+    },
+    {
+        name: 'Kiralık Daire',
+        hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-kiralik/daire',
+        sahibinden: 'https://www.sahibinden.com/kiralik-daire/balikesir-ayvalik',
+        emlakjet: 'https://www.emlakjet.com/kiralik-daire/balikesir-ayvalik/',
+        type: 'rent',
         category: 'daire'
     },
     {
@@ -91,6 +101,14 @@ const CATEGORIES = [
         category: 'villa'
     },
     {
+        name: 'Kiralık Villa',
+        hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-kiralik/villa',
+        sahibinden: 'https://www.sahibinden.com/kiralik-villa/balikesir-ayvalik',
+        emlakjet: 'https://www.emlakjet.com/kiralik-villa/balikesir-ayvalik/',
+        type: 'rent',
+        category: 'villa'
+    },
+    {
         name: 'Satılık Müstakil Ev',
         hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-satilik/mustakil-ev',
         sahibinden: 'https://www.sahibinden.com/satilik-mustakil-ev/balikesir-ayvalik',
@@ -98,22 +116,34 @@ const CATEGORIES = [
         type: 'sale',
         category: 'mustakil'
     },
-    {
-        name: 'Kiralık Daire',
-        hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-kiralik/daire',
-        sahibinden: 'https://www.sahibinden.com/kiralik-daire/balikesir-ayvalik',
-        emlakjet: 'https://www.emlakjet.com/kiralik-daire/balikesir-ayvalik/',
-        type: 'rent',
-        category: 'daire'
-    },
+
+    // --- ARSA & TARIM (LAND & AGRICULTURE) ---
     {
         name: 'Satılık Arsa',
-        hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-satilik-arsa',
+        hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-satilik/arsa',
         sahibinden: 'https://www.sahibinden.com/satilik-arsa/balikesir-ayvalik',
         emlakjet: 'https://www.emlakjet.com/satilik-arsa/balikesir-ayvalik/',
         type: 'sale',
         category: 'land'
     },
+    {
+        name: 'Satılık Zeytinlik',
+        hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-satilik/zeytinlik',
+        sahibinden: 'https://www.sahibinden.com/satilik-zeytinlik/balikesir-ayvalik',
+        emlakjet: 'https://www.emlakjet.com/satilik-zeytinlik/balikesir-ayvalik/',
+        type: 'sale',
+        category: 'zeytinlik'
+    },
+    {
+        name: 'Satılık Tarla',
+        hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-satilik/tarla',
+        sahibinden: 'https://www.sahibinden.com/satilik-tarla/balikesir-ayvalik',
+        emlakjet: 'https://www.emlakjet.com/satilik-tarla/balikesir-ayvalik/',
+        type: 'sale',
+        category: 'tarla'
+    },
+
+    // --- ISYERI & TURIZM (COMMERCIAL & TOURISM) ---
     {
         name: 'Satılık İşyeri',
         hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-satilik-isyeri',
@@ -121,6 +151,22 @@ const CATEGORIES = [
         emlakjet: 'https://www.emlakjet.com/satilik-isyeri/balikesir-ayvalik/',
         type: 'sale',
         category: 'commercial'
+    },
+    {
+        name: 'Kiralık İşyeri',
+        hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-kiralik-isyeri',
+        sahibinden: 'https://www.sahibinden.com/kiralik-is-yeri/balikesir-ayvalik',
+        emlakjet: 'https://www.emlakjet.com/kiralik-isyeri/balikesir-ayvalik/',
+        type: 'rent',
+        category: 'commercial'
+    },
+    {
+        name: 'Turistik Tesis',
+        hepsiemlak: 'https://www.hepsiemlak.com/ayvalik-satilik/turistik-tesis',
+        sahibinden: 'https://www.sahibinden.com/satilik-turistik-tesis/balikesir-ayvalik',
+        emlakjet: 'https://www.emlakjet.com/satilik-turistik-tesis/balikesir-ayvalik/',
+        type: 'sale',
+        category: 'tourism'
     }
 ];
 
@@ -153,7 +199,7 @@ async function scrapeProperties(provider = 'all') {
                 await scrapeHepsiemlak(page, cat.hepsiemlak, null, cat.category);
 
                 if (cat.type === 'sale') {
-                    const ownerUrl = cat.hepsiemlak.replace('satilik', 'satilik-sahibinden');
+                    const ownerUrl = cat.hepsiemlak.replace('satilik', 'satilik-sahibinden'); // Works for standard HE URLs
                     console.log(`Targeting Hepsiemlak (Owner Tab): ${ownerUrl}`);
                     await scrapeHepsiemlak(page, ownerUrl, 'owner', cat.category);
                 }
@@ -269,7 +315,8 @@ async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = '
     let pageNum = 1;
     let hasNextPage = true;
 
-    while (hasNextPage && pageNum <= 5) {
+    // INCREASED PAGE LIMIT FOR DEEPER SCRAPING
+    while (hasNextPage && pageNum <= 20) {
         const pageUrl = `${url}?page=${pageNum}`;
         console.log(`Navigating to Hepsiemlak Page ${pageNum}: ${pageUrl}`);
 

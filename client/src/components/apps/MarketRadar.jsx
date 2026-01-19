@@ -14,7 +14,9 @@ const MarketRadar = ({ onBack }) => {
     const fetchProperties = async () => {
         try {
             const response = await api.get('/properties');
-            setProperties(response.data);
+            // Handle paginated response ({ data: [...], meta: ... }) or legacy array
+            const data = Array.isArray(response.data) ? response.data : (response.data.data || []);
+            setProperties(data);
         } catch (error) {
             console.error('Failed to fetch properties:', error);
         } finally {

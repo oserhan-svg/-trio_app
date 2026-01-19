@@ -34,10 +34,19 @@ const calculateMatchScore = (property, demand) => {
     // 2. Neighborhood Score (30 pts)
     if (!demand.neighborhood) {
         score += 30; // Broad matches get full points for location if not specified
-    } else if (property.neighborhood && property.neighborhood.toLowerCase().includes(demand.neighborhood.toLowerCase())) {
-        score += 30;
     } else {
-        reasons.push('Mahalle uyumsuz');
+        // Multi-select support: demand.neighborhood might be "Cunda, 150 Evler"
+        const targetNeighborhoods = demand.neighborhood.split(',').map(n => n.trim().toLowerCase());
+        const propNeighborhood = (property.neighborhood || '').toLowerCase();
+
+        // Check if property neighborhood matches ANY of the requested neighborhoods
+        const isMatch = targetNeighborhoods.some(target => propNeighborhood.includes(target));
+
+        if (isMatch) {
+            score += 30;
+        } else {
+            reasons.push('Mahalle uyumsuz');
+        }
     }
 
     // 3. Rooms Score (20 pts)

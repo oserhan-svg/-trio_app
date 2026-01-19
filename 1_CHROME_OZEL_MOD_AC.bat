@@ -19,19 +19,46 @@ echo Devam etmek icin bir tusa basin...
 pause >nul
 
 echo.
-echo Chrome kapatiliyor...
+echo Chrome kapatiliyor (Zorla)...
+taskkill /F /IM chrome.exe /T 2>nul
+timeout /t 2 >nul
 taskkill /F /IM chrome.exe /T 2>nul
 timeout /t 2 >nul
 
-echo.
-echo Chrome Ozel Modda Aciliyor...
-start chrome.exe --remote-debugging-port=9222 --restore-last-session
+:: Kontrol: Hala calisan Chrome var mi?
+tasklist | find /i "chrome.exe" >nul
+if %errorlevel% equ 0 (
+    echo.
+    echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    echo DIKKAT: Chrome tamamen kapanmadi!
+    echo Lutfen sag alt kosedeki (saatin yanindaki) ok isaretine
+    echo tiklayip Chrome simgesi varsa sag tiklayip "Cikis" deyin.
+    echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    echo.
+    echo Elle kapattiktan sonra bir tusa basin...
+    pause
+    taskkill /F /IM chrome.exe /T 2>nul
+)
 
 echo.
-echo ==================================================
-echo   CHROME ACILDI!
-echo   Lutfen sitelere giris yapin, ardindan
-echo   otomatik cekim islemi icin diger dosyayi calistirin.
-echo ==================================================
+echo Chrome Ozel Modda Aciliyor...
+start "" "C:\Program Files\Google\Chrome\Application\chrome.exe" --remote-debugging-port=9222 --restore-last-session
+
+echo.
+echo Port 9222 kontrol ediliyor...
+:CHECK_PORT
+timeout /t 1 >nul
+netstat -an | find "9222" | find "LISTENING" >nul
+if %errorlevel% equ 0 (
+    echo.
+    echo ==================================================
+    echo   BASARILI! Chrome Port 9222 uzerinden dinliyor.
+    echo   Simdi sitelere giris yapip 2. dosyayi calistirabilirsiniz.
+    echo ==================================================
+) else (
+    echo Port henuz acilmadi, bekleniyor...
+    goto CHECK_PORT
+)
+
 echo Penceremiz arka planda acik kalabilir.
 pause

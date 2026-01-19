@@ -21,7 +21,9 @@ const OpportunityListGenerator = ({ onBack }) => {
             const response = await api.get('/properties', {
                 params: { seller_type: 'owner' }
             });
-            const allProps = response.data;
+            // Handle paginated response
+            const raw = response.data;
+            const allProps = Array.isArray(raw) ? raw : (raw.data || []);
 
             // Sort by Opportunity Score Desc
             allProps.sort((a, b) => (b.opportunity_score || 0) - (a.opportunity_score || 0));

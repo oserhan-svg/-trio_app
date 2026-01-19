@@ -108,32 +108,11 @@ const AddDemandModal = ({ isOpen, onClose, onSave, clientName, initialData = nul
                         />
 
                         <div className="flex flex-col gap-1.5">
-                            <label className="text-sm font-medium text-gray-700">Mahalle</label>
-                            <select
-                                className="px-3 py-2 rounded-xl border border-gray-300 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                            <label className="text-sm font-medium text-gray-700">Mahalle (Çoklu Seçim)</label>
+                            <NeighborhoodMultiSelect
                                 value={formData.neighborhood}
-                                onChange={e => setFormData({ ...formData, neighborhood: e.target.value })}
-                            >
-                                <option value="">Tümü / Farketmez</option>
-                                <option value="150 Evler">150 Evler</option>
-                                <option value="Ali Çetinkaya">Ali Çetinkaya</option>
-                                <option value="Altınova">Altınova</option>
-                                <option value="Cunda (Namık Kemal)">Cunda (Namık Kemal)</option>
-                                <option value="Fevzipaşa">Fevzipaşa</option>
-                                <option value="Gazi Kemal">Gazi Kemal</option>
-                                <option value="Hamdibey">Hamdibey</option>
-                                <option value="Hayrettin Paşa">Hayrettin Paşa</option>
-                                <option value="İsmet Paşa">İsmet Paşa</option>
-                                <option value="Kazım Karabekir">Kazım Karabekir</option>
-                                <option value="Küçükköy">Küçükköy</option>
-                                <option value="Mithatpaşa">Mithatpaşa</option>
-                                <option value="Sahilkent">Sahilkent</option>
-                                <option value="Sakarya">Sakarya</option>
-                                <option value="Sarımsaklı">Sarımsaklı</option>
-                                <option value="Sefa Çamlık">Sefa Çamlık</option>
-                                <option value="Yeni">Yeni</option>
-                                <option value="Zekibey">Zekibey</option>
-                            </select>
+                                onChange={val => setFormData({ ...formData, neighborhood: val })}
+                            />
                         </div>
                     </div>
 
@@ -145,6 +124,100 @@ const AddDemandModal = ({ isOpen, onClose, onSave, clientName, initialData = nul
                     </div>
                 </form>
             </div>
+        </div>
+    );
+};
+
+// Internal Multi-Select Component for Neighborhoods
+const NeighborhoodMultiSelect = ({ value, onChange }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [selected, setSelected] = useState([]);
+
+    const neighborhoods = [
+        "150 Evler", "Ali Çetinkaya", "Altınova", "Cunda (Namık Kemal)",
+        "Fevzipaşa", "Gazi Kemal", "Hamdibey", "Hayrettin Paşa",
+        "İsmet Paşa", "Kazım Karabekir", "Küçükköy", "Mithatpaşa",
+        "Sahilkent", "Sakarya", "Sarımsaklı", "Sefa Çamlık",
+        "Yeni", "Zekibey"
+    ];
+
+    useEffect(() => {
+        if (value) {
+            setSelected(value.split(',').map(s => s.trim()).filter(Boolean));
+        } else {
+            setSelected([]);
+        }
+    }, [value]);
+
+    const toggleSelection = (item) => {
+        let newSelection;
+        if (selected.includes(item)) {
+            newSelection = selected.filter(i => i !== item);
+        } else {
+            newSelection = [...selected, item];
+        }
+        setSelected(newSelection);
+        onChange(newSelection.join(','));
+    };
+
+    const toggleAll = () => {
+        if (selected.length > 0) {
+            onChange(''); // Clear all
+        } else {
+            // Optional: Select all? Usually "All" means empty filter.
+            // Let's keep it as "Clear" logic mostly, or just empty.
+            onChange('');
+        }
+    };
+
+    return (
+        <div className="relative">
+            <button
+                type="button"
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full px-3 py-2 text-left rounded-xl border border-gray-300 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm flex justify-between items-center"
+            >
+                <span className="truncate">
+                    {selected.length === 0 ? 'Tümü / Farketmez' : `${selected.length} Mahalle Seçildi`}
+                </span>
+                <span className="text-gray-400 text-xs">▼</span>
+            </button>
+
+            {isOpen && (
+                <>
+                    <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
+                    <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto p-2">
+                        <div
+                            className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer border-b border-gray-100 mb-1"
+                            onClick={toggleAll}
+                        >
+                            <input
+                                type="checkbox"
+                                checked={selected.length === 0}
+                                readOnly
+                                className="rounded text-emerald-600 focus:ring-emerald-500"
+                            />
+                            <span className="text-sm font-medium text-gray-700">Tümü / Farketmez</span>
+                        </div>
+
+                        {neighborhoods.map(nb => (
+                            <div
+                                key={nb}
+                                className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+                                onClick={() => toggleSelection(nb)}
+                            >
+                                <input
+                                    type="checkbox"
+                                    checked={selected.includes(nb)}
+                                    readOnly
+                                    className="rounded text-emerald-600 focus:ring-emerald-500"
+                                />
+                                <span className="text-sm text-gray-700">{nb}</span>
+                            </div>
+                        ))}
+                    </div>
+                </>
+            )}
         </div>
     );
 };

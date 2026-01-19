@@ -37,7 +37,8 @@ const OpportunityReportPage = () => {
 
                 // Fetch properties
                 const response = await api.get('/properties');
-                const all = response.data;
+                const raw = response.data;
+                const all = Array.isArray(raw) ? raw : (raw.data || []);
                 const safeIds = ids.map(id => parseInt(id)).filter(n => !isNaN(n));
                 const selected = all.filter(p => safeIds.includes(p.id));
                 setProperties(selected);

@@ -57,6 +57,34 @@ async function extractFromDebug() {
             console.log(`📂 Dosya Yolu     : ${cookiePath}`);
             console.log('==================================================\n');
 
+            // --- LISTING DETECTION (USER FEEDBACK) ---
+            try {
+                const listingCount = await page.evaluate(() => {
+                    const shLength = document.querySelectorAll('#searchResultsTable tbody tr.searchResultsItem').length;
+                    const heLength = document.querySelectorAll('.listing-item').length;
+                    const ejLength = document.querySelectorAll('a[class*="styles_wrapper__"]').length;
+                    return { shLength, heLength, ejLength };
+                });
+
+                const totalFound = listingCount.shLength + listingCount.heLength + listingCount.ejLength;
+
+                console.log('👀 EKRAN ANALİZİ (Açık Olan Sayfa)');
+                console.log('--------------------------------------------------');
+                if (totalFound > 0) {
+                    console.log(`✅ TESPİT EDİLEN İLAN: ${totalFound} Adet`);
+                    if (listingCount.shLength > 0) console.log(`   - Sahibinden: ${listingCount.shLength}`);
+                    if (listingCount.heLength > 0) console.log(`   - Hepsiemlak: ${listingCount.heLength}`);
+                    if (listingCount.ejLength > 0) console.log(`   - Emlakjet  : ${listingCount.ejLength}`);
+                    console.log('\n(Bu ilanlar sistem tarafından "görülebilir" durumdadır.)');
+                } else {
+                    console.log('❌ İlan Listesi Görülemedi!');
+                    console.log('   (Lütfen Chrome penceresinde bir ilan arama sayfasının açık olduğundan emin olun)');
+                }
+                console.log('==================================================\n');
+            } catch (err) {
+                console.log('⚠️ Ekran analizi yapılamadı (Sayfa kapalı veya meşgul).');
+            }
+
             if (sahibindenCount === 0 && hepsiemlakCount === 0) {
                 console.warn('⚠️  UYARI: Hedef sitelere ait çerez görünmüyor!');
                 console.warn("   Lütfen Chrome penceresinde sitelere giriş yaptığınızdan emin olun.");

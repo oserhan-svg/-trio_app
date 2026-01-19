@@ -227,7 +227,10 @@ const Dashboard = () => {
                             <option value="villa">Villa</option>
                             <option value="mustakil">Müstakil Ev</option>
                             <option value="land">Arsa</option>
+                            <option value="zeytinlik">Zeytinlik</option>
+                            <option value="tarla">Tarla</option>
                             <option value="commercial">İşyeri</option>
+                            <option value="tourism">Turistik Tesis</option>
                         </select>
                     </div>
                     {/* ... filter inputs ... */}
