@@ -190,20 +190,16 @@ const getProperties = async (req, res) => {
             console.error('DEBUG: Analytics Service Failed:', analyticsErr.message);
         }
 
-        try {
-            res.json({
-                data: propertiesWithScore,
-                meta: {
-                    page,
-                    limit,
-                    total,
-                    totalPages: Math.ceil(total / limit)
-                }
-            });
-        } catch (jsonErr) {
-            console.error('CRITICAL: JSON Serialization Failed:', jsonErr);
-            res.status(500).json({ error: 'JSON Serialization Error: ' + jsonErr.message });
-        }
+        // Use safe serializer for potential BigInts in Data or Meta
+        jsonBigInt(res, {
+            data: propertiesWithScore,
+            meta: {
+                page,
+                limit,
+                total,
+                totalPages: Math.ceil(Number(total) / limit)
+            }
+        });
 
     } catch (error) {
         console.error(error);
