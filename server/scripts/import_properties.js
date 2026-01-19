@@ -1,6 +1,26 @@
-const prisma = require('../db');
+const { PrismaClient } = require('@prisma/client');
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config();
+
+// Use LIVE_DATABASE_URL if available, otherwise fall back to default (but warn)
+const url = process.env.LIVE_DATABASE_URL || process.env.DATABASE_URL;
+
+if (!process.env.LIVE_DATABASE_URL) {
+    console.warn('⚠️  UYARI: LIVE_DATABASE_URL bulunamadı. Aktif .env ayarları kullanılıyor.');
+    console.warn('   Eğer yerel veritabanına aktarım yapmak istemiyorsanız işlemi durdurun.');
+    console.warn('   Canlıya aktarmak için .env dosyanıza LIVE_DATABASE_URL ekleyin.');
+} else {
+    console.log('🌍 Canlı Sunucu Hedeflendi (LIVE_DATABASE_URL detected).');
+}
+
+const prisma = new PrismaClient({
+    datasources: {
+        db: {
+            url: url,
+        },
+    },
+});
 
 async function importProperties() {
     console.log('🚀 Hızlı ve güvenli veri aktarımı başlatılıyor (Batch Mode)...');

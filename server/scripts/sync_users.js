@@ -1,12 +1,36 @@
-const prisma = require('../db');
+const { PrismaClient } = require('@prisma/client');
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config();
 
 async function syncUsers() {
-    const isLive = process.env.DATABASE_URL.includes('supabase');
-    console.log(`🚀 Mode: ${isLive ? 'LIVE (Import)' : 'LOCAL (Export)'}`);
+    const mode = process.argv[2]; // 'export' or 'import'
 
-    if (!isLive) {
+    if (!mode || !['export', 'import'].includes(mode)) {
+        console.error('❌ Kullanım: node sync_users.js [export|import]');
+        process.exit(1);
+    }
+
+    const isExport = mode === 'export';
+    // Decide URL based on mode
+    const url = isExport
+        ? (process.env.LOCAL_DATABASE_URL || process.env.DATABASE_URL)
+        : (process.env.LIVE_DATABASE_URL || process.env.DATABASE_URL);
+
+    console.log(`🚀 Mode: ${mode.toUpperCase()}`);
+    if (isExport) {
+        if (!process.env.LOCAL_DATABASE_URL) console.log('ℹ️  Using default DATABASE_URL for export.');
+        else console.log('💻 Using LOCAL_DATABASE_URL for export.');
+    } else {
+        if (!process.env.LIVE_DATABASE_URL) console.warn('⚠️  Using default DATABASE_URL for import (LIVE_DATABASE_URL missing).');
+        else console.log('🌍 Using LIVE_DATABASE_URL for import.');
+    }
+
+    const prisma = new PrismaClient({
+        datasources: { db: { url } }
+    });
+
+    if (isExport) {
         // EXPORT MODE
         try {
             const users = await prisma.user.findMany();
