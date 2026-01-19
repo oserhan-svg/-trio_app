@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Home, Building, TreeDeciduous, Palmtree, ExternalLink, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Home, Building, TreeDeciduous, ExternalLink, TrendingUp } from 'lucide-react';
 import api from '../../services/api';
 
 const MarketRadar = ({ onBack }) => {
@@ -37,6 +37,12 @@ const MarketRadar = ({ onBack }) => {
         // Arsa (Land that isn't zeytinlik)
         if (category === 'land' || title.includes('arsa') || title.includes('arazi') || title.includes('imar')) return 'arsa';
 
+        if (category === 'tarla' || title.includes('tarla') || title.includes('bağ')) return 'tarla';
+
+        if (category === 'commercial' || title.includes('dükkan') || title.includes('mağaza') || title.includes('ofis') || title.includes('işyeri')) return 'commercial';
+
+        if (category === 'tourism' || title.includes('otel') || title.includes('pansiyon') || title.includes('apart')) return 'tourism';
+
         // Daire (Default residential)
         return 'daire';
     };
@@ -45,7 +51,10 @@ const MarketRadar = ({ onBack }) => {
         { id: 'daire', label: 'Daire', icon: Building, color: 'blue' },
         { id: 'villa', label: 'Villa', icon: Home, color: 'purple' },
         { id: 'arsa', label: 'Arsa', icon: TreeDeciduous, color: 'emerald' },
-        { id: 'zeytinlik', label: 'Zeytinlik', icon: Palmtree, color: 'olive' } // Custom color class needed or use hex
+        { id: 'zeytinlik', label: 'Zeytinlik', icon: TreeDeciduous, color: 'lime' }, // Olive -> Lime
+        { id: 'tarla', label: 'Tarla', icon: TreeDeciduous, color: 'amber' },
+        { id: 'commercial', label: 'İşyeri', icon: Building, color: 'gray' },
+        { id: 'tourism', label: 'Turizm', icon: Home, color: 'orange' }
     ];
 
     const filteredProperties = properties
@@ -89,8 +98,8 @@ const MarketRadar = ({ onBack }) => {
                                 key={cat.id}
                                 onClick={() => setActiveCategory(cat.id)}
                                 className={`flex items-center gap-3 p-3 rounded-xl transition-all w-full text-left whitespace-nowrap ${isActive
-                                        ? 'bg-white shadow-sm text-gray-900 font-bold ring-1 ring-gray-200'
-                                        : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+                                    ? 'bg-white shadow-sm text-gray-900 font-bold ring-1 ring-gray-200'
+                                    : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
                                     }`}
                             >
                                 <div className={`p-2 rounded-lg ${isActive ? `bg-${cat.color}-50 text-${cat.color}-600` : 'bg-transparent'
@@ -149,8 +158,8 @@ const MarketRadar = ({ onBack }) => {
                                         {/* Score Badge */}
                                         <div className="flex flex-col items-end gap-1">
                                             <div className={`px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 ${p.opportunity_score >= 8 ? 'bg-emerald-100 text-emerald-700' :
-                                                    p.opportunity_score >= 6 ? 'bg-yellow-100 text-yellow-700' :
-                                                        'bg-gray-100 text-gray-600'
+                                                p.opportunity_score >= 6 ? 'bg-yellow-100 text-yellow-700' :
+                                                    'bg-gray-100 text-gray-600'
                                                 }`}>
                                                 <span>Puan: {p.opportunity_score}</span>
                                             </div>
