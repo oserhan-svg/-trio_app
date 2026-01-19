@@ -151,9 +151,9 @@ const getProperties = async (req, res) => {
             if (sort === 'score') {
                 propertiesWithScore.sort((a, b) => (b.opportunity_score || 0) - (a.opportunity_score || 0));
             } else if (sort === 'price_asc') {
-                propertiesWithScore.sort((a, b) => a.price - b.price);
+                propertiesWithScore.sort((a, b) => Number(a.price) - Number(b.price));
             } else if (sort === 'price_desc') {
-                propertiesWithScore.sort((a, b) => b.price - a.price);
+                propertiesWithScore.sort((a, b) => Number(b.price) - Number(a.price));
             } else if (sort === 'deviation') {
                 propertiesWithScore.sort((a, b) => (b.deviation || 0) - (a.deviation || 0));
             } else if (sort === 'newest' || sort === 'date_desc') {
@@ -188,22 +188,32 @@ const getProperties = async (req, res) => {
             }
         } catch (analyticsErr) {
             console.error('DEBUG: Analytics Service Failed:', analyticsErr.message);
+            // Continue without sorting if analytics fails, or better, return error to debug
+            return res.status(500).json({ error: 'Analytics Error: ' + analyticsErr.message });
         }
 
         // Use safe serializer for potential BigInts in Data or Meta
-        jsonBigInt(res, {
-            data: propertiesWithScore,
-            meta: {
-                page,
-                limit,
-                total,
-                totalPages: Math.ceil(Number(total) / limit)
-            }
-        });
+        try {
+            jsonBigInt(res, {
+                data: propertiesWithScore,
+                meta: {
+                    page,
+                    limit,
+                    total,
+                    totalPages: Math.ceil(Number(total) / limit)
+                }
+            });
+        } catch (jsonErr) {
+            console.error('CRITICAL: JSON Serialization Failed:', jsonErr);
+            res.status(500).json({ error: 'JSON Serialization Error: ' + jsonErr.message });
+        }
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Server error' });
+        console.error('CRITICAL SERVER ERROR:', error);
+        res.status(500).json({
+            error: 'Server Error: ' + error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
     }
 };
 
