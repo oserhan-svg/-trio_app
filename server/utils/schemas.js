@@ -31,8 +31,8 @@ const authSchema = Joi.object({
         'string.email': 'Geçerli bir e-posta adresi giriniz.',
         'any.required': 'E-posta alanı zorunludur.'
     }),
-    password: Joi.string().min(6).required().messages({
-        'string.min': 'Şifre en az 6 karakter olmalıdır.',
+    password: Joi.string().min(4).required().messages({
+        'string.min': 'Şifre en az 4 karakter olmalıdır.',
         'any.required': 'Şifre alanı zorunludur.'
     })
 });

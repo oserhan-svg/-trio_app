@@ -15,6 +15,10 @@ const upgradeImages = (images) => {
 
 const getProperties = async (req, res) => {
     try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 50;
+        const skip = (page - 1) * limit;
+
         const { minPrice, maxPrice, rooms, district, opportunity_filter, category, listingType, seller_type, sort } = req.query;
 
         const where = { AND: [] };
@@ -84,10 +88,13 @@ const getProperties = async (req, res) => {
         }
 
         // console.log('Fetching properties...');
+        const total = await prisma.property.count({ where });
         const properties = await prisma.property.findMany({
             where,
             orderBy: { created_at: 'desc' },
-            include: { history: true } // Fetch history for price drop analysis
+            include: { history: true },
+            skip: skip,
+            take: limit
         });
 
         // Upgrade images on the fly
@@ -160,7 +167,15 @@ const getProperties = async (req, res) => {
         }
 
         try {
-            jsonBigInt(res, propertiesWithScore);
+            res.json({
+                data: propertiesWithScore,
+                meta: {
+                    page,
+                    limit,
+                    total,
+                    totalPages: Math.ceil(total / limit)
+                }
+            });
         } catch (jsonErr) {
             console.error('CRITICAL: JSON Serialization Failed:', jsonErr);
             res.status(500).json({ error: 'JSON Serialization Error: ' + jsonErr.message });

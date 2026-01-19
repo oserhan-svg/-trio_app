@@ -1,6 +1,8 @@
 const puppeteer = require('puppeteer-extra');
 const { createStealthBrowser, configureStealthPage, humanizePage, saveBrowserState } = require('./browserFactory');
 const cron = require('node-cron');
+const path = require('path');
+const scraperConfig = require('../config/scraperConfig');
 const prisma = require('../db');
 
 // Organic Navigation Helper
@@ -125,29 +127,23 @@ const CATEGORIES = [
 async function scrapeProperties(provider = 'all') {
     console.log(`Starting scrape job for: ${provider}`);
 
-    let browser;
+    let browser, page;
     try {
         // PLAN B: Real Browser Switch
         const { launchRealBrowser } = require('./realBrowser');
         const { browser: rb, page: rp } = await launchRealBrowser();
         browser = rb;
-        // rb comes with a page (rp), but existing logic uses 'page = await browser.newPage()'.
-        // We can close rp and let newPage happen, OR just use rp.
-        // Let's close rp to be clean and let logic flow as before if possible, 
-        // BUT real-browser might need ITS verified page.
-        // Let's close the default rp and let the scheduled logic open one, 
-        // OR better: Assign rp to a variable if we were passing it, but here we create 'page' below.
-        if (rp) await rp.close();
+        page = rp;
 
     } catch (err) {
         console.error('CRITICAL: Could not launch Real Browser.', err);
         return;
     }
 
-    if (!browser) return;
+    if (!browser || !page) return;
 
     try {
-        const page = await browser.newPage();
+        // Use the page already provided by launchRealBrowser
         // await configureStealthPage(page); // RealBrowser handles stealth
         // await humanizePage(page); // RealBrowser handles fingerprinting
 

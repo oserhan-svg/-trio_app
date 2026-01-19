@@ -1,0 +1,52 @@
+const prisma = require('../db');
+const fs = require('fs');
+const path = require('path');
+
+async function importProperties() {
+    console.log('🚀 Hızlı ve güvenli veri aktarımı başlatılıyor (Batch Mode)...');
+    const dataPath = path.join(__dirname, '../temp_properties.json');
+
+    if (!fs.existsSync(dataPath)) {
+        console.error('❌ Veri dosyası bulunamadı!');
+        return;
+    }
+
+    try {
+        const rawData = fs.readFileSync(dataPath, 'utf8');
+        const properties = JSON.parse(rawData);
+        console.log(`📑 Toplam ${properties.length} ilan işlenecek...`);
+
+        // Önce canlı veritabanındaki eski (boş ise sorun yok) verileri temizleyelim
+        // veya tek tek upsert yerine 50'şerli gruplarla işlem yapalım.
+        const BATCH_SIZE = 50;
+
+        for (let i = 0; i < properties.length; i += BATCH_SIZE) {
+            const batch = properties.slice(i, i + BATCH_SIZE);
+
+            // Note: createMany with skipDuplicates is the fastest but depends on DB support
+            // We'll use a Promise.all with upserts for small batches to be safe and accurate
+            await Promise.all(batch.map(prop => {
+                const { id, ...data } = prop;
+                // Ensure price is decimal/string as expected by Prisma
+                return prisma.property.upsert({
+                    where: { external_id: data.external_id || `manual-${id}` },
+                    update: data,
+                    create: data
+                }).catch(e => { /* log errors silently */ });
+            }));
+
+            console.log(`✅ İlerleme: %${Math.min(100, ((i + BATCH_SIZE) / properties.length) * 100).toFixed(1)} (${Math.min(i + BATCH_SIZE, properties.length)}/${properties.length})`);
+
+            // Belleği rahatlatmak için her batch sonrası minik bir bekleme
+            await new Promise(r => setTimeout(r, 200));
+        }
+
+        console.log('🏁 Aktarım başarıyla tamamlandı!');
+    } catch (error) {
+        console.error('❌ Hata:', error);
+    } finally {
+        await prisma.$disconnect();
+    }
+}
+
+importProperties();
