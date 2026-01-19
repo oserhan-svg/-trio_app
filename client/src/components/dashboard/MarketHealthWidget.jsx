@@ -1,9 +1,9 @@
 import React from 'react';
 import { Activity, Users, Globe, Flame } from 'lucide-react';
 
-const MarketHealthWidget = ({ data = [] }) => {
+const MarketHealthWidget = ({ data = [], totalCount: propTotalCount }) => {
     // Basic heuristics based on scraped data
-    const totalCount = data.length;
+    const totalCount = propTotalCount || data.length;
     const ownerCount = data.filter(p => p.seller_type === 'owner').length;
     const ownerRatio = totalCount > 0 ? (ownerCount / totalCount) * 100 : 0;
 

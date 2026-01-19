@@ -164,7 +164,7 @@ const Dashboard = () => {
                         <span className="hidden md:inline">{user?.role === 'admin' ? 'Admin Paneli' : 'Danışman Paneli'}</span>
                     </button>
                     <div className="text-sm text-gray-500 hidden md:block">
-                        {properties.length} ilan listeleniyor
+                        {meta.total || properties.length} ilan mevcut
                     </div>
                     <button onClick={() => navigate('/report')} className="flex items-center gap-1 text-gray-500 hover:text-purple-600 transition" title="Proje Raporu">
                         <FileText size={20} />
@@ -182,7 +182,7 @@ const Dashboard = () => {
                     <span className="text-xl font-bold text-blue-600 ml-2">TrioApp</span>
                 </div>
                 <div className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded">
-                    {properties.length} İlan
+                    {meta.total || properties.length} İlan
                 </div>
             </div>
 
@@ -190,10 +190,10 @@ const Dashboard = () => {
             <main className="p-3 md:p-6 max-w-7xl mx-auto space-y-4 md:space-y-6">
 
                 {/* Market Health Indicators */}
-                <MarketHealthWidget data={properties} />
+                <MarketHealthWidget data={properties} totalCount={meta.total} />
 
                 {/* Stats Header now includes Rental Widget */}
-                <DashboardStatsHeader properties={properties} stats={stats} />
+                <DashboardStatsHeader properties={properties} stats={stats} totalCount={meta.total} />
 
                 {/* Filters */}
                 <form onSubmit={handleSearch} className="bg-white p-4 rounded-lg shadow-sm grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-end relative z-40">

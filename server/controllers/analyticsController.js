@@ -5,7 +5,9 @@ const getStats = async (req, res) => {
         const statsMap = await getNeighborhoodStatsMap();
         const supplyDemand = await getSupplyDemandStats();
 
+        const totalProperties = await prisma.property.count();
         const responseData = {
+            totalProperties,
             marketStats: statsMap._heatmapData,
             supplyDemand
         };
