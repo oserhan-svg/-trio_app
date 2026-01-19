@@ -46,8 +46,6 @@ function findChromeExecutable() {
         }
     }
 
-    // Fallback: Default to null and let library try, or throw friendly error
-    // On Render, we usually need correct path to avoid 'ChromePathNotSetError'
     return null;
 }
 
@@ -57,22 +55,19 @@ async function launchRealBrowser(options = {}) {
     // Attempt to find chrome
     const chromePath = findChromeExecutable();
 
+    if (chromePath) {
+        console.log(`🔧 Setting CHROME_PATH env var to: ${chromePath}`);
+        process.env.CHROME_PATH = chromePath;
+    } else {
+        console.warn('⚠️ Chrome executable not found! real-browser might fail.');
+    }
+
     // Render specific config
     const isRender = process.env.RENDER || process.env.NODE_ENV === 'production';
 
-    // If on Render and no xvfb, we might need 'headless: "new"' to avoid crash,
-    // BUT real-browser recommends headless: false. 
-    // We try headless: false first, if it fails, the library usually warns.
-    // However, without Xvfb on Linux, headless: false WILL crash.
-    // So for Render, we MUST use headless: true (new) OR use xvfb-run in start command.
-    // Since we can't change start command easily right now, we use headless: true as fallback.
-    // But real-browser often works best with headful.
-
-    // Strategy: Use the found path. Pass it to customConfig.
-
     try {
         const { browser, page } = await connect({
-            headless: isRender ? 'new' : false, // Auto-switch for Render
+            headless: isRender ? 'new' : false,
             args: [
                 '--no-sandbox',
                 '--disable-setuid-sandbox',
