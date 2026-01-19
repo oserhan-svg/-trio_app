@@ -235,11 +235,31 @@ async function solveCloudflareChallenge(page) {
 
                     // Click -25px (Standard)
                     await page.mouse.click(textFoundCords.x - 25, targetY);
-                    await new Promise(r => setTimeout(r, 300));
+                    await new Promise(r => setTimeout(r, 200));
 
                     // Click -45px (If wider)
                     await page.mouse.click(textFoundCords.x - 45, targetY);
+                    await new Promise(r => setTimeout(r, 200));
+
+                    console.log('🛡️ Executing Accessibility Assault (Keyboard)...');
+
+                    // Shift+Tab (Back to checkbox) -> Space
+                    await page.keyboard.down('Shift');
+                    await page.keyboard.press('Tab');
+                    await page.keyboard.up('Shift');
+                    await new Promise(r => setTimeout(r, 100));
+                    await page.keyboard.press('Space');
+
                     await new Promise(r => setTimeout(r, 300));
+
+                    // Tab (Forward to checkbox/link) -> Space
+                    await page.keyboard.press('Tab');
+                    await new Promise(r => setTimeout(r, 100));
+                    await page.keyboard.press('Space');
+
+                    // Just in case: Click text again to ensure focus, then Space default
+                    await page.mouse.click(targetX, targetY);
+                    await page.keyboard.press('Space');
 
                     // Click -15px (If narrow)
                     await page.mouse.click(textFoundCords.x - 15, targetY);
