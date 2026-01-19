@@ -217,13 +217,33 @@ async function solveCloudflareChallenge(page) {
 
                 if (textFoundCords) {
                     console.log('🛡️ Clicked "Verify" text.');
-                    // Click text to focus
-                    await page.mouse.click(textFoundCords.x + textFoundCords.w / 2, textFoundCords.y + textFoundCords.h / 2);
-                    await new Promise(r => setTimeout(r, 500));
 
-                    // Click just to the left of the text (common layout)
-                    console.log('🛡️ Clicked Left of "Verify" text.');
-                    await page.mouse.click(textFoundCords.x - 30, textFoundCords.y + textFoundCords.h / 2);
+                    // 1. Move to text organically (simulation)
+                    const targetX = textFoundCords.x + textFoundCords.w / 2;
+                    const targetY = textFoundCords.y + textFoundCords.h / 2;
+
+                    // Simple organic move simulation (steps)
+                    await page.mouse.move(targetX - 100, targetY - 100, { steps: 5 });
+                    await page.mouse.move(targetX, targetY, { steps: 10 });
+
+                    // 2. Click Text Center (Focus)
+                    await page.mouse.click(targetX, targetY);
+                    await new Promise(r => setTimeout(r, 200));
+
+                    // 3. Scatter Clicks (Left of text where checkbox usually is)
+                    console.log('🛡️ Executing Scatter Clicks (Left of Text)...');
+
+                    // Click -25px (Standard)
+                    await page.mouse.click(textFoundCords.x - 25, targetY);
+                    await new Promise(r => setTimeout(r, 300));
+
+                    // Click -45px (If wider)
+                    await page.mouse.click(textFoundCords.x - 45, targetY);
+                    await new Promise(r => setTimeout(r, 300));
+
+                    // Click -15px (If narrow)
+                    await page.mouse.click(textFoundCords.x - 15, targetY);
+
                     solved = true;
                 } else {
                     // 3. Fallback: Click Center of Screen (Standard Cloudflare location)
