@@ -203,7 +203,8 @@ async function solveCloudflareChallenge(page) {
     console.log('🛡️ Cloudflare detected. RealBrowser should auto-solve...');
 
     // Wait for the library's internal solver or just wait for navigation
-    await new Promise(r => setTimeout(r, 6000));
+    // Increased to 15s to allow slower Turnstile verification
+    await new Promise(r => setTimeout(r, 15000));
 
     try {
         const title = await page.title();
