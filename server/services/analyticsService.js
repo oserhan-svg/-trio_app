@@ -18,10 +18,10 @@ const getMarketStats = async () => {
     const formatStats = (s, key) => ({
         name: s[key] || 'Bilinmiyor',
         district: s.district || null, // Only for neighborhoods
-        avgPrice: s._avg.price || 0,
-        avgM2: s._avg.size_m2 || 0,
+        avgPrice: Number(s._avg.price) || 0,
+        avgM2: Number(s._avg.size_m2) || 0,
         count: s._count.id,
-        avgPricePerM2: (s._avg.size_m2 && s._avg.size_m2 > 0) ? (s._avg.price / s._avg.size_m2) : 0
+        avgPricePerM2: (s._avg.size_m2 && Number(s._avg.size_m2) > 0) ? (Number(s._avg.price) / Number(s._avg.size_m2)) : 0
     });
 
     return {

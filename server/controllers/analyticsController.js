@@ -1,4 +1,4 @@
-const { getMarketStats, getNeighborhoodStatsMap, getSupplyDemandStats } = require('../services/analyticsService');
+const { jsonBigInt } = require('../utils/responseHelper');
 
 const getStats = async (req, res) => {
     try {
@@ -12,12 +12,7 @@ const getStats = async (req, res) => {
             supplyDemand
         };
 
-        const jsonString = JSON.stringify(responseData, (key, value) =>
-            typeof value === 'bigint' ? value.toString() : value
-        );
-
-        res.setHeader('Content-Type', 'application/json');
-        res.send(jsonString);
+        jsonBigInt(res, responseData);
     } catch (error) {
         res.status(500).json({ error: 'Error calculating stats: ' + error.message });
     }
