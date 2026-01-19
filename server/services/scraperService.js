@@ -3,6 +3,52 @@ const { createStealthBrowser, configureStealthPage, humanizePage, saveBrowserSta
 const cron = require('node-cron');
 const prisma = require('../db');
 
+// Organic Navigation Helper
+async function organicNav(page, targetUrl) {
+    try {
+        console.log('🌍 Organic Entry: Starting Google Search routing...');
+        await page.goto('https://www.google.com.tr', { waitUntil: 'domcontentloaded' });
+
+        // Random Queries to vary behavior
+        const queries = [
+            'hepsiemlak ayvalık satılık daire',
+            'ayvalık satılık ev fiyatları hepsiemlak',
+            'hepsiemlak balıkesir ayvalık ilanlar',
+            'ayvalık emlak piyasası hepsiemlak',
+            'hepsiemlak.com ayvalık fırsatları',
+            'ayvalık satılık yazlık hepsiemlak',
+            'balıkesir ayvalık kiralık daire hepsiemlak'
+        ];
+        const query = queries[Math.floor(Math.random() * queries.length)];
+        console.log(`🔍 Searching Google for: "${query}"`);
+
+        const searchBox = await page.$('textarea[name="q"]') || await page.$('input[name="q"]');
+        if (searchBox) {
+            await searchBox.type(query, { delay: 100 });
+            await page.keyboard.press('Enter');
+            // Wait for results
+            await new Promise(r => setTimeout(r, 3000));
+
+            // Find result and click
+            const links = await page.$$('a[href*="hepsiemlak.com"]');
+            if (links.length > 0) {
+                console.log('✅ Found Hepsiemlak on Google. Clicking...');
+                // Click the first specific one, or just the first
+                await Promise.all([
+                    page.waitForNavigation({ timeout: 60000 }).catch(() => { }),
+                    links[0].click()
+                ]);
+                return; // Success
+            }
+        }
+        console.log('⚠️ Google Search fallback: navigating directly.');
+    } catch (e) {
+        console.log(`⚠️ Organic Nav failed (${e.message}), defaulting to direct.`);
+    }
+    // Fallback if google failed
+    await page.goto(targetUrl, { waitUntil: 'domcontentloaded' });
+}
+
 // ... (keep normalizeNeighborhood)
 
 const normalizeNeighborhood = (name) => {
