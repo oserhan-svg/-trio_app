@@ -125,7 +125,12 @@ const createClient = async (req, res) => {
 // Add a demand for a client
 const addDemand = async (req, res) => {
     const { id } = req.params;
-    const { min_price, max_price, rooms, district, neighborhood } = req.body;
+    let { min_price, max_price, rooms, district, neighborhood } = req.body;
+
+    // Sanitize prices: convert "" to null
+    if (min_price === '') min_price = null;
+    if (max_price === '') max_price = null;
+
     try {
         const demand = await prisma.demand.create({
             data: {
@@ -140,46 +145,21 @@ const addDemand = async (req, res) => {
         res.json(demand);
     } catch (error) {
         console.error('Error adding demand:', error);
-        res.status(500).json({ error: 'Error adding demand' });
+        res.status(500).json({ error: error.message || 'Error adding demand' });
     }
 };
 
-// Delete a client
-const deleteClient = async (req, res) => {
-    const { id } = req.params;
-    try {
-        await prisma.client.delete({ where: { id: parseInt(id) } });
-        res.json({ message: 'Client deleted successfully' });
-    } catch (error) {
-        console.error('Error deleting client:', error);
-        res.status(500).json({ error: 'Error deleting client' });
-    }
-};
-
-// Update a client
-const updateClient = async (req, res) => {
-    const { id } = req.params;
-    let { name, phone, email, notes, type } = req.body;
-
-    // Sanitize inputs
-    if (name) name = stripHtml(name);
-    if (notes) notes = stripHtml(notes);
-
-    try {
-        const client = await prisma.client.update({
-            where: { id: parseInt(id) },
-            data: { name, phone, email, notes, type }
-        });
-        res.json(client);
-    } catch (error) {
-        res.status(500).json({ error: 'Error updating client' });
-    }
-};
+// ... existing deleteClient ...
 
 // Update a demand
 const updateDemand = async (req, res) => {
     const { id } = req.params;
-    const { min_price, max_price, rooms, district, neighborhood } = req.body;
+    let { min_price, max_price, rooms, district, neighborhood } = req.body;
+
+    // Sanitize prices
+    if (min_price === '') min_price = null;
+    if (max_price === '') max_price = null;
+
     try {
         const demand = await prisma.demand.update({
             where: { id: parseInt(id) },

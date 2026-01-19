@@ -481,9 +481,17 @@ const ClientDetail = () => {
                 isOpen={showDemandModal}
                 onClose={() => setShowDemandModal(false)}
                 onSave={async (data) => {
-                    await api.post(`/clients/${id}/demands`, data);
-                    setShowDemandModal(false);
-                    fetchClientData();
+                    try {
+                        await api.post(`/clients/${id}/demands`, data);
+                        setShowDemandModal(false);
+                        fetchClientData();
+                        addToast('Talep ve kriterler başarıyla eklendi', 'success');
+                    } catch (error) {
+                        console.error('Save failed', error);
+                        const msg = error.response?.data?.error || 'Talep kaydedilemedi. Lütfen alanları kontrol edin.';
+                        addToast(msg, 'error');
+                        throw error; // Re-throw so modal handles loading state if needed
+                    }
                 }}
                 clientName={client.name}
                 initialData={selectedDemand}

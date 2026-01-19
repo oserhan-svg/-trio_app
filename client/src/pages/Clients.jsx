@@ -137,8 +137,11 @@ const Clients = () => {
             }
             setShowAddDemand(false);
             fetchClients();
-        } catch {
-            addToast('Talep kaydedilemedi', 'error');
+        } catch (error) {
+            console.error('Save Demand Error:', error);
+            const msg = error.response?.data?.error || 'Talep kaydedilemedi';
+            addToast(msg, 'error');
+            throw error;
         }
     };
 

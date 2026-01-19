@@ -17,10 +17,8 @@ const clientSchema = Joi.object({
 });
 
 const demandSchema = Joi.object({
-    min_price: Joi.number().min(0).optional().allow(null),
-    max_price: Joi.number().min(Joi.ref('min_price')).optional().allow(null).messages({
-        'number.min': 'Maksimum fiyat, minimum fiyattan küçük olamaz.'
-    }),
+    min_price: Joi.alternatives().try(Joi.number().min(0), Joi.string().allow('', null)).optional(),
+    max_price: Joi.alternatives().try(Joi.number().min(0), Joi.string().allow('', null)).optional(),
     rooms: Joi.string().optional().allow(''),
     district: Joi.string().optional().allow(''),
     neighborhood: Joi.string().optional().allow('')
