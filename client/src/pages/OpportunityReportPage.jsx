@@ -19,9 +19,14 @@ const OpportunityReportPage = () => {
                     ids = urlIds.split(',').map(Number);
                 } else {
                     // 2. Fallback to LocalStorage (Local Navigation)
-                    const stored = localStorage.getItem('report_selected_ids');
-                    if (stored) {
-                        ids = JSON.parse(stored);
+                    try {
+                        const stored = localStorage.getItem('report_selected_ids');
+                        if (stored) {
+                            ids = JSON.parse(stored);
+                        }
+                    } catch (e) {
+                        console.error('Failed to parse stored report IDs', e);
+                        ids = [];
                     }
                 }
 
@@ -33,7 +38,8 @@ const OpportunityReportPage = () => {
                 // Fetch properties
                 const response = await api.get('/properties');
                 const all = response.data;
-                const selected = all.filter(p => ids.includes(p.id));
+                const safeIds = ids.map(id => parseInt(id)).filter(n => !isNaN(n));
+                const selected = all.filter(p => safeIds.includes(p.id));
                 setProperties(selected);
 
             } catch (error) {
