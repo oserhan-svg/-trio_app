@@ -55,6 +55,17 @@ async function launchRealBrowser(options = {}) {
     // Attempt to find chrome
     const chromePath = findChromeExecutable();
 
+    // Ensure User Data Dir exists to prevent log file errors (ENOENT)
+    const userDataDir = scraperConfig.paths.userDataDir;
+    if (!fs.existsSync(userDataDir)) {
+        try {
+            console.log(`📁 Creating user data directory at: ${userDataDir}`);
+            fs.mkdirSync(userDataDir, { recursive: true });
+        } catch (err) {
+            console.error('❌ Failed to create user data directory:', err);
+        }
+    }
+
     if (chromePath) {
         console.log(`🔧 Setting CHROME_PATH env var to: ${chromePath}`);
         process.env.CHROME_PATH = chromePath;
@@ -78,7 +89,7 @@ async function launchRealBrowser(options = {}) {
             ],
             customConfig: {
                 executablePath: chromePath, // Explicit path
-                userDataDir: scraperConfig.paths.userDataDir // Persistence
+                userDataDir: userDataDir // Persistence
             },
             turnstile: true,
             disableXvfb: isRender, // Disable Xvfb check if we are on Render (prevent error throw)
