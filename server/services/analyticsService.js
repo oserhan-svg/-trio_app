@@ -50,8 +50,8 @@ const getSupplyDemandStats = async () => {
     ])].filter(Boolean);
 
     return neighborhoods.map(n => {
-        const demand = demandStats.find(d => d.neighborhood === n)?._count.id || 0;
-        const supply = propertyStats.find(p => p.neighborhood === n)?._count.id || 0;
+        const demand = Number(demandStats.find(d => d.neighborhood === n)?._count.id || 0);
+        const supply = Number(propertyStats.find(p => p.neighborhood === n)?._count.id || 0);
         return {
             name: n,
             supply,
