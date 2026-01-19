@@ -27,7 +27,15 @@ async function importProperties() {
             // We'll use a Promise.all with upserts for small batches to be safe and accurate
             await Promise.all(batch.map(prop => {
                 const { id, ...data } = prop;
-                // Ensure price is decimal/string as expected by Prisma
+
+                // Fix Date objects lost during JSON stringify
+                if (data.created_at) data.created_at = new Date(data.created_at);
+                if (data.updated_at) data.updated_at = new Date(data.updated_at);
+                if (data.listing_date) data.listing_date = new Date(data.listing_date);
+                if (data.last_scraped) data.last_scraped = new Date(data.last_scraped);
+                if (data.price) data.price = Number(data.price); // Ensure Decimal compatibility
+                if (data.size_m2) data.size_m2 = Number(data.size_m2);
+
                 return prisma.property.upsert({
                     where: { external_id: data.external_id || `manual-${id}` },
                     update: data,
