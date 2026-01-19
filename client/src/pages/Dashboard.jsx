@@ -109,7 +109,7 @@ const Dashboard = () => {
 
     useEffect(() => {
         fetchAllData(filters);
-    }, [fetchAllData]);
+    }, [fetchAllData, filters]);
 
     const handleLoadMore = () => {
         if (meta.page < meta.totalPages) {
