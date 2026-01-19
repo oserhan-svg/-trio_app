@@ -40,10 +40,10 @@ async function createStealthBrowser(options = {}) {
         '--ignore-certificate-errors',
         '--ignore-certificate-errors-spki-list',
         '--disable-blink-features=AutomationControlled',
-        // '--disable-features=IsolateOrigins,site-per-process', // Removed for stealth
-        // '--disable-site-isolation-trials', // Removed for stealth
-        // '--disable-web-security', // Removed for stealth
-        // '--allow-running-insecure-content', // Removed for stealth
+        '--disable-features=IsolateOrigins,site-per-process',
+        '--disable-site-isolation-trials',
+        '--disable-web-security',
+        '--allow-running-insecure-content',
         '--disable-notifications',
         '--disable-popup-blocking',
         // New anti-detection flags
