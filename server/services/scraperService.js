@@ -199,14 +199,42 @@ async function solveCloudflareChallenge(page) {
         console.log(`🛡️ Check status: ${title}`);
 
         if (title.includes('Just a moment') || title.includes('Bir dakika') || title.includes('Attention Required')) {
-            console.log('⚠️ RealBrowser auto-solve might struggle. Trying simple click...');
-            // Fallback: Simple click on anything that looks like a checkbox iframe body
+            console.log('⚠️ RealBrowser auto-solve might struggle. Trying robust interaction...');
+
+            // Try specific Turnstile iframe selector first
+            try {
+                const turnstileFrame = page.frames().find(f => f.url().includes('turnstile'));
+                if (turnstileFrame) {
+                    console.log('🎯 Turnstile frame found by URL. Clicking center...');
+                    const box = await turnstileFrame.boundingBox(); // Note: frames don't usually have boundingBox on the Page object directly easily without ElementHandle
+                    // safer to find the element handle for the frame
+                    const frameHandle = await page.$('iframe[src*="turnstile"]');
+                    if (frameHandle) {
+                        const box = await frameHandle.boundingBox();
+                        if (box) {
+                            await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+                            console.log('🖱️ Clicked coordinates of Turnstile iframe.');
+                            await new Promise(r => setTimeout(r, 2000));
+                        }
+                    }
+                }
+            } catch (err) {
+                console.log('Error active clicking turnstile:', err.message);
+            }
+
+            // Iterate frames for fallback generic click
             const frames = page.frames();
             for (const frame of frames) {
-                const turnstile = await frame.$('body');
-                if (turnstile) {
-                    await turnstile.click().catch(() => { });
-                    await new Promise(r => setTimeout(r, 500));
+                try {
+                    const body = await frame.$('body');
+                    if (body) {
+                        // Just click the body of small frames? Risky but maybe needed.
+                        // Or just checking for specific shadow roots if possible.
+                        // For now, let's just avoid the detached error
+                        await body.click({ delay: 50 }).catch(() => { });
+                    }
+                } catch (e) {
+                    // Ignore detached frame errors
                 }
             }
         }
