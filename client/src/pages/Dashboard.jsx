@@ -60,25 +60,39 @@ const Dashboard = () => {
             const requests = [api.get(`/properties?${params.toString()}`)];
             if (page === 1) requests.push(api.get('/analytics'));
 
-            const responses = await Promise.all(requests);
-            const propRes = responses[0];
+            const results = await Promise.allSettled(requests);
 
-            // Handle Pagination
-            if (propRes.data && propRes.data.data && Array.isArray(propRes.data.data)) {
-                if (append) {
-                    setProperties(prev => [...prev, ...propRes.data.data]);
+            // 1. Handle Property Response
+            const propResult = results[0];
+            if (propResult.status === 'fulfilled') {
+                const propRes = propResult.value;
+                if (propRes.data && propRes.data.data && Array.isArray(propRes.data.data)) {
+                    if (append) {
+                        setProperties(prev => [...prev, ...propRes.data.data]);
+                    } else {
+                        setProperties(propRes.data.data);
+                    }
+                    if (propRes.data.meta) setMeta(propRes.data.meta);
+                } else if (Array.isArray(propRes.data)) {
+                    setProperties(propRes.data); // Legacy fallback
                 } else {
-                    setProperties(propRes.data.data);
+                    setProperties([]);
                 }
-                if (propRes.data.meta) setMeta(propRes.data.meta);
-            } else if (Array.isArray(propRes.data)) {
-                setProperties(propRes.data); // Legacy fallback
             } else {
-                setProperties([]);
+                console.error('Properties fetch failed:', propResult.reason);
+                throw propResult.reason; // Rethrow property error as it's critical
             }
 
-            if (page === 1 && responses[1]) {
-                setStats(responses[1].data);
+            // 2. Handle Analytics Response (Optional)
+            if (page === 1 && results[1]) {
+                const analyticsResult = results[1];
+                if (analyticsResult.status === 'fulfilled') {
+                    setStats(analyticsResult.value.data);
+                } else {
+                    console.error('Analytics fetch failed (Non-critical):', analyticsResult.reason);
+                    // Do not throw, just log. UI allows missing stats.
+                    toast.error('İstatistikler yüklenemedi, ancak ilanlar listeleniyor.');
+                }
             }
 
         } catch (error) {
