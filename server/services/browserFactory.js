@@ -216,7 +216,6 @@ async function configureStealthPage(page) {
         'Sec-Ch-Ua': '"Google Chrome";v="124", "Chromium";v="124", "Not-A.Brand";v="24"',
         'Sec-Ch-Ua-Mobile': isMobile ? '?1' : '?0',
         'Sec-Ch-Ua-Platform': `"${platform}"`,
-        'Upgrade-Insecure-Requests': '1',
         'Referer': 'https://www.google.com/'
     });
 
