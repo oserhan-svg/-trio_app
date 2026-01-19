@@ -13,9 +13,10 @@ async function organicNav(page, targetUrl) {
             'ayvalık satılık yazlık hepsiemlak'
         ];
         const query = queries[Math.floor(Math.random() * queries.length)];
-        const searchUrl = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
+        // Use Yandex TR for better local relevance even from US IP
+        const searchUrl = `https://yandex.com.tr/search/?text=${encodeURIComponent(query)}`;
 
-        console.log(`🌍 Organic Entry: Going directly to Bing Search: "${query}"`);
+        console.log(`🌍 Organic Entry: Going directly to Yandex Search: "${query}"`);
         await page.goto(searchUrl, { waitUntil: 'domcontentloaded' });
 
         // Wait for results
@@ -24,7 +25,7 @@ async function organicNav(page, targetUrl) {
         // Find result using broad selector
         const links = await page.$$('a[href*="hepsiemlak.com"]');
         if (links.length > 0) {
-            console.log(`✅ Found ${links.length} Hepsiemlak links on Bing. Clicking first...`);
+            console.log(`✅ Found ${links.length} Hepsiemlak links on Yandex. Clicking first...`);
             await Promise.all([
                 page.waitForNavigation({ timeout: 60000, waitUntil: 'domcontentloaded' }).catch(() => { }),
                 links[0].click()
@@ -32,7 +33,7 @@ async function organicNav(page, targetUrl) {
             return; // Success
         }
 
-        console.log('⚠️ Bing Search fallback: Link not found on results page.');
+        console.log('⚠️ Yandex Search fallback: Link not found on results page.');
     } catch (e) {
         console.log(`⚠️ Organic Nav failed (${e.message}).`);
     }
