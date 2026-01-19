@@ -185,180 +185,130 @@ async function scrapeProperties(provider = 'all') {
     }
 }
 
+// The library handles Turnstile automatically, so this function is now just a verification/backup
 async function solveCloudflareChallenge(page) {
+    console.log('🛡️ Cloudflare detected. RealBrowser should auto-solve...');
+
+    // Wait for the library's internal solver or just wait for navigation
+    await new Promise(r => setTimeout(r, 6000));
+
     try {
-        console.log('🛡️ Attempting to solve Cloudflare challenge (Hybrid Scan + Wait + Visual)...');
+        const title = await page.title();
+        console.log(`🛡️ Check status: ${title}`);
 
-        // 0. Explicitly wait for the challenge iframe
-        let iframeFound = false;
-        try {
-            await page.waitForSelector('iframe[src*="cloudflare-if/"]', { timeout: 6000 });
-            iframeFound = true;
-        } catch (e) {
-            try {
-                await page.waitForSelector('iframe[src*="challenges"]', { timeout: 4000 });
-                iframeFound = true;
-            } catch (e2) { }
-        }
-
-        console.log(`🛡️ Iframe Wait Result: ${iframeFound ? 'Found' : 'Not Found (Main Frame Only)'}`);
-        await new Promise(r => setTimeout(r, 2000));
-
-        let solved = false;
-
-        // 1. Scan frames (if any)
-        const frames = page.frames();
-        console.log(`🛡️ Scanning ${frames.length} frames for Turnstile...`);
-
-        for (const frame of frames) {
-            try {
-                // Run Shadow DOM search INSIDE each frame
-                const foundInFrame = await frame.evaluate(() => {
-                    const findShadowElement = (selector, root = document) => {
-                        const element = root.querySelector(selector);
-                        if (element) return element;
-                        const walkers = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, null, false);
-                        while (walkers.nextNode()) {
-                            const node = walkers.currentNode;
-                            if (node.shadowRoot) {
-                                const found = findShadowElement(selector, node.shadowRoot);
-                                if (found) return found;
-                            }
-                        }
-                        return null;
-                    };
-                    const target = findShadowElement('input[type="checkbox"]') || findShadowElement('.ctp-checkbox-label');
-                    if (target) { target.click(); return true; }
-                    return false;
-                });
-
-                if (foundInFrame) {
-                    console.log(`🛡️ Found & Clicked Turnstile in frame: ${frame.url()}`);
-                    solved = true;
-                    break;
+        if (title.includes('Just a moment') || title.includes('Bir dakika') || title.includes('Attention Required')) {
+            console.log('⚠️ RealBrowser auto-solve might struggle. Trying simple click...');
+            // Fallback: Simple click on anything that looks like a checkbox iframe body
+            const frames = page.frames();
+            for (const frame of frames) {
+                const turnstile = await frame.$('body');
+                if (turnstile) {
+                    await turnstile.click().catch(() => { });
+                    await new Promise(r => setTimeout(r, 500));
                 }
-            } catch (e) { }
-        }
-
-        // 2. Fallback: Text-Based Coordinate Click (Main Frame)
-        if (!solved) {
-            console.log('🛡️ Semantic click failed. Trying Text-Coordinate Fallback...');
-            try {
-                // Find "Verify you are human" or "Doğrulanıyor" text
-                let retries = 0;
-                let textFoundCords = null;
-                // Increased to 30 retries (approx 15 seconds)
-                while (!textFoundCords && retries < 30) {
-                    textFoundCords = await page.evaluate(() => {
-                        const allElements = document.querySelectorAll('*');
-                        for (const el of allElements) {
-                            if (el.innerText) {
-                                const text = el.innerText.toLowerCase();
-                                if (text.includes('verify you are human') || text.includes('human') || text.includes('doğrulanıyor') || text.includes('doğrulama') || text.includes('devam etmek')) {
-                                    const rect = el.getBoundingClientRect();
-                                    if (rect.width > 0 && rect.height > 0) {
-                                        return { x: rect.x, y: rect.y, w: rect.width, h: rect.height };
-                                    }
-                                }
-                            }
-                        }
-                        return null;
-                    });
-                    if (!textFoundCords) {
-                        if (retries % 5 === 0) console.log(`🛡️ Text scan attempt ${retries + 1}/30...`);
-                        await new Promise(r => setTimeout(r, 500));
-                        retries++;
-                    }
-                }
-
-                if (textFoundCords) {
-                    console.log('🛡️ Clicked "Verify" text.');
-
-                    // 1. Move to text organically (simulation)
-                    const targetX = textFoundCords.x + textFoundCords.w / 2;
-                    const targetY = textFoundCords.y + textFoundCords.h / 2;
-
-                    // Simple organic move simulation (steps)
-                    await page.mouse.move(targetX - 100, targetY - 100, { steps: 5 });
-                    await page.mouse.move(targetX, targetY, { steps: 10 });
-
-                    // 2. Click Text Center (Focus)
-                    await page.mouse.click(targetX, targetY);
-                    await new Promise(r => setTimeout(r, 200));
-
-                    // 3. Scatter Clicks & Keyboard "Assault"
-                    console.log('🛡️ Executing "Tab Cycle" Assault (Permanent Fix)...');
-
-                    // Focus on the text first
-                    await page.mouse.click(targetX, targetY);
-
-                    // Bruteforce Tabbing: Turnstile is usually index 1 or 2.
-                    // We will Tab -> Space -> Wait -> Repeat 20 times.
-                    // This is the "Blind User" simulation which is highly trusted.
-                    for (let i = 0; i < 20; i++) {
-                        await page.keyboard.press('Tab');
-                        await new Promise(r => setTimeout(r, 100)); // fast tabs
-
-                        // Try to click whatever is focused every few tabs
-                        if (i % 2 === 0) {
-                            await page.keyboard.press('Space');
-                            await new Promise(r => setTimeout(r, 50));
-                        }
-                    }
-
-                    // Also try Shift+Tab loop (going backwards)
-                    await page.mouse.click(targetX, targetY); // Reset focus to text
-                    for (let i = 0; i < 5; i++) {
-                        await page.keyboard.down('Shift');
-                        await page.keyboard.press('Tab');
-                        await page.keyboard.up('Shift');
-                        await new Promise(r => setTimeout(r, 100));
-                        await page.keyboard.press('Space');
-                    }
-
-                    solved = true;
-                    await page.mouse.click(targetX, targetY);
-                    await page.keyboard.press('Space');
-
-                    // Click -15px (If narrow)
-                    await page.mouse.click(textFoundCords.x - 15, targetY);
-
-                    solved = true;
-                } else {
-                    // 3. Fallback: Click Center of Screen (Standard Cloudflare location)
-                    const viewport = page.viewport();
-                    if (viewport) {
-                        console.log('🛡️ Text not found. Clicking Center of Screen...');
-                        await page.mouse.click(viewport.width / 2, viewport.height / 2);
-                        solved = true;
-                    }
-                }
-            } catch (e) {
-                console.log('Visual fallback error:', e.message);
             }
         }
+    } catch (e) {
+        console.log('Error checking CF status:', e.message);
+    }
 
-        // 4. Fallback: Blind Keyboard Interaction
-        if (!solved) {
-            console.log('🛡️ Trying Keyboard Fallback (Tab+Space)...');
-            try {
-                await page.click('body').catch(() => { });
-                await new Promise(r => setTimeout(r, 500));
-                for (let i = 0; i < 3; i++) {
-                    await page.keyboard.press('Tab');
-                    await new Promise(r => setTimeout(r, 300));
+    return true;
+}
+if (!textFoundCords) {
+    if (retries % 5 === 0) console.log(`🛡️ Text scan attempt ${retries + 1}/30...`);
+    await new Promise(r => setTimeout(r, 500));
+    retries++;
+}
                 }
-                await page.keyboard.press('Space');
-                console.log('🛡️ Sent Blind Keypress.');
-            } catch (e) { }
+
+if (textFoundCords) {
+    console.log('🛡️ Clicked "Verify" text.');
+
+    // 1. Move to text organically (simulation)
+    const targetX = textFoundCords.x + textFoundCords.w / 2;
+    const targetY = textFoundCords.y + textFoundCords.h / 2;
+
+    // Simple organic move simulation (steps)
+    await page.mouse.move(targetX - 100, targetY - 100, { steps: 5 });
+    await page.mouse.move(targetX, targetY, { steps: 10 });
+
+    // 2. Click Text Center (Focus)
+    await page.mouse.click(targetX, targetY);
+    await new Promise(r => setTimeout(r, 200));
+
+    // 3. Scatter Clicks & Keyboard "Assault"
+    console.log('🛡️ Executing "Tab Cycle" Assault (Permanent Fix)...');
+
+    // Focus on the text first
+    await page.mouse.click(targetX, targetY);
+
+    // Bruteforce Tabbing: Turnstile is usually index 1 or 2.
+    // We will Tab -> Space -> Wait -> Repeat 20 times.
+    // This is the "Blind User" simulation which is highly trusted.
+    for (let i = 0; i < 20; i++) {
+        await page.keyboard.press('Tab');
+        await new Promise(r => setTimeout(r, 100)); // fast tabs
+
+        // Try to click whatever is focused every few tabs
+        if (i % 2 === 0) {
+            await page.keyboard.press('Space');
+            await new Promise(r => setTimeout(r, 50));
+        }
+    }
+
+    // Also try Shift+Tab loop (going backwards)
+    await page.mouse.click(targetX, targetY); // Reset focus to text
+    for (let i = 0; i < 5; i++) {
+        await page.keyboard.down('Shift');
+        await page.keyboard.press('Tab');
+        await page.keyboard.up('Shift');
+        await new Promise(r => setTimeout(r, 100));
+        await page.keyboard.press('Space');
+    }
+
+    solved = true;
+    await page.mouse.click(targetX, targetY);
+    await page.keyboard.press('Space');
+
+    // Click -15px (If narrow)
+    await page.mouse.click(textFoundCords.x - 15, targetY);
+
+    solved = true;
+} else {
+    // 3. Fallback: Click Center of Screen (Standard Cloudflare location)
+    const viewport = page.viewport();
+    if (viewport) {
+        console.log('🛡️ Text not found. Clicking Center of Screen...');
+        await page.mouse.click(viewport.width / 2, viewport.height / 2);
+        solved = true;
+    }
+}
+            } catch (e) {
+    console.log('Visual fallback error:', e.message);
+}
         }
 
-        console.log('🛡️ Interaction attempted. Waiting for reload...');
-        await new Promise(r => setTimeout(r, 8000));
+// 4. Fallback: Blind Keyboard Interaction
+if (!solved) {
+    console.log('🛡️ Trying Keyboard Fallback (Tab+Space)...');
+    try {
+        await page.click('body').catch(() => { });
+        await new Promise(r => setTimeout(r, 500));
+        for (let i = 0; i < 3; i++) {
+            await page.keyboard.press('Tab');
+            await new Promise(r => setTimeout(r, 300));
+        }
+        await page.keyboard.press('Space');
+        console.log('🛡️ Sent Blind Keypress.');
+    } catch (e) { }
+}
+
+console.log('🛡️ Interaction attempted. Waiting for reload...');
+await new Promise(r => setTimeout(r, 8000));
 
     } catch (e) {
-        console.log('Error solving Cloudflare:', e.message);
-    }
+    console.log('Error solving Cloudflare:', e.message);
+}
 }
 
 async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = 'residential') {
