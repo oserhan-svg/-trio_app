@@ -21,6 +21,20 @@ if %errorlevel% neq 0 (
     exit /b %errorlevel%
 )
 echo.
+echo Adim 3: Kullanici verileri disari aktariliyor (Export)...
+node server/scripts/sync_users.js export
+if %errorlevel% neq 0 (
+    echo [HATA] Kullanici Export islemi basarisiz oldu!
+    echo Devam ediliyor...
+)
+echo.
+echo Adim 4: Kullanici verileri canli sunucuya yukleniyor (Import)...
+node server/scripts/sync_users.js import
+if %errorlevel% neq 0 (
+    echo [HATA] Kullanici Import islemi basarisiz oldu!
+    echo Devam ediliyor...
+)
+echo.
 echo ==================================================
 echo   ISLEM BASARIYLA TAMAMLANDI!
 echo   Tum ilanlar canli sisteme aktarildi.
