@@ -21,6 +21,11 @@ function findChromeExecutable() {
         '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
     ];
 
+    // Add Local AppData (User-specific install) for Windows
+    if (process.env.LOCALAPPDATA) {
+        commonPaths.push(path.join(process.env.LOCALAPPDATA, 'Google\\Chrome\\Application\\chrome.exe'));
+    }
+
     for (const p of commonPaths) {
         if (fs.existsSync(p)) {
             console.log(`✅ Found System Chrome: ${p}`);
