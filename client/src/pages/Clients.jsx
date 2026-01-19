@@ -92,8 +92,10 @@ const Clients = () => {
             setShowAddClient(false);
             addToast('Müşteri başarıyla eklendi');
             fetchClients();
-        } catch {
-            addToast('Müşteri eklenirken hata oluştu', 'error');
+        } catch (error) {
+            console.error('Create Client Error:', error);
+            const msg = error.response?.data?.error || error.response?.data?.message || 'Müşteri eklenirken hata oluştu';
+            addToast(msg, 'error');
         }
     };
 
