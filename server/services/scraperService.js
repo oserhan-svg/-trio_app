@@ -6,18 +6,6 @@ const prisma = require('../db');
 // Organic Navigation Helper
 async function organicNav(page, targetUrl) {
     try {
-        console.log('🌍 Organic Entry: Starting Search Engine routing (Bing)...');
-        await page.goto('https://www.bing.com', { waitUntil: 'domcontentloaded' });
-        await new Promise(r => setTimeout(r, 1500));
-
-        // Handle Bing Cookie Banner (Generic)
-        const acceptBtn = await page.$('#bnp_btn_accept') || await page.$('button[id*="accept"]');
-        if (acceptBtn) {
-            console.log('🍪 Bing Cookie Banner detected. Clicking accept...');
-            await acceptBtn.click();
-            await new Promise(r => setTimeout(r, 500));
-        }
-
         // Random Queries
         const queries = [
             'hepsiemlak ayvalık satılık daire',
@@ -25,37 +13,36 @@ async function organicNav(page, targetUrl) {
             'ayvalık satılık yazlık hepsiemlak'
         ];
         const query = queries[Math.floor(Math.random() * queries.length)];
-        console.log(`🔍 Searching Bing for: "${query}"`);
+        const searchUrl = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
 
-        const searchBox = await page.$('[name="q"]');
-        if (searchBox) {
-            await searchBox.type(query, { delay: 100 });
-            await page.keyboard.press('Enter');
-            // Wait longer for results (Render network might be slow)
-            await new Promise(r => setTimeout(r, 6000));
+        console.log(`🌍 Organic Entry: Going directly to Bing Search: "${query}"`);
+        await page.goto(searchUrl, { waitUntil: 'domcontentloaded' });
 
-            // Find result using broad selector
-            const links = await page.$$('a[href*="hepsiemlak.com"]');
-            if (links.length > 0) {
-                console.log(`✅ Found ${links.length} Hepsiemlak links on Bing. Clicking first...`);
-                await Promise.all([
-                    page.waitForNavigation({ timeout: 60000, waitUntil: 'domcontentloaded' }).catch(() => { }),
-                    links[0].click()
-                ]);
-                return; // Success
-            }
+        // Wait for results
+        await new Promise(r => setTimeout(r, 3000));
+
+        // Find result using broad selector
+        const links = await page.$$('a[href*="hepsiemlak.com"]');
+        if (links.length > 0) {
+            console.log(`✅ Found ${links.length} Hepsiemlak links on Bing. Clicking first...`);
+            await Promise.all([
+                page.waitForNavigation({ timeout: 60000, waitUntil: 'domcontentloaded' }).catch(() => { }),
+                links[0].click()
+            ]);
+            return; // Success
         }
-        console.log('⚠️ Bing Search fallback: Link not found.');
+
+        console.log('⚠️ Bing Search fallback: Link not found on results page.');
     } catch (e) {
         console.log(`⚠️ Organic Nav failed (${e.message}).`);
     }
 
-    // Fallback: Direct entry with FAKE REFERER (The "Ghost" Strategy)
+    // Fallback: Direct entry with FAKE REFERER
     console.log('👻 Applying Fake Referer Strategy (Google) and navigating directly...');
     try {
         await page.setExtraHTTPHeaders({
             'Referer': 'https://www.google.com/',
-            'Sec-Fetch-Site': 'same-origin' // Mimic internal navigation
+            'Sec-Fetch-Site': 'same-origin'
         });
     } catch (err) { }
 
