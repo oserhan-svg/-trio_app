@@ -149,7 +149,37 @@ const addDemand = async (req, res) => {
     }
 };
 
-// ... existing deleteClient ...
+// Delete a client
+const deleteClient = async (req, res) => {
+    const { id } = req.params;
+    try {
+        await prisma.client.delete({ where: { id: parseInt(id) } });
+        res.json({ message: 'Client deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting client:', error);
+        res.status(500).json({ error: 'Error deleting client' });
+    }
+};
+
+// Update a client
+const updateClient = async (req, res) => {
+    const { id } = req.params;
+    let { name, phone, email, notes, type } = req.body;
+
+    // Sanitize inputs
+    if (name) name = stripHtml(name);
+    if (notes) notes = stripHtml(notes);
+
+    try {
+        const client = await prisma.client.update({
+            where: { id: parseInt(id) },
+            data: { name, phone, email, notes, type }
+        });
+        res.json(client);
+    } catch (error) {
+        res.status(500).json({ error: 'Error updating client' });
+    }
+};
 
 // Update a demand
 const updateDemand = async (req, res) => {

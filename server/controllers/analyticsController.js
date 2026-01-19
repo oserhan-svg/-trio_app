@@ -1,3 +1,5 @@
+const prisma = require('../db');
+const { getNeighborhoodStatsMap, getSupplyDemandStats } = require('../services/analyticsService');
 const { jsonBigInt } = require('../utils/responseHelper');
 
 const getStats = async (req, res) => {
