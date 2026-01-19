@@ -6,8 +6,9 @@ const prisma = require('../db');
 // Organic Navigation Helper
 async function organicNav(page, targetUrl) {
     try {
-        console.log('🌍 Organic Entry: Starting Google Search routing...');
-        await page.goto('https://www.google.com.tr', { waitUntil: 'domcontentloaded' });
+        console.log('🌍 Organic Entry: Starting Search Engine routing (Bing)...');
+        await page.goto('https://www.bing.com', { waitUntil: 'domcontentloaded' });
+        await new Promise(r => setTimeout(r, 1000));
 
         // Random Queries to vary behavior
         const queries = [
@@ -20,9 +21,9 @@ async function organicNav(page, targetUrl) {
             'balıkesir ayvalık kiralık daire hepsiemlak'
         ];
         const query = queries[Math.floor(Math.random() * queries.length)];
-        console.log(`🔍 Searching Google for: "${query}"`);
+        console.log(`🔍 Searching Bing for: "${query}"`);
 
-        const searchBox = await page.$('textarea[name="q"]') || await page.$('input[name="q"]');
+        const searchBox = await page.$('[name="q"]');
         if (searchBox) {
             await searchBox.type(query, { delay: 100 });
             await page.keyboard.press('Enter');
@@ -32,7 +33,7 @@ async function organicNav(page, targetUrl) {
             // Find result and click
             const links = await page.$$('a[href*="hepsiemlak.com"]');
             if (links.length > 0) {
-                console.log('✅ Found Hepsiemlak on Google. Clicking...');
+                console.log('✅ Found Hepsiemlak on Bing. Clicking...');
                 // Click the first specific one, or just the first
                 await Promise.all([
                     page.waitForNavigation({ timeout: 60000 }).catch(() => { }),
@@ -41,11 +42,11 @@ async function organicNav(page, targetUrl) {
                 return; // Success
             }
         }
-        console.log('⚠️ Google Search fallback: navigating directly.');
+        console.log('⚠️ Bing Search fallback: navigating directly.');
     } catch (e) {
         console.log(`⚠️ Organic Nav failed (${e.message}), defaulting to direct.`);
     }
-    // Fallback if google failed
+    // Fallback if search failed
     await page.goto(targetUrl, { waitUntil: 'domcontentloaded' });
 }
 
