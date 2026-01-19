@@ -59,19 +59,19 @@ async function extractFromDebug() {
 
             if (sahibindenCount === 0 && hepsiemlakCount === 0) {
                 console.warn('⚠️  UYARI: Hedef sitelere ait çerez görünmüyor!');
-                console.warn('   Lütfen Chrome penceresinde sitelere giriş yaptığınızdan emin olun.');
+                console.warn("   Lütfen Chrome penceresinde sitelere giriş yaptığınızdan emin olun.");
             } else {
                 console.log('👍 İşlem başarılı! Scraper artık bu oturumları kullanabilir.');
             }
         } else {
-            console.warn('⚠️  Hiç çerez bulunamadı. Lütfen Chrome''da sitelere giriş yaptığınızdan emin olun.');
+            console.warn("⚠️  Hiç çerez bulunamadı. Lütfen Chrome'da sitelere giriş yaptığınızdan emin olun.");
         }
 
         await browser.disconnect();
 
     } catch (e) {
-        console.error('❌ HATA: Chrome''a bağlanılamadı.');
-        console.error('   Lütfen Chrome''un "Hata Ayıklama Modunda" açık olduğundan emin olun.');
+        console.error("❌ HATA: Chrome'a bağlanılamadı.");
+        console.error("   Lütfen Chrome'un 'Hata Ayıklama Modunda' açık olduğundan emin olun.");
         console.error('   Detay: ' + e.message);
         process.exit(1);
     }
