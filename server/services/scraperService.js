@@ -189,21 +189,30 @@ async function solveCloudflareChallenge(page) {
             console.log('🛡️ Semantic click failed. Trying Text-Coordinate Fallback...');
             try {
                 // Find "Verify you are human" or "Doğrulanıyor" text
-                const textFoundCords = await page.evaluate(() => {
-                    const allElements = document.querySelectorAll('*');
-                    for (const el of allElements) {
-                        if (el.innerText) {
-                            const text = el.innerText.toLowerCase();
-                            if (text.includes('verify you are human') || text.includes('human') || text.includes('doğrulanıyor') || text.includes('doğrulama') || text.includes('devam etmek')) {
-                                const rect = el.getBoundingClientRect();
-                                if (rect.width > 0 && rect.height > 0) {
-                                    return { x: rect.x, y: rect.y, w: rect.width, h: rect.height };
+                let retries = 0;
+                let textFoundCords = null;
+                while (!textFoundCords && retries < 10) {
+                    textFoundCords = await page.evaluate(() => {
+                        const allElements = document.querySelectorAll('*');
+                        for (const el of allElements) {
+                            if (el.innerText) {
+                                const text = el.innerText.toLowerCase();
+                                if (text.includes('verify you are human') || text.includes('human') || text.includes('doğrulanıyor') || text.includes('doğrulama') || text.includes('devam etmek')) {
+                                    const rect = el.getBoundingClientRect();
+                                    if (rect.width > 0 && rect.height > 0) {
+                                        return { x: rect.x, y: rect.y, w: rect.width, h: rect.height };
+                                    }
                                 }
                             }
                         }
+                        return null;
+                    });
+                    if (!textFoundCords) {
+                        console.log(`🛡️ Text scan attempt ${retries + 1}/10 failed. Retrying...`);
+                        await new Promise(r => setTimeout(r, 500));
+                        retries++;
                     }
-                    return null;
-                });
+                }
 
                 if (textFoundCords) {
                     console.log('🛡️ Clicked "Verify" text.');
