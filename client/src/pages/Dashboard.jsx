@@ -360,6 +360,7 @@ const Dashboard = () => {
                                     properties={properties}
                                     currentSort={filters.sort}
                                     onSortChange={(val) => handleFilterChange({ target: { name: 'sort', value: val } })}
+                                    totalCount={meta.total}
                                 />
 
                                 {/* Load More Button */}
