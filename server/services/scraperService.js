@@ -307,7 +307,14 @@ async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = '
                         const currentTitle = await page.title();
                         console.log(`Current Title: ${currentTitle}`);
 
-                        if (currentTitle.includes('Bir dakika') || currentTitle.includes('Just a moment') || currentTitle.includes('Attention Required')) {
+                        const currentBody = await page.evaluate(() => document.body.innerText.toLowerCase());
+                        if (
+                            currentTitle.includes('Bir dakika') ||
+                            currentTitle.includes('Just a moment') ||
+                            currentTitle.includes('Attention Required') ||
+                            currentBody.includes('blocked') ||
+                            currentBody.includes('err_')
+                        ) {
                             // Still blocked, try forced reload
                             console.log(`⚠️ Still on Cloudflare page. Force reloading target URL: ${pageUrl}`);
                             // Fix: Set Referer to same-origin to look natural
