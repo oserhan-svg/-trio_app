@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ExternalLink, FileSpreadsheet, Instagram, Eye, ChevronLeft, ChevronRight, FileText, TrendingDown, Home } from 'lucide-react';
+import { ExternalLink, FileSpreadsheet, Instagram, Eye, ChevronLeft, ChevronRight, FileText, TrendingDown, Home, ChevronUp, ChevronDown } from 'lucide-react';
 import api from '../services/api';
 
-const PropertyTable = ({ properties }) => {
+const PropertyTable = ({ properties, currentSort, onSortChange, totalCount }) => {
     const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState(1);
     const ITEMS_PER_PAGE = 15;
@@ -56,11 +56,39 @@ const PropertyTable = ({ properties }) => {
         }
     };
 
+    const SortHeader = ({ label, sortKeyBase, currentSort, onSortChange }) => {
+        const isCurrent = currentSort === `${sortKeyBase}_asc` || currentSort === `${sortKeyBase}_desc` || (sortKeyBase === 'date' && currentSort === 'newest');
+        const isDesc = currentSort === `${sortKeyBase}_desc` || (sortKeyBase === 'date' && currentSort === 'newest');
+
+        const handleClick = () => {
+            if (!onSortChange) return;
+            if (sortKeyBase === 'date') {
+                onSortChange(currentSort === 'newest' ? 'date_asc' : 'newest');
+            } else {
+                onSortChange(isDesc ? `${sortKeyBase}_asc` : `${sortKeyBase}_desc`);
+            }
+        };
+
+        return (
+            <th
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition group"
+                onClick={handleClick}
+            >
+                <div className="flex items-center gap-1">
+                    {label}
+                    <div className={`transition-opacity ${isCurrent ? 'opacity-100' : 'opacity-0 group-hover:opacity-50'}`}>
+                        {isDesc ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+                    </div>
+                </div>
+            </th>
+        );
+    };
+
     return (
         <div className="bg-white shadow-md rounded-lg overflow-hidden flex flex-col h-full">
             <div className="p-4 border-b flex justify-between items-center bg-gray-50">
                 <h2 className="text-lg font-semibold text-gray-700">
-                    İlan Listesi <span className="text-sm font-normal text-gray-500">({properties.length} ilan)</span>
+                    İlan Listesi <span className="text-sm font-normal text-gray-500">({totalCount || properties.length} ilan)</span>
                 </h2>
                 <div className="flex items-center gap-4">
                     {/* Pagination Controls (Top) */}
@@ -234,10 +262,10 @@ const PropertyTable = ({ properties }) => {
                     {/* ... (keep existing desktop Thead and Tbody) */}
                     <thead className="bg-gray-50 sticky top-0 z-10 shadow-sm">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tarih</th>
+                            <SortHeader label="Tarih" sortKeyBase="date" currentSort={currentSort} onSortChange={onSortChange} />
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">İlan Başlığı</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fiyat</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Konum</th>
+                            <SortHeader label="Fiyat" sortKeyBase="price" currentSort={currentSort} onSortChange={onSortChange} />
+                            <SortHeader label="Konum" sortKeyBase="location" currentSort={currentSort} onSortChange={onSortChange} />
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Özellikler</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Yatırım (ROI)</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">İşlem</th>

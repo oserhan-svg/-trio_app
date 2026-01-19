@@ -356,7 +356,11 @@ const Dashboard = () => {
                     ) : (
                         viewMode === 'list' ? (
                             <>
-                                <PropertyTable properties={properties} />
+                                <PropertyTable
+                                    properties={properties}
+                                    currentSort={filters.sort}
+                                    onSortChange={(val) => handleFilterChange({ target: { name: 'sort', value: val } })}
+                                />
 
                                 {/* Load More Button */}
                                 {meta.page < meta.totalPages && !loading && (

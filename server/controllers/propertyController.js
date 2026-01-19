@@ -156,8 +156,20 @@ const getProperties = async (req, res) => {
                 propertiesWithScore.sort((a, b) => b.price - a.price);
             } else if (sort === 'deviation') {
                 propertiesWithScore.sort((a, b) => (b.deviation || 0) - (a.deviation || 0));
-            } else if (sort === 'newest') {
+            } else if (sort === 'newest' || sort === 'date_desc') {
                 propertiesWithScore.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            } else if (sort === 'date_asc') {
+                propertiesWithScore.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            } else if (sort === 'location_asc') {
+                propertiesWithScore.sort((a, b) => {
+                    const distCompare = a.district.localeCompare(b.district, 'tr');
+                    return distCompare !== 0 ? distCompare : a.neighborhood.localeCompare(b.neighborhood, 'tr');
+                });
+            } else if (sort === 'location_desc') {
+                propertiesWithScore.sort((a, b) => {
+                    const distCompare = b.district.localeCompare(a.district, 'tr');
+                    return distCompare !== 0 ? distCompare : b.neighborhood.localeCompare(a.neighborhood, 'tr');
+                });
             } else if (req.query.opportunity_filter) {
                 // Default sorting for opportunity filter if no explicit sort
                 propertiesWithScore.sort((a, b) => (b.opportunity_score || 0) - (a.opportunity_score || 0));
