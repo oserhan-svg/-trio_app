@@ -191,7 +191,8 @@ async function solveCloudflareChallenge(page) {
                 // Find "Verify you are human" or "Doğrulanıyor" text
                 let retries = 0;
                 let textFoundCords = null;
-                while (!textFoundCords && retries < 10) {
+                // Increased to 30 retries (approx 15 seconds)
+                while (!textFoundCords && retries < 30) {
                     textFoundCords = await page.evaluate(() => {
                         const allElements = document.querySelectorAll('*');
                         for (const el of allElements) {
@@ -208,7 +209,7 @@ async function solveCloudflareChallenge(page) {
                         return null;
                     });
                     if (!textFoundCords) {
-                        console.log(`🛡️ Text scan attempt ${retries + 1}/10 failed. Retrying...`);
+                        if (retries % 5 === 0) console.log(`🛡️ Text scan attempt ${retries + 1}/30...`);
                         await new Promise(r => setTimeout(r, 500));
                         retries++;
                     }
@@ -301,15 +302,20 @@ async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = '
                             await page.mouse.move(200, 200);
                         } catch (ev) { }
 
-                        console.log('🛡️ Evasion wait complete. Checking if we passed...');
+                        console.log('🛡️ Evasion wait complete. Checking status...');
 
-                        // Force reload target URL to ensure we are on the right page
-                        console.log(`🔄 Reloading target URL to apply cookies: ${pageUrl}`);
+                        const currentTitle = await page.title();
+                        console.log(`Current Title: ${currentTitle}`);
 
-                        // Fix: Set Referer to same-origin to look natural
-                        await page.setExtraHTTPHeaders({ 'Referer': 'https://www.hepsiemlak.com/' });
-
-                        await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+                        if (currentTitle.includes('Bir dakika') || currentTitle.includes('Just a moment') || currentTitle.includes('Attention Required')) {
+                            // Still blocked, try forced reload
+                            console.log(`⚠️ Still on Cloudflare page. Force reloading target URL: ${pageUrl}`);
+                            // Fix: Set Referer to same-origin to look natural
+                            await page.setExtraHTTPHeaders({ 'Referer': 'https://www.hepsiemlak.com/' });
+                            await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+                        } else {
+                            console.log('✅ It seems we passed Cloudflare! Proceeding without reload.');
+                        }
                     }
                 } catch (err) {
                     console.log('Error checking for Cloudflare:', err.message);
