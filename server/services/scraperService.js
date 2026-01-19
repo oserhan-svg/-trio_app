@@ -6,6 +6,11 @@ const prisma = require('../db');
 // Organic Navigation Helper
 async function organicNav(page, targetUrl) {
     try {
+        console.log('🌍 Organic Entry: Starting with neutral hop (Wikipedia)...');
+        // Hop to Wikipedia first to establish a "clean" history
+        await page.goto('https://tr.wikipedia.org/wiki/Ana_Sayfa', { waitUntil: 'domcontentloaded' }).catch(() => { });
+        await new Promise(r => setTimeout(r, 2000));
+
         // Random Queries
         const queries = [
             'hepsiemlak ayvalık satılık daire',
@@ -13,19 +18,19 @@ async function organicNav(page, targetUrl) {
             'ayvalık satılık yazlık hepsiemlak'
         ];
         const query = queries[Math.floor(Math.random() * queries.length)];
-        // Use Yandex TR for better local relevance even from US IP
-        const searchUrl = `https://yandex.com.tr/search/?text=${encodeURIComponent(query)}`;
+        // Use DuckDuckGo - consistent results, less CAPTCHAs
+        const searchUrl = `https://duckduckgo.com/?q=${encodeURIComponent(query)}&t=h_&ia=web`;
 
-        console.log(`🌍 Organic Entry: Going directly to Yandex Search: "${query}"`);
+        console.log(`🌍 Organic Entry: Going to DuckDuckGo Search: "${query}"`);
         await page.goto(searchUrl, { waitUntil: 'domcontentloaded' });
 
         // Wait for results
-        await new Promise(r => setTimeout(r, 3000));
+        await new Promise(r => setTimeout(r, 4000));
 
-        // Find result using broad selector
+        // Find result - DDG results usually have a specific structure but broad selector works
         const links = await page.$$('a[href*="hepsiemlak.com"]');
         if (links.length > 0) {
-            console.log(`✅ Found ${links.length} Hepsiemlak links on Yandex. Clicking first...`);
+            console.log(`✅ Found ${links.length} Hepsiemlak links on DuckDuckGo. Clicking first...`);
             await Promise.all([
                 page.waitForNavigation({ timeout: 60000, waitUntil: 'domcontentloaded' }).catch(() => { }),
                 links[0].click()
@@ -33,16 +38,16 @@ async function organicNav(page, targetUrl) {
             return; // Success
         }
 
-        console.log('⚠️ Yandex Search fallback: Link not found on results page.');
+        console.log('⚠️ DuckDuckGo Search fallback: Link not found on results page.');
     } catch (e) {
         console.log(`⚠️ Organic Nav failed (${e.message}).`);
     }
 
     // Fallback: Direct entry with FAKE REFERER
-    console.log('👻 Applying Fake Referer Strategy (Google) and navigating directly...');
+    console.log('👻 Applying Fake Referer Strategy (Wikipedia) and navigating directly...');
     try {
         await page.setExtraHTTPHeaders({
-            'Referer': 'https://www.google.com/',
+            'Referer': 'https://tr.wikipedia.org/',
             'Sec-Fetch-Site': 'same-origin'
         });
     } catch (err) { }
@@ -191,47 +196,63 @@ async function solveCloudflareChallenge(page) {
     console.log('🛡️ Cloudflare detected. RealBrowser should auto-solve...');
 
     // Wait for the library's internal solver or just wait for navigation
-    // Increased to 15s to allow slower Turnstile verification
-    await new Promise(r => setTimeout(r, 15000));
+    // Increased to 30s to allow slower Turnstile verification on Render
+    await new Promise(r => setTimeout(r, 30000));
 
     try {
         const title = await page.title();
         console.log(`🛡️ Check status: ${title}`);
 
+        // If the title has changed, it means the challenge might have been solved
+        if (!title.includes('Just a moment') && !title.includes('Bir dakika') && !title.includes('Attention Required')) {
+            console.log('✅ Challenge seems to be solved (title changed). Returning early.');
+            return true;
+        }
+
         if (title.includes('Just a moment') || title.includes('Bir dakika') || title.includes('Attention Required')) {
             console.log('⚠️ RealBrowser auto-solve might struggle. Trying robust interaction...');
 
-            // Try specific Turnstile iframe selector first
+            const frames = page.frames();
+            console.log(`📦 Detected ${frames.length} frames.`);
+            // Log frame URLs for debugging if needed
+            for (let i = 0; i < frames.length; i++) {
+                try {
+                    console.log(`  Frame ${i}: ${frames[i].url().substring(0, 100)}...`);
+                } catch (e) {
+                    console.log(`  Frame ${i}: [Error getting URL: ${e.message}]`);
+                }
+            }
+
+            // Try specific Turnstile iframe selector 
             try {
-                const turnstileFrame = page.frames().find(f => f.url().includes('turnstile'));
-                if (turnstileFrame) {
-                    console.log('🎯 Turnstile frame found by URL. Clicking center...');
-                    const box = await turnstileFrame.boundingBox(); // Note: frames don't usually have boundingBox on the Page object directly easily without ElementHandle
-                    // safer to find the element handle for the frame
-                    const frameHandle = await page.$('iframe[src*="turnstile"]');
-                    if (frameHandle) {
-                        const box = await frameHandle.boundingBox();
-                        if (box) {
-                            await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
-                            console.log('🖱️ Clicked coordinates of Turnstile iframe.');
-                            await new Promise(r => setTimeout(r, 2000));
-                        }
+                // Find frame that likely contains turnstile
+                const frameHandle = await page.$('iframe[src*="turnstile"]') ||
+                    await page.$('iframe[src*="cloudflare"]') ||
+                    await page.$('iframe[id*="cf-"]');
+
+                if (frameHandle) {
+                    console.log('🎯 Turnstile frame element found. Clicking center...');
+                    const box = await frameHandle.boundingBox();
+                    if (box) {
+                        // Click slightly offset from center to hit the checkbox if it exists
+                        await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+                        console.log('🖱️ Clicked coordinates of potential Turnstile widget.');
+                        await new Promise(r => setTimeout(r, 5000));
                     }
                 }
             } catch (err) {
                 console.log('Error active clicking turnstile:', err.message);
             }
 
-            // Iterate frames for fallback generic click
-            const frames = page.frames();
+            // Fallback: Click all small bodies (generic checkbox attempt)
             for (const frame of frames) {
                 try {
-                    const body = await frame.$('body');
-                    if (body) {
-                        // Just click the body of small frames? Risky but maybe needed.
-                        // Or just checking for specific shadow roots if possible.
-                        // For now, let's just avoid the detached error
-                        await body.click({ delay: 50 }).catch(() => { });
+                    const url = frame.url();
+                    if (url.includes('turnstile') || url.includes('cloudflare')) {
+                        const body = await frame.$('body');
+                        if (body) {
+                            await body.click({ delay: 50 }).catch(() => { });
+                        }
                     }
                 } catch (e) {
                     // Ignore detached frame errors
@@ -334,7 +355,14 @@ async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = '
                         if (title.includes('Bir dakika') || title.includes('Just a moment') || bodyText.includes('Doğrulanıyor') || bodyText.includes('Verify')) {
                             console.log('🛡️ Cloudflare detected during timeout. Attempting to bypass...');
                             await solveCloudflareChallenge(page);
-                            await new Promise(r => setTimeout(r, 15000));
+                            // Wait even longer after solving attempt
+                            await new Promise(r => setTimeout(r, 20000));
+
+                            const newTitle = await page.title();
+                            if (newTitle.includes('Just a moment')) {
+                                console.log('🛡️ Still on Cloudflare. Final 10s wait before giving up/retrying.');
+                                await new Promise(r => setTimeout(r, 10000));
+                            }
 
                             console.log('🔄 Restarting loop to check if resolved...');
                             retryCount++;

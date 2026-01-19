@@ -85,8 +85,6 @@ async function launchRealBrowser(options = {}) {
                 '--disable-dev-shm-usage',
                 '--disable-features=IsolateOrigins,site-per-process',
                 '--disable-site-isolation-trials',
-                '--disable-gpu',
-                '--disable-gl-drawing-for-tests',
                 '--mute-audio',
                 '--window-size=1920,1080'
             ],
