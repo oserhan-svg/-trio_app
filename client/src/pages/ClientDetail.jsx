@@ -5,7 +5,7 @@ import {
     User, Phone, Mail, ArrowLeft, Calendar,
     MessageSquare, Clock, MapPin, TrendingUp,
     CheckCircle, XCircle, Star, Send, Plus, Edit2, X, FileText, Trash2,
-    Briefcase, MoreHorizontal, Filter
+    Briefcase, MoreHorizontal, Filter, Home
 } from 'lucide-react';
 import Button from '../components/ui/Button';
 import { useToast } from '../context/ToastContext';
