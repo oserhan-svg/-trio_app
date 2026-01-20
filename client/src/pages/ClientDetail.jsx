@@ -44,10 +44,13 @@ const ClientDetail = () => {
         try {
             setLoading(true);
             const clientRes = await api.get(`/clients/${id}`);
+            console.log('Client Data Loaded:', clientRes.data); // Debug log
             setClient(clientRes.data);
             setInteractions(clientRes.data.interactions || []);
             setSavedProperties(clientRes.data.saved_properties || []);
-        } catch {
+        } catch (error) {
+            console.error('Fetch Client Error:', error);
+            addToast('Müşteri bilgileri alınamadı: ' + error.message, 'error');
         } finally {
             setLoading(false);
         }
@@ -345,82 +348,94 @@ const ClientDetail = () => {
                         <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                             <div className="divide-y divide-gray-100">
                                 {(() => {
-                                    const validProperties = savedProperties.filter(p => p.property);
+                                    try {
+                                        const validProperties = savedProperties.filter(p => p && p.property);
 
-                                    if (validProperties.length === 0) {
-                                        return <div className="p-8 text-center text-gray-400 italic">Kayıtlı ilan yok.</div>;
-                                    }
+                                        if (validProperties.length === 0) {
+                                            return <div className="p-8 text-center text-gray-400 italic">Kayıtlı ilan yok.</div>;
+                                        }
 
-                                    return validProperties.map(p => (
-                                        <div key={p.id} className="p-3 flex gap-3 hover:bg-gray-50 transition-colors group relative">
+                                        return validProperties.map(p => {
+                                            // Ultra-defensive checks
+                                            const prop = p.property || {};
+                                            const title = typeof prop.title === 'string' ? prop.title : 'Başlıksız İlan';
+                                            const images = Array.isArray(prop.images) ? prop.images : [];
+                                            const price = prop.price ? parseInt(prop.price) : 0;
+                                            const matchScore = p.current_match_score || 0;
 
-                                            {/* Image */}
-                                            <div className="w-20 h-20 bg-gray-200 rounded-md overflow-hidden flex-shrink-0 relative">
-                                                {p.property.images?.[0] ?
-                                                    <img src={p.property.images[0]} className="w-full h-full object-cover" />
-                                                    : <div className="w-full h-full flex items-center justify-center text-gray-400"><Home size={16} /></div>
-                                                }
-                                                {p.current_match_score !== undefined && (
-                                                    <div className={`absolute bottom-0 w-full text-[9px] font-bold text-center text-white py-0.5 ${p.current_match_score >= 80 ? 'bg-emerald-500' :
-                                                        p.current_match_score >= 50 ? 'bg-orange-500' : 'bg-red-500'
-                                                        }`}>
-                                                        %{p.current_match_score}
+                                            return (
+                                                <div key={p.id} className="p-3 flex gap-3 hover:bg-gray-50 transition-colors group relative">
+
+                                                    {/* Image */}
+                                                    <div className="w-20 h-20 bg-gray-200 rounded-md overflow-hidden flex-shrink-0 relative">
+                                                        {images.length > 0 && images[0] ?
+                                                            <img src={images[0]} className="w-full h-full object-cover" onError={(e) => e.target.style.display = 'none'} />
+                                                            : <div className="w-full h-full flex items-center justify-center text-gray-400"><Home size={16} /></div>
+                                                        }
+                                                        {/* Score Badge */}
+                                                        <div className={`absolute bottom-0 w-full text-[9px] font-bold text-center text-white py-0.5 ${matchScore >= 80 ? 'bg-emerald-500' :
+                                                            matchScore >= 50 ? 'bg-orange-500' : 'bg-red-500'
+                                                            }`}>
+                                                            %{matchScore}
+                                                        </div>
                                                     </div>
-                                                )}
-                                            </div>
 
-                                            {/* Content */}
-                                            <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
-                                                <div>
-                                                    <div className="flex justify-between items-start">
-                                                        <h4 className="font-bold text-gray-800 text-sm truncate mr-2" title={p.property.title}>
-                                                            {p.property.title?.split('#')[0].trim() || 'Başlıksız İlan'}
-                                                        </h4>
-                                                        <span className="font-bold text-blue-600 text-sm whitespace-nowrap">
-                                                            {parseInt(p.property.price || 0).toLocaleString()} ₺
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
-                                                        <SourceBadge url={p.property.url} />
-                                                        <span>{p.property.district} / {p.property.neighborhood}</span>
-                                                        <span>• {p.property.rooms}</span>
-                                                        <span>• {p.property.size_m2} m²</span>
-                                                    </div>
-                                                </div>
-
-                                                {/* Notes / Actions */}
-                                                <div className="flex items-end justify-between mt-2">
-                                                    {/* Note Section */}
-                                                    <div className="flex-1 mr-4">
-                                                        {editingPropertyNote === p.property.id ? (
-                                                            <div className="flex items-center gap-1">
-                                                                <input
-                                                                    className="flex-1 text-xs px-2 py-1 border rounded"
-                                                                    value={tempPropertyNote}
-                                                                    onChange={e => setTempPropertyNote(e.target.value)}
-                                                                    autoFocus
-                                                                />
-                                                                <button onClick={() => handleSavePropertyNote(p.id, p.property.id)} className="text-green-600"><CheckCircle size={14} /></button>
-                                                                <button onClick={() => setEditingPropertyNote(null)} className="text-gray-400"><X size={14} /></button>
+                                                    {/* Content */}
+                                                    <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                                                        <div>
+                                                            <div className="flex justify-between items-start">
+                                                                <h4 className="font-bold text-gray-800 text-sm truncate mr-2" title={title}>
+                                                                    {title.split('#')[0].trim()}
+                                                                </h4>
+                                                                <span className="font-bold text-blue-600 text-sm whitespace-nowrap">
+                                                                    {price.toLocaleString()} ₺
+                                                                </span>
                                                             </div>
-                                                        ) : (
-                                                            <button
-                                                                onClick={() => { setEditingPropertyNote(p.property.id); setTempPropertyNote(p.notes || ''); }}
-                                                                className={`text-xs flex items-center gap-1 max-w-full text-left truncate ${p.notes ? 'text-gray-600 bg-yellow-50 px-2 py-0.5 rounded' : 'text-gray-300 hover:text-gray-500'}`}
-                                                            >
-                                                                <MessageSquare size={12} /> {p.notes || 'Not ekle...'}
-                                                            </button>
-                                                        )}
-                                                    </div>
+                                                            <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                                                                <SourceBadge url={prop.url} />
+                                                                <span>{prop.district} / {prop.neighborhood}</span>
+                                                                <span>• {prop.rooms}</span>
+                                                                <span>• {prop.size_m2} m²</span>
+                                                            </div>
+                                                        </div>
 
-                                                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <button onClick={() => window.open(`/property-listing/${p.property.id}`, '_blank')} className="p-1.5 text-gray-500 hover:bg-gray-200 rounded" title="Detay Sayfası"><FileText size={14} /></button>
-                                                        <button onClick={() => handleRemoveProperty(p.property.id)} className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded" title="Kaldır"><Trash2 size={14} /></button>
+                                                        {/* Actions */}
+                                                        <div className="flex items-end justify-between mt-2">
+                                                            <div className="flex-1 mr-4">
+                                                                {editingPropertyNote === prop.id ? (
+                                                                    <div className="flex items-center gap-1">
+                                                                        <input
+                                                                            className="flex-1 text-xs px-2 py-1 border rounded"
+                                                                            value={tempPropertyNote}
+                                                                            onChange={e => setTempPropertyNote(e.target.value)}
+                                                                            autoFocus
+                                                                        />
+                                                                        <button onClick={() => handleSavePropertyNote(p.id, prop.id)} className="text-green-600"><CheckCircle size={14} /></button>
+                                                                        <button onClick={() => setEditingPropertyNote(null)} className="text-gray-400"><X size={14} /></button>
+                                                                    </div>
+                                                                ) : (
+                                                                    <button
+                                                                        onClick={() => { setEditingPropertyNote(prop.id); setTempPropertyNote(p.notes || ''); }}
+                                                                        className={`text-xs flex items-center gap-1 max-w-full text-left truncate ${p.notes ? 'text-gray-600 bg-yellow-50 px-2 py-0.5 rounded' : 'text-gray-300 hover:text-gray-500'}`}
+                                                                    >
+                                                                        <MessageSquare size={12} /> {p.notes || 'Not ekle...'}
+                                                                    </button>
+                                                                )}
+                                                            </div>
+
+                                                            <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                <button onClick={() => window.open(`/property-listing/${prop.id}`, '_blank')} className="p-1.5 text-gray-500 hover:bg-gray-200 rounded" title="Detay"><FileText size={14} /></button>
+                                                                <button onClick={() => handleRemoveProperty(prop.id)} className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded" title="Kaldır"><Trash2 size={14} /></button>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </div>
-                                    ));
+                                            );
+                                        });
+                                    } catch (err) {
+                                        console.error('Render Error in Portfolio:', err);
+                                        return <div className="p-4 text-red-500 text-xs">Bir hata oluştu: {err.message}</div>;
+                                    }
                                 })()}
                             </div>
                         </div>
