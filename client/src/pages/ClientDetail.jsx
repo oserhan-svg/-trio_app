@@ -267,6 +267,69 @@ const ClientDetail = () => {
                         </div>
                     </div>
 
+                    {/* Selected Properties Widget */}
+                    <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+                        <div className="p-3 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                            <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                                <Star size={14} className="text-yellow-500 fill-yellow-500" /> Seçilenler
+                            </h3>
+                            <span className="text-[10px] font-bold bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded-full">
+                                {savedProperties.filter(p => p && p.property).length}
+                            </span>
+                        </div>
+                        <div className="divide-y divide-gray-100">
+                            {(() => {
+                                const validProps = savedProperties.filter(p => p && p.property)
+                                    .sort((a, b) => (b.current_match_score || 0) - (a.current_match_score || 0))
+                                    .slice(0, 3);
+
+                                if (validProps.length === 0) {
+                                    return <div className="p-4 text-center text-xs text-gray-400 italic">Henüz seçim yok.</div>;
+                                }
+
+                                return validProps.map(p => (
+                                    <div
+                                        key={p.id}
+                                        className="p-2 flex gap-2 hover:bg-gray-50 cursor-pointer transition-colors"
+                                        onClick={() => window.open(`/property-listing/${p.property.id}`, '_blank')}
+                                    >
+                                        {/* Thumbnail */}
+                                        <div className="w-10 h-10 bg-gray-200 rounded overflow-hidden flex-shrink-0 relative flex items-center justify-center">
+                                            {p.property.images?.[0] ?
+                                                <img src={p.property.images[0]} className="w-full h-full object-cover" onError={(e) => e.target.style.display = 'none'} />
+                                                : <Home size={12} className="text-gray-400" />
+                                            }
+                                        </div>
+                                        {/* Info */}
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex justify-between items-start">
+                                                <div className="text-xs font-medium truncate text-gray-800 mr-1" title={p.property.title || ''}>
+                                                    {(p.property.title || 'Başlıksız').split('#')[0]}
+                                                </div>
+                                                <div className={`text-[9px] font-bold px-1 rounded text-white flex-shrink-0 ${(p.current_match_score || 0) >= 80 ? 'bg-emerald-500' :
+                                                        (p.current_match_score || 0) >= 50 ? 'bg-orange-500' : 'bg-red-500'
+                                                    }`}>
+                                                    %{p.current_match_score || 0}
+                                                </div>
+                                            </div>
+                                            <div className="text-[10px] text-gray-500 mt-0.5">
+                                                {parseInt(p.property.price || 0).toLocaleString()} ₺
+                                            </div>
+                                        </div>
+                                    </div>
+                                ));
+                            })()}
+                        </div>
+                        {savedProperties.filter(p => p && p.property).length > 3 && (
+                            <button
+                                onClick={() => setActiveTab('portfolio')}
+                                className="w-full text-center py-2 text-xs text-blue-600 font-medium hover:bg-gray-50 border-t border-gray-100 transition-colors"
+                            >
+                                Tümünü Gör
+                            </button>
+                        )}
+                    </div>
+
                 </div>
 
                 {/* Right/Center Content (9Cols) */}
