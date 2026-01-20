@@ -291,7 +291,7 @@ const ClientDetail = () => {
                                     <div
                                         key={p.id}
                                         className="p-2 flex gap-2 hover:bg-gray-50 cursor-pointer transition-colors"
-                                        onClick={() => window.open(`/property-listing/${p.property.id}`, '_blank')}
+                                        onClick={() => window.open(`/property/${p.property.id}`, '_blank')}
                                     >
                                         {/* Thumbnail */}
                                         <div className="w-10 h-10 bg-gray-200 rounded overflow-hidden flex-shrink-0 relative flex items-center justify-center">
@@ -307,7 +307,7 @@ const ClientDetail = () => {
                                                     {(p.property.title || 'Başlıksız').split('#')[0]}
                                                 </div>
                                                 <div className={`text-[9px] font-bold px-1 rounded text-white flex-shrink-0 ${(p.current_match_score || 0) >= 80 ? 'bg-emerald-500' :
-                                                        (p.current_match_score || 0) >= 50 ? 'bg-orange-500' : 'bg-red-500'
+                                                    (p.current_match_score || 0) >= 50 ? 'bg-orange-500' : 'bg-red-500'
                                                     }`}>
                                                     %{p.current_match_score || 0}
                                                 </div>
@@ -320,14 +320,6 @@ const ClientDetail = () => {
                                 ));
                             })()}
                         </div>
-                        {savedProperties.filter(p => p && p.property).length > 3 && (
-                            <button
-                                onClick={() => setActiveTab('portfolio')}
-                                className="w-full text-center py-2 text-xs text-blue-600 font-medium hover:bg-gray-50 border-t border-gray-100 transition-colors"
-                            >
-                                Tümünü Gör
-                            </button>
-                        )}
                     </div>
 
                 </div>
@@ -487,7 +479,7 @@ const ClientDetail = () => {
                                                             </div>
 
                                                             <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                <button onClick={() => window.open(`/property-listing/${prop.id}`, '_blank')} className="p-1.5 text-gray-500 hover:bg-gray-200 rounded" title="Detay"><FileText size={14} /></button>
+                                                                <button onClick={() => window.open(`/property/${prop.id}`, '_blank')} className="p-1.5 text-gray-500 hover:bg-gray-200 rounded" title="Detay"><FileText size={14} /></button>
                                                                 <button onClick={() => handleRemoveProperty(prop.id)} className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded" title="Kaldır"><Trash2 size={14} /></button>
                                                             </div>
                                                         </div>

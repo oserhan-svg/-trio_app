@@ -215,6 +215,13 @@ const PropertyDetail = () => {
                             Son Güncelleme: {new Date(property.last_scraped).toLocaleString('tr-TR')}
                         </div>
 
+                        <button
+                            onClick={() => window.open(`/property-listing/${property.id}`, '_blank')}
+                            className="w-full bg-blue-50 text-blue-600 font-bold py-2 rounded-lg hover:bg-blue-100 transition flex items-center justify-center gap-2 mb-3"
+                        >
+                            <FileText size={18} /> İlan Sunum Sayfası Oluştur
+                        </button>
+
                         {/* Owner Info Mockup */}
                         <div className="border-t border-gray-100 pt-3">
                             <h4 className="text-sm font-bold text-gray-800 mb-2">İlan Sahibi</h4>
