@@ -162,8 +162,14 @@ const ClientDetail = () => {
                     </div>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => setShowMatchModal(true)} className="h-8 text-xs gap-1.5">
-                        <Star size={14} className="text-yellow-500" /> Akıllı Eşleştirme
+                    <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setShowMatchModal(true)}
+                        className="h-8 text-xs flex items-center justify-center gap-1.5 border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-300 shadow-sm transition-all"
+                    >
+                        <Star size={14} className="text-yellow-500 fill-yellow-500" />
+                        Akıllı Eşleştirme
                     </Button>
                 </div>
             </div>
@@ -338,10 +344,14 @@ const ClientDetail = () => {
                     {activeTab === 'portfolio' && (
                         <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                             <div className="divide-y divide-gray-100">
-                                {savedProperties.length === 0 && <div className="p-8 text-center text-gray-400 italic">Kayıtlı ilan yok.</div>}
-                                {savedProperties.map(p => {
-                                    if (!p.property) return null; // Skip if property data is missing
-                                    return (
+                                {(() => {
+                                    const validProperties = savedProperties.filter(p => p.property);
+
+                                    if (validProperties.length === 0) {
+                                        return <div className="p-8 text-center text-gray-400 italic">Kayıtlı ilan yok.</div>;
+                                    }
+
+                                    return validProperties.map(p => (
                                         <div key={p.id} className="p-3 flex gap-3 hover:bg-gray-50 transition-colors group relative">
 
                                             {/* Image */}
@@ -410,8 +420,8 @@ const ClientDetail = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                    );
-                                })}
+                                    ));
+                                })()}
                             </div>
                         </div>
                     )}
