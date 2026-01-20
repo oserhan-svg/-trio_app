@@ -93,6 +93,7 @@ const getClient = async (req, res) => {
         // Calculate dynamic match scores for saved properties
         if (client.demands && client.demands.length > 0 && client.saved_properties && client.saved_properties.length > 0) {
             client.saved_properties = client.saved_properties.map(sp => {
+                if (!sp.property) return { ...sp, current_match_score: 0 }; // Handle orphaned property
                 let bestScore = 0;
                 for (const demand of client.demands) {
                     const { score } = calculateMatchScore(sp.property, demand);
