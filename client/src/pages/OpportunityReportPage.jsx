@@ -126,7 +126,7 @@ const OpportunityReportPage = () => {
                             <div className="p-4">
                                 <div className="flex justify-between items-start mb-2">
                                     <h3 className="font-bold text-lg leading-tight line-clamp-2 min-h-[2.5rem]">
-                                        {p.title}
+                                        {p.title?.split('#')[0].trim()}
                                     </h3>
                                 </div>
 
@@ -136,7 +136,7 @@ const OpportunityReportPage = () => {
                                 </div>
 
                                 <div className="text-[10px] text-gray-400 mb-3 bg-gray-50 inline-block px-1.5 py-0.5 rounded border border-gray-100">
-                                    İlan No: #{p.external_id}
+                                    İlan No: #{p.external_id?.split('block')[0]}
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 mb-4 bg-gray-50 p-2 rounded">

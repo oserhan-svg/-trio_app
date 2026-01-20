@@ -195,13 +195,13 @@ async function scrapeProperties(provider = 'all') {
 
         if (provider === 'all' || provider === 'hepsiemlak') {
             for (const cat of CATEGORIES) {
-                console.log(`Targeting Hepsiemlak Category: ${cat.name}`);
-                await scrapeHepsiemlak(page, cat.hepsiemlak, null, cat.category);
+                const pages = await getPageRange('hepsiemlak', cat.category, cat.type);
+                console.log(`Targeting Hepsiemlak Category: ${cat.name} | Pages: ${pages.join(',')}`);
+                await scrapeHepsiemlak(page, cat.hepsiemlak, null, cat.category, pages);
 
                 if (cat.type === 'sale') {
-                    const ownerUrl = cat.hepsiemlak.replace('satilik', 'satilik-sahibinden'); // Works for standard HE URLs
-                    console.log(`Targeting Hepsiemlak (Owner Tab): ${ownerUrl}`);
-                    await scrapeHepsiemlak(page, ownerUrl, 'owner', cat.category);
+                    const ownerUrl = cat.hepsiemlak.replace('satilik', 'satilik-sahibinden');
+                    await scrapeHepsiemlak(page, ownerUrl, 'owner', cat.category, [1, 2]); // Always first 2 for owners as they are rare
                 }
                 await new Promise(r => setTimeout(r, 5000 + Math.random() * 5000));
             }
@@ -209,20 +209,30 @@ async function scrapeProperties(provider = 'all') {
 
         if (provider === 'all' || provider === 'emlakjet') {
             for (const cat of CATEGORIES) {
-                console.log(`Targeting Emlakjet Category: ${cat.name}`);
-                await scrapeEmlakjet(page, cat.emlakjet, cat.category);
+                const pages = await getPageRange('emlakjet', cat.category, cat.type);
+                console.log(`Targeting Emlakjet Category: ${cat.name} | Pages: ${pages.join(',')}`);
+                await scrapeEmlakjet(page, cat.emlakjet, cat.category, pages);
                 await new Promise(r => setTimeout(r, 5000 + Math.random() * 5000));
             }
         }
 
         if (provider === 'all' || provider === 'sahibinden') {
             for (const cat of CATEGORIES) {
-                console.log(`Targeting Sahibinden Category: ${cat.name}`);
+                const pages = await getPageRange('sahibinden', cat.category, cat.type);
+                console.log(`Targeting Sahibinden Category: ${cat.name} | Pages: ${pages.join(',')}`);
                 const { scrapeSahibindenStealth } = require('./stealthScraper');
-                await scrapeSahibindenStealth(cat.sahibinden, null, cat.category);
+                await scrapeSahibindenStealth(cat.sahibinden, null, cat.category, pages);
                 await new Promise(r => setTimeout(r, 10000 + Math.random() * 10000));
             }
         }
+
+        // --- REMOVAL DETECTION ---
+        // After all categories are scanned for a provider, any 'active' listing from that provider 
+        // that wasn't updated in the last 12 hours is likely removed.
+        const providerName = provider === 'all' ? null : provider;
+        await markRemovedListings(providerName);
+        // ------------------------
+
     } catch (error) {
         console.error('Global Scraper Error:', error);
     } finally {
@@ -309,14 +319,11 @@ async function solveCloudflareChallenge(page) {
 }
 
 
-async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = 'residential') {
-    console.log(`--- Scraping Hepsiemlak (${url}) [Forced Type: ${forcedSellerType || 'Auto'}, Category: ${category}] ---`);
+async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = 'residential', targetPages = [1, 2, 3]) {
+    console.log(`--- Scraping Hepsiemlak (${url}) [Pages: ${targetPages.join(', ')}] ---`);
     let allListings = [];
-    let pageNum = 1;
-    let hasNextPage = true;
 
-    // INCREASED PAGE LIMIT FOR DEEPER SCRAPING
-    while (hasNextPage && pageNum <= 20) {
+    for (const pageNum of targetPages) {
         const pageUrl = `${url}?page=${pageNum}`;
         console.log(`Navigating to Hepsiemlak Page ${pageNum}: ${pageUrl}`);
 
@@ -519,14 +526,12 @@ async function scrapeHepsiemlak(page, url, forcedSellerType = null, category = '
                         console.log(`Found ${listings.length} listings. Saving progress...`);
                         await saveListings(listings);
                         allListings = [...allListings, ...listings];
-                        pageNum++;
                     }
                 }
                 pageSuccess = true;
             } catch (e) {
                 console.log(`Error on page ${pageNum}: ${e.message}`);
                 retryCount++;
-                if (retryCount > maxRetries) hasNextPage = false;
             }
         }
     }
@@ -537,6 +542,7 @@ async function saveListings(listings) {
     if (listings.length === 0) return;
     console.log(`Saving ${listings.length} listings to DB...`);
     const { sendMatchNotification } = require('./notificationService');
+    const { groupProperty } = require('./deduplicationService');
     for (const item of listings) {
         const { external_id, title, price, url, district, neighborhood, rooms, size_m2, listing_date, listing_type, category, seller_type, seller_name } = item;
         try {
@@ -554,12 +560,12 @@ async function saveListings(listings) {
                     });
                     await prisma.property.update({
                         where: { id: existingProp.id },
-                        data: { price: price, last_scraped: new Date() }
+                        data: { price: price, last_scraped: new Date(), status: 'active' }
                     });
                 } else {
                     await prisma.property.update({
                         where: { id: existingProp.id },
-                        data: { last_scraped: new Date() }
+                        data: { last_scraped: new Date(), status: 'active' }
                     });
                 }
             } else {
@@ -571,9 +577,14 @@ async function saveListings(listings) {
                         seller_name: seller_name || 'Bilinmiyor',
                         listing_type: listing_type || 'sale',
                         category: category || 'daire',
-                        last_scraped: new Date()
+                        last_scraped: new Date(),
+                        status: 'active'
                     }
                 });
+
+                // Deduplication
+                await groupProperty(newProp.id);
+
                 await checkOpportunity(newProp);
                 const matches = await findMatchesForProperty(newProp);
                 for (const match of matches) {
@@ -674,17 +685,13 @@ async function scrapeEmlakjet(page, url, category = 'residential') {
                 return data;
             }, category);
 
-            if (listings.length === 0) {
-                hasNextPage = false;
-            } else {
+            if (listings.length > 0) {
                 console.log(`Found ${listings.length} listings on page ${pageNum}. Saving progress...`);
                 await saveListings(listings);
                 allListings = [...allListings, ...listings];
-                pageNum++;
             }
         } catch (err) {
             console.error(`Emlakjet Page ${pageNum} Error:`, err.message);
-            hasNextPage = false;
         }
     }
     return allListings;
@@ -747,4 +754,71 @@ async function scrapeDetails(url) {
     }
 }
 
-module.exports = { scrapeProperties, startScheduler, scrapeDetails, saveListings };
+async function markRemovedListings(provider = null) {
+    console.log(`--- Detecting removed listings for provider: ${provider || 'ALL'} ---`);
+
+    // Threshold: Not updated in the last 12 hours
+    const threshold = new Date(Date.now() - 12 * 60 * 60 * 1000);
+
+    const where = {
+        status: 'active',
+        last_scraped: { lt: threshold }
+    };
+
+    if (provider) {
+        if (provider === 'sahibinden') where.url = { contains: 'sahibinden.com' };
+        if (provider === 'hepsiemlak') where.url = { contains: 'hepsiemlak.com' };
+        if (provider === 'emlakjet') where.url = { contains: 'emlakjet.com' };
+    }
+
+    const removedListings = await prisma.property.findMany({ where });
+    console.log(`🧹 Mark as Removed: Found ${removedListings.length} stale listings.`);
+
+    if (removedListings.length > 0) {
+        await prisma.property.updateMany({
+            where: { id: { in: removedListings.map(p => p.id) } },
+            data: { status: 'removed' }
+        });
+    }
+}
+
+async function getPageRange(provider, category, type = 'sale') {
+    try {
+        // Find or Create progress record
+        let progress = await prisma.scraperProgress.findFirst({
+            where: { provider, category, type }
+        });
+
+        if (!progress) {
+            progress = await prisma.scraperProgress.create({
+                data: { provider, category, type, last_page: 0 } // Start from 0 so first deep is 1
+            });
+        }
+
+        const windowSize = 3; // Scrape 3 deep pages per run
+        const pages = [1]; // Always include page 1 for fresh listings
+
+        let current = progress.last_page + 1;
+        for (let i = 0; i < windowSize; i++) {
+            let p = current + i;
+            if (p > progress.max_pages) p = (p % progress.max_pages) || 1;
+            if (!pages.includes(p)) pages.push(p);
+        }
+
+        // Update progress for next run (move forward by windowSize)
+        let nextLastPage = progress.last_page + windowSize;
+        if (nextLastPage >= progress.max_pages) nextLastPage = 0;
+
+        await prisma.scraperProgress.update({
+            where: { id: progress.id },
+            data: { last_page: nextLastPage }
+        });
+
+        return [...new Set(pages)].sort((a, b) => a - b);
+    } catch (e) {
+        console.error(`Error calculating page range for ${provider}:`, e.message);
+        return [1, 2];
+    }
+}
+
+module.exports = { scrapeProperties, startScheduler, scrapeDetails, saveListings, markRemovedListings, getPageRange };

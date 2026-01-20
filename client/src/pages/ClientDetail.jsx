@@ -401,10 +401,8 @@ const ClientDetail = () => {
                                             </button>
                                         </div>
                                         <div className="p-3 flex-1 flex flex-col">
-                                            <h4 className="font-semibold text-gray-900 text-sm line-clamp-1 flex items-center">
-                                                {p.property.title}
-                                                <SourceBadge url={p.property.url} />
-                                            </h4>
+                                            <h3 className="font-bold">{p.property.title?.split('#')[0].trim()}</h3>
+                                            <SourceBadge url={p.property.url} />
                                             <p className="text-xs text-gray-500 mt-1">{p.property.district} / {p.property.neighborhood}</p>
 
                                             {/* Property-Specific Notes */}

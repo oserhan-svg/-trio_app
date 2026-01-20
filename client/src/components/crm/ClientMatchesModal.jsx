@@ -119,7 +119,7 @@ const ClientMatchesModal = ({ isOpen, onClose, client, onUpdate }) => {
                                         </div>
 
                                         <p className="text-xs text-gray-500 mt-1 line-clamp-2 min-h-[2.5em]">
-                                            {prop.rooms} • {prop.size_m2}m² • {prop.title}
+                                            {prop.rooms} • {prop.size_m2}m² • {prop.title?.split('#')[0].trim()}
                                         </p>
 
                                         {/* Match Badge */}

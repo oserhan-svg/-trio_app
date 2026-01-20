@@ -5,12 +5,14 @@ echo ==================================================
 echo   TRIO EMLAK SISTEMI ACILIYOR
 echo ==================================================
 echo.
-echo 1. Arka Plan Sunucusu (Backend)
-echo 2. Kullanici Arayuzu (Frontend)
+echo 1. Arka Plan Sunucusu (Backend) baslatiliyor...
+start "Trio Backend" cmd /k "cd server && npm start"
+
+echo 2. Kullanici Arayuzu (Frontend) baslatiliyor...
+start "Trio Frontend" cmd /k "cd client && npm run dev"
+
 echo.
-echo Lutfen bekleyin...
-echo (Bu pencereyi kapatmayin, sistem calisirken acik kalmali)
+echo Sistem baslatildi! Pencereleri kapatmayin.
+echo Tarayici otomatik olarak acilacaktir: http://localhost:5173
 echo.
-cd server
-npm run dev
 pause

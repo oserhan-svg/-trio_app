@@ -127,9 +127,12 @@ const OpportunityCarousel = ({ compact = false }) => {
                                             {prop.rooms} • {prop.size_m2} m²
                                         </span>
                                     </div>
-                                    <h3 className={`font-bold text-gray-800 ${compact ? 'text-xs' : 'text-sm'} leading-tight truncate`} title={prop.title}>
-                                        {prop.neighborhood}
+                                    <h3 className={`font-bold text-gray-800 ${compact ? 'text-[11px]' : 'text-xs'} leading-tight line-clamp-2`} title={prop.title}>
+                                        {prop.title?.split('#')[0].trim()}
                                     </h3>
+                                    <div className="text-[10px] text-gray-400 mt-1">
+                                        {prop.neighborhood}
+                                    </div>
 
                                     {/* Rationale Badge */}
                                     <div className={`mt-1 text-[9px] font-bold inline-flex items-center gap-0.5 px-1 rounded ${isKelepir ? 'bg-orange-100 text-orange-700' : 'bg-emerald-50 text-emerald-700'}`}>

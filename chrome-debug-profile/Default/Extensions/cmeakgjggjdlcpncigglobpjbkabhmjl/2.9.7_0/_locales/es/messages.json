@@ -1,0 +1,10 @@
+{
+   "extension_description": {
+      "description": "Descripción de la extensión",
+      "message": "Mejora Steam: venta automática de skins, artículos económicos de varias fuentes y mucho más."
+   },
+   "langcode": {
+      "description": "",
+      "message": "es"
+   }
+}

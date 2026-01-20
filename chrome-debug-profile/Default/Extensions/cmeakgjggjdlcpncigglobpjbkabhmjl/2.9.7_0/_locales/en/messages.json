@@ -1,0 +1,10 @@
+{
+   "extension_description": {
+      "description": "Extension's description",
+      "message": "Enhances Steam: auto-selling skins, affordable items from various sources, and much more."
+   },
+   "langcode": {
+      "description": "",
+      "message": "en"
+   }
+}

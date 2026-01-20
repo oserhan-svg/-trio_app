@@ -80,12 +80,20 @@ const PropertyDetail = () => {
                     >
                         <ArrowLeft size={24} />
                     </button>
-                    <h1 className="text-xl font-bold text-gray-800 truncate flex-1">{property.title}</h1>
+                    <h1 className="text-xl font-bold text-gray-800 truncate flex-1">{property.title?.split('#')[0].trim()}</h1>
                     <span className="text-2xl font-bold text-blue-600 whitespace-nowrap">
                         {parseFloat(property.price).toLocaleString('tr-TR')} TL
                     </span>
                 </div>
             </div>
+
+            {/* Removal Warning Banner */}
+            {property.status === 'removed' && (
+                <div className="bg-rose-600 text-white py-3 px-4 shadow-md sticky top-[72px] z-40 text-center font-bold flex items-center justify-center gap-3">
+                    <span className="text-xl">⚠️</span>
+                    İlan Yayından Kaldırılmış: Bu mülk artık kaynak portalda bulunmuyor.
+                </div>
+            )}
 
             <div className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
 
@@ -203,7 +211,7 @@ const PropertyDetail = () => {
                             <ExternalLink size={20} /> Orjinal İlana Git
                         </a>
                         <div className="text-xs text-gray-500 text-center mb-3">
-                            İlan No: {property.external_id} <br />
+                            İlan No: {property.external_id?.split('block')[0]} <br />
                             Son Güncelleme: {new Date(property.last_scraped).toLocaleString('tr-TR')}
                         </div>
 
@@ -235,6 +243,42 @@ const PropertyDetail = () => {
                                 )}
                             </div>
                         </div>
+
+                        {/* Other Portals / Grouped Listings */}
+                        {property.other_listings && property.other_listings.length > 0 && (
+                            <div className="bg-gray-50 rounded-xl p-4 mt-4 border border-blue-100">
+                                <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                    <ExternalLink size={12} className="text-blue-500" />
+                                    Diğer Portallardaki İlanlar
+                                </h4>
+                                <div className="space-y-2">
+                                    {property.other_listings.map((other) => {
+                                        const portal = other.url.includes('sahibinden.com') ? 'Sahibinden' :
+                                            other.url.includes('hepsiemlak.com') ? 'Hepsiemlak' :
+                                                other.url.includes('emlakjet.com') ? 'Emlakjet' : 'Diğer Portal';
+                                        const portalColor = portal === 'Sahibinden' ? 'bg-yellow-50 text-yellow-700' :
+                                            portal === 'Hepsiemlak' ? 'bg-rose-50 text-rose-700' :
+                                                'bg-blue-50 text-blue-700';
+
+                                        return (
+                                            <a
+                                                key={other.id}
+                                                href={other.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center justify-between p-2 rounded-lg bg-white border border-gray-100 hover:shadow-sm transition-all group"
+                                            >
+                                                <div className="flex flex-col">
+                                                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded w-fit mb-0.5 ${portalColor}`}>{portal}</span>
+                                                    <span className="text-xs font-bold text-gray-900">{parseFloat(other.price).toLocaleString('tr-TR')} TL</span>
+                                                </div>
+                                                <ExternalLink size={14} className="text-gray-300 group-hover:text-blue-500" />
+                                            </a>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Details Card */}
@@ -301,18 +345,18 @@ const PropertyDetail = () => {
                         )}
                     </div>
 
-                    {/* Price History (Basic List for now, Chart is on Dashboard) */}
+                    {/* Price History (Merged from all portals) */}
                     <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h3 className="font-bold text-gray-800 mb-4">Fiyat Geçmişi</h3>
+                        <h3 className="font-bold text-gray-800 mb-4">Birleşik Fiyat Geçmişi</h3>
                         <div className="space-y-4 relative border-l-2 border-gray-200 ml-2 pl-4">
-                            {property.history && property.history.map((h) => (
+                            {(property.merged_history || property.history || []).map((h) => (
                                 <div key={h.id} className="relative">
                                     <div className="absolute -left-[21px] top-1 w-3 h-3 bg-blue-500 rounded-full border-2 border-white"></div>
                                     <div className="text-sm font-bold text-gray-800">
                                         {parseFloat(h.price).toLocaleString('tr-TR')} TL
                                     </div>
                                     <div className="text-xs text-gray-500">
-                                        {new Date(h.changed_at).toLocaleDateString('tr-TR')} - {h.change_type === 'initial' ? 'İlk Fiyat' : (h.change_type === 'price_increase' ? 'Artış ↗' : 'Düşüş ↘')}
+                                        {new Date(h.changed_at).toLocaleDateString('tr-TR')} - {h.change_type === 'initial' ? 'İlk İlan' : (h.change_type === 'price_decrease' ? 'Düşüş ↘' : 'Artış ↗')}
                                     </div>
                                 </div>
                             ))}

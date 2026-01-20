@@ -1,0 +1,80 @@
+2026/01/19-18:35:56.769 bb4 Creating DB C:\Users\ozanc\Downloads\emlak22\chrome-debug-profile\Default\Session Storage since it was missing.
+2026/01/19-18:35:56.804 bb4 Reusing MANIFEST C:\Users\ozanc\Downloads\emlak22\chrome-debug-profile\Default\Session Storage/MANIFEST-000001
+2026/01/19-19:36:13.924 ce8 Level-0 table #5: started
+2026/01/19-19:36:13.933 ce8 Level-0 table #5: 13865 bytes OK
+2026/01/19-19:36:13.936 ce8 Delete type=0 #3
+2026/01/19-19:36:52.234 ce8 Level-0 table #7: started
+2026/01/19-19:36:52.245 ce8 Level-0 table #7: 12180 bytes OK
+2026/01/19-19:36:52.249 ce8 Delete type=0 #4
+2026/01/19-19:37:44.143 bb4 Level-0 table #9: started
+2026/01/19-19:37:44.149 bb4 Level-0 table #9: 11120 bytes OK
+2026/01/19-19:37:44.151 bb4 Delete type=0 #6
+2026/01/19-19:38:14.483 bb4 Level-0 table #11: started
+2026/01/19-19:38:14.488 bb4 Level-0 table #11: 12159 bytes OK
+2026/01/19-19:38:14.490 bb4 Delete type=0 #8
+2026/01/19-19:38:58.283 ce8 Level-0 table #13: started
+2026/01/19-19:38:58.291 ce8 Level-0 table #13: 14421 bytes OK
+2026/01/19-19:38:58.293 ce8 Delete type=0 #10
+2026/01/19-19:39:15.925 ce8 Level-0 table #15: started
+2026/01/19-19:39:15.930 ce8 Level-0 table #15: 14436 bytes OK
+2026/01/19-19:39:15.932 ce8 Delete type=0 #12
+2026/01/19-19:39:15.933 ce8 Compacting 4@0 + 1@1 files
+2026/01/19-19:39:15.939 ce8 Generated table #16@0: 48 keys, 10174 bytes
+2026/01/19-19:39:15.939 ce8 Compacted 4@0 + 1@1 files => 10174 bytes
+2026/01/19-19:39:15.939 ce8 compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/01/19-19:39:15.940 ce8 Delete type=2 #7
+2026/01/19-19:39:15.940 ce8 Delete type=2 #9
+2026/01/19-19:39:15.940 ce8 Delete type=2 #11
+2026/01/19-19:39:15.940 ce8 Delete type=2 #13
+2026/01/19-19:39:15.940 ce8 Delete type=2 #15
+2026/01/19-19:39:46.733 ce8 Level-0 table #18: started
+2026/01/19-19:39:46.819 ce8 Level-0 table #18: 16501 bytes OK
+2026/01/19-19:39:46.821 ce8 Delete type=0 #14
+2026/01/19-19:40:24.637 ce8 Level-0 table #20: started
+2026/01/19-19:40:24.644 ce8 Level-0 table #20: 9556 bytes OK
+2026/01/19-19:40:24.645 ce8 Delete type=0 #17
+2026/01/19-19:40:30.056 ce8 Level-0 table #22: started
+2026/01/19-19:40:30.066 ce8 Level-0 table #22: 9728 bytes OK
+2026/01/19-19:40:30.068 ce8 Delete type=0 #19
+2026/01/19-19:40:42.833 ce8 Level-0 table #24: started
+2026/01/19-19:40:42.850 ce8 Level-0 table #24: 10122 bytes OK
+2026/01/19-19:40:42.855 ce8 Delete type=0 #21
+2026/01/19-19:40:42.856 ce8 Compacting 4@0 + 1@1 files
+2026/01/19-19:40:42.867 ce8 Generated table #25@0: 62 keys, 13069 bytes
+2026/01/19-19:40:42.867 ce8 Compacted 4@0 + 1@1 files => 13069 bytes
+2026/01/19-19:40:42.868 ce8 compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/01/19-19:40:42.869 ce8 Delete type=2 #16
+2026/01/19-19:40:42.869 ce8 Delete type=2 #18
+2026/01/19-19:40:42.869 ce8 Delete type=2 #20
+2026/01/19-19:40:42.869 ce8 Delete type=2 #22
+2026/01/19-19:40:42.869 ce8 Delete type=2 #24
+2026/01/19-19:41:03.480 ce8 Level-0 table #27: started
+2026/01/19-19:41:03.489 ce8 Level-0 table #27: 10785 bytes OK
+2026/01/19-19:41:03.495 ce8 Delete type=0 #23
+2026/01/19-19:41:10.829 ce8 Level-0 table #29: started
+2026/01/19-19:41:10.837 ce8 Level-0 table #29: 10822 bytes OK
+2026/01/19-19:41:10.839 ce8 Delete type=0 #26
+2026/01/19-19:41:52.652 ce8 Level-0 table #31: started
+2026/01/19-19:41:52.659 ce8 Level-0 table #31: 11370 bytes OK
+2026/01/19-19:41:52.661 ce8 Delete type=0 #28
+2026/01/19-19:41:59.641 ce8 Level-0 table #33: started
+2026/01/19-19:41:59.648 ce8 Level-0 table #33: 11693 bytes OK
+2026/01/19-19:41:59.650 ce8 Delete type=0 #30
+2026/01/19-19:41:59.651 ce8 Compacting 4@0 + 1@1 files
+2026/01/19-19:41:59.658 ce8 Generated table #34@0: 68 keys, 14812 bytes
+2026/01/19-19:41:59.659 ce8 Compacted 4@0 + 1@1 files => 14812 bytes
+2026/01/19-19:41:59.659 ce8 compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/01/19-19:41:59.661 ce8 Delete type=2 #25
+2026/01/19-19:41:59.661 ce8 Delete type=2 #27
+2026/01/19-19:41:59.661 ce8 Delete type=2 #29
+2026/01/19-19:41:59.661 ce8 Delete type=2 #31
+2026/01/19-19:41:59.662 ce8 Delete type=2 #33
+2026/01/19-19:42:12.423 ce8 Level-0 table #36: started
+2026/01/19-19:42:12.429 ce8 Level-0 table #36: 12135 bytes OK
+2026/01/19-19:42:12.430 ce8 Delete type=0 #32
+2026/01/19-19:42:28.271 bb4 Level-0 table #38: started
+2026/01/19-19:42:28.279 bb4 Level-0 table #38: 12996 bytes OK
+2026/01/19-19:42:28.281 bb4 Delete type=0 #35
+2026/01/19-19:42:46.714 bb4 Level-0 table #40: started
+2026/01/19-19:42:46.721 bb4 Level-0 table #40: 12597 bytes OK
+2026/01/19-19:42:46.722 bb4 Delete type=0 #37

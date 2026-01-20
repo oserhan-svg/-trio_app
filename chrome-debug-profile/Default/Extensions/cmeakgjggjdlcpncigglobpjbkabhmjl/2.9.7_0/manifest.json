@@ -1,0 +1,267 @@
+{
+   "action": {
+      "default_icon": {
+         "16": "assets/icon128.png"
+      },
+      "default_title": "Steam Inventory Helper"
+   },
+   "background": {
+      "service_worker": "service-worker.js"
+   },
+   "content_scripts": [ {
+      "css": [ "css/fontello.css", "bundle/css/controls.css" ],
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "js/json2.js", "js/tradeoffer.js", "js/common/settings.js" ],
+      "matches": [ "*://steamcommunity.com/tradeoffer/*", "*://steamcommunity.com/trade/*" ],
+      "run_at": "document_end"
+   }, {
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "js/json2.js", "js/gifts.js" ],
+      "matches": [ "*://*.steampowered.com/checkout/sendgift/*" ],
+      "run_at": "document_end"
+   }, {
+      "css": [ "css/fontello.css", "css/inventprice.css", "bundle/css/controls.css" ],
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "js/inventprice.js", "js/common/settings.js" ],
+      "matches": [ "*://steamcommunity.com/id/*/inventory", "*://steamcommunity.com/id/*/inventory/*", "*://steamcommunity.com/profiles/*/inventory", "*://steamcommunity.com/profiles/*/inventory/*" ],
+      "run_at": "document_end"
+   }, {
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "js/inventory_history.js" ],
+      "matches": [ "*://steamcommunity.com/id/*/inventoryhistory", "*://steamcommunity.com/id/*/inventoryhistory*", "*://steamcommunity.com/profiles/*/inventoryhistory", "*://steamcommunity.com/profiles/*/inventoryhistory*" ],
+      "run_at": "document_end"
+   }, {
+      "css": [ "css/fontello.css", "bundle/css/profile.css" ],
+      "exclude_matches": [ "*://steamcommunity.com/id/*/inventory*", "*://steamcommunity.com/profiles/*/inventory*", "*://steamcommunity.com/id/*/badges*", "*://steamcommunity.com/profiles/*/badges*", "*://steamcommunity.com/id/*/gamecards*", "*://steamcommunity.com/profiles/*/gamecards*", "*://steamcommunity.com/id/*/friends/pending*", "*://steamcommunity.com/profiles/*/friends/pending*", "*://steamcommunity.com/id/*/groups*", "*://steamcommunity.com/profiles/*/groups*", "*://steamcommunity.com/id/*/tradeoffer*", "*://steamcommunity.com/profiles/*/tradeoffer*" ],
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/common.js", "bundle/js/profile.js", "bundle/js/profilestat.js", "js/profile.js" ],
+      "matches": [ "*://steamcommunity.com/id/*", "*://steamcommunity.com/profiles/*" ],
+      "run_at": "document_end"
+   }, {
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "js/miniProfileHover.js" ],
+      "matches": [ "*://*.steampowered.com/*", "*://steamcommunity.com/*" ],
+      "run_at": "document_end"
+   }, {
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "js/profileStats.js" ],
+      "matches": [ "*://steamcommunity.com/id/*/stats/*", "*://steamcommunity.com/profiles/*/stats/*", "*://steamcommunity.com/id/*/stats", "*://steamcommunity.com/profiles/*/stats" ],
+      "run_at": "document_end"
+   }, {
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "js/tradeofferrev.js" ],
+      "matches": [ "*://steamcommunity.com/id/*/tradeoffers/*", "*://steamcommunity.com/profiles/*/tradeoffers/*", "*://steamcommunity.com/id/*/tradeoffers", "*://steamcommunity.com/profiles/*/tradeoffers" ],
+      "run_at": "document_end"
+   }, {
+      "css": [ "css/fontello.css", "bundle/css/controls.css" ],
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "js/listing.js" ],
+      "matches": [ "*://steamcommunity.com/market/listings/*" ],
+      "run_at": "document_end"
+   }, {
+      "css": [ "css/fontello.css", "bundle/css/controls.css" ],
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "js/market.js" ],
+      "matches": [ "*://steamcommunity.com/market/*", "*://steamcommunity.com/market" ],
+      "run_at": "document_end"
+   }, {
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/common.js", "bundle/js/gamecards.js", "js/badge.js" ],
+      "matches": [ "*://steamcommunity.com/id/*/gamecards/*", "*://steamcommunity.com/profiles/*/gamecards/*" ],
+      "run_at": "document_end"
+   }, {
+      "css": [ "css/fontello.css", "bundle/css/groups.css", "bundle/css/invites.css" ],
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/common.js", "bundle/js/groups.js", "bundle/js/invites.js", "js/invites.js" ],
+      "matches": [ "*://steamcommunity.com/id/*/friends*", "*://steamcommunity.com/id/*/groups*", "*://steamcommunity.com/profiles/*/friends*", "*://steamcommunity.com/profiles/*/groups*" ],
+      "run_at": "document_end"
+   }, {
+      "css": [ "css/fontello.css", "bundle/css/gameprice.css", "css/fam-flags.css" ],
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/common.js", "bundle/js/gameprice.js", "bundle/js/gamestat.js" ],
+      "matches": [ "*://*.steampowered.com/app/*", "*://*.steampowered.com/bundle/*", "*://*.steampowered.com/sub/*" ],
+      "run_at": "document_end"
+   }, {
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/common.js", "bundle/js/spentmoney.js" ],
+      "matches": [ "*://*.steampowered.com/account/", "*://*.steampowered.com/account/store_transactions/" ],
+      "run_at": "document_end"
+   }, {
+      "exclude_matches": [ "*://*.steampowered.com/checkout/sendgift/*", "*://*.steampowered.com/account/*" ],
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/common.js", "bundle/js/highlight.js", "bundle/js/steampoweredlogin.js" ],
+      "matches": [ "*://*.steampowered.com/*" ],
+      "run_at": "document_end"
+   }, {
+      "css": [ "css/fontello.css", "bundle/css/history.css" ],
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/common.js", "bundle/js/history.js" ],
+      "matches": [ "*://steamcommunity.com/id/*/inventoryhistory/", "*://steamcommunity.com/profiles/*/inventoryhistory/" ],
+      "run_at": "document_end"
+   }, {
+      "css": [ "css/fontello.css", "bundle/css/levels.css" ],
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/common.js", "bundle/js/levels.js", "js/badges-main.js" ],
+      "matches": [ "*://steamcommunity.com/id/*/badges/*", "*://steamcommunity.com/id/*/badges", "*://steamcommunity.com/profiles/*/badges/*", "*://steamcommunity.com/profiles/*/badges", "*://steamcommunity.com/market/multibuy*" ],
+      "run_at": "document_end"
+   }, {
+      "css": [ "css/fontello.css", "bundle/css/badgeprogress.css" ],
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/common.js", "bundle/js/badgeprogress.js", "js/gamePage.js" ],
+      "matches": [ "*://*.steampowered.com/app/*" ],
+      "run_at": "document_end"
+   }, {
+      "css": [ "css/fontello.css" ],
+      "js": [ "js/pointsPage.js" ],
+      "matches": [ "*://*.steampowered.com/points/*" ],
+      "run_at": "document_end"
+   }, {
+      "css": [ "css/fontello.css" ],
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "js/search.js" ],
+      "matches": [ "*://*.steampowered.com/search*" ],
+      "run_at": "document_end"
+   }, {
+      "css": [ "css/fontello.css" ],
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "js/cart.js" ],
+      "matches": [ "*://*.steampowered.com/cart/*" ],
+      "run_at": "document_end"
+   }, {
+      "css": [ "css/fontello.css" ],
+      "js": [ "js/wishlist.js" ],
+      "matches": [ "*://*.steampowered.com/wishlist/*" ],
+      "run_at": "document_end"
+   }, {
+      "css": [ "css/fontello.css" ],
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "js/explore.js" ],
+      "matches": [ "*://*.steampowered.com/explore/*" ],
+      "run_at": "document_end"
+   }, {
+      "css": [ "css/fontello.css" ],
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "js/sih_global_header.js" ],
+      "matches": [ "*://*.steampowered.com/*", "*://steamcommunity.com/*" ],
+      "run_at": "document_end"
+   }, {
+      "css": [ "css/fontello.css" ],
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/externalMarketHandler.js", "js/otherMarkets/waxpeer/waxpeer.js" ],
+      "matches": [ "*://waxpeer.com/*" ],
+      "run_at": "document_end"
+   }, {
+      "css": [ "css/fontello.css" ],
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/externalMarketHandler.js", "js/otherMarkets/csgocom/csgocom.js" ],
+      "matches": [ "*://market.csgo.com/*" ],
+      "run_at": "document_start"
+   }, {
+      "css": [ "css/fontello.css" ],
+      "js": [ "bundle/js/externalMarketHandler.js", "js/otherMarkets/buff/buff.js" ],
+      "matches": [ "*://buff.163.com/*" ],
+      "run_at": "document_end"
+   }, {
+      "css": [ "css/fontello.css" ],
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/externalMarketHandler.js", "js/otherMarkets/skinport/skinport.js" ],
+      "matches": [ "*://skinport.com/*" ],
+      "run_at": "document_start"
+   }, {
+      "css": [ "css/fontello.css" ],
+      "js": [ "bundle/js/externalMarketHandler.js", "js/otherMarkets/lisskins/lisskins.js" ],
+      "matches": [ "*://lis-skins.ru/*", "*://lis-skins.com/*" ],
+      "run_at": "document_end"
+   }, {
+      "js": [ "bundle/js/externalMarketHandler.js", "js/otherMarkets/haloskins/haloskins.js" ],
+      "matches": [ "*://www.haloskins.com/*", "*://haloskins.com/*" ],
+      "run_at": "document_start"
+   }, {
+      "css": [ "css/fontello.css" ],
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/externalMarketHandler.js", "js/otherMarkets/shadowpay/shadowpay.js" ],
+      "matches": [ "*://shadowpay.com/*" ],
+      "run_at": "document_start"
+   }, {
+      "css": [ "css/fontello.css" ],
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/externalMarketHandler.js", "js/otherMarkets/bitskins/bitskins.js" ],
+      "matches": [ "*://bitskins.com/*" ],
+      "run_at": "document_end"
+   }, {
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/externalMarketHandler.js", "js/otherMarkets/whitemarket/whitemarket.js" ],
+      "matches": [ "*://white.market/*" ],
+      "run_at": "document_start"
+   }, {
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/externalMarketHandler.js", "js/otherMarkets/skinout/skinout.js" ],
+      "matches": [ "*://skinout.gg/*" ],
+      "run_at": "document_end"
+   }, {
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/externalMarketHandler.js", "js/otherMarkets/gamerpay/gamerpay.js" ],
+      "matches": [ "*://gamerpay.gg/*" ],
+      "run_at": "document_end"
+   }, {
+      "js": [ "bundle/js/externalMarketHandler.js", "js/otherMarkets/mannco/mannco.js" ],
+      "matches": [ "*://mannco.store/*" ],
+      "run_at": "document_end"
+   }, {
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/externalMarketHandler.js", "js/otherMarkets/igxe/igxe.js" ],
+      "matches": [ "*://www.igxe.cn/*" ],
+      "run_at": "document_end"
+   }, {
+      "css": [ "css/fontello.css" ],
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/externalMarketHandler.js", "js/otherMarkets/dmarket/dmarket.js" ],
+      "matches": [ "*://dmarket.com/*" ],
+      "run_at": "document_end"
+   }, {
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/externalMarketHandler.js", "js/otherMarkets/csmoney/csmoney.js" ],
+      "matches": [ "*://cs.money/*" ],
+      "run_at": "document_end"
+   }, {
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/externalMarketHandler.js", "js/otherMarkets/tradeit/tradeit.js" ],
+      "matches": [ "*://tradeit.gg/*" ],
+      "run_at": "document_start"
+   }, {
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/externalMarketHandler.js", "js/otherMarkets/skinbaron/skinbaron.js" ],
+      "matches": [ "*://skinbaron.de/*" ],
+      "run_at": "document_end"
+   }, {
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/externalMarketHandler.js", "js/otherMarkets/csfloat/csfloat.js" ],
+      "matches": [ "*://csfloat.com/*" ],
+      "run_at": "document_start"
+   }, {
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/externalMarketHandler.js", "js/otherMarkets/avanmarket/avanmarket.js" ],
+      "matches": [ "*://avan.market/*" ],
+      "run_at": "document_start"
+   }, {
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/externalMarketHandler.js", "js/otherMarkets/gameboost/gameboost.js" ],
+      "matches": [ "*://gameboost.com/counter-strike-2/*" ],
+      "run_at": "document_start"
+   }, {
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "bundle/js/externalMarketHandler.js", "js/otherMarkets/skinplace/skinplace.js" ],
+      "matches": [ "*://skin.place/*" ],
+      "run_at": "document_start"
+   }, {
+      "js": [ "js/checkoutPage.js" ],
+      "matches": [ "*://checkout.steampowered.com/*" ],
+      "run_at": "document_end"
+   }, {
+      "js": [ "js/jquery/jquery-1.10.2.min.js", "js/epicGames/epicGames.js" ],
+      "matches": [ "*://store.epicgames.com/*" ],
+      "run_at": "document_end"
+   }, {
+      "js": [ "js/sih-rep-inject/sih-rep-inject.js" ],
+      "matches": [ "*://sih.app/*", "*://*.sih.app/*", "*://sihrep.com/*", "*://*.sihrep.com/*" ],
+      "run_at": "document_end"
+   } ],
+   "content_security_policy": {
+      "extension_pages": "script-src 'self'; object-src 'self'"
+   },
+   "declarative_net_request": {
+      "rule_resources": [ {
+         "enabled": true,
+         "id": "ruleset_1",
+         "path": "rules.json"
+      } ]
+   },
+   "default_locale": "en",
+   "description": "__MSG_extension_description__",
+   "externally_connectable": {
+      "matches": [ "https://api.steaminventoryhelper.com/*", "https://stats.steaminventoryhelper.com/*", "https://wss-api.steaminventoryhelper.com/*", "*://*.steampowered.com/*", "*://steamcommunity.com/*", "*://store.epicgames.com/*", "*://sih.app/*", "*://*.sih.app/*", "*://sihrep.com/*", "*://*.sihrep.com/*" ]
+   },
+   "homepage_url": "https://chrome.google.com/webstore/detail/steam-inventory-helper/cmeakgjggjdlcpncigglobpjbkabhmjl",
+   "host_permissions": [ "\u003Call_urls>" ],
+   "icons": {
+      "128": "assets/icon128.png"
+   },
+   "incognito": "split",
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1VtB6075FEgL7ORPBwcfR2hXhOXZ92Wg/s87+Odt4ix+NSzKTcnZ9/ln6YIV7sVO/7B8kkL1j5zFUpUGrxTv/+dhs9Vprz1iziulktdLhPHpwoRE8PgmSz5sItmqsArNFEFm4zEkZRjNgZaIG0bL/5BmkE2CjAPUjhYBiVQyFPYaFjGjd077ZMkbmiVCVdyk+8GiUjOlroX6cE9jO04CZW+VikuAU5jLoNzd50WOHDVeMQoukFUtVAIYv1IWvbUYfaseo8t/Z47jF2KivXoggAXFrV/uJiTvMot13XstxpR5yG8xnmZHnh42Q6nY7Ke/HYzTYnB9ftftAFpMBVAj6wIDAQAB",
+   "manifest_version": 3,
+   "name": "Steam Inventory Helper",
+   "options_ui": {
+      "open_in_tab": true,
+      "page": "dist/index.html"
+   },
+   "permissions": [ "notifications", "alarms", "storage", "unlimitedStorage", "background", "webRequest", "declarativeNetRequest", "declarativeNetRequestFeedback", "cookies", "activeTab", "management" ],
+   "short_name": "SIH",
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "2.9.7",
+   "web_accessible_resources": [ {
+      "extension_ids": [  ],
+      "matches": [ "\u003Call_urls>" ],
+      "resources": [ "_locales/*", "font/*", "js/lang/*", "assets/*", "bundle/js/*.js", "js/*.js", "js/*.css", "js/jquery/*.js", "js/lang/*.js", "css/*.css", "css/*.png", "css/*.svg", "js/angular/assets/*" ]
+   } ]
+}

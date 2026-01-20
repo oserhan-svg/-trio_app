@@ -1,0 +1,1824 @@
+{
+  "unpack": "РАСПАКОВКА БУСТЕРОВ",
+  "noreload": "Не обновлять инвентарь во время продажи",
+  "quickbuy": "Быстрая покупка",
+  "reloadinvent": "Обновить инвентарь (alt + R)",
+  "selectitem": "Выбрать предметы",
+  "selectall": "Выбрать все",
+  "turngems": "Превратить в самоцветы",
+  "sendgifts": "Отправить подарком",
+  "cancel": "Отмена",
+  "total": "Общая сумма",
+  "loading": "Загрузка...",
+  "inventvalue": "Стоимость инвентаря",
+  "steamprice": "Цена в Steam",
+  "sold24h": "продано за последние 24 часа",
+  "numowned": "В наличии",
+  "sell1item": "Продать 1 предмет",
+  "sellnitem": "Продать $1 предмета(ов)",
+  "quicksell": "Быстрая продажа за $1",
+  "noitemstoconvertintogems": "Выбранные предметы нельзя превратить в самоцветы.",
+  "confirmitemconversionintogems": "Вы действительно хотите превратить эти предметы в самоцветы? Операция не может быть отменена.",
+  "instantsell": "Мгновенная продажа за $1",
+  "instant_sell_tooltip": "Вам нужно включить кнопку \"Мгновенной продажи\" в разделе \"Настройки\" куда вы будете перенаправлены по клику на кнопку.",
+  "buymissing": "Купить недостающие предметы",
+  "autoaccept": "Подтверждать все предметы автоматически",
+  "autoadjust": "Автоматическое регулирование цены по маркетплейсу",
+  "historynoselect": "Выберите предмет",
+  "sponsors": "Спонсоры SIH",
+  "functions": "Функции",
+  "externalprices": "Внешние цены",
+  "showpriceproviders": "Показать провайдеров цен",
+  "hidepriceproviders": "Скрыть провайдеров цен",
+  "expandall": "Показать все",
+  "collapseall": "Свернуть все",
+  "maxnumprovidersselectedwarn": "Из за размера ячейки предмета невозможно выбрать более 5 провайдеров цен одновременно.",
+  "adjusterrormessage": "ВНИМАНИЕ: При расчете стоимости предмета для покупателя применяется операция округления на стороне Steam. В связи с этим, для некоторых значений полей стоимости предметов - разница между ожидаемой стоимостью и итоговой стоимостью предмета на торговой площадке может отличаться на несколько центов.",
+  "adjusterrormessagetooltip": "Вы можете отключить показ данного предупреждения в настройках SIH: Инвентарь / Отображать предупреждение разницы цен в окне массовой продажи",
+  "adjust_error_message": "ВНИМАНИЕ: Из-за конвертации валюты аккаунта, Steam применяет изменение минимального шага при корректировке цены быстрой продажи, по этому конечная сумма предмета может изменяться в зависимости от валюты аккаунта.",
+  "quick_sell_error_tooltip_1": "ВНИМАНИЕ: Из-за конвертации валюты Steam - изменение цены на $delta невозможно.",
+  "quick_sell_error_tooltip_2": "Минимальный шаг изменения данной цены $diff",
+  "buysetoutofstock": "В данный момент отсутствует в продаже",
+  "showconfirm_text": "Уведомление, если разница цен более",
+  "showconfirm_tooltip": "SIH запросит дополнительное подтверждение, если ваша цена отличается от рыночной более чем на 30% (по умолчанию). Вы можете изменить процент или отключить уведомления вовсе.",
+  "position_tooltip": "Global - рейтинг среди всех известных скинов<br>Local - рейтинг внутри одного скина, в каждой из категорий износа<br><br>Точность определения позиции в рейтинге - 89%",
+  "info": {
+    "viewcm": "Найти на Торговой площадке",
+    "startingAt": "От",
+    "nosales": "Сейчас этот предмет никто не продает.",
+    "last24": "%1$s за последние 24 часа",
+    "volume": "Продано",
+    "sell": "Продать",
+    "noproviders": "К сожалению у нас нет ни одного провайдера цен для данной игры. Пожалуйста пришлите нам сообщение со ссылкой на провайдера которому вы доверяете и которого вы хотели бы видеть в ценах в нашем приложении. Мы обязательно добавим их цены если это возможно."
+  },
+  "inventory": {
+    "slidesAds": {
+      "slide_1_text_1": "удобно и выгодно",
+      "slide_2_text_1": "Торговать с SIH",
+      "slide_2_text_2": "Все преимущества",
+      "slide_3_text_1": "удобно и выгодно"
+    },
+    "title1": "Выбрать источник цен",
+    "title2": "Вторая стоимость",
+    "title3": "Отображать стоимость инвентаря по ценам с другого сервиса",
+    "title4": "ОТМЕНА",
+    "title5": "ГОТОВО",
+    "title6": "Стоимость на других площадках",
+    "title7": "ПЕРЕЙТИ К ПРОДАЖЕ",
+    "title8": "CГРУППИРОВАТЬ",
+    "switcher_load_float_tooltip": "Авто-загрузка флоатов отключена из-за чрезмерной нагрузки на наши сервера",
+    "title9": "ПОЛУЧИТЬ FLOAT",
+    "title10": "ВЫБРАТЬ ПРЕДМЕТЫ",
+    "title11": "ВЫБРАТЬ ВСЁ",
+    "title12": "Показать цены",
+    "title13": "Одновременно в карточку лота может отображаться до 2 цен",
+    "title14": "Провайдер цен",
+    "title15": "ПЕРЕЙТИ",
+    "title17": "Перейти к новому дизайну",
+    "title18": "Выбрано: $1 шт. • ",
+    "mass_dismantle_checkbox": "Подсчет гемов",
+    "title19": "Преобразовать в самоцветы > получите $1 шт.",
+    "title20": "Посмотреть предложения",
+    "title21": "$1 шт.",
+    "title22": "Количество",
+    "title23": "Ввести сумму",
+    "title24": "Выбрать всё",
+    "title25": "Отмена",
+    "title26": "ГОТОВО",
+    "title27": "Группа",
+    "title28": "В этих настройках вы можете изменить отображение игр в инвентаре.",
+    "title29": "Круто, спасибо",
+    "title30": "Теперь вы можете добавлять неограниченное количество фильтров!",
+    "title35": "Мы переехали на новый сервер. Теперь ссылки на маркеты открываются в 2 раза быстрее и без сбоев",
+    "title36": "Отобразить эту панель компактно",
+    "title37": "Настройки инвентаря",
+    "title38": "Упрощенный интерфейс",
+    "display_sih_market_tab": "Отображать SIH Market",
+    "sih_currency": "Валюта SIH",
+    "backlight_brightness": "Регулировка подсветки редкости предметов",
+    "subscribe_button": "Стань адептом SIH! >",
+    "confirm_modal": {
+      "title1": "Подтверждение цены",
+      "userPriceBlock1": "SIH автоматически выставит на продажу",
+      "userPriceBlock2": "предметов по цене в",
+      "userPriceBlock3": "за каждый",
+      "userTotalPriceBlock1": "Общая стоимость по вашей цене",
+      "marketplacePriceBlock1": "Рыночная цена",
+      "continue": "Продолжить",
+      "cancel": "Изменить цену"
+    },
+    "self_rate": "Свой курс"
+  },
+  "market": {
+    "with_fees": "Со сборами",
+    "select_overpriced_1": "Выбрать все",
+    "select_overpriced_2": "С завышенной ценой",
+    "removeselected": "Удалить выбранные",
+    "remove": "Удалить",
+    "reloadlistings": "Перезагрузить лоты (alt + R)",
+    "hidelistings": "Скрыть лоты",
+    "showlistings": "Показать лоты",
+    "total": "Сумма",
+    "minimum": "Мин.цена",
+    "maximum": "Макс.цена",
+    "mybookmarks": "Мои закладки",
+    "general": "Основные",
+    "all": "Все",
+    "addcategory": "Добавить категорию",
+    "sortfloat": "по Float",
+    "viewglws": "Посмотреть на glws",
+    "getfloat": "Получить Float",
+    "stickerwear": "Износ",
+    "priceMarketFrom": "от",
+    "priceMarketBestPrice": "ЛУЧШАЯ ЦЕНа",
+    "priceSteamBestPrice": "STEAM ЦЕНА",
+    "priceMarketButton": "К ПРЕДЛОЖЕНИЯМ",
+    "accordionInventoryDescription": "Описание",
+    "inventoryOfferText": "предложений от",
+    "inventoryOfferText_11": "предложений",
+    "inventoryOfferText_12": "от",
+    "inventoryOffersText": "Предложений",
+    "inventoryPriceFromText": "Цена от",
+    "inventoryLots": "Лоты",
+    "inventoryItems": "шт.",
+    "marketServiceCommission": "Комиссия сервиса уже в цене",
+    "marketPriceLotsTradeLock": "Учитывать цены на лоты с трейд-локом",
+    "exteriorFN": "Прямо с завода",
+    "exteriorMW": "Немного поношенное",
+    "exteriorFT": "После полевых испытаний",
+    "exteriorWW": "Поношенное",
+    "exteriorBS": "Закаленное в боях",
+    "sentenceBlockSettings": "Панель настройки маркетов",
+    "currencies_and_fees": "Валюта и комиссии",
+    "sorting_market": "Сортировка маркетов",
+    "sorting_market_tab": {
+      "plug_text": "Управляйте списком маркетов в инвентаре и на странице предмета с SIH Black!\nНапример, вы можете закрепить на первых местах ваши любимые маркеты, а остальные отсортировать по цене.",
+      "plug_button_text": "Получить SIH Black от",
+      "plug_button_price": "2.33 $",
+      "plug_button_month": "/в мес.",
+      "text_1": "Очерёдность маркетов в панели предложений. Нажимайте на карточки, чтобы активировать их и закрепить в топе. Вы можете изменить порядок закреплённых маркетов перетаскивая соответствующие карточки. Неактивные карточки, без места, сортируются по цене.",
+      "market_active": "- вы задали место маркету",
+      "market_inactive": "- сортировка по цене",
+      "reset": "cбросить"
+    },
+    "currencyPrice": "Цена в валюте",
+    "informationFromSites": "Информация с площадок",
+    "averagePriceOfSiteOffers": "Средняя цена лота",
+    "numberOfLots": "Количество лотов",
+    "numberOfLotsAlert": "Количество одновременно выставленных на продажу лотов, в каждом из магазинов",
+    "tradingPlatformCommissions": "Комиссии торговых площадок, % + фиксированная плата, $",
+    "getFloatAndStickerWear": "Получить данные о скинах",
+    "stickerPriceButton": "Получить цены стикеров",
+    "getAutoFloatAndStickerWear": "Получать данные о скинах, по умолчанию",
+    "load_listing": "Загрузить лоты через SIH",
+    "load_listing_tooltip": "Мы выпустили экстренное обновление, исправляющее баг торговой площадки Steam",
+    "goPage": "Перейти",
+    "pageFrom": "из",
+    "exchangePrice": "На обмен от",
+    "commissionFeesAlert": "Комиссионные сборы (за пополнение счёта, налог на обмен скина в обменнике). Задаётся в % для покупки или обмена предмета.",
+    "betaVersion": "Бета",
+    "feedbackButton": "Я нашёл ошибку",
+    "feedbackStep1Title": "Что случилось?",
+    "feedbackStep1AppTitle": "Проблемы с предложением",
+    "feedbackStep1AppDescription": "Например, цена не совпадает с реальным предложением от маркета",
+    "feedbackStep1SIHTitle": "Ошибки работы SIH",
+    "feedbackStep1SIHDescription": "Напишите нам, если нашли баг или считаете, что какой то функционал работает некорректно",
+    "feedbackStep2AppTitle": "Проблемы с предложением",
+    "feedbackStep2AppSelectMarketTitle": "Выберите маркетплейс,<br/> с которым возникли проблемы:",
+    "feedbackStep2AppOption1": "Цена не совпадает",
+    "feedbackStep2AppOption2": "Маркет не работает в моей стране",
+    "feedbackStep2AppOption3": "Ссылка ведёт на другой предмет",
+    "feedbackStep2AppOption4": "Другое",
+    "feedbackStep2CancelButton": "НАЗАД",
+    "feedbackStep2OkButton": "ПОЖАЛОВАТЬСЯ",
+    "feedbackStep2SIHTitle": "Ошибки работы SIH",
+    "feedbackStep2SIHOption1": "Я нашёл ошибку",
+    "feedbackStepDescriptionPlaceholder": "Расскажите подробнее",
+    "favoritesButton": "В ИЗБРАННОЕ",
+    "blockBestOfferOfMarketplaceTabs1Title": "Описание",
+    "blockBestOfferOfMarketplaceTabs2Title": "Лоты от",
+    "blockBestOfferOfMarketplaceSteamTitle": "STEAM ЦЕНА от",
+    "blockBestOfferOfMarketplaceSteamButton": "Купить в Steam",
+    "blockBestOfferOfMarketplaceMarketTitle": "ЛУЧШАЯ ЦЕНА НА МАРКЕТАХ от",
+    "blockBestOfferOfMarketplaceMarketCommission": "комиссии",
+    "blockBestOfferOfMarketplaceMarketButton": "В магазин",
+    "blockBestOfferOfMarketplaceStatsTitle": "Продано в Steam",
+    "blockBestOfferOfMarketplaceStatsDay": " за день",
+    "blockBestOfferOfMarketplaceStatsWeek": " за неделю",
+    "blockBestOfferOfMarketplaceStatsMonth": " за месяц",
+
+    "blockBestOfferOfMarketplaceCopyItemName": "Скопировать",
+    "blockBestOfferOfMarketplaceCopiedItemName": "Скопировано",
+
+    "marketCommodityOrderSpreadAccordionButtonDown": "ПОКАЗАТЬ БОЛЬШЕ ОРДЕРОВ",
+    "marketCommodityOrderSpreadAccordionButtonUp": "ПОКАЗАТЬ МЕНЬШЕ ОРДЕРОВ",
+    "marketCommodityOrderSpreadMarginTD": "Доходность",
+    "marketCommodityOrderSpreadWithoutFeesTD": "Без комиссий",
+    "marketCommodityOrderSpreadPriceTD": "Цена",
+    "marketCommodityOrderSpreadQuantityTD": "Кол-во",
+    "marketCommodityOrderSpreadSettingsDialogInfo": "Нужно больше данных?",
+    "marketCommodityOrderSpreadSettingsDialogButton": "Настройки",
+    "marketCommodityOrderSpreadSettingsDialogTitle": "Настройка таблицы",
+    "marketCommodityOrderSpreadSettingsDialogDescription": "Задайте отображение нужных столбцов",
+    "marketCommodityOrderSpreadSettingsDialogCancelButton": "Отменить",
+    "marketCommodityOrderSpreadSettingsDialogSaveButton": "Сохранить",
+    "viewLotsProfitability": "Показывать доходность лотов",
+    "searchPaintSeedBlockTitle": "Маркировка по Paint Seed",
+    "searchFloatBlockTitle": "Маркировка по Float",
+    "searchPaintSeedAndFloatBlockButtonTitle": "ПОИСК ПО PAINT SEED И FLOAT",
+    "searchPaintSeedAndFloatBlockSavedFiltersTitle": "Ваши фильтры",
+    "searchPaintSeedAndFloatBlockEditingFilterLink": "Ред.",
+    "searchPaintSeedAndFloatBlockCreatedFilterLink": "+ Сохранить в фильтр",
+    "searchPaintSeedAndFloatBlockDefaultName": "Фильтр",
+    "searchPaintSeedAndFloatBlockNotFilters": "У вас пока нет сохранённых фильтров",
+    "searchPaintSeedAndFloatBlockDeletedFilterLink": "Удалить",
+    "searchPaintSeedAndFloatBlockCreatedValueLink": "+ Добавить поле",
+    "searchPaintSeedAndFloatBlockSaveLink": "Сохранить",
+    "searchPaintSeedAndFloatBlockCancelLink": "Отменить",
+    "searchPaintSeedAndFloatBlockApplyLink": "Применить",
+    "searchPaintSeedBlockValueTitle1": "Введите значение паттерна (1 - 1000)",
+    "searchPaintSeedBlockValueTitle2": "Применён \"$1\"",
+    "searchFloatBlockValueTitle": "Введите крайние значения float",
+    "searchFloatBlockValueFromName": "от",
+    "searchFloatBlockValueToName": "до",
+    "lockAlert": "Предметы с самой низкой ценой, из-за трейд-лока могут быть недоступны для вывода прямо сейчас",
+    "stickerTotalPrice": "Стоимость стикеров",
+    "keychainsTotalPrice": "Цена брелка",
+    "tooltip1": "Переключение режимов загрузки цен. Авто или ручной",
+    "tooltip2": "Нажмите, чтобы загрузить цены",
+    "tooltip3": "Сортировка карточек маркетов и многое другое с",
+    "tooltip4": "Сортировка маркетов по цене",
+    "tooltip5": "место, в вашем списке маркетов",
+    "change": "изменить",
+    "sih_black": "SIH Black",
+    "requestPrice": "Запросить цены",
+    "auto": "АВТО",
+    "manual": "РУЧНОЙ",
+
+    "buy": "Покупка",
+    "trade": "Обмен",
+    "buy_orders": "Покупка",
+    "sell_orders": "Продажа",
+    "tradeInstantly": "Мгновенный обмен",
+    "yourItem": "Ваш предмет",
+    "viewOn": "Смотреть на",
+    "deposit": "Депозит",
+
+    "tooltips": {
+      "your_price": "Ваша цена",
+      "min_market_price": "Минимальная рыночная цена",
+      "cost_all_items": "Стоимость всех предметов",
+      "cost_page_items": "Стоимость предметов с текущей страницы",
+      "order_date": "Дата размещения ордера",
+      "max_market_price": "Максимальная рыночная цена",
+      "number_items": "Количество размещенных ордеров",
+      "lots_number": "Использование иного от представленных значений загружаемых предметов может привести к ошибке Steam при загрузке."
+    },
+
+    "filter_controls": {
+      "sort_markets": "Сортировка маркетов",
+      "by_price": "По цене",
+      "your_sorting": "Ваша сортировка",
+      "change": "Изменить",
+      "close": "Закрыть",
+      "not_specified": "Не задано",
+      "customise": "Настроить"
+    },
+
+    "buy_order_controls": {
+      "reload_required": "Требуется перезагрузка страницы",
+      "need_reload": "Страница будет перезагружена",
+      "reload_page": "Перезагрузить страницу",
+      "reload_automatically": "Перезагружать автоматически",
+      "not_reload_automatically": "Не перезагружать автоматически",
+      "order_placed": "Ордер выставлен",
+      "order_canceled": "Ордер снят",
+      "place_buy_order": "Выставить ордер на покупку",
+      "raise_top": "Поднять в топ стакана",
+      "cancel_order": "Снять ордер",
+      "units": "шт.",
+      "quantity": "Кол-во",
+      "price_per_item": "Цена (за единицу)",
+      "confirm": "Подтвердить",
+      "sub_info": "Поднимайте свои ордера в топ стакана в 2 клика с",
+      "include_current_orders": "Учитывать текущие"
+    },
+    "steam_graph": {
+      "points": "Точки",
+      "hour": "час",
+      "day": "день",
+      "hide_cumulate": "скрыть ликвидность",
+      "show_cumulate": "показать ликвидность"
+    },
+    "stickers_info": {
+      "showing": "Показать",
+      "by_price": "цену наклеек",
+      "by_wear": "износ наклеек"
+    },
+
+    "custom_remove_modal": {
+      "title": "Снять лоты",
+      "sell_listings_text_1": "Вы действительно хотите снять с продажи выбранные предметы",
+      "sell_listings_text_2": "и вернуть их в инвентарь?",
+      "await_listings_text_1": "Вы действительно хотите удалить выбранные запросы на подтверждение предметов",
+      "buy_orders_text_1": "Вы действительно хотите снять выбранные запросы на покупку предметов",
+      "confirm": "Да, снять лоты",
+      "cancel": "Нет"
+    },
+    "resubmit_orders": {
+      "cancel": "Отмена",
+      "confirm": "Подтвердить",
+      "alert_resubmit": "Понимаю. Перевыставить",
+      "save": "Сохранить",
+      "selected": "Выбрано",
+      "items": "предмета(ов)",
+      "drop": "Скинуть",
+      "add": "Добавить",
+      "set_price": "Задать цену вручную",
+      "set_new_price": "Задать новую цену",
+      "attention": "Внимание!",
+      "alert_info_text_1": "Минимальная рыночная цена ниже вашей более чем на",
+      "alert_info_buy_text_1": "Максимальное значение запроса на покупку выше вашего более чем на",
+      "new_price_less_1": "Новая цена меньше предыдущей на",
+      "new_price_discount_1": "Вы сделали очень большую скидку в",
+      "new_price_discount_2": "от текущей рыночной цены.",
+      "new_price_discount_buy_1": "Вы сделали очень большую наценку в",
+      "new_price_discount_buy_2": "от наивысшего значения запроса на покупку.",
+      "new_price_bigger_1": "Новое значение запроса на покупку больше предыдущего на ",
+      "relisting": "Перевыставить",
+      "market_price": "Рыночная цена",
+      "reduce_by": "Снизить на",
+      "increase_by": "Добавить",
+      "of_min_price": "от мин. цены",
+      "of_max_price": "от макс. цены",
+      "enter_all_price": "Введите новую цену для всех предметов",
+      "sub_info": "Перевыстави свои предметы в 2 клика с ",
+      "sub_info_2": "Управляй ордерами <br/> с ",
+
+      "tooltips": {
+        "need_load_price_1": "Загрузите",
+        "need_load_price_2": "цены для их редактирования",
+        "alert_info_edit": "Настроить",
+        "total_after_resubmit": "Стоимость всех предметов после перевыставления",
+        "current_price": "Ваша текущая цена",
+        "edit_alert_1": "Уведомлять, если рыночная цена ниже вашей более чем на",
+        "edit_alert_buy_1": "Уведомлять, если рыночная цена больше вашей более чем на",
+        "edit_delay": "Задержка между снятиями ордеров для обхода ограничений Steam. Рекомендуемый показатель не менее 300ms"
+      },
+
+      "toolbar": {
+        "clear_list": "Очистить список",
+        "show_list": "Показать список",
+        "hide_list": "Скрыть список",
+        "load_info": "Инструменты будут доступны после загрузки цен на все выбранные предметы"
+      },
+      "change_panel": {
+        "title": "Изменена цена"
+      },
+      "edit_alert_modal": {
+        "title": "Редактирование процента"
+      },
+      "edit_delay_modal": {
+        "title": "Редактирование задержки"
+      },
+      "final_modal": {
+        "title": "Перевыставление на продажу",
+        "title_buy": "Перевыставление на покупку",
+        "initial_cost": "Начальная стоимость",
+        "after_resubmit": "После переоценки",
+        "result": "Результат",
+        "you_get": "Вы получите",
+        "you_spend": "Вы потратите"
+      },
+      "progress_panel": {
+        "title": "Перевыставление",
+        "dont_refresh": "Не обновляйте страницу до завершения перевыставления",
+        "reload": "Перезагрузить страницу",
+        "not_relisted_items": "предмета не перевыставились"
+      },
+      "user_confirm_descriptions_modal": {
+        "title_1": "В инвентаре",
+        "title_2_p1_v1": "идентичный",
+        "title_2_p1_v2": "идентичных",
+        "title_2_p2_v1": "предмет",
+        "title_2_p2_v2": "предмета",
+        "title_2_p2_v3": "предметов",
+        "title_3": "",
+        "subtitle": "Выберите предмет который вы хотите перевыставить",
+        "remember_identical_text": "Запомнить выбор для идентичных предметов",
+        "remember_identical_tooltip": "Данная настройка будет запоминать выбор и генерировать перевыставление случайного из идентичных предметов."
+      }
+    },
+    "pagination": {
+      "go_to_page": "Перейти на страницу"
+    },
+    "block_of_marketplace_prices": {
+      "title": "Сравните цены на предмет у наших партнёров",
+      "sort_btn": "Сортировка маркетов",
+      "only_for_subs": "Только в SIH Black"
+    }
+  },
+  "export_market_history": {
+    "title": "Экспорт истории сделок",
+    "text_1": "Теперь Вы можете экспортировать всю историю своих сделок, чтобы проанализировать их. В таблице будут отображаться названия товаров, сумма, полученная от сделки в валюте вашего счета, дата выставления, покупки и другие полезные данные.",
+    "text_2": "Как только Вы выберете количество товаров, историю которых хотите получить, начнется процесс создания файла. Обратите внимание, что чем больший диапазон предметов Вы выберете, тем больше времени займет процесс создания файла.",
+    "text_3": "После того как файл будет создан, вы сможете скачать его, нажав соответствующую кнопку.",
+    "number_items": "Кол-во предметов",
+    "select_range": "Выберите значения",
+    "from": "От",
+    "to": "До",
+    "apply": "Применить",
+    "exclude_non_transaction": "Исключить незавершенные транзакции",
+    "request": "Запрос",
+    "time_remaining": "Оценка оставшегося времени",
+    "seconds": "секунд",
+    "export_csv": "Экспорт .csv файла",
+    "download": "Скачать .csv",
+    "loading": "Загрузка",
+    "tooltip_1": "Если у вас имеются проблемы с визуальным отображением данных в файле, это может быть связано с вашей версией Excel, в таком случае вам нужно выгрузить файл отчётности в Google таблицы - это исправит проблему"
+  },
+  "queue": {
+    "items": "Предметов",
+    "withfee": "Общая стоимость",
+    "withoutfee": "Без комиссии",
+    "manualsell": "Ручная продажа",
+    "autosell": "Автопродажа",
+    "removeitem": "Убрать из очереди",
+    "removelower": "Убрать ниже",
+    "removehigher": "Убрать выше",
+    "removeintrade": "Убрать \"в обмене\"",
+    "removeequipped": "Убрать надетые",
+    "takelower": "Взять ниже",
+    "takehigher": "Взять выше",
+    "emptyprice": "Убрать без цен"
+  },
+  "sort": {
+    "sortitem": "Сортировать",
+    "price": "По цене",
+    "name": "По имени",
+    "float": "По флоат",
+    "blocking": "По времени блокировки",
+    "gems": "По gems",
+    "sticker_price": "По цене наклеек",
+    "pattern": "По паттерну",
+    "knife_phase": "По фазе",
+    "charm_price": "По цене брелоков"
+  },
+  "trade_right_panel": {
+    "actions" : {
+      "title": "Действия",
+      "request_price_btn": "Запросить цены Steam",
+      "request_price_subtext": "Новое",
+      "request_price_input": "Авто запрос цен",
+      "get_float": "Получить Float",
+      "quick_offer": "Быстрый обмен"
+    },
+    "add_trade": {
+      "title": "Добавить в трейд",
+      "input_placeholder": "Ввести цену",
+      "add_lower": "Добавить дешевле",
+      "add_higher": "Добавить дороже"
+    },
+    "remove_trade": {
+      "title": "Убрать из трейда",
+      "input_placeholder": "Ввести цену",
+      "remove_higher": "Убрать дороже",
+      "remove_lower": "Убрать дешевле",
+      "remove_equipped": "Убрать надетые",
+      "remove_in_trade": "Убрать \"в обмене\"",
+      "remove_empty": "Убрать без цен"
+    },
+    "sort": {
+      "title": "Сортировка предметов",
+      "unsorted": "Неотсортированы",
+      "price": "По цене",
+      "float": "По флоат"
+    },
+    "external": {
+      "title": "Внешние цены"
+    }
+  },
+  "tradingcards": {
+    "buyall": "Купить все",
+    "reload": "Обновить список",
+    "dialogtitle": "Купить недостающие карты",
+    "showpopup": "Показать окно покупки карт"
+  },
+  "profile": {
+    "communityban": "Бан сообщества",
+    "tradeban": "Трейд бан",
+    "vacban": "VAC бан",
+    "none": "Нет",
+    "banned": "Бан",
+    "registration": "Присоединился к Steam",
+    "about_friend": "Друзья с",
+    "about_friend_days": "Друзья",
+    "permanent_link": "Постоянная ссылка"
+  },
+  "badges": {
+    "craft_badges_button": "Создать доступные значки",
+    "craft_selected_button": "Создать выбранные значки",
+    "craft_completed": "Создание завершено",
+    "badges_crafted": "Значков создано",
+    "need_cardsets": "Необходимо наборов карточек",
+    "your_level": "Твой следующий уровень",
+    "levelup": "Поднять уровень",
+    "buy_cards": "Купить карточки",
+    "take_into_account_cards": "Учитывать карточки в инвентаре",
+    "scanning": "Сканируем",
+    "craft_menu": "Крафт меню",
+    "craft_notification": "От интервалов зависит, с какой частотой будет происходить крафт комплектов. По умолчанию - 3 секунды.Но если вы параллельно хотите сёрфить страницы стима, то советую выставить интервал побольше. Чтобы уменьшить частоту запросов в Steam",
+    "popup_title1": "Изготовление значков",
+    "popup_subtitle": "Интервалы",
+    "popup_milliseconds": "мс",
+    "games": "Игры",
+    "crafting_process": "Создание значков... Пожалуйста, не закрывайте модальное окно",
+    "popup_done": "Окей"
+  },
+  "tradeoffers": {
+    "latest_friends": {
+      "title": "Ваши недавние трейды с...",
+      "empty_list": "Нет недавних трейдов"
+    },
+    "removeall": "Убрать все",
+    "takeall": "Взять все",
+    "totalprice": "Общая стоимость",
+    "notrash": "Без мусора",
+    "skipintrade": "Убрать предметы \"в обмене\"",
+    "noduplicate": "Без дубликатов",
+    "noofitems": "Количество предметов",
+    "recount": "Пересчитать",
+    "youritems": "Ваши предметы",
+    "theiritem": "Предметы друга",
+    "filter": {
+      "sort": {
+        "time_new": "Сначала новые",
+        "time_old": "Сначала старые",
+        "price_request": "Требуется загрузка цен",
+        "profit_desc": "Профит % по убыванию",
+        "profit_asc": "Профит % по возрастанию",
+        "name_asc": "Ник отправителя A-Z",
+        "name_desc": "Ник отправителя Z-A"
+      },
+      "title_incoming": "Входящие",
+      "title_sent": "Отправленные",
+      "prices": "Цены:",
+      "reload": "Перезагрузить цены",
+      "enter_float_text_1": "Для получения флоат",
+      "enter_float_text_2": "введите свой API key",
+      "update_float_text_1": "Необходимо обновить API key"
+    },
+    "lots": "Лоты",
+    "your_lots": "Ваши лоты",
+    "units": "шт.",
+    "load_prices": "Загрузить цены",
+    "fast_accept": "Быстро принять",
+    "offers": "Предлагает:",
+    "for_your": "За ваши:",
+    "you_requested": "Вы запросили:",
+    "items": "Предметов:",
+    "cost": "Стоимость",
+    "profits": {
+      "normal": "Приемлемо",
+      "profit": "Вам выгодно",
+      "lose": "Вам не выгодно"
+    },
+    "show_message": "Показать сообщение",
+    "hide_message": "Скрыть сообщение",
+    "mobile_confirmation": "Подтвердите обмен на мобильном устройстве",
+    "trade_accepted": "Трейд принят",
+    "accepting": "Принятие...",
+    "not_accept": "Не удалось принять трейд",
+    "ads_notification": "SIH Black без рекламы",
+    "get_prices": "Получить цены",
+    "keys": "Ключи",
+    "trading_cards": "Карточки",
+    "sent": "Отправленные",
+    "received": "Полученные"
+  },
+  "nontradable": {
+    "counter": "предметов не доступных для обмена",
+    "startdate": "Первые доступны с",
+    "lastdate": "Последние доступны с",
+    "totalprice": "Всего"
+  },
+  "gameinfo": {
+    "at": "в",
+    "on": "на",
+    "info": "инфо",
+    "historical": "Исторический минимум",
+    "bestprice": "Лучшая цена",
+    "savings": "Вы экономите",
+    "checkit": "Проверить на",
+    "online": "Сейчас онлайн",
+    "updatedAt": "Обновлено"
+  },
+  "badgeprogress": {
+    "title": "Прогресс значка",
+    "progressText": "$1 из $2 карточек ($3%)",
+    "badgeNotUnlocked": "Не разблокирован",
+    "viewBadge": "Перейти на страницу значка",
+    "viewBadgeProgress": "Перейти на страницу значка"
+  },
+  "accountinfo": {
+    "purchases": "Покупки в магазине",
+    "transactions": "Транзакции на маркете",
+    "gifts": "Покупки подарков",
+    "ingame": "Внутриигровые покупки",
+    "total": "Всего потрачено",
+    "refresh_btn": "Обновить историю трат",
+    "refresh_text": "Эта кнопка позволяет обновить данные о потраченных средствах в магазине Steam",
+    "error_text": "Ошибка Steam: не удалось обновить историю трат"
+  },
+  "gamecards": {
+    "storelink": "Страница в магазине"
+  },
+  "event_cards": {
+    "btn_text": "Сбор осенних наград",
+    "btn_tooltip": "Вы можете получить предмет один раз в день. Ваш аккаунт должен быть активирован",
+    "progress_info": "Сканируем:",
+    "complete_text": "Готово!"
+  },
+  "cart": {
+    "add_to_cart": "В корзину",
+    "clear_all": "Очистить всё",
+    "timer_tooltip": "Цена актуальна в течение указанного времени"
+  },
+  "notifications": {
+    "sih_notifications": "Уведомления SIH",
+    "title": "Уведомления",
+    "mark_read": "Отметить всё как прочитанное",
+    "today": "Сегодня",
+    "no_notifications": "Нет уведомлений",
+    "missing_notification": "У меня пропали все уведомления",
+    "download": "Download",
+    "market_local": "SIH Market. Локальное уведомление",
+    "cases_local": "SIH Market. Локальное уведомление",
+    "market_server": "SIH Market. Серверное уведомление",
+    "not_processed": "Уведомление не обработано"
+  },
+  "notification_popup": {
+    "steam error": "Ошибка Steam",
+    "error": "Ошибка",
+    "errors": {
+      "rate_limit_exceeded": "Превышен лимит запросов. Повторите попытку позже"
+    },
+    "warnings": {
+      "need_confirmation": "Необходимо подтверждение покупки на мобильном телефоне или SDA"
+    },
+    "warning": "Внимание"
+  },
+  "TOS": {
+    "tos_1": "Я ознакомлен с",
+    "tos_2": "Правилами и условиями",
+    "tos_3": "Так же...",
+    "tos_tooltip": "Так же, я подтверждаю, что не являюсь гражданином, резидентом или не подключаюсь к сайту находясь на территории следующих стран: Объединенные Арабские Эмираты"
+  },
+  "sihAppMarket": {
+    "global": {
+      "delete": "Удалить",
+      "not_available": "Нет в наличии",
+      "units": "шт",
+      "total": "Всего",
+      "delete_all": "Удалить всё",
+      "remove_all": "Снять всё",
+      "select_all": "Выбрать всё",
+      "add_bookmark": "В избранное",
+      "remove_bookmark": "Удалить из избранного"
+    },
+    "cart": {
+      "title": "Добавлено в корзину",
+      "title_empty": "Моя корзина",
+      "empty_title": "Сейчас здесь пусто",
+      "empty_text": "Покупайте на странице предмета Steam",
+      "info_message_1_text_1": "Перед покупкой создадим вам SIH аккаунт (привязанный к вашему Steam ID), баланс которого нужно пополнить. Далее покупка будет совершена автоматически, путём списания необходимой суммы.",
+      "info_message_1_text_2": "Зачем мне SIH аккаунт?",
+      "buy_now": "Купить сейчас",
+      "continue": "Продолжить покупки"
+    },
+    "ordering": {
+      "title": "Оформление",
+      "items": "предметов",
+      "plug_text_1": "На вашем балансе недостаточно средств",
+      "plug_text_2": "Для оплаты пополните баланс, покупка будет совершена автоматически.",
+      "available_items": "Доступно для покупки сейчас -",
+      "unavailable_items": "Требует пополнения баланса -",
+      "buy_on_steam": "Купить на Steam ID",
+      "your_balance": "У вас на балансе SIH",
+      "not_enough_balance": "Не хватает на предметы",
+      "summary": "Итого",
+      "available_item_now": "Предметов доступно сейчас",
+      "for_all": "За всё",
+      "buy_available": "Купить доступное",
+      "buy_available_tooltip": "После нажатия, мы спишем с вашего баланса сумму, необходимую для покупки доступных предметов.",
+      "buy_all": "Пополнить баланс и купить всё",
+      "buy_all_tooltip": "После нажатия кнопки мы спишем с вашего баланса сумму, необходимую для покупки имеющихся товаров. Для покупки товаров, требующих пополнения, мы направим вас для пополнения баланса через платежную систему.",
+      "info_text": "После пополнения баланса на требуемую сумму, покупка будет совершена автоматически."
+    },
+    "orders": {
+      "statuses": {
+        "ordering": "Формируем счёт на оплату",
+        "pending": "Ожидается оплата",
+        "new": "Создание нового заказа",
+        "created": "Заказ создан",
+        "processing": "Отправка трейда",
+        "sent": "Трейд отправлен",
+        "finished": "Заказ завершён успешно",
+        "failed": "Заказ не удался",
+        "penalized": "Отправлен на модерацию"
+      },
+      "errors": {
+        "not_enough_balance": "Недостаточно средств",
+        "time_refills_up": "Время пополнения истекло",
+        "receiver_failed": "Проблема с отправкой или получением трейда",
+        "max_retries_reached": "Предмет был куплен другим пользователем"
+      },
+      "my_sih_orders": "Мои заказы в SIH",
+      "title": "Мои заказы",
+      "tab_active": "Активные заказы",
+      "tab_history": "История заказов",
+      "subtab_skins": "Предметы",
+      "subtab_keys": "Игры",
+      "plug_active_title": "Пока нет активных заказов",
+      "plug_history_title": "Пока нет истории заказов",
+      "plug_text": "Покупайте на странице предмета steam или в разделе SIH market",
+      "order": "Заказ",
+      "sender": "Отправитель",
+      "trade_number_text": "Номер трейда",
+      "order_date": "Дата заказа",
+      "purchased_on_steam": "Куплено на Steam ID",
+      "cancel_purchase": "Отменить покупку",
+      "pay": "Оплатить",
+      "payment": "Оплата",
+      "pending_payment": "ожидает оплаты",
+      "pending_payment_tooltip": "Если на вашем балансе достаточно средств, оплата произойдёт автоматически",
+      "open": "Открыть",
+      "go_to_trades": "Перейти к трейдам",
+      "successful_operation": "Успешная покупка!",
+      "price": "Цена",
+      "cancel_info": "Мы пришлём трейд или отменим заказ через"
+    },
+    "listing_lot": {
+      "sih_best_price": "SIH цена",
+      "best_price": "Лучшая цена от",
+      "delivery": "Быстрая доставка",
+      "add_cart": "В корзину",
+      "current_rate": "Текущий курс:",
+      "buy_for": "Купить за",
+      "in_cart": "В корзине",
+      "already_in": "Уже в",
+      "processing": "обработке"
+    },
+    "plug_steam_guard": {
+      "title": "Ваш аккаунт не защищен Steam Guard",
+      "info_text": "Согласно правилам Steam, для совершения торгов нужна защита Steam Guard",
+      "setup": "Настройка Steam Guard",
+      "learn_more_guard": "Подробнее о Steam Guard",
+      "learn_more_guard_mobile": "Подробнее о мобильном аутентификаторе Steam Guard"
+    },
+    "topSales": {
+      "title": "Покупай дешевле чем в Steam:",
+      "name": "Имя",
+      "sales_week": "Продажи 7д",
+      "sih_price": "SIH Цена",
+      "profit": "Профит",
+      "plug_tab": {
+        "title": "Мы не получили данные",
+        "text_1": "Такое иногда бывает, с другой попытки всё получится",
+        "text_2": "Запросить данные ещё раз"
+      },
+      "pagination": {
+        "showing": "Показываем",
+        "of": "из",
+        "results": "результатов"
+      },
+      "filter": {
+        "title": "SIH Market фильтр",
+        "reset": "Сбросить",
+        "sih_market_price": "SIH Market цена",
+        "steam_price": "Steam цена",
+        "from": "от",
+        "to": "до",
+        "weekly_sales": "Продажи за неделю",
+        "profit_percent": "Профит в %",
+        "name_search": "Поиск по названию",
+        "more_filters": "больше фильтров"
+      }
+    },
+    "filter_category": {
+      "all": "Всё",
+      "balance": "Под ваш баланс"
+    },
+    "user_account_info": {
+      "day": "день",
+      "day_2": "дня",
+      "days": "дней",
+      "refill_balance": "Пополнить SIH баланс"
+    },
+    "errors": {
+      "not_found_auth": "Отсутствует авторизация в sih"
+    }
+  },
+  "subscribeAds": {
+    "modal": {
+      "subscriptionInfo": {
+        "sorryInfo": {
+          "title": "Мы тоже не в восторге от рекламы",
+          "text": "Но она помогает нам развиваться и улучшать SIH для Вас! <br /> Приобретайте подписку SIH Black, получайте кучу полезных фишек и больше никакой рекламы!"
+        },
+        "title": "Ваш новый уровень эффективности",
+        "subtitle": "Торгуйте с максимальным профитом со сравнением цен, легко управляйте своим Steam инвентарём с плагином SIH, держите руку на пульсе рынка скинов с нашей аналитикой",
+        "button_1": "Получить SIH Black от 2.33 $/в мес.",
+        "soon": "Скоро!",
+        "with_sih_black": "C SIH Black",
+        "without_sih_black": "Без SIH Black",
+        "in_sih": "В Steam Inventory Helper для Steam",
+        "sih_option_1": "Управление списком маркетов",
+        "sih_option_1_tooltip": "Управляйте списком маркетов в инвентаре и на странице предмета с SIH Black! Например, вы можете закрепить на первых местах ваши любимые маркеты, а остальные отсортировать по цене.",
+        "sih_option_2": "Нет рекламы",
+        "sih_option_2_tooltip": "Никакой баннерной рекламы",
+        "sih_option_3": "Перевыставление ордеров на продажу на торговой площадке Steam",
+        "sih_option_3_tooltip": "Перевыставляйте свои ордеры на продажу по выбранной цене или же выставите их по самой выгодной за пару кликов!",
+        "sih_option_4": "Поднятие запроса за покупку в топ",
+        "sih_option_4_tooltip": "Поднимайте свой запрос на покупку предмета всего в 2 клика.",
+        "sih_option_5": "Отображение цены на все состояния предмета разом",
+        "sih_option_5_tooltip": "Теперь Вы сразу видите актуальные цены на все состояния предмета на его странице в Steam.",
+        "in_sih_app": "В sih.app",
+        "sih_app_option_1": "Верхний уровень цен предметов в сравнении цен",
+        "sih_app_option_1_tooltip": "Ищите выгодные предложения без ограничений максимальной стоимости предметов",
+        "sih_app_option_1_without": "До 5$",
+        "sih_app_option_1_with": "Нет",
+        "sih_app_option_2": "Расширенный список торговых площадок",
+        "sih_app_option_2_tooltip": "Ищите выгодные предложения по всем доступным торговым площадкам",
+        "sih_app_option_3": "Самые актуальные цены Steam Buy и Sell ордеров",
+        "sih_app_option_4": "Обзор рынков. Аналитика"
+      },
+      "selectingPlan": {
+        "title": "SIH Black",
+        "sih_balance": "SIH Баланс",
+        "payment_method": "Способ оплаты",
+        "payment_message_info": "Множество способов пополнения и низкие комиссии",
+        "sub_packages": "Пакеты подписки",
+        "support_sih_now": "Я хочу поддержать SIH",
+        "buy_sub": "Купить подписку",
+        "refill": "Пополнить"
+      },
+      "activePlan": {
+        "title": "Спасибо за поддержку",
+        "active": "Активно",
+        "days_left": "Осталось дней",
+        "hours_left": "Осталось часов"
+      },
+      "enterPassword": {
+        "title": "Введите пароль двухэтапной аутентификации",
+        "enter_pwd": "Введите пароль",
+        "forgot_pwd": "Я забыл пароль",
+        "trade_rule_1": "Подтверждаю, что ознакомился с",
+        "trade_rule_2": "правилами торговли",
+        "continue": "Продолжить"
+      },
+
+      "month": "в мес.",
+
+      "second_title": "Спасибо",
+      "back": "Назад",
+      "edit": "Изменить",
+      "save": "Сохранить",
+      "cancel": "Отмена",
+      "text_3": "Введите ваш е-mail, он нужен для перехода к cовершению транзакции через выбранную платёжную систему.",
+      "text_4": "E-mail для платёжной системы",
+      "support_options": "Варианты поддержки",
+      "plan_every_week_name": "SIH пионер",
+      "plan_every_month_name": "Друг SIH",
+      "plan_every_month_period": "1 месяц",
+      "plan_every_3_month_name": "Фанат SIH",
+      "plan_every_3_month_period": "3 месяца",
+      "plan_every_6_month_name": "Адепт SIH",
+      "plan_every_6_month_period": "6 месяцев",
+      "plan_for_one_year_name": "SIH бро",
+      "plan_for_one_year_period": "1 год",
+
+      "questions": "У меня проблема",
+      "support_sih_later": "Может быть позже",
+      "complete_payment": "Завершить платёж",
+      "complete_payment_stripe": "Завершить платёж на Stripe",
+      "complete_payment_gamemoney": "Завершить платёж на GameMoney",
+
+      "reload_page": "Перезагрузить страницу",
+      "what_is_black": "Что даёт SIH Black?",
+      "okey": "Хорошо",
+      "sub_management": "Управление подписками",
+      "in_wallet": "В кошельке",
+      "not_enough_funds": "Недостаточно средств",
+      "total": "Итого"
+    }
+  },
+  "sihCases": {
+    "drops_from": "Можно найти в",
+    "free_simulation": "Бесплатная Симуляция",
+    "case_simulation": "Симуляция кейса",
+    "demo_opening": "Демо открытие",
+    "fast_opening": "Открыть Быстро",
+    "refill": "Пополнить",
+    "spin": "Крутить",
+    "accelerate": "Ускорить",
+    "accelerated": "Ускорено",
+    "buy_for": "Купить за",
+    "buy_in": "Купить в",
+    "psc": "шт",
+    "sale_on": "Продажа",
+    "cases": "Кейсы",
+    "name": "Название",
+    "price": "Цена",
+    "opening_price": "Цена открытия",
+    "profitability": "Доходность",
+    "markets": "Маркеты",
+    "prices": "Цены",
+    "all_cases": "Все кейсы",
+    "back": "Назад",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "result": "Результат",
+    "wear": "Износ",
+    "chance": "Шанс",
+    "all": "Все",
+    "item": "Предмет",
+    "source": "Источник",
+    "status": "Статус",
+    "sell_all": "Продать всё",
+    "withdraw_all": "Вывести всё",
+    "sell": "Продать",
+    "sell_for": "Продать за",
+    "withdraw": "Вывести",
+    "reset": "Сбросить",
+    "steam_cases": "Steam Кейсы",
+    "sih_cases": "SIH Кейсы",
+    "today": "Сегодня",
+    "special_items": "Редкие предметы",
+    "reset_zoom": "Сброс масштаба",
+    "inventory_plug": "У вас еще нет предметов в инвентаре, симулируйте открытие кейса, чтобы заполнить инвентарь и вывести предметы",
+    "history_plug": "У вас еще нет предметов в истории, симулируйте открытие кейса, чтобы заполнить инвентарь и вывести предметы",
+    "withdraw_plug": "У вас еще нет предметов в выводах, симулируйте открытие кейса, чтобы заполнить инвентарь и вывести предметы",
+    "top_gains_plug": "Не удалось найти Топ Прирост.",
+    "hot_drops_plug": "Не удалось найти Горячие Дропы.",
+    "confirm_modal": {
+      "sell_title": "Подтверждение продажи",
+      "withdraw_title": "Подтверждение вывода",
+      "withdraw_text_1": "Вы действительно хотите запустить вывод всего вашего инвентаря?",
+      "sell_text_1": "Вы действительно хотите продать весь ваш инвентарь?",
+      "do_not_show_again": "Больше не показывать"
+    },
+    "settings_modal": {
+      "title": "Настройки",
+      "select_currency": "Выбрать валюту"
+    },
+    "statuses": {
+      "nothing": "В инвентаре",
+      "sold": "Продан",
+      "created": "Создан",
+      "processing": "В обработке",
+      "sent": "Отправлен",
+      "finished": "Выведен",
+      "failed": "Возврат средств",
+      "refund_text": "На баланс начислено"
+    },
+    "server_errors": {
+      "suitcase_not_found": "Кейс не найден",
+      "case_not_real": "",
+      "case_disabled": "Кейс выключен",
+      "suitcase_content_not_found": "Предметы кейса не найдены",
+      "invalid_number_of_rolls": "Некорректное количество открытий",
+      "case_available_only_for_real_open": "Кейс доступен только для платного открытия",
+      "no_available_items": "Нет доступных предметов"
+    },
+    "local_errors": {
+      "case_list_error": "Не удалось загрузить список кейсов. Повторите попытку позже.",
+      "items_list_error": "Не удалось загрузить предметы кейса. Повторите попытку позже.",
+      "inventory_list_error": "Не удалось загрузить данные инвентаря. Повторите попытку позже.",
+      "withdraw_list_error": "Не удалось загрузить данные выводов. Повторите попытку позже.",
+      "sell_all_error": "Ошибка продажи всех предметов. Пожалуйста повторите попытку.",
+      "withdraw_all_error": "Ошибка вывода всех предметов. Пожалуйста повторите попытку.",
+      "sell_error": "Ошибка продажи. Пожалуйста повторите попытку.",
+      "withdraw_error": "Ошибка продажи. Пожалуйста повторите попытку.",
+      "top_gains_error": "Не удалось загрузить данные Топ Прироста. Повторите попытку позже.",
+      "hot_drops_error": "Не удалось загрузить данные Горячих Дропов. Повторите попытку позже."
+    },
+    "tab_controls": {
+      "items_in_case": "Предметы в кейсе",
+      "statistics": "Статистика",
+      "inventory": "Инвентарь SIH",
+      "history": "История Симуляций",
+      "withdrawal": "Вывод Симуляций",
+      "top_gains": "Топ Прирост",
+      "hot_drops": "Горячие дропы",
+      "cs2_items_history": "История предметов CS2"
+    },
+    "statistics": {
+      "opening_statistics": "Статистика открытий",
+      "total_open": "Всего открыто",
+      "spent": "Потрачено",
+      "gained": "Получено",
+      "profit": "Профит",
+      "quality": "Качество",
+      "items": "Предметы",
+      "dropped_items": "Выпавшие предметы",
+      "dropped": "Выпало",
+      "price_psc": "Цена за 1 шт.",
+      "sum": "Сумма",
+      "reset_statistics": "Сбросить статистику"
+    },
+    "tooltips": {
+      "roi": "<b>ROI (Return on Investment)</b> - это популярная единица измерения для оценки рентабельности открытия кейса на данный момент. Мы рассчитываем его следующим образом: (средняя стоимость каждого товара в кейсе) / (стоимость кейса + стоимость открытия) * 100",
+      "profit": "Профит - это сумма шансов всех предметов, которые могут выпасть из кейса, стоимость которых выше стоимости открытия кейса.",
+      "profitability": "Доходность - минимальная и максимальная цена среди всех выпадаемых предметов из кейса."
+    },
+    "inventory_filter": {
+      "new_first": "Сначала новые",
+      "old_first": "Сначала старые"
+    },
+    "drops_filter": {
+      "day": "День",
+      "week": "Неделя",
+      "month": "Месяц",
+      "month_3": "3 Месяца"
+    }
+  },
+  "skinsRefilling": {
+    "exchange_for": "Обменять на",
+    "modal": {
+      "title_1": "Обменять",
+      "753": "самоцветы",
+      "440": "ключи",
+      "title_2": "и получить",
+      "title_3": "на SIH Баланс",
+      "text_1": "Вы <br> меняете",
+      "text_2": "Принимаете трейд <br> от нашего бота",
+      "text_3": "Средства поступят <br> на SIH баланс",
+      "button": "Перейти к обмену на SIH.app",
+      "top_sales_title": "С помощью SIH Баланса Вы сможете купить"
+    }
+  },
+  "refillBalance": {
+    "info_message": {
+      "title": "Информация о пополнении",
+      "text_1": "Платежи обычно обрабатываются в течении 15 минут, но иногда бывают задержки до 2 часов.",
+      "text_2": "После поступления средств на баланс, вы сможете оплатить подписку SIH Black.",
+      "text_3": "Узнать свой текущий баланс и статус подписки - ",
+      "btn_text": "Понял",
+      "refill_terms": "Больше не показывать"
+    },
+    "title": "Пополнить SIH Баланс",
+    "subtitle": "На",
+    "payment_country": "Страна пополнения",
+    "payment_method": "Метод оплаты",
+    "bank_title": "С банковской карты",
+    "crypt_title": "Криптовалютой",
+    "wallet_title": "Через платёжные системы",
+    "and": "и ещё",
+    "more_currencies": "валюты"
+  },
+  "itemWearLinks": {
+    "showPrices": "Показать цены",
+    "hidePrices": "Скрыть цены",
+    "wear": "Износ",
+    "subTooltip": "Загружайте цены с ",
+    "noPrice": "Нет цены"
+  },
+  "friends": {
+    "info_message": "Для получения расширенной информации о каждом пользователе, вам необходимо ввести свой API key в настройках"
+  },
+  "removeAds": "Убрать рекламу",
+  "settings": "Настройки",
+  "selectItemCount": "Выбрать $1 предмета(ов)",
+  "filtrationHistoryMarketName": "Фильтр событий",
+  "filters": "Фильтры",
+  "uploadHistoryMarket": "Еще $1",
+  "collapseHistoryMarket": "СВЕРНУТЬ ДОПОЛНИТЕЛЬНЫЕ СТРОКИ",
+  "historySaleSlotPlaced": "Лот размещен",
+  "historySaleSlotRemoved": "Лот снят",
+  "historySaleSlotPurchased": "Лот куплен",
+  "historySaleSlotSold": "Лот продан",
+  "historyTotal": "Всего",
+  "filterPaintSeedBtn": "Фильтровать по Paint Seed",
+  "filterPaintSeedState": "Применить фильтры по Paint Seed",
+  "filterPaintSeedPlaceHolderNewFilter": "Введите название",
+  "filterPaintSeedNewBtn": "Создать фильтр",
+  "filterPaintSeedSelectLabel": "Выбрать сохраненный фильтр",
+  "filterPaintSeedSettingLabel": "Введите паттерн, через запятую:",
+  "filterPaintSeedNewSettingBtn": "Добавить поле",
+  "filterFloatBtn": "Фильтровать по Float",
+  "filterFloatGlobalBtn": "Глобальный",
+  "filterFloatState": "Применить фильтры по Float",
+  "filterFloatPlaceHolderNewFilter": "Введите название",
+  "filterFloatNewBtn": "Создать фильтр",
+  "filterFloatSelectLabel": "Выбрать сохраненный фильтр",
+  "filterFloatSettingLabel": "\"$1\" float value $2 - $3:",
+  "filterFloatSettingLabelFrom": "от",
+  "filterFloatSettingLabelTo": "до",
+  "filterFloatNewSettingBtn": "Добавить поле",
+  "contributedby": "",
+  "savebuttontitle": "Сохранить",
+  "selectMultiple": "Выбрать",
+  "chooseAll": "Выбрать все",
+  "howManyDoYouWantToChoose": "Сколько вы хотите выбрать?",
+  "show": "Показать",
+  "reset": "Сбросить",
+  "search": "Поиск",
+  "manifestModalHeader": "Уважаемые пользователи SIH",
+  "manifestModalContentPt1": "В связи с переходом расширения на стандарты Google Manifest v3, старые версии Steam Inventory Helper потеряют часть функционала, в частности: автоматическое принятие трейдов, перевыставление предметов, получение информации о ценах и т. д. Чтобы не потерять возможности расширения, необходимо установить новую версию приложения, которая обновится автоматически, как только будет готова. Для этого потребуется предоставить новой версии дополнительные разрешения. Рассмотрим некоторые из них:<br><br><strong>declarativeNetRequest</strong>, <strong>declarativeNetRequestFeedback</strong> и <strong>cookies</strong> — эти разрешения необходимы для восстановления текущего функционала. Ранее эти разрешения были доступны всем приложениям по умолчанию во второй версии манифеста, сейчас они вынесены в отдельные пункты.<br><br><strong>management</strong> — API chrome.management необходим для определения, какие приложения используются вместе с SIH. Это нужно для нескольких целей:<br><br>Избежание конфликтов с другими приложениями, когда совместная работа приводит к сбоям в отображении данных на странице, на самой странице или в функционале SIH.<br><br>Борьба со скамерами. Мы часто получаем жалобы о краже скинов, и во время расследований выясняем, что у пользователей установлены приложения, которые подменяют трейды или автоматически покупают предметы с завышенной ценой. Мы сможем собирать списки таких приложений и предупреждать пользователя о наличии угроз для его аккаунта в Steam.<br><br><strong>unlimitedStorage</strong> — нужно для ускорения работы приложения за счет использования более 5 МБ памяти.<br><br><strong>chrome.proxy</strong> — для удобства пользования международными площадками. Это необходимо, чтобы запросы на сторонние площадки, такие как Buff, были доступны напрямую пользователю без использования сторонних VPN-сервисов.<br><br>Мы стараемся не только сохранить весь функционал, но и добавить новые возможности, такие как сравнение цен предметов с другими площадками и ускорение процесса загрузки цен напрямую. Для этого мы вынуждены изменить формат разрешений и запрашивать у вас дополнительные, включая доступ ко всем сайтам. Этот доступ необходим для прямых запросов к источникам цен, не используя наши сервера. Мы будем запрашивать его единожды, чтобы избежать повторных запросов. Вы всегда сможете запретить любой доступ в настройках расширения.<br><br>SIH продолжает оставаться прозрачным, поэтому все изменения и разрешения будут описаны и добавлены в нашу обновленную ",
+  "manifestModalContentPt2": " и ",
+  "manifestModalContentPt3": " Детали перехода и все обсуждения Вы можете найти здесь:",
+  "manifestSocial": "https://t.me/sihofficial_ru",
+  "disableNotification": "Отключить уведомление",
+  "privacyPolicy": "Политику Конфиденциальности",
+  "serviceRules": "Правила сервиса",
+  "privacyPolicyLabel": "Политики Конфиденциальности",
+  "serviceRulesLabel": "Правилами сервиса",
+  "manifestCheckboxLabelPt1": "Я подтверждаю, что полностью ознакомлен с изменениями ",
+  "manifestCheckboxLabelPt2": " и ",
+  "manifestCheckboxLabelPt3": " в связи с переходом расширения SIH на стандарты Google Manifest v3",
+  "buy": "Купить",
+  "externalStoreTooltip": "Хотите добавить сюда свой магазин?\nСвяжитесь с нами - csinvhelp@gmail.com",
+  "tradeConfirmationFrom": "Подтверждение трейда от",
+  "marketConfirmation": "Подтверждение маркет за",
+  "accept": "Подтвердить",
+  "reject": "Отклонить",
+  "selling_delay": "Установить интервал между выставлением ордера на продажу",
+  "millisec": "мс",
+  "delay": "Задержка",
+  "external_injection": {
+    "add_market": "Как добавить свой магазин?",
+    "more_info": "Больше информации",
+    "modal_text": "Если хотите видеть свой магазин в списке сравнения, а также с пожеланиями и предложениями, пишите нам на почту",
+    "or": "или",
+    "self_rate": "Свой курс"
+  },
+  "remove_all_games": "Удалить все игры",
+  "timer": {
+    "day": "д",
+    "hour": "ч",
+    "minute": "м",
+    "second": "с",
+    "remains": "осталось"
+  },
+  "game_filters": {
+    "title": "Фильтры игр",
+    "cart": "Из вашей корзины",
+    "mixed": "Со смешанными отзывами",
+    "negative": "С отрицательными отзывами",
+    "between": "Между",
+    "and": "и",
+    "positive_reviews": "положительных обзоров",
+    "number_reviews": "Количество обзоров",
+    "discount": "Процент скидки",
+    "min": "мин",
+    "max": "макс"
+  },
+  "rewards": {
+    "get_all_free": "Получи предметы бесплатно",
+    "loading": "Загрузка...",
+    "received": "Получено",
+    "non_available": "Нет доступных",
+    "scanning": "Сканирование",
+    "processing": "Обработка",
+    "steam_error": "Произошла Steam ошибка",
+    "notification_text": "Вы можете проверить возможность получения бесплатных предметов Steam!",
+    "btn_accept": "Перейти",
+    "btn_disable": "Не уведомлять",
+    "modal_title": "Настройки нотификаций",
+    "modal_checkbox_text": "Уведомлять меня каждые 24ч о новых предметах Steam",
+    "notification_steam_error_msg": "Произошла ошибка при выполнении запроса. Пожалуйста, повторите попытку!",
+    "notification_non_available_warn_msg": "Нет доступных предметов для получения.",
+    "modal": {
+      "inventory_link": "В инвентарь",
+      "title_pt1": "Поздравляем! Вы получили",
+      "title_pt2_v1": "предмет",
+      "title_pt2_v2": "предмета",
+      "title_pt2_v3": "предметов",
+      "title_pt3": "бесплатно"
+    },
+    "available_modal": {
+      "title": "Предметы доступные к бесплатному получению",
+      "btn": "Забрать"
+    }
+  },
+  "select_locked": "Выделять заблокированные",
+  "item_visible": "Предмет будет виден пользователям через",
+  "show_item_info": "Показать информацию",
+  "hide_item_info": "Скрыть информацию",
+  "comment_deleting": {
+    "delete_all": "Удалить все комментарии",
+    "dialog_title": "Удаление комментариев",
+    "confirm_dialog_text": "Вы уверены, что хотите удалить все комментарии?",
+    "alert_dialog_text": "Комментарии были успешно удалены.",
+    "alert_dialog_btn": "Обновить страницу"
+  },
+  "float_block": {
+    "float": "Float предмета",
+    "paintseed": "Паттерн",
+    "charm_paintseed": "Паттерн брелока",
+    "origin": "Источник",
+    "global": "Глобальный рейтинг",
+    "local": "Локальный  рейтинг",
+    "low": "низ.",
+    "high": "выс."
+  },
+  "show_hidden_achieve": "Показать скрытые достижения",
+  "achieve_owned": "Это достижение есть у",
+  "hidden_achieve_owned": "Это скрытое достижение есть у",
+  "of_players": "игроков",
+  "yes": "Да",
+  "no": "Нет",
+  "apps_remaining": "Игр с карточками",
+  "drops_remaining": "Осталось карточек",
+  "reset_zoom": "Сбросить Приближение",
+  "elo_points": "CS2 ELO Очки",
+  "season": "Сезон",
+  "date": "Дата",
+  "points_change": "Изменение Очков",
+  "badge_level": "Уровень значка",
+  "foil_badge_level": "Уровен металлического значка",
+  "badge_not_created": "Значок не создан",
+  "wishlist_modal": {
+    "title": "Вы уверены?",
+    "text": "Это действие удалит все добавленные игры из вашего списка желаемого",
+    "yes": "Да",
+    "no": "Нет"
+  },
+  "game_page": {
+    "sih_rate": "Рейтинг SIH",
+    "last_update": "Последнее обновление",
+    "today": "сегодня",
+    "yesterday": "вчера",
+    "days_ago": "дн. назад",
+    "month_ago": "мес. назад",
+    "months_ago": "мес. назад",
+    "out_of": "из",
+    "positive_reviews": "обзоров положительные (все типы покупок)"
+  },
+  "app_price_history": {
+    "min_fixed_price": "Минимальная зафиксированная цена —",
+    "limited": "Минимум за 2 года —",
+    "discount": "при скидке",
+    "subtitle": "Цена указана по состоянию на",
+    "subtitle_multi_pt1": "Цену фиксировали",
+    "subtitle_multi_pt2": "раз(-а), последний раз"
+  },
+  "sih_game_stats": {
+    "title": "SIH Статистика",
+    "more_btn": "Расширенная статистика",
+    "hide": "Скрыть",
+    "show": "Показать",
+    "online_now": "Играют сейчас",
+    "online_monthly": "Сред. за 24ч. в месяц",
+    "online_peak_daily": "Пик за день",
+    "online_peak_all": "Пик за все время",
+    "steam_rank": "Топы Steam",
+    "last_update": "Последнее обновление",
+    "game_drop": "Игровой дроп",
+    "graph": {
+      "title": "История онлайна",
+      "average": "В среднем играет",
+      "label": "Онлайн",
+      "filter": {
+        "all": "За все время",
+        "half_year": "6 месяцев",
+        "montly": "за месяц",
+        "weekly": "за неделю",
+        "daily": "за день"
+      }
+    }
+  },
+  "twitch_stats": {
+    "title": "Twitch цифры",
+    "online_now": "Смотрят сейчас",
+    "followers": "Следят",
+    "top_streams": "Топ стримы",
+    "viewers": "зрителей"
+  },
+  "interaction_history": "История взаимодействия",
+  "trades": "Трейдов",
+  "profile_modifier": {
+    "tooltip": {
+      "copy_btn": "Вы можете скопировать собранную конфигурацию профиля в виде ссылке и поделиться с друзьми, применение ссылки в адресную строку применит этот стиль на авторизованный профиль",
+      "copy_btn_success": "Скопировано",
+      "save_btn_success": "Сохранено",
+      "save_btn_no_data": "Нет данных для сохранения",
+      "save_btn_already_saved": "Уже сохранено",
+      "switcher": "Кнопка позволит вам включить или выключить применение кастомного профиля, данные изменения своего профиля или профиля других пользователей будут видны только вам"
+    },
+    "no_data_text": "Ничего не найдено",
+    "steam_action_btn": "Редактор профиля SIH",
+    "header": {
+      "title": "SIH ПРОФИЛЬ",
+      "save_btn": "Сохранить конфигурацию",
+      "copy_btn": "Ссылка на конфигурацию",
+      "tabs": {
+        "gallery": "Галерея",
+        "favorites": "Избранное",
+        "my_config": "Мои конфигурации"
+      }
+    },
+    "tab_name": {
+      "profile": "Темы",
+      "avatar": "Аватары",
+      "frame": "Рамки",
+      "miniProfile": "Мини профили",
+      "background": "Фоны",
+      "savedProfiles": "Сохраненное"
+    },
+    "title_name": {
+      "profile": "Специальные профили",
+      "avatar": "Аватары",
+      "frame": "Рамки",
+      "miniProfile": "Мини профили",
+      "background": "Фоны",
+      "savedProfiles": "Сохраненное"
+    },
+    "search": "Поиск",
+    "sort": {
+      "date": "Дата",
+      "game": "По играм",
+      "name": "По названию",
+      "popular": "Популярность"
+    },
+    "base_themes": "Темы",
+    "bg_filters": {
+      "animated": "С анимацией",
+      "static": "Статичные",
+      "from_games": "Ваши игры",
+      "played": "2+ часа"
+    },
+    "subtab": {
+      "all_available": "Все доступные",
+      "purchased": "Купленные"
+    },
+    "apply_in_steam": "Применить в Steam",
+    "remove_all_btn": "Убрать всё"
+  },
+  "sell_on": "Продать на",
+  "for": "за",
+  "sih_features": {
+    "feature_btn_text": "SIH Возможности",
+    "tab_buttons": {
+      "freebie_collector": "Сборщик Бесплатного",
+      "profile_customization": "Кастомизация Профиля",
+      "case_simulator": "Симулятор Кейсов",
+      "level_up_feature": "Поднятие уровня",
+      "sih_market": "Маркет SIH",
+      "floats_database": "База Флоатов",
+      "steam_stats": "Steam-stats",
+      "egs_free": "Epic Games Раздачи",
+      "sih_sda": "SIH SDA",
+      "cs2_items_history": "История предметов CS2",
+      "sih_rep": "SIH REP",
+      "sih_keys": "SIH Игры"
+    },
+    "freebie_collector_tab_info": {
+      "text_1": "Получайте все доступные бесплатные Steam предметы в 1 клик!",
+      "button_text": "Забрать",
+      "checkbox_label": "Уведомлять о новых бесплатных предметах"
+    },
+    "freebie_collector_overlay_info": {
+      "text_1": "Заберите все доступные предметы в один клик"
+    },
+    "profile_customization_tab_info": {
+      "text_1": "Выбирай темы, аватар, мини-профили и фон из любых доступных в Steam в 1 клик. Удобная навигация и поиск предметов.",
+      "button_text": "Воспользоваться бесплатно"
+    },
+    "profile_customization_overlay_info": {
+      "title": "Кастомизируйте профиль",
+      "text_1": "Бесплатно выбирайте из любых доступных инструментов кастомизации Steam и активируйте себе в профиль по клику.",
+      "button_text": "Открыть галерею"
+    },
+    "case_simulator_tab_info": {
+      "text_1": "Симулируйте открытие любого кейса, узнавайте цены на предметы и потенциальный профит!",
+      "button_text": "Воспользоваться бесплатно"
+    },
+    "case_simulator_overlay_info": {
+      "tooltip_text": "Попробуйте <span class=\"text_blue\">бесплатную</span> симуляцию!"
+    },
+    "level_up_feature_tab_info": {
+      "text_1": "Быстро и Выгодно поднимите Ваш уровень до желаемого вместе с SIH!",
+      "button_text": "Воспользоваться бесплатно"
+    },
+    "level_up_feature_overlay_info": {
+      "tooltip_text_1": "Выберите необходимый уровень",
+      "tooltip_text_2": "Запустите подбор самых выгодных карточек",
+      "of": "из",
+      "next": "Далее"
+    },
+    "sih_market_tab_info": {
+      "text_1": "Покупай скины в среднем дешевле на 30% чем в Steam!",
+      "button_text": "Перейти в магазин"
+    },
+    "sih_market_overlay_info": {
+      "tooltip_text_1": "Используйте фильтры для поиска",
+      "tooltip_text_2": "Ищите выгодные скины"
+    },
+    "floats_database_tab_info": {
+      "text_1": "Огромная база флоатов с более чем 1 млрд предметов, поиском и историей!",
+      "button_text": "Найти топовые флоаты"
+    },
+    "steam_stats_tab_info": {
+      "text_1": "Новейший сервис игровой статистики от SIH. Отслеживай топы игр, самые выгодные цены, оцени внутриигровой дроп любой игры в Steam.",
+      "button_text": "Перейти"
+    },
+    "egs_free_tab_info": {
+      "text_1": "Еженедельная раздача бесплатных игр",
+      "button_text": "Забрать все игры"
+    },
+    "sih_sda": {
+      "text_1": "SDA (Steam Desktop Authenticator) — это приложение от SIH, которое заменяет мобильный Steam Guard на компьютере. Вы сможете добавить все свои аккаунты Steam в одном месте и обеспечить из надежную защиту путем шифрования данных, а также быстро подтверждать операции, такие как обмены и покупки в CS2.",
+      "button_text": "Подключить"
+    },
+    "cs2_items_history_tab_info": {
+      "text_1": "Просканируй всю историю получения своих предметов в CS2!",
+      "button_text": "Воспользоваться бесплатно"
+    },
+    "cs2_items_history_overlay_info": {
+      "tooltip_text_1": "Загрузите всю вашу историю предметов CS2 — Все что вы когда-либо получали",
+      "tooltip_text_2": "Анализируйте графики — Сколько кейсов открыто и какие получили предметы",
+      "tooltip_text_3": "Мы отображаем все логи",
+      "tooltip_text_4": "Изучайте персональную статистику — открытые кейсы и капсулы, полученные дропы, созданные предметы, награды за миссии и использованные пропуски арсенала",
+      "tooltip_text_5": "Просмотрите детальную историю по каждому предмету",
+      "continue": "Продолжить"
+    },
+    "sih_rep_tab_info": {
+      "text_1": "Надёжный сервис верификации для Steam трейдеров",
+      "text_2": "Формируй честные рейтинги",
+      "button_text_1": "Оставить отзыв",
+      "button_text_2": "Проверить свой рейтинг",
+      "or": "или"
+    },
+    "sih_keys_tab_info": {
+      "text_1": "Выбирай любые игры для своего профиля Steam из каталога SIH по самым низким ценам",
+      "button_text_1": "Выбрать игру"
+    }
+  },
+  "sih_currency_modal": {
+    "title": "Выберите валюту конвертации",
+    "text_1": "Курс может отличаться от курса Steam"
+  },
+  "egs_free": {
+    "preloader_text": "Ищем игры, еще немного!",
+    "title": "Игры",
+    "free_price": "Бесплатно",
+    "claim_all": "Забрать все",
+    "error": {
+      "something_wrong": "Что-то пошло не так.. попробуйте позже",
+      "none_available": "К сожалению, мы не нашли бесплатных игр для вас",
+      "btn": "Ок"
+    },
+    "notification": {
+      "text": "Новые бесплатные игры в Epic Game Store",
+      "accept_btn": "Проверить",
+      "decline_btn": "Не уведомлять"
+    },
+    "header_btn_text": "Получить бесплатные игры"
+  },
+  "faceit": {
+    "ban_status": "FACEIT Анти-Чит статус",
+    "yes": "Заблокирован",
+    "no": "Не заблокирован",
+    "global_ranking": "Глобальный Рейтинг",
+    "recent_results": "Последние Результаты",
+    "win_rate": "Процент Побед",
+    "total_matches": "Всего Матчей",
+    "longest_win_streak": "Самая Длинная Победная Серия",
+    "avg_headshot": "Средний % Убийств в Голову",
+    "avg_kd": "Средний Показатель У/С",
+    "btn_text": "Статистика CS2",
+    "checkbox_label": "Больше не показывать",
+    "tooltip": "Включая данную настройку, Вы полностью отключите отображение статистики FACEIT на всех аккаунтах. Повторно включить ее можно в \"настройках\" SIH"
+  },
+  "tadeoffer_settings": {
+    "btn_text": "Авто-трейды",
+    "list": {
+      "autoaccept": "Автоматически принимать \"подарочные\" трейд-офферы",
+      "autoaccept_subtitle": "Пустые с вашей стороны",
+      "sih_market_autoaccept_trades_toggle":  "Автоматически принимать \"подарочные\" трейд-офферы от SIH",
+      "sih_market_autoaccept_trades_toggle_subtitle": "Пустые с вашей стороны",
+      "autocheckofferprice": "Автоматически загружать цену при обмене",
+      "autodecline": "Отменять недоступные трейд офферы"
+    }
+  },
+  "internal_ad_banner": {
+    "sih_sda": "Повысь безопасность Steam с SIH SDA",
+    "steam_refill": "Пополни Steam баланс выгодно"
+  },
+  "inventory_history": {
+    "title": "История предметов CS2",
+    "loading": "Загрузка",
+    "load_stats": "Загрузить данные",
+    "force_load": "Перезагрузить данные",
+    "continue_load": "Продолжить загрузку",
+    "update_stats": "Обновить данные",
+    "saved_info_1": "Последняя серия из",
+    "saved_info_2": "событий",
+    "reset": "Сбросить",
+    "cases_opened": "Открытые кейсы",
+    "since_last_special_item": "Открыто кейсов с последнего \"Необычайно редкого\" предмета",
+    "until_first_special_item": "Кейсов открыто до первого \"Необычайно редкого\" предмета",
+    "show_source_opening": "Показать источник открытия",
+    "unboxed_items": "Открыто предметов",
+    "rarities": {
+      "all": "Все"
+    },
+    "logs": {
+      "many_requests": "Слишком много запросов, попробуйте позже",
+      "last_parsing": "Последний парсинг истории был выполнен",
+      "start_search": "Начат поиск предметов",
+      "end_search": "Завершен поиск предметов",
+      "search_date": "Дата поиска",
+      "not_found_items": "Предметов не найдено",
+      "found_opened_case": "Найдено открытых кейсов",
+      "found_opened_capsules": "Найдено открытых капсул",
+      "found_dropped_items": "Найдено выпавших предметов",
+      "found_crafted_items": "Найдено созданных предметов",
+      "found_reward_items": "Найдено наградных предметов",
+      "found_used_armory_items": "Найдено предметов из боевого пропуска"
+    },
+    "searching_options": {
+      "drops": "Дропов",
+      "unlocked a container": "Открыто кейсов",
+      "unlocked a capsule": "Открыто капсул",
+      "crafted": "Создано",
+      "mission reward": "Наград за миссию",
+      "used armory pass": "Использовано пропусков арсенала"
+    }
+  },
+  "stream_embed": {
+    "dont_show_again": "Больше не показывать"
+  },
+  "sih_keys": {
+    "buy_btn": "Цена SIH",
+    "auth_btn": "Купить дешевле",
+    "main_modal_btn": "SIH Игры",
+    "show": "Показать",
+    "modals": {
+      "buy": {
+        "title": "Купить с помощью SIH.Market",
+        "region" : "Регион",
+        "steam_price": "Steam цена",
+        "sih_price": "SIH.Market price",
+        "profit": "Выгода",
+        "email": "Почта для получения ключа",
+        "email_placeholder": "Введите вашу почту",
+        "email_error_msg": "Некорректный email",
+        "activate": "Активировать игру на текущий Steam",
+        "pay_from_sih": "Оплата с SIH баланса",
+        "your_balance": "Ваш SIH баланс",
+        "price": "Цена",
+        "total": "Итого",
+        "tooltip": "Нам необходим адрес вашей почты для отправки виртуального ключа игры, а также подтверждения покупки. Пожалуйста, вводите только существующий адрес почты, а также проверяйте правильность ее написания, в случае предоставления некорректных данных, SIH не несет ответственности за сохранность данных. Если Вы не увидели сообщение, то проверьте папку Спам.",
+        "buy_btn": "Купить сейчас",
+        "refill_btn": "Пополнить баланс и купить",
+        "wrong_region": "Активация недоступна в вашем регионе",
+        "is_rock_star": "Ключ активируется исключительно в Rockstar Social Club"
+      },
+      "success": {
+        "title": "Ваш заказ успешно завершен!",
+        "order": "Заказ №",
+        "amount": "Сумма",
+        "date": "Дата",
+        "region": "Регион",
+        "your_key": "Ваш цифровой ключ",
+        "show": "Показать",
+        "copy": "Копировать",
+        "how_activate": {
+          "title": "Как активировать ключ",
+          "step_1": "Откройте сайт/приложение Steam и войдите в свой аккаунт.",
+          "step_2_pt1": "Выберите раздел \"Игры\" →",
+          "step_2_pt2" : "Активировать продукт в Steam",
+          "step_3": "Введите ключ - Следуйте инструкциям для завершения активации."
+        },
+        "important_information": {
+          "title": "Важная информация",
+          "step_1": "Ключ действителен только для региона:",
+          "step_2_title" : "Возврат ключа после его получения:",
+          "step_2_value" : "невозможен",
+          "step_3" : "Цифровой ключ был отправлен на почту:"
+        },
+        "need_help": "Нужна помощь - свяжитесь с нами :",
+        "done": "Готово"
+      },
+      "main": {
+        "add_funds": "Пополнить",
+        "auth": "Авторизоваться",
+        "buy": "Купить",
+        "search_placeholder": "Поиск в каталоге",
+        "dd_placeholder": "Искать",
+        "title": "Каталог SIH игр",
+        "games": "игр",
+        "my_balance":"Мой баланс",
+        "reset_all_btn": "Сбросить всё",
+        "rockstar_tooltip": "Данная игра активируется ИСКЛЮЧИТЕЛЬНО в Rockstar Social Club. После приобретения цифрового ключа, Вам необходимо скачать официальное приложение Rockstar Social Club, зарегистрироваться или авторизоваться в Вашем профиле, и активировать цифровой ключ.",
+        "filters": {
+          "titles": {
+            "platform": "Платформа",
+            "genre": "Жанр",
+            "region": "Регион",
+            "category": "Категория",
+            "lang": "Язык",
+            "price": "Цена",
+            "steam_price": "Steam цена"
+          },
+          "sortBy": {
+            "popular": "Популярные",
+            "price_desc": "Сначала дороже",
+            "price_asc": "Сначала дешевле"
+          },
+          "active": {
+            "appType": "Тип",
+            "regions": "Регион",
+            "platforms": "",
+            "genres": "",
+            "langs": "",
+            "categories": "",
+            "cheaperSteam": "Цена дороже Steam",
+            "searchQuery": "Поиск:",
+            "priceMax": "Макс. цена",
+            "priceMin": "Мин. цена",
+            "steamMax": "Макс. цена Steam",
+            "steamMin": "Мин. цена Steam",
+            "sortBy": "Сортировка:"
+          },
+          "appType": {
+            "demo": "Демо",
+            "game": "Игры",
+            "dlc": "DLC",
+            "music": "Музыкальные",
+            "video": "Видео"
+          },
+          "genres": {
+            "1": "Экшен",
+            "37": "Бесплатное",
+            "2": "Стратегии",
+            "25": "Приключения",
+            "23": "Инди",
+            "28": "Симуляторы",
+            "3": "RPG",
+            "51": "Анимации и Моделирование",
+            "58": "Видеомейкинг",
+            "4": "Casual",
+            "9": "Гонки",
+            "29": "Мультиплеер",
+            "18": "Спортивные",
+            "72": "Нагота",
+            "73": "Жестокие",
+            "70": "Ранний доступ",
+            "57": "Утилиты",
+            "53": "Дизайн и Иллюстрации",
+            "60": "Разработка Игр",
+            "52": "Аудио Разработка",
+            "54": "Образовательные",
+            "56": "Разработка",
+            "59": "Веб-публикации",
+            "74": "Кровавые сцены",
+            "55": "Фоторедакторы",
+            "71": "Сексуальный Контент",
+            "80": "Фильмы",
+            "81": "Документальный",
+            "82": "Эпизодический",
+            "50": "Финансовые",
+            "83": "Короткие",
+            "84": "Гайды",
+            "85": "Видео 360"
+          },
+          "cheeperSteam": "Дешевле Steam"
+        },
+        "favorites": {
+          "no_games": "Нет избранных игр",
+          "press_btn": "Нажмите <3 чтобы добавить игру в \"Избранное\"",
+          "back_btn": "Вернуться в каталог игр"
+        },
+        "empty": {
+          "no_games": "Игры не найдены",
+          "adjust_filters": "Попробуйте изменить фильтры",
+          "reset_btn": "Сбросить фильтры"
+        }
+      },
+      "regions": {
+        "title": "Регионы активации",
+        "success_activation": "Можно активировать на этот Steam",
+        "wrong_activation": "Активация недоступна в вашем регионе",
+        "search_placeholder": "Искать регион",
+        "not_found": "Регион не найден"
+      }
+    },
+    "notification": {
+      "title": "Ключ SIH.Market",
+      "creating_error": "Ошибка при создании заказа",
+      "refill_timeout": "Время на пополнение вышло",
+      "unexpected_error": "Что-то пошло не так. Попробуйте снова, а если ошибка будет повторяться — напишите в поддержку SIH."
+    },
+    "status": {
+      "created": "Создан",
+      "processing": "Обрабатывается",
+      "finished": "Завершен",
+      "failed": "Ошибка",
+      "pending": "В ожидании"
+    },
+    "activation_status": {
+      "success": "Ключ успешно активирован",
+      "steam_error": {
+        "9": "Продукты, привязанные к этому ключу, уже есть на вашем аккаунте Steam. Вы можете найти их в библиотеке клиента",
+        "13": "К сожалению, данный товар невозможно приобрести в этой стране. Ключ не активирован.",
+        "14": "Либо вы ввели неверный ключ активации продукта, либо он для другой категории товаров. Проверьте, не опечатались ли вы. Легко спутать символы I, L и 1; V и Y; 0 и O. Если же вы пытаетесь активировать код подарочной карты, это нужно делать <a href=\"https://store.steampowered.com/account/redeemwalletcode\">здесь</a>.",
+        "15": "Введённый ключ активации уже зарегистрирован на другом аккаунте Steam. Его невозможно использовать повторно. Пожалуйста, обратитесь за помощью к продавцу.",
+        "24": "Чтобы активировать введённый цифровой ключ, необходимо владеть другим продуктом.\n\nЕсли вы пытаетесь активировать дополнительный контент, пожалуйста, сначала активируйте основную игру.",
+        "36": "Вы ввели ключ активации продукта, для регистрации которого нужно сначала запустить игру на консоли PlayStation®3.\n\nПожалуйста:\n\n— Запустите эту игру на вашей консоли PlayStation®3\n\n— Привяжите ваш аккаунт Steam к аккаунту PlayStation®3 Network\n\n— Подключитесь к Steam пока эта игра запущена на консоли PlayStation®3\n\n— Зарегистрируйте этот ключ продукта в Steam",
+        "53": "С этого аккаунта или интернет-адреса произведено слишком много попыток активации ключей. Пожалуйста, попробуйте зарегистрировать ключ позже.",
+        "default": "Произошла непредвиденная ошибка. Ваш ключ активации не зарегистрирован. Пожалуйста, подождите 30 минут и попробуйте активировать ключ снова. Если проблема повторится, обратитесь в <a href=\"https://help.steampowered.com/ru/wizard/HelpWithCDKey\">службу поддержки Steam</a>."
+      }
+    }
+  },
+  "sih_rep": {
+    "overlay_tooltip": "Оставьте отзыв об обмене и помогите сообществу сделать сделки безопасными!",
+    "okay": "Хорошо",
+    "no_trades_plug_title": "Обменов еще нет",
+    "no_trades_plug_subtitle_waiting": "Здесь будут обмены на которые вы сможете оставить отзыв",
+    "no_trades_plug_subtitle_sending": "Здесь будут ваши отзывы на обмены",
+    "show_all": "Показать всё",
+    "hide": "Скрыть",
+    "leave_review": "Оставить отзыв",
+    "accepted": "Принят",
+    "refunded": "Возвращен",
+    "all_reviews_title": "Ваши отзывы SIHREP",
+    "pending": "Ожидают",
+    "sent": "Отправленные",
+    "sent_trades": "Отправлено",
+    "received_trades": "Получено",
+    "item_list": "Список предметов",
+    "your_items": "Ваши предметы",
+    "lots": "Лоты",
+    "request_verify_title": "Разрешите верификацию обменов",
+    "request_verify_subtitle": "Верификация необходима, чтобы ваш отзыв учитывался в рейтинге пользователя",
+    "allow": "Разрешить",
+    "deny": "Запретить",
+    "failed_accept_permission": "Не удалось принять разрешение, повторите ещё раз",
+    "review": "Отзыв",
+    "trade_refund_message": "Сообщение о возврате трейда",
+    "positive": "Положительный",
+    "negative": "Отрицательный",
+    "minimum": "Минимум",
+    "characters": "символов",
+    "entered": "Введено",
+    "report_refund": "Сообщить о возврате",
+    "cancel": "Отменить",
+    "review_placeholder": "Опишите ситуацию как можно более подробно - это поможет другим пользователям!",
+    "success_send_review": "Отзыв успешно отправлен на SIHREP",
+    "close": "Закрыть",
+    "all_reviews": "Все отзывы",
+    "reviews": "Отзывы",
+    "failed_send_review": "Не удалось отправить отзыв",
+    "failed_send_report": "Не удалось отправить сообщение о возврате трейда",
+    "trade_verified": "Обмен верифицирован",
+    "server_errors": {
+      "tradeId cannot be empty": "tradeId не может быть пустым",
+      "Invalid input steamId": "Неверный ввод steamId",
+      "You can't post a review about yourself": "Вы не можете оставить отзыв о себе",
+      "Max reached unverified": "Достигнут максимум для неверифицированных отзывов",
+      "Failed to verify users": "Не удалось верифицировать пользователей",
+      "Failed to add review": "Не удалось добавить отзыв",
+      "There is already a complaint about this trade": "Жалоба на этот обмен уже существует",
+      "No permissions to read history, request sent": "Нет прав на просмотр истории, запрос отправлен",
+      "Application banned": "Приложение заблокировано",
+      "Unable to check permissions": "Не удалось проверить права",
+      "empty history": "История пуста",
+      "No cancelled offer from subject found": "Не найдено отменённых предложений от пользователя",
+      "Return review cannot have sentiment": "Отзыв о возврате не содержит оценку",
+      "Unable to convert review into a refund": "Не удалось преобразовать отзыв в возврат",
+      "Sentiment must be specified": "Необходимо указать оценку",
+      "Review not found": "Отзыв не найден",
+      "Failed to perform action": "Не удалось выполнить действие",
+      "content should not be empty": "Содержимое не может быть пустым",
+      "content must be longer than or equal to 10 characters": "Содержимое должно содержать не менее 10 символов"
+    },
+    "approval_rate": "Процент одобрения",
+    "rating_title": "SIHREP рейтинг",
+    "rating_rise": "Рост рейтинга",
+    "rating_drop": "Падение рейтинга",
+    "rating_scam": "Имеется Steam возврат",
+    "edit_review": "Изменить отзыв",
+    "delete_review": "Удалить отзыв",
+    "delete_review_title": "Вы действительно хотите удалить отзыв?",
+    "delete": "Удалить",
+    "success_delete_review": "Отзыв успешно удален",
+    "success_edit_review": "Отзыв успешно изменен",
+    "failed_edit_review": "Не удалось измененить отзыв",
+    "failed_delete_review": "Не удалось удалить отзыв"
+  },
+  "market_commodity_block" : {
+    "no_commission": "Без комиссии",
+    "purchase_margin": "Доходность покупки",
+    "sale_margin": "Доходность продажи"
+  },
+  "steam_powered_trailer_download": {
+    "errors": {
+      "steam_error": "недоступен для загрузки из-за ошибки Steam."
+    }
+  },
+  "inspect_in_browser": "Осмотр в браузере"
+}

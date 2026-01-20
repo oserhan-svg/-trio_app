@@ -115,7 +115,7 @@ const PropertyListingPublic = () => {
 
                 {/* Property Title */}
                 <div className="p-8 print:p-6 border-b">
-                    <h2 className="text-3xl font-bold text-gray-900 mb-2 print:text-2xl">{property.title}</h2>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-2 print:text-2xl">{property.title?.split('#')[0].trim()}</h2>
                     <p className="text-gray-600 flex items-center gap-2">
                         <MapPin size={18} />
                         {property.neighborhood}, {property.district}

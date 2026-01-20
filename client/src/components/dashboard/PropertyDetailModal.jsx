@@ -77,9 +77,11 @@ const PropertyDetailModal = ({ property, onClose }) => {
                 {/* Header */}
                 <div className="flex justify-between items-center p-6 border-b border-gray-100 sticky top-0 bg-white z-10">
                     <div>
-                        <h2 className="text-xl font-bold text-gray-900">{property.title}</h2>
+                        <h2 className="text-xl font-bold text-gray-900">{property.title?.split('#')[0].trim()}</h2>
                         <p className="text-sm text-gray-500 mt-1 flex items-center gap-2">
                             <MapPin size={14} /> {property.district} / {property.neighborhood}
+                            <span className="mx-2 text-gray-300">|</span>
+                            <span className="font-semibold text-gray-700">İlan No: {property.external_id?.split('block')[0]}</span>
                         </p>
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500">

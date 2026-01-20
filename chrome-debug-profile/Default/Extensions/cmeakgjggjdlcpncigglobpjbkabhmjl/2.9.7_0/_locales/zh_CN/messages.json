@@ -1,0 +1,10 @@
+{
+   "extension_description": {
+      "description": "Extension's description",
+      "message": "自动销售皮肤、来自不同来源的廉价物品以及更多功能。"
+   },
+   "langcode": {
+      "description": "",
+      "message": "zh_CN"
+   }
+}

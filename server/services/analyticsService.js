@@ -1,32 +1,70 @@
 const prisma = require('../db');
 
 const getMarketStats = async () => {
-    // 1. Group by Neighborhood
-    const neighborhoodStats = await prisma.property.groupBy({
-        by: ['neighborhood', 'district'], // Include district for mapping
-        _avg: { price: true, size_m2: true },
-        _count: { id: true }
+    // 1. Get all properties to calculate medians/outliers
+    const properties = await prisma.property.findMany({
+        where: { price: { gt: 0 }, size_m2: { gt: 0 } },
+        select: { neighborhood: true, district: true, price: true, size_m2: true }
     });
 
-    // 2. Group by District (Fallback)
-    const districtStats = await prisma.property.groupBy({
-        by: ['district'],
-        _avg: { price: true, size_m2: true },
-        _count: { id: true }
+    const neighborhoodGroups = {};
+    const districtGroups = {};
+
+    properties.forEach(p => {
+        const m2Price = Number(p.price) / Number(p.size_m2);
+
+        // Neighborhood group
+        if (p.neighborhood) {
+            if (!neighborhoodGroups[p.neighborhood]) neighborhoodGroups[p.neighborhood] = { m2Prices: [], district: p.district };
+            neighborhoodGroups[p.neighborhood].m2Prices.push(m2Price);
+        }
+
+        // District group
+        if (p.district) {
+            if (!districtGroups[p.district]) districtGroups[p.district] = [];
+            districtGroups[p.district].push(m2Price);
+        }
     });
 
-    const formatStats = (s, key) => ({
-        name: s[key] || 'Bilinmiyor',
-        district: s.district || null, // Only for neighborhoods
-        avgPrice: Number(s._avg.price) || 0,
-        avgM2: Number(s._avg.size_m2) || 0,
-        count: s._count.id,
-        avgPricePerM2: (s._avg.size_m2 && Number(s._avg.size_m2) > 0) ? (Number(s._avg.price) / Number(s._avg.size_m2)) : 0
+    const calculateCleanStats = (m2Prices) => {
+        if (m2Prices.length === 0) return { avg: 0, count: 0 };
+        if (m2Prices.length < 5) return { avg: m2Prices.reduce((a, b) => a + b, 0) / m2Prices.length, count: m2Prices.length };
+
+        // Sort and exclude top/bottom 10%
+        const sorted = [...m2Prices].sort((a, b) => a - b);
+        const cut = Math.floor(sorted.length * 0.1);
+        const clean = sorted.slice(cut, sorted.length - cut);
+
+        return {
+            avg: clean.reduce((a, b) => a + b, 0) / clean.length,
+            count: m2Prices.length
+        };
+    };
+
+    const neighborhoodStats = Object.keys(neighborhoodGroups).map(name => {
+        const group = neighborhoodGroups[name];
+        const stats = calculateCleanStats(group.m2Prices);
+        return {
+            name,
+            district: group.district,
+            avgPricePerM2: stats.avg,
+            count: stats.count
+        };
+    });
+
+    const districtStats = Object.keys(districtGroups).map(name => {
+        const m2Prices = districtGroups[name];
+        const stats = calculateCleanStats(m2Prices);
+        return {
+            name,
+            avgPricePerM2: stats.avg,
+            count: stats.count
+        };
     });
 
     return {
-        neighborhoods: neighborhoodStats.map(s => formatStats(s, 'neighborhood')),
-        districts: districtStats.map(s => formatStats(s, 'district'))
+        neighborhoods: neighborhoodStats,
+        districts: districtStats
     };
 };
 
@@ -194,6 +232,28 @@ const scoreProperty = (property, statsMap, history = []) => {
     const propertyM2Price = property.price / property.size_m2;
     let ratio = propertyM2Price / avgM2Price;
 
+    // --- KEYWORD EMOTION / URGENCY ANALYSIS ---
+    let urgencyBoost = 1.0;
+    const urgencyKeywords = /acil|acele|sıkışık|ihtiyaçtan|fiyatı düştü|kelepir|son fırsat/i;
+    const combinedText = `${property.title || ''} ${property.description || ''}`;
+
+    if (urgencyKeywords.test(combinedText)) {
+        urgencyBoost = 0.95; // 5% Boost for urgent keywords
+    }
+    ratio *= urgencyBoost;
+    // ------------------------------------------
+
+    // --- PREMIUM FEATURE DETECTION ---
+    let isPremium = false;
+    const premiumKeywords = /havuz|deniz manzaralı|lüks|müstakil|özel tasarım|panorami/i;
+    if (Array.isArray(property.features)) {
+        isPremium = property.features.some(f => premiumKeywords.test(f));
+    }
+    if (!isPremium && premiumKeywords.test(combinedText)) {
+        isPremium = true;
+    }
+    // ---------------------------------
+
     // --- PRICE DROP BOOST ---
     if (hasRecentPriceDrop) {
         ratio *= 0.95; // 5% Boost score
@@ -238,10 +298,10 @@ const scoreProperty = (property, statsMap, history = []) => {
         label = '✅ Uygun'; // >5% cheaper
     } else if (propertyM2Price > avgM2Price * 1.25) {
         score = 2;
-        label = 'pahalı';
+        label = isPremium ? 'Premium' : 'pahalı';
     } else if (propertyM2Price > avgM2Price * 1.15) {
         score = 4;
-        label = 'Yüksek';
+        label = isPremium ? 'Premium' : 'Yüksek';
     }
 
     return {
@@ -251,7 +311,8 @@ const scoreProperty = (property, statsMap, history = []) => {
         roi: calculateROI(property.price),
         comparisonBasis,
         comparisonPrice: Math.round(avgM2Price),
-        hasRecentPriceDrop: hasRecentPriceDrop
+        hasRecentPriceDrop: hasRecentPriceDrop,
+        isPremium: isPremium
     };
 };
 

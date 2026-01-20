@@ -126,19 +126,19 @@ const ConsultantPanel = () => {
             <div className="max-w-7xl mx-auto p-6">
                 {activeTab === 'clients' && (
                     <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                        {/* My Portfolio Stats & Match Feed */}
+                        {/* Top Section: Neighborhood Chart & Match Feed */}
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
                             <div className="lg:col-span-2">
-                                <PortfolioDashboard mode="mine" userId={user?.id} />
+                                <MarketSupplyDemandChart />
                             </div>
                             <div className="lg:col-span-1">
                                 <MatchNewsfeed />
                             </div>
                         </div>
 
-                        {/* Market Gap Analysis */}
+                        {/* Portfolio Dashboard */}
                         <div className="mb-8">
-                            <MarketSupplyDemandChart />
+                            <PortfolioDashboard mode="mine" userId={user?.id} />
                         </div>
 
                         <ClientTracking

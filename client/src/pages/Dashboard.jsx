@@ -177,8 +177,9 @@ const Dashboard = () => {
                         <Users size={18} />
                         <span className="hidden md:inline">{user?.role === 'admin' ? 'Admin Paneli' : 'Danışman Paneli'}</span>
                     </button>
-                    <div className="text-sm text-gray-500 hidden md:block">
-                        {meta.total || properties.length} ilan mevcut
+                    <div className="text-sm text-gray-500 hidden md:flex flex-col items-end leading-none">
+                        <span className="font-bold text-blue-600">{meta.total || properties.length} ilan</span>
+                        {stats.totalProperties && <span className="text-[10px] opacity-70">veri tabanında {stats.totalProperties} kayıt</span>}
                     </div>
                     <button onClick={() => navigate('/report')} className="flex items-center gap-1 text-gray-500 hover:text-purple-600 transition" title="Proje Raporu">
                         <FileText size={20} />
@@ -195,8 +196,9 @@ const Dashboard = () => {
                     <MobileNav user={user} handleScrape={handleScrape} handleLogout={handleLogout} propertiesCount={properties.length} />
                     <span className="text-xl font-bold text-blue-600 ml-2">TrioApp</span>
                 </div>
-                <div className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded">
-                    {meta.total || properties.length} İlan
+                <div className="text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded flex flex-col items-center leading-tight">
+                    <span className="font-bold">{meta.total || properties.length} İlan</span>
+                    {stats.totalProperties && <span className="opacity-70 text-[8px]">{stats.totalProperties} veri</span>}
                 </div>
             </div>
 

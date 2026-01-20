@@ -1,0 +1,10 @@
+{
+   "extension_description": {
+      "description": "Описание расширения",
+      "message": "Улучшает Steam: авто-продажа скинов, дешевые предметы из разных источников и многое другое."
+   },
+   "langcode": {
+      "description": "",
+      "message": "ru"
+   }
+}

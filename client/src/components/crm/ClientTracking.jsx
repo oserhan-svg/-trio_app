@@ -23,7 +23,7 @@ const ClientTracking = ({ isAddModalOpen, onCloseAddModal }) => {
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 9; // Show 9 cards per page (3x3 grid)
+    const pageSize = 15; // Show 15 rows per page (Ultra Compact)
 
     // Modals
     // const [showAddClient, setShowAddClient] = useState(false); // REMOVED
@@ -79,10 +79,22 @@ const ClientTracking = ({ isAddModalOpen, onCloseAddModal }) => {
             console.log('Fetching clients...');
             const response = await api.get('/clients');
             console.log('Clients fetched:', response.data);
-            setClients(response.data);
-            setFilteredClients(response.data);
+
+            if (Array.isArray(response.data)) {
+                setClients(response.data);
+                setFilteredClients(response.data);
+            } else if (response.data && Array.isArray(response.data.data)) {
+                // Handle paginated response just in case
+                setClients(response.data.data);
+                setFilteredClients(response.data.data);
+            } else {
+                console.error('Unexpected response format:', response.data);
+                addToast('Beklenmedik veri formatı.', 'error');
+            }
+
         } catch (error) {
             console.error('Error fetching clients:', error);
+            addToast('Müşteriler yüklenemedi: ' + (error.response?.data?.error || error.message), 'error');
         } finally {
             setLoading(false);
         }
@@ -159,47 +171,100 @@ const ClientTracking = ({ isAddModalOpen, onCloseAddModal }) => {
         setShowMatches(true);
     };
 
-    return (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            {/* Toolbar Area */}
-            <div className="p-4 border-b border-gray-200 flex flex-col md:flex-row gap-4 justify-between items-center bg-gray-50/50 rounded-t-lg">
+    // Derived Stats
+    const totalClients = clients.length;
+    const activeBuyers = clients.filter(c => (c.type === 'buyer' || !c.type) && c.status === 'Active').length;
+    const activeSellers = clients.filter(c => c.type === 'seller' && c.status === 'Active').length;
+    const newThisMonth = clients.filter(c => {
+        const date = new Date(c.created_at);
+        const now = new Date();
+        return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+    }).length;
 
-                {/* Search & Filter Bar */}
-                <div className="flex flex-1 gap-2 w-full md:w-auto">
-                    <div className="relative flex-1 max-w-md">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                        <input
-                            type="text"
-                            placeholder="İsim, Telefon veya E-posta..."
-                            className="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all shadow-sm"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
+    return (
+        <div className="space-y-6">
+            {/* KPI Stats Widgets */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center">
+                    <div className="text-gray-500 text-xs font-medium mb-1 uppercase tracking-wider">Toplam Müşteri</div>
+                    <div className="text-2xl font-bold text-gray-900">{totalClients}</div>
+                    <div className="text-xs text-gray-400 mt-1">Portföy Geneli</div>
+                </div>
+                <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center border-b-4 border-b-blue-500">
+                    <div className="text-blue-600 text-xs font-medium mb-1 uppercase tracking-wider">Aktif Alıcılar</div>
+                    <div className="text-2xl font-bold text-gray-900">{activeBuyers}</div>
+                    <div className="text-xs text-gray-400 mt-1">Sıcak Müşteriler</div>
+                </div>
+                <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center border-b-4 border-b-amber-500">
+                    <div className="text-amber-600 text-xs font-medium mb-1 uppercase tracking-wider">Aktif Satıcılar</div>
+                    <div className="text-2xl font-bold text-gray-900">{activeSellers}</div>
+                    <div className="text-xs text-gray-400 mt-1">Portföy Kaynakları</div>
+                </div>
+                <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center border-b-4 border-b-emerald-500">
+                    <div className="text-emerald-600 text-xs font-medium mb-1 uppercase tracking-wider">Yeni (Bu Ay)</div>
+                    <div className="text-2xl font-bold text-gray-900">{newThisMonth}</div>
+                    <div className="text-xs text-gray-400 mt-1">Büyüme Hızı</div>
+                </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                {/* Toolbar Area - Refined */}
+                <div className="p-3 border-b border-gray-100 flex flex-col md:flex-row gap-3 justify-between items-center bg-white rounded-t-lg">
+
+                    {/* Left: Search & Filters */}
+                    <div className="flex flex-1 gap-2 w-full md:w-auto items-center">
+                        {/* Search */}
+                        <div className="relative flex-1 max-w-xs">
+                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+                            <input
+                                type="text"
+                                placeholder="Müşteri ara..."
+                                className="w-full pl-8 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all placeholder:text-gray-400"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+
+                        {/* Filters */}
+                        <div className="flex items-center gap-2">
+                            <div className="relative">
+                                <select
+                                    className="pl-2 pr-6 py-1.5 bg-gray-50 border border-gray-200 rounded-md text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer text-gray-700 hover:bg-gray-100 transition-colors"
+                                    value={statusFilter}
+                                    onChange={(e) => setStatusFilter(e.target.value)}
+                                >
+                                    <option value="all">Tüm Durumlar</option>
+                                    <option value="Active">Aktif</option>
+                                    <option value="Negotiation">Görüşülüyor</option>
+                                    <option value="Closed Won">Kazanıldı</option>
+                                    <option value="Lost">Kaybedildi</option>
+                                </select>
+                            </div>
+                            <div className="relative">
+                                <select
+                                    className="pl-2 pr-6 py-1.5 bg-gray-50 border border-gray-200 rounded-md text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer text-gray-700 hover:bg-gray-100 transition-colors"
+                                    value={typeFilter}
+                                    onChange={(e) => setTypeFilter(e.target.value)}
+                                >
+                                    <option value="all">Tüm Tipler</option>
+                                    <option value="buyer">🏠 Alıcı</option>
+                                    <option value="seller">🔑 Satıcı</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    <div className="relative">
-                        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
-                        <select
-                            className="pl-8 pr-8 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 appearance-none cursor-pointer shadow-sm"
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                        >
-                            <option value="all">Durum</option>
-                            <option value="Active">Aktif</option>
-                            <option value="Negotiation">Görüşülüyor</option>
-                            <option value="Closed Won">Kazanıldı</option>
-                            <option value="Lost">Kaybedildi</option>
-                        </select>
-                    </div>
-                    <div className="relative">
-                        <select
-                            className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 appearance-none cursor-pointer shadow-sm font-medium text-gray-600"
-                            value={typeFilter}
-                            onChange={(e) => setTypeFilter(e.target.value)}
-                        >
-                            <option value="all">Tip: Tümü</option>
-                            <option value="buyer">🏠 Alıcı</option>
-                            <option value="seller">🔑 Satıcı</option>
-                        </select>
+
+                    {/* Right: Actions */}
+                    <div>
+                        {/* Button handled by parent via prop mostly, but we can put clear filters here if needed */}
+                        {(searchTerm || statusFilter !== 'all' || typeFilter !== 'all') && (
+                            <button
+                                onClick={() => { setSearchTerm(''); setStatusFilter('all'); setTypeFilter('all'); }}
+                                className="text-xs text-gray-500 hover:text-red-500 font-medium px-2 py-1 rounded hover:bg-red-50 transition-colors mr-2"
+                            >
+                                Filtreleri Temizle
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -236,67 +301,66 @@ const ClientTracking = ({ isAddModalOpen, onCloseAddModal }) => {
                     <>
                         <div className="overflow-x-auto">
                             <table className="w-full text-left text-sm">
-                                <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
+                                <thead className="bg-gray-50 text-gray-500 font-semibold border-b border-gray-200 text-xs">
                                     <tr>
-                                        <th className="px-6 py-3 w-64">Müşteri</th>
-                                        <th className="px-6 py-3 w-48">İletişim</th>
-                                        <th className="px-6 py-3 w-32">Durum</th>
-                                        <th className="px-6 py-3">Aktif Talepler</th>
-                                        <th className="px-6 py-3 text-right w-40">İşlemler</th>
+                                        <th className="px-3 py-2 w-56">Müşteri</th>
+                                        <th className="px-3 py-2 w-40">İletişim</th>
+                                        <th className="px-3 py-2 w-28">Durum</th>
+                                        <th className="px-3 py-2">Aktif Talepler</th>
+                                        <th className="px-3 py-2 text-right w-28">İşlemler</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
                                     {paginatedClients.map(client => (
                                         <tr key={client.id} className="hover:bg-slate-50 transition-colors group">
-                                            {/* Name & Type */}
-                                            <td className="px-6 py-3">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-9 h-9 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">
+                                            {/* Name & Type - Compact */}
+                                            <td className="px-3 py-1.5">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-8 h-8 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0">
                                                         {client.name.charAt(0).toUpperCase()}
                                                     </div>
                                                     <div className="min-w-0">
                                                         <div
                                                             onClick={() => navigate(`/clients/${client.id}`)}
-                                                            className="font-semibold text-gray-900 truncate cursor-pointer hover:text-emerald-600 flex items-center gap-1"
+                                                            className="font-semibold text-gray-900 truncate cursor-pointer hover:text-emerald-600 flex items-center gap-1 text-sm leading-tight"
                                                         >
                                                             {client.name}
-                                                            <ExternalLink size={12} className="opacity-0 group-hover:opacity-100 text-gray-400" />
                                                         </div>
-                                                        <div className="text-xs text-gray-500 flex items-center gap-1">
+                                                        <div className="text-[10px] text-gray-400 flex items-center gap-1 leading-tight mt-0.5">
                                                             {client.type === 'seller' ? (
-                                                                <span className="text-amber-600 flex items-center gap-0.5"><Users size={10} /> Satıcı</span>
+                                                                <span className="text-amber-600">Satıcı</span>
                                                             ) : (
-                                                                <span className="text-blue-600 flex items-center gap-0.5"><Users size={10} /> Alıcı</span>
+                                                                <span className="text-blue-600">Alıcı</span>
                                                             )}
-                                                            <span className="text-gray-300">•</span>
+                                                            <span>•</span>
                                                             <span>{new Date(client.created_at).toLocaleDateString()}</span>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </td>
 
-                                            {/* Contact */}
-                                            <td className="px-6 py-3 align-top">
+                                            {/* Contact - Compact */}
+                                            <td className="px-3 py-1.5 align-middle">
                                                 <div className="space-y-0.5">
-                                                    <div className="flex items-center gap-1.5 text-gray-700 font-medium">
-                                                        <Phone size={12} className="text-gray-400" />
+                                                    <div className="flex items-center gap-1.5 text-gray-700 font-medium text-xs">
+                                                        <Phone size={10} className="text-gray-400" />
                                                         {client.phone || '-'}
                                                     </div>
                                                     {client.email && (
-                                                        <div className="flex items-center gap-1.5 text-xs text-gray-400 truncate max-w-[150px]" title={client.email}>
-                                                            <Mail size={12} />
+                                                        <div className="flex items-center gap-1.5 text-[10px] text-gray-400 truncate max-w-[140px]" title={client.email}>
+                                                            <Mail size={10} />
                                                             {client.email}
                                                         </div>
                                                     )}
                                                 </div>
                                             </td>
 
-                                            {/* Status */}
-                                            <td className="px-6 py-3">
-                                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${client.status === 'Active' ? 'bg-green-100 text-green-700' :
-                                                        client.status === 'Negotiation' ? 'bg-orange-100 text-orange-700' :
-                                                            client.status === 'Closed Won' ? 'bg-purple-100 text-purple-700' :
-                                                                'bg-gray-100 text-gray-600'
+                                            {/* Status - Compact Badge */}
+                                            <td className="px-3 py-1.5 align-middle">
+                                                <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border ${client.status === 'Active' ? 'bg-green-50 text-green-700 border-green-100' :
+                                                    client.status === 'Negotiation' ? 'bg-orange-50 text-orange-700 border-orange-100' :
+                                                        client.status === 'Closed Won' ? 'bg-purple-50 text-purple-700 border-purple-100' :
+                                                            'bg-gray-50 text-gray-600 border-gray-100'
                                                     }`}>
                                                     {client.status === 'Active' ? 'Aktif' :
                                                         client.status === 'Negotiation' ? 'Görüşülüyor' :
@@ -304,59 +368,58 @@ const ClientTracking = ({ isAddModalOpen, onCloseAddModal }) => {
                                                 </span>
                                             </td>
 
-                                            {/* Demands */}
-                                            <td className="px-6 py-3">
-                                                <div className="flex flex-wrap gap-1.5">
-                                                    {client.demands.slice(0, 2).map(d => (
+                                            {/* Demands - Tags */}
+                                            <td className="px-3 py-1.5 align-middle">
+                                                <div className="flex flex-wrap gap-1">
+                                                    {client.demands.slice(0, 3).map(d => (
                                                         <span
                                                             key={d.id}
                                                             onClick={() => openEditDemandModal(client, d)}
-                                                            className="inline-flex items-center gap-1 px-2 py-1 rounded border border-gray-200 bg-white text-xs text-gray-600 hover:border-emerald-300 hover:text-emerald-700 cursor-pointer transition-colors max-w-[140px] truncate"
+                                                            className="inline-flex items-center px-1.5 py-0.5 rounded border border-gray-200 bg-white text-[10px] text-gray-600 hover:border-emerald-300 hover:text-emerald-700 cursor-pointer transition-colors max-w-[120px] truncate"
                                                             title={`${d.district} / ${d.neighborhood}`}
                                                         >
-                                                            {d.neighborhood || d.district || 'Konum Yok'}
+                                                            {d.neighborhood || d.district || '?'}
                                                         </span>
                                                     ))}
-                                                    {client.demands.length > 2 && (
-                                                        <span className="inline-flex items-center px-1.5 py-1 rounded bg-gray-100 text-xs text-gray-500 font-medium">
-                                                            +{client.demands.length - 2}
+                                                    {client.demands.length > 3 && (
+                                                        <span className="inline-flex items-center px-1 py-0.5 rounded bg-gray-100 text-[10px] text-gray-500 font-medium">
+                                                            +{client.demands.length - 3}
                                                         </span>
                                                     )}
                                                     {client.demands.length === 0 && (
                                                         <button
                                                             onClick={() => openAddDemandModal(client)}
-                                                            className="text-xs text-gray-400 hover:text-emerald-600 flex items-center gap-1 border border-dashed border-gray-300 px-2 py-1 rounded hover:border-emerald-300 transition-colors"
+                                                            className="text-[10px] text-gray-400 hover:text-emerald-600 flex items-center gap-1 border border-dashed border-gray-300 px-1.5 py-0.5 rounded hover:border-emerald-300 transition-colors opacity-60 hover:opacity-100"
                                                         >
-                                                            <Plus size={12} /> Talep Ekle
+                                                            <Plus size={10} /> Ekle
                                                         </button>
                                                     )}
                                                 </div>
                                             </td>
 
-                                            {/* Actions */}
-                                            <td className="px-6 py-3 text-right">
-                                                <div className="flex justify-end items-center gap-1">
+                                            {/* Actions - Compact */}
+                                            <td className="px-3 py-1.5 text-right align-middle">
+                                                <div className="flex justify-end items-center gap-0.5">
                                                     <button
                                                         onClick={() => openMatchesModal(client)}
-                                                        className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
+                                                        className="p-1 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
                                                         title="Eşleşmeler"
                                                     >
-                                                        <Tag size={16} />
+                                                        <Tag size={14} />
                                                     </button>
                                                     <button
                                                         onClick={() => openAddDemandModal(client)}
-                                                        className="p-1.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded transition-colors"
+                                                        className="p-1 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded transition-colors"
                                                         title="Yeni Talep Ekle"
                                                     >
-                                                        <Plus size={16} />
+                                                        <Plus size={14} />
                                                     </button>
-                                                    <div className="w-px h-4 bg-gray-200 mx-1"></div>
                                                     <button
                                                         onClick={() => handleDelete(client.id)}
-                                                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                                        className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                                                         title="Sil"
                                                     >
-                                                        <Trash2 size={16} />
+                                                        <Trash2 size={14} />
                                                     </button>
                                                 </div>
                                             </td>
@@ -367,15 +430,18 @@ const ClientTracking = ({ isAddModalOpen, onCloseAddModal }) => {
                         </div>
 
                         {totalPages > 1 && (
-                            <div className="flex justify-center items-center gap-2 py-4 border-t border-gray-100">
+                            <div className="flex justify-between items-center px-4 py-2 border-t border-gray-100 bg-gray-50/50">
+                                <div className="text-xs text-gray-400">
+                                    Toplam {filteredClients.length} kayıt
+                                </div>
                                 <div className="flex items-center gap-1">
                                     {[...Array(totalPages)].map((_, i) => (
                                         <button
                                             key={i + 1}
                                             onClick={() => setCurrentPage(i + 1)}
-                                            className={`w-7 h-7 rounded text-xs font-medium transition-all ${currentPage === i + 1
-                                                ? 'bg-emerald-600 text-white'
-                                                : 'text-gray-600 hover:bg-gray-100'
+                                            className={`w-6 h-6 rounded text-xs font-medium transition-all ${currentPage === i + 1
+                                                ? 'bg-emerald-600 text-white shadow-sm'
+                                                : 'text-gray-500 hover:bg-white hover:shadow-sm'
                                                 }`}
                                         >
                                             {i + 1}

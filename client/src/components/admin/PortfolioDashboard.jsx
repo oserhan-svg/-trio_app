@@ -7,16 +7,18 @@ const PortfolioDashboard = ({ mode = 'agency', userId }) => {
     const [stats, setStats] = useState(null);
     const [listings, setListings] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [viewStatus, setViewStatus] = useState('active'); // 'active' or 'removed'
 
     useEffect(() => {
         fetchPortfolio();
-    }, [mode, userId]);
+    }, [mode, userId, viewStatus]);
 
     const fetchPortfolio = async () => {
         try {
             setLoading(true);
             const params = {
                 portfolio: mode,
+                status: viewStatus,
                 ...(mode === 'mine' && { user_id: userId })
             };
             const response = await api.get('/properties', { params });
@@ -62,10 +64,26 @@ const PortfolioDashboard = ({ mode = 'agency', userId }) => {
 
     return (
         <div className="space-y-6">
-            <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                <Building className="text-blue-600" />
-                {mode === 'agency' ? 'Genel Portföy Durumu' : 'Portföyüm'}
-            </h3>
+            <div className="flex justify-between items-center">
+                <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <Building className="text-blue-600" />
+                    {mode === 'agency' ? 'Genel Portföy Durumu' : 'Portföyüm'}
+                </h3>
+                <div className="flex bg-gray-100 p-1 rounded-lg">
+                    <button
+                        onClick={() => setViewStatus('active')}
+                        className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${viewStatus === 'active' ? 'bg-white text-emerald-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                    >
+                        Aktif İlanlar
+                    </button>
+                    <button
+                        onClick={() => setViewStatus('removed')}
+                        className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${viewStatus === 'removed' ? 'bg-white text-rose-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                    >
+                        Yayından Kalkanlar
+                    </button>
+                </div>
+            </div>
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -116,7 +134,7 @@ const PortfolioDashboard = ({ mode = 'agency', userId }) => {
                         <tbody className="divide-y divide-gray-50">
                             {listings.slice(0, 5).map(p => (
                                 <tr key={p.id} className="hover:bg-gray-50">
-                                    <td className="px-4 py-3 font-medium text-gray-800 max-w-xs truncate">{p.title}</td>
+                                    <td className="px-4 py-3 font-medium text-gray-800 max-w-xs truncate">{p.title?.split('#')[0].trim()}</td>
                                     <td className="px-4 py-3 text-emerald-600 font-bold">{parseFloat(p.price).toLocaleString()} ₺</td>
                                     <td className="px-4 py-3">
                                         {p.url.includes('sahibinden')

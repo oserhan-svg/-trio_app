@@ -6,6 +6,7 @@ const MarketRadar = ({ onBack }) => {
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeCategory, setActiveCategory] = useState('daire'); // 'daire', 'villa', 'arsa', 'zeytinlik'
+    const [ownerOnly, setOwnerOnly] = useState(false);
 
     useEffect(() => {
         fetchProperties();
@@ -13,7 +14,7 @@ const MarketRadar = ({ onBack }) => {
 
     const fetchProperties = async () => {
         try {
-            const response = await api.get('/properties');
+            const response = await api.get('/properties?limit=100');
             // Handle paginated response ({ data: [...], meta: ... }) or legacy array
             const data = Array.isArray(response.data) ? response.data : (response.data.data || []);
             setProperties(data);
@@ -53,16 +54,18 @@ const MarketRadar = ({ onBack }) => {
         { id: 'daire', label: 'Daire', icon: Building, color: 'blue' },
         { id: 'villa', label: 'Villa', icon: Home, color: 'purple' },
         { id: 'arsa', label: 'Arsa', icon: TreeDeciduous, color: 'emerald' },
-        { id: 'zeytinlik', label: 'Zeytinlik', icon: TreeDeciduous, color: 'lime' }, // Olive -> Lime
+        { id: 'zeytinlik', label: 'Zeytinlik', icon: TreeDeciduous, color: 'lime' },
         { id: 'tarla', label: 'Tarla', icon: TreeDeciduous, color: 'amber' },
         { id: 'commercial', label: 'İşyeri', icon: Building, color: 'gray' },
         { id: 'tourism', label: 'Turizm', icon: Home, color: 'orange' }
     ];
 
     const filteredProperties = properties
+        .filter(p => p.status !== 'removed') // Exclude removed listings
         .filter(p => getCategory(p) === activeCategory)
+        .filter(p => !ownerOnly || p.seller_type === 'owner')
         .sort((a, b) => (b.opportunity_score || 0) - (a.opportunity_score || 0))
-        .slice(0, 20); // Top 20
+        .slice(0, 50); // Show more results
 
     if (loading) return <div className="p-8 text-center text-gray-500">Piyasa verileri taranıyor...</div>;
 
@@ -84,8 +87,20 @@ const MarketRadar = ({ onBack }) => {
                             <TrendingUp className="text-rose-500" />
                             Fırsat Radarı
                         </h2>
-                        <p className="text-sm text-gray-500">Kategorilere göre en yüksek puanlı fırsatlar</p>
+                        <p className="text-sm text-gray-500">Piyasa ortalamasının altındaki {activeCategory} ilanları</p>
                     </div>
+                </div>
+
+                <div className="flex items-center gap-4">
+                    <label className="flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm hover:border-emerald-300 transition-colors">
+                        <input
+                            type="checkbox"
+                            checked={ownerOnly}
+                            onChange={(e) => setOwnerOnly(e.target.checked)}
+                            className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-gray-300"
+                        />
+                        <span className="text-xs font-bold text-gray-700">Sadece Sahibinden</span>
+                    </label>
                 </div>
             </div>
 
@@ -104,11 +119,11 @@ const MarketRadar = ({ onBack }) => {
                                     : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
                                     }`}
                             >
-                                <div className={`p-2 rounded-lg ${isActive ? `bg-${cat.color}-50 text-${cat.color}-600` : 'bg-transparent'
+                                <div className={`p-2 rounded-lg ${isActive ? `bg-${cat.color === 'lime' ? 'emerald' : cat.color}-50 text-${cat.color === 'lime' ? 'emerald' : cat.color}-600` : 'bg-transparent'
                                     }`}>
                                     <Icon size={20} className={isActive ? '' : 'opacity-70'} />
                                 </div>
-                                <span>{cat.label}</span>
+                                <span className="text-sm">{cat.label}</span>
                                 {isActive && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-rose-500" />}
                             </button>
                         );
@@ -119,7 +134,7 @@ const MarketRadar = ({ onBack }) => {
                 <div className="flex-1 p-6 bg-slate-50 overflow-y-auto h-[600px]">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         {filteredProperties.length > 0 ? filteredProperties.map(p => (
-                            <div key={p.id} className="bg-white p-4 rounded-xl border border-gray-100 hover:shadow-md transition-shadow group flex gap-4">
+                            <div key={p.id} className="bg-white p-4 rounded-xl border border-gray-100 hover:shadow-md transition-shadow group flex gap-4 relative">
                                 {/* Image */}
                                 <div className="w-32 h-32 flex-shrink-0 bg-gray-200 rounded-lg overflow-hidden relative">
                                     {p.images && p.images[0] ? (
@@ -127,53 +142,71 @@ const MarketRadar = ({ onBack }) => {
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-gray-400">No Img</div>
                                     )}
-                                    <div className="absolute top-2 left-2 bg-white/90 backdrop-blur px-2 py-0.5 rounded text-xs font-bold shadow-sm">
+                                    <div className="absolute top-2 left-2 bg-white/95 backdrop-blur px-2 py-0.5 rounded text-[10px] font-bold shadow-sm border border-gray-100">
                                         {p.district}
                                     </div>
+                                    {p.seller_type === 'owner' && (
+                                        <div className="absolute bottom-2 left-2 bg-blue-600 text-white px-1.5 py-0.5 rounded text-[9px] font-bold shadow-sm">
+                                            Sahibinden
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Details */}
                                 <div className="flex-1 min-w-0 flex flex-col justify-between">
                                     <div>
-                                        <h3 className="font-bold text-gray-900 line-clamp-2 text-sm mb-1 group-hover:text-blue-600 transition-colors">
-                                            {p.title}
-                                        </h3>
-                                        <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
-                                            <span>{p.rooms || '-'}</span>
-                                            <span>•</span>
-                                            <span>{p.size_m2}m²</span>
-                                            <span>•</span>
-                                            <span>{p.neighborhood}</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-end justify-between">
-                                        <div>
-                                            <div className="text-lg font-bold text-emerald-600">
-                                                {parseFloat(p.price).toLocaleString()} ₺
-                                            </div>
-                                            <div className="text-xs text-gray-400">
-                                                {Math.round(p.price / p.size_m2).toLocaleString()} ₺/m²
-                                            </div>
-                                        </div>
-
-                                        {/* Score Badge */}
-                                        <div className="flex flex-col items-end gap-1">
-                                            <div className={`px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 ${p.opportunity_score >= 8 ? 'bg-emerald-100 text-emerald-700' :
-                                                p.opportunity_score >= 6 ? 'bg-yellow-100 text-yellow-700' :
-                                                    'bg-gray-100 text-gray-600'
-                                                }`}>
-                                                <span>Puan: {p.opportunity_score}</span>
-                                            </div>
+                                        <div className="flex justify-between items-start mb-1">
+                                            <h3 className="font-bold text-gray-900 line-clamp-2 text-xs group-hover:text-blue-600 transition-colors pr-8">
+                                                {p.title?.split('#')[0].trim()}
+                                            </h3>
                                             <a
                                                 href={p.url}
                                                 target="_blank"
                                                 rel="noreferrer"
-                                                className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors"
-                                                title="İlana Git"
+                                                className="absolute top-4 right-4 p-1.5 text-gray-300 hover:text-rose-500 transition-colors"
                                             >
-                                                <ExternalLink size={16} />
+                                                <ExternalLink size={14} />
                                             </a>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-[10px] text-gray-500 mb-2">
+                                            <span>{p.rooms || '-'}</span>
+                                            <span>•</span>
+                                            <span>{p.size_m2}m²</span>
+                                            <span>•</span>
+                                            <span className="truncate">{p.neighborhood}</span>
+                                        </div>
+
+                                        {/* Score & Deviation */}
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${p.opportunity_score >= 8 ? 'bg-emerald-100 text-emerald-700' :
+                                                p.opportunity_score >= 6 ? 'bg-amber-100 text-amber-700' :
+                                                    'bg-gray-100 text-gray-600'
+                                                }`}>
+                                                {p.opportunity_label || `Puan: ${p.opportunity_score}`}
+                                            </span>
+                                            {p.deviation > 0 && (
+                                                <span className="text-[10px] font-bold text-emerald-600">
+                                                    %{p.deviation} daha uygun
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-end justify-between border-t border-gray-50 pt-2">
+                                        <div>
+                                            <div className="text-sm font-bold text-gray-900">
+                                                {parseFloat(p.price).toLocaleString()} ₺
+                                            </div>
+                                            <div className="text-[10px] text-gray-400">
+                                                {Math.round(p.price / p.size_m2).toLocaleString()} ₺/m²
+                                            </div>
+                                        </div>
+
+                                        <div className="text-right">
+                                            <div className="text-[9px] text-gray-400 uppercase tracking-tighter">Geri Dönüş</div>
+                                            <div className="text-[10px] font-bold text-blue-600">
+                                                {p.roi?.amortizationYears} Yıl
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -183,7 +216,7 @@ const MarketRadar = ({ onBack }) => {
                                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                                     <TreeDeciduous className="text-gray-400" size={32} />
                                 </div>
-                                <p>Bu kategoride şu an fırsat listelenecek ilan bulunamadı.</p>
+                                <p>Bu kategoride şu an kriterlere uygun fırsat bulunamadı.</p>
                             </div>
                         )}
                     </div>

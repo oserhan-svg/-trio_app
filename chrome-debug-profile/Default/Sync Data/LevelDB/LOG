@@ -1,0 +1,11 @@
+2026/01/19-18:35:56.552 924 Creating DB C:\Users\ozanc\Downloads\emlak22\chrome-debug-profile\Default\Sync Data\LevelDB since it was missing.
+2026/01/19-18:35:56.603 924 Reusing MANIFEST C:\Users\ozanc\Downloads\emlak22\chrome-debug-profile\Default\Sync Data\LevelDB/MANIFEST-000001
+2026/01/19-18:40:53.282 924 Level-0 table #5: started
+2026/01/19-18:40:53.290 924 Level-0 table #5: 236474 bytes OK
+2026/01/19-18:40:53.292 924 Delete type=0 #3
+2026/01/19-19:36:45.739 924 Level-0 table #7: started
+2026/01/19-19:36:45.745 924 Level-0 table #7: 107847 bytes OK
+2026/01/19-19:36:45.746 924 Delete type=0 #4
+2026/01/19-19:42:07.790 924 Level-0 table #9: started
+2026/01/19-19:42:07.801 924 Level-0 table #9: 103464 bytes OK
+2026/01/19-19:42:07.802 924 Delete type=0 #6

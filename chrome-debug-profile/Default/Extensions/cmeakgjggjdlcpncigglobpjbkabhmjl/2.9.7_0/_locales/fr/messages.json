@@ -1,0 +1,10 @@
+{
+   "extension_description": {
+      "description": "Description de l'extension",
+      "message": "Améliore Steam : vente automatique de skins, objets bon marché provenant de diverses sources, et bien plus encore."
+   },
+   "langcode": {
+      "description": "",
+      "message": "fr"
+   }
+}

@@ -39,7 +39,7 @@ const MapView = ({ properties }) => {
                         <Marker key={prop.id} position={[lat, lng]}>
                             <Popup>
                                 <div className="text-sm">
-                                    <h3 className="font-bold">{prop.title}</h3>
+                                    <h3 className="font-bold">{prop.title?.split('#')[0].trim()}</h3>
                                     <p className="text-blue-600 font-semibold">{parseFloat(prop.price).toLocaleString('tr-TR')} TL</p>
                                     <p>{prop.neighborhood}</p>
                                     <a href={prop.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline text-xs">İlana Git</a>

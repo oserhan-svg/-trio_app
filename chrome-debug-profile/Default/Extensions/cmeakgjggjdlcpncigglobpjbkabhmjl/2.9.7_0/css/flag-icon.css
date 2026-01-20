@@ -1,0 +1,1822 @@
+@charset "UTF-8";
+.flag-icon-background,
+.flag-icon {
+  background-size: contain !important;
+  background-position: 50% !important;
+  background-repeat: no-repeat !important;
+}
+
+.flag-icon {
+  position: relative !important;
+  display: inline-block !important;
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 50% !important;
+  line-height: 1em !important;
+  box-sizing: border-box !important;
+}
+.flag-icon:before {
+  content: ' ' !important;
+}
+.flag-icon.flag-icon-squared {
+  width: 1em;
+}
+
+.flag-icon-abw {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/abw.svg) !important;
+}
+.flag-icon-abw.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/abw.svg) !important;
+}
+
+.flag-icon-afg {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/afg.svg) !important;
+}
+.flag-icon-afg.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/afg.svg) !important;
+}
+
+.flag-icon-ago {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/ago.svg) !important;
+}
+.flag-icon-ago.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/ago.svg) !important;
+}
+
+.flag-icon-aia {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/aia.svg) !important;
+}
+.flag-icon-aia.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/aia.svg) !important;
+}
+
+.flag-icon-ala {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/ala.svg) !important;
+}
+.flag-icon-ala.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/ala.svg) !important;
+}
+
+.flag-icon-alb {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/alb.svg) !important;
+}
+.flag-icon-alb.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/alb.svg) !important;
+}
+
+.flag-icon-and {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/and.svg) !important;
+}
+.flag-icon-and.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/and.svg) !important;
+}
+
+.flag-icon-are {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/are.svg) !important;
+}
+.flag-icon-are.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/are.svg) !important;
+}
+
+.flag-icon-arg {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/arg.svg) !important;
+}
+.flag-icon-arg.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/arg.svg) !important;
+}
+
+.flag-icon-arm {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/arm.svg) !important;
+}
+.flag-icon-arm.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/arm.svg) !important;
+}
+
+.flag-icon-asm {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/asm.svg) !important;
+}
+.flag-icon-asm.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/asm.svg) !important;
+}
+
+.flag-icon-ata {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/ata.svg) !important;
+}
+.flag-icon-ata.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/ata.svg) !important;
+}
+
+.flag-icon-atf {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/atf.svg) !important;
+}
+.flag-icon-atf.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/atf.svg) !important;
+}
+
+.flag-icon-atg {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/atg.svg) !important;
+}
+.flag-icon-atg.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/atg.svg) !important;
+}
+
+.flag-icon-aus {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/aus.svg) !important;
+}
+.flag-icon-aus.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/aus.svg) !important;
+}
+
+.flag-icon-aut {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/aut.svg) !important;
+}
+.flag-icon-aut.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/aut.svg) !important;
+}
+
+.flag-icon-aze {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/aze.svg) !important;
+}
+.flag-icon-aze.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/aze.svg) !important;
+}
+
+.flag-icon-bdi {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/bdi.svg) !important;
+}
+.flag-icon-bdi.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/bdi.svg) !important;
+}
+
+.flag-icon-bel {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/bel.svg) !important;
+}
+.flag-icon-bel.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/bel.svg) !important;
+}
+
+.flag-icon-ben {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/ben.svg) !important;
+}
+.flag-icon-ben.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/ben.svg) !important;
+}
+
+.flag-icon-bes {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/bes.svg) !important;
+}
+.flag-icon-bes.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/bes.svg) !important;
+}
+
+.flag-icon-bfa {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/bfa.svg) !important;
+}
+.flag-icon-bfa.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/bfa.svg) !important;
+}
+
+.flag-icon-bgd {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/bgd.svg) !important;
+}
+.flag-icon-bgd.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/bgd.svg) !important;
+}
+
+.flag-icon-bgr {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/bgr.svg) !important;
+}
+.flag-icon-bgr.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/bgr.svg) !important;
+}
+
+.flag-icon-bhr {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/bhr.svg) !important;
+}
+.flag-icon-bhr.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/bhr.svg) !important;
+}
+
+.flag-icon-bhs {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/bhs.svg) !important;
+}
+.flag-icon-bhs.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/bhs.svg) !important;
+}
+
+.flag-icon-bih {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/bih.svg) !important;
+}
+.flag-icon-bih.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/bih.svg) !important;
+}
+
+.flag-icon-blm {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/blm.svg) !important;
+}
+.flag-icon-blm.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/blm.svg) !important;
+}
+
+.flag-icon-blr {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/blr.svg) !important;
+}
+.flag-icon-blr.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/blr.svg) !important;
+}
+
+.flag-icon-blz {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/blz.svg) !important;
+}
+.flag-icon-blz.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/blz.svg) !important;
+}
+
+.flag-icon-bmu {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/bmu.svg) !important;
+}
+.flag-icon-bmu.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/bmu.svg) !important;
+}
+
+.flag-icon-bol {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/bol.svg) !important;
+}
+.flag-icon-bol.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/bol.svg) !important;
+}
+
+.flag-icon-bra {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/bra.svg) !important;
+}
+.flag-icon-bra.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/bra.svg) !important;
+}
+
+.flag-icon-brb {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/brb.svg) !important;
+}
+.flag-icon-brb.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/brb.svg) !important;
+}
+
+.flag-icon-brn {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/brn.svg) !important;
+}
+.flag-icon-brn.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/brn.svg) !important;
+}
+
+.flag-icon-btn {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/btn.svg) !important;
+}
+.flag-icon-btn.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/btn.svg) !important;
+}
+
+.flag-icon-bvt {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/bvt.svg) !important;
+}
+.flag-icon-bvt.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/bvt.svg) !important;
+}
+
+.flag-icon-bwa {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/bwa.svg) !important;
+}
+.flag-icon-bwa.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/bwa.svg) !important;
+}
+
+.flag-icon-caf {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/caf.svg) !important;
+}
+.flag-icon-caf.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/caf.svg) !important;
+}
+
+.flag-icon-can {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/can.svg) !important;
+}
+.flag-icon-can.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/can.svg) !important;
+}
+
+.flag-icon-cat {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/cat.svg) !important;
+}
+.flag-icon-cat.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/cat.svg) !important;
+}
+
+.flag-icon-cck {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/cck.svg) !important;
+}
+.flag-icon-cck.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/cck.svg) !important;
+}
+
+.flag-icon-che {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/che.svg) !important;
+}
+.flag-icon-che.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/che.svg) !important;
+}
+
+.flag-icon-chl {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/chl.svg) !important;
+}
+.flag-icon-chl.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/chl.svg) !important;
+}
+
+.flag-icon-chn {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/chn.svg) !important;
+}
+.flag-icon-chn.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/chn.svg) !important;
+}
+
+.flag-icon-civ {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/civ.svg) !important;
+}
+.flag-icon-civ.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/civ.svg) !important;
+}
+
+.flag-icon-cmr {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/cmr.svg) !important;
+}
+.flag-icon-cmr.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/cmr.svg) !important;
+}
+
+.flag-icon-cod {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/cod.svg) !important;
+}
+.flag-icon-cod.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/cod.svg) !important;
+}
+
+.flag-icon-cog {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/cog.svg) !important;
+}
+.flag-icon-cog.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/cog.svg) !important;
+}
+
+.flag-icon-cok {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/cok.svg) !important;
+}
+.flag-icon-cok.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/cok.svg) !important;
+}
+
+.flag-icon-col {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/col.svg) !important;
+}
+.flag-icon-col.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/col.svg) !important;
+}
+
+.flag-icon-com {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/com.svg) !important;
+}
+.flag-icon-com.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/com.svg) !important;
+}
+
+.flag-icon-cpv {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/cpv.svg) !important;
+}
+.flag-icon-cpv.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/cpv.svg) !important;
+}
+
+.flag-icon-cri {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/cri.svg) !important;
+}
+.flag-icon-cri.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/cri.svg) !important;
+}
+
+.flag-icon-cub {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/cub.svg) !important;
+}
+.flag-icon-cub.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/cub.svg) !important;
+}
+
+.flag-icon-cuw {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/cuw.svg) !important;
+}
+.flag-icon-cuw.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/cuw.svg) !important;
+}
+
+.flag-icon-cxr {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/cxr.svg) !important;
+}
+.flag-icon-cxr.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/cxr.svg) !important;
+}
+
+.flag-icon-cym {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/cym.svg) !important;
+}
+.flag-icon-cym.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/cym.svg) !important;
+}
+
+.flag-icon-cyp {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/cyp.svg) !important;
+}
+.flag-icon-cyp.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/cyp.svg) !important;
+}
+
+.flag-icon-cze {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/cze.svg) !important;
+}
+.flag-icon-cze.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/cze.svg) !important;
+}
+
+.flag-icon-deu {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/deu.svg) !important;
+}
+.flag-icon-deu.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/deu.svg) !important;
+}
+
+.flag-icon-dji {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/dji.svg) !important;
+}
+.flag-icon-dji.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/dji.svg) !important;
+}
+
+.flag-icon-dma {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/dma.svg) !important;
+}
+.flag-icon-dma.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/dma.svg) !important;
+}
+
+.flag-icon-dnk {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/dnk.svg) !important;
+}
+.flag-icon-dnk.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/dnk.svg) !important;
+}
+
+.flag-icon-dom {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/dom.svg) !important;
+}
+.flag-icon-dom.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/dom.svg) !important;
+}
+
+.flag-icon-dza {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/dza.svg) !important;
+}
+.flag-icon-dza.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/dza.svg) !important;
+}
+
+.flag-icon-ecu {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/ecu.svg) !important;
+}
+.flag-icon-ecu.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/ecu.svg) !important;
+}
+
+.flag-icon-egy {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/egy.svg) !important;
+}
+.flag-icon-egy.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/egy.svg) !important;
+}
+
+.flag-icon-eng {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/eng.svg) !important;
+}
+.flag-icon-eng.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/eng.svg) !important;
+}
+
+.flag-icon-eri {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/eri.svg) !important;
+}
+.flag-icon-eri.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/eri.svg) !important;
+}
+
+.flag-icon-esh {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/esh.svg) !important;
+}
+.flag-icon-esh.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/esh.svg) !important;
+}
+
+.flag-icon-esp {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/esp.svg) !important;
+}
+.flag-icon-esp.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/esp.svg) !important;
+}
+
+.flag-icon-est {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/est.svg) !important;
+}
+.flag-icon-est.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/est.svg) !important;
+}
+
+.flag-icon-eth {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/eth.svg) !important;
+}
+.flag-icon-eth.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/eth.svg) !important;
+}
+
+.flag-icon-eun {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/eun.svg) !important;
+}
+.flag-icon-eun.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/eun.svg) !important;
+}
+
+.flag-icon-fin {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/fin.svg) !important;
+}
+.flag-icon-fin.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/fin.svg) !important;
+}
+
+.flag-icon-fji {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/fji.svg) !important;
+}
+.flag-icon-fji.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/fji.svg) !important;
+}
+
+.flag-icon-flk {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/flk.svg) !important;
+}
+.flag-icon-flk.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/flk.svg) !important;
+}
+
+.flag-icon-fra {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/fra.svg) !important;
+}
+.flag-icon-fra.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/fra.svg) !important;
+}
+
+.flag-icon-fro {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/fro.svg) !important;
+}
+.flag-icon-fro.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/fro.svg) !important;
+}
+
+.flag-icon-fsm {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/fsm.svg) !important;
+}
+.flag-icon-fsm.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/fsm.svg) !important;
+}
+
+.flag-icon-gab {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/gab.svg) !important;
+}
+.flag-icon-gab.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/gab.svg) !important;
+}
+
+.flag-icon-gbr {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/gbr.svg) !important;
+}
+.flag-icon-gbr.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/gbr.svg) !important;
+}
+
+.flag-icon-geo {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/geo.svg) !important;
+}
+.flag-icon-geo.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/geo.svg) !important;
+}
+
+.flag-icon-ggy {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/ggy.svg) !important;
+}
+.flag-icon-ggy.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/ggy.svg) !important;
+}
+
+.flag-icon-gha {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/gha.svg) !important;
+}
+.flag-icon-gha.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/gha.svg) !important;
+}
+
+.flag-icon-gib {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/gib.svg) !important;
+}
+.flag-icon-gib.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/gib.svg) !important;
+}
+
+.flag-icon-gin {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/gin.svg) !important;
+}
+.flag-icon-gin.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/gin.svg) !important;
+}
+
+.flag-icon-glp {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/glp.svg) !important;
+}
+.flag-icon-glp.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/glp.svg) !important;
+}
+
+.flag-icon-gmb {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/gmb.svg) !important;
+}
+.flag-icon-gmb.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/gmb.svg) !important;
+}
+
+.flag-icon-gnb {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/gnb.svg) !important;
+}
+.flag-icon-gnb.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/gnb.svg) !important;
+}
+
+.flag-icon-gnq {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/gnq.svg) !important;
+}
+.flag-icon-gnq.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/gnq.svg) !important;
+}
+
+.flag-icon-grc {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/grc.svg) !important;
+}
+.flag-icon-grc.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/grc.svg) !important;
+}
+
+.flag-icon-grd {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/grd.svg) !important;
+}
+.flag-icon-grd.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/grd.svg) !important;
+}
+
+.flag-icon-grl {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/grl.svg) !important;
+}
+.flag-icon-grl.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/grl.svg) !important;
+}
+
+.flag-icon-gtm {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/gtm.svg) !important;
+}
+.flag-icon-gtm.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/gtm.svg) !important;
+}
+
+.flag-icon-guf {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/guf.svg) !important;
+}
+.flag-icon-guf.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/guf.svg) !important;
+}
+
+.flag-icon-gum {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/gum.svg) !important;
+}
+.flag-icon-gum.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/gum.svg) !important;
+}
+
+.flag-icon-guy {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/guy.svg) !important;
+}
+.flag-icon-guy.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/guy.svg) !important;
+}
+
+.flag-icon-hkg {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/hkg.svg) !important;
+}
+.flag-icon-hkg.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/hkg.svg) !important;
+}
+
+.flag-icon-hmd {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/hmd.svg) !important;
+}
+.flag-icon-hmd.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/hmd.svg) !important;
+}
+
+.flag-icon-hnd {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/hnd.svg) !important;
+}
+.flag-icon-hnd.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/hnd.svg) !important;
+}
+
+.flag-icon-hrv {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/hrv.svg) !important;
+}
+.flag-icon-hrv.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/hrv.svg) !important;
+}
+
+.flag-icon-hti {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/hti.svg) !important;
+}
+.flag-icon-hti.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/hti.svg) !important;
+}
+
+.flag-icon-hun {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/hun.svg) !important;
+}
+.flag-icon-hun.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/hun.svg) !important;
+}
+
+.flag-icon-idn {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/idn.svg) !important;
+}
+.flag-icon-idn.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/idn.svg) !important;
+}
+
+.flag-icon-imn {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/imn.svg) !important;
+}
+.flag-icon-imn.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/imn.svg) !important;
+}
+
+.flag-icon-ind {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/ind.svg) !important;
+}
+.flag-icon-ind.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/ind.svg) !important;
+}
+
+.flag-icon-iot {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/iot.svg) !important;
+}
+.flag-icon-iot.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/iot.svg) !important;
+}
+
+.flag-icon-irl {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/irl.svg) !important;
+}
+.flag-icon-irl.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/irl.svg) !important;
+}
+
+.flag-icon-irn {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/irn.svg) !important;
+}
+.flag-icon-irn.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/irn.svg) !important;
+}
+
+.flag-icon-irq {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/irq.svg) !important;
+}
+.flag-icon-irq.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/irq.svg) !important;
+}
+
+.flag-icon-isl {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/isl.svg) !important;
+}
+.flag-icon-isl.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/isl.svg) !important;
+}
+
+.flag-icon-isr {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/isr.svg) !important;
+}
+.flag-icon-isr.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/isr.svg) !important;
+}
+
+.flag-icon-ita {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/ita.svg) !important;
+}
+.flag-icon-ita.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/ita.svg) !important;
+}
+
+.flag-icon-jam {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/jam.svg) !important;
+}
+.flag-icon-jam.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/jam.svg) !important;
+}
+
+.flag-icon-jey {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/jey.svg) !important;
+}
+.flag-icon-jey.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/jey.svg) !important;
+}
+
+.flag-icon-jor {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/jor.svg) !important;
+}
+.flag-icon-jor.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/jor.svg) !important;
+}
+
+.flag-icon-jpn {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/jpn.svg) !important;
+}
+.flag-icon-jpn.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/jpn.svg) !important;
+}
+
+.flag-icon-kaz {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/kaz.svg) !important;
+}
+.flag-icon-kaz.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/kaz.svg) !important;
+}
+
+.flag-icon-ken {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/ken.svg) !important;
+}
+.flag-icon-ken.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/ken.svg) !important;
+}
+
+.flag-icon-kgz {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/kgz.svg) !important;
+}
+.flag-icon-kgz.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/kgz.svg) !important;
+}
+
+.flag-icon-khm {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/khm.svg) !important;
+}
+.flag-icon-khm.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/khm.svg) !important;
+}
+
+.flag-icon-kir {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/kir.svg) !important;
+}
+.flag-icon-kir.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/kir.svg) !important;
+}
+
+.flag-icon-kna {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/kna.svg) !important;
+}
+.flag-icon-kna.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/kna.svg) !important;
+}
+
+.flag-icon-kor {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/kor.svg) !important;
+}
+.flag-icon-kor.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/kor.svg) !important;
+}
+
+.flag-icon-kos {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/kos.svg) !important;
+}
+.flag-icon-kos.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/kos.svg) !important;
+}
+
+.flag-icon-kwt {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/kwt.svg) !important;
+}
+.flag-icon-kwt.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/kwt.svg) !important;
+}
+
+.flag-icon-lao {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/lao.svg) !important;
+}
+.flag-icon-lao.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/lao.svg) !important;
+}
+
+.flag-icon-lbn {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/lbn.svg) !important;
+}
+.flag-icon-lbn.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/lbn.svg) !important;
+}
+
+.flag-icon-lbr {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/lbr.svg) !important;
+}
+.flag-icon-lbr.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/lbr.svg) !important;
+}
+
+.flag-icon-lby {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/lby.svg) !important;
+}
+.flag-icon-lby.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/lby.svg) !important;
+}
+
+.flag-icon-lca {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/lca.svg) !important;
+}
+.flag-icon-lca.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/lca.svg) !important;
+}
+
+.flag-icon-lie {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/lie.svg) !important;
+}
+.flag-icon-lie.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/lie.svg) !important;
+}
+
+.flag-icon-lka {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/lka.svg) !important;
+}
+.flag-icon-lka.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/lka.svg) !important;
+}
+
+.flag-icon-lso {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/lso.svg) !important;
+}
+.flag-icon-lso.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/lso.svg) !important;
+}
+
+.flag-icon-ltu {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/ltu.svg) !important;
+}
+.flag-icon-ltu.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/ltu.svg) !important;
+}
+
+.flag-icon-lux {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/lux.svg) !important;
+}
+.flag-icon-lux.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/lux.svg) !important;
+}
+
+.flag-icon-lva {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/lva.svg) !important;
+}
+.flag-icon-lva.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/lva.svg) !important;
+}
+
+.flag-icon-mac {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/mac.svg) !important;
+}
+.flag-icon-mac.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/mac.svg) !important;
+}
+
+.flag-icon-maf {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/maf.svg) !important;
+}
+.flag-icon-maf.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/maf.svg) !important;
+}
+
+.flag-icon-mar {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/mar.svg) !important;
+}
+.flag-icon-mar.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/mar.svg) !important;
+}
+
+.flag-icon-mco {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/mco.svg) !important;
+}
+.flag-icon-mco.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/mco.svg) !important;
+}
+
+.flag-icon-mda {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/mda.svg) !important;
+}
+.flag-icon-mda.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/mda.svg) !important;
+}
+
+.flag-icon-mdg {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/mdg.svg) !important;
+}
+.flag-icon-mdg.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/mdg.svg) !important;
+}
+
+.flag-icon-mdv {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/mdv.svg) !important;
+}
+.flag-icon-mdv.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/mdv.svg) !important;
+}
+
+.flag-icon-mex {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/mex.svg) !important;
+}
+.flag-icon-mex.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/mex.svg) !important;
+}
+
+.flag-icon-mhl {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/mhl.svg) !important;
+}
+.flag-icon-mhl.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/mhl.svg) !important;
+}
+
+.flag-icon-mkd {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/mkd.svg) !important;
+}
+.flag-icon-mkd.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/mkd.svg) !important;
+}
+
+.flag-icon-mli {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/mli.svg) !important;
+}
+.flag-icon-mli.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/mli.svg) !important;
+}
+
+.flag-icon-mlt {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/mlt.svg) !important;
+}
+.flag-icon-mlt.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/mlt.svg) !important;
+}
+
+.flag-icon-mmr {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/mmr.svg) !important;
+}
+.flag-icon-mmr.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/mmr.svg) !important;
+}
+
+.flag-icon-mne {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/mne.svg) !important;
+}
+.flag-icon-mne.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/mne.svg) !important;
+}
+
+.flag-icon-mng {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/mng.svg) !important;
+}
+.flag-icon-mng.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/mng.svg) !important;
+}
+
+.flag-icon-mnp {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/mnp.svg) !important;
+}
+.flag-icon-mnp.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/mnp.svg) !important;
+}
+
+.flag-icon-moz {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/moz.svg) !important;
+}
+.flag-icon-moz.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/moz.svg) !important;
+}
+
+.flag-icon-mrt {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/mrt.svg) !important;
+}
+.flag-icon-mrt.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/mrt.svg) !important;
+}
+
+.flag-icon-msr {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/msr.svg) !important;
+}
+.flag-icon-msr.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/msr.svg) !important;
+}
+
+.flag-icon-mtq {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/mtq.svg) !important;
+}
+.flag-icon-mtq.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/mtq.svg) !important;
+}
+
+.flag-icon-mus {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/mus.svg) !important;
+}
+.flag-icon-mus.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/mus.svg) !important;
+}
+
+.flag-icon-mwi {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/mwi.svg) !important;
+}
+.flag-icon-mwi.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/mwi.svg) !important;
+}
+
+.flag-icon-mys {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/mys.svg) !important;
+}
+.flag-icon-mys.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/mys.svg) !important;
+}
+
+.flag-icon-myt {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/myt.svg) !important;
+}
+.flag-icon-myt.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/myt.svg) !important;
+}
+
+.flag-icon-nam {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/nam.svg) !important;
+}
+.flag-icon-nam.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/nam.svg) !important;
+}
+
+.flag-icon-ncl {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/ncl.svg) !important;
+}
+.flag-icon-ncl.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/ncl.svg) !important;
+}
+
+.flag-icon-ner {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/ner.svg) !important;
+}
+.flag-icon-ner.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/ner.svg) !important;
+}
+
+.flag-icon-nfk {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/nfk.svg) !important;
+}
+.flag-icon-nfk.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/nfk.svg) !important;
+}
+
+.flag-icon-nga {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/nga.svg) !important;
+}
+.flag-icon-nga.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/nga.svg) !important;
+}
+
+.flag-icon-nic {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/nic.svg) !important;
+}
+.flag-icon-nic.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/nic.svg) !important;
+}
+
+.flag-icon-nir {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/nir.svg) !important;
+}
+.flag-icon-nir.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/nir.svg) !important;
+}
+
+.flag-icon-niu {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/niu.svg) !important;
+}
+.flag-icon-niu.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/niu.svg) !important;
+}
+
+.flag-icon-nld {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/nld.svg) !important;
+}
+.flag-icon-nld.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/nld.svg) !important;
+}
+
+.flag-icon-nor {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/nor.svg) !important;
+}
+.flag-icon-nor.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/nor.svg) !important;
+}
+
+.flag-icon-npl {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/npl.svg) !important;
+}
+.flag-icon-npl.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/npl.svg) !important;
+}
+
+.flag-icon-nru {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/nru.svg) !important;
+}
+.flag-icon-nru.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/nru.svg) !important;
+}
+
+.flag-icon-nzl {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/nzl.svg) !important;
+}
+.flag-icon-nzl.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/nzl.svg) !important;
+}
+
+.flag-icon-omn {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/omn.svg) !important;
+}
+.flag-icon-omn.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/omn.svg) !important;
+}
+
+.flag-icon-pak {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/pak.svg) !important;
+}
+.flag-icon-pak.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/pak.svg) !important;
+}
+
+.flag-icon-pan {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/pan.svg) !important;
+}
+.flag-icon-pan.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/pan.svg) !important;
+}
+
+.flag-icon-pcn {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/pcn.svg) !important;
+}
+.flag-icon-pcn.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/pcn.svg) !important;
+}
+
+.flag-icon-per {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/per.svg) !important;
+}
+.flag-icon-per.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/per.svg) !important;
+}
+
+.flag-icon-phl {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/phl.svg) !important;
+}
+.flag-icon-phl.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/phl.svg) !important;
+}
+
+.flag-icon-plw {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/plw.svg) !important;
+}
+.flag-icon-plw.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/plw.svg) !important;
+}
+
+.flag-icon-png {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/png.svg) !important;
+}
+.flag-icon-png.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/png.svg) !important;
+}
+
+.flag-icon-pol {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/pol.svg) !important;
+}
+.flag-icon-pol.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/pol.svg) !important;
+}
+
+.flag-icon-pri {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/pri.svg) !important;
+}
+.flag-icon-pri.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/pri.svg) !important;
+}
+
+.flag-icon-prk {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/prk.svg) !important;
+}
+.flag-icon-prk.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/prk.svg) !important;
+}
+
+.flag-icon-prt {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/prt.svg) !important;
+}
+.flag-icon-prt.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/prt.svg) !important;
+}
+
+.flag-icon-pry {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/pry.svg) !important;
+}
+.flag-icon-pry.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/pry.svg) !important;
+}
+
+.flag-icon-pse {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/pse.svg) !important;
+}
+.flag-icon-pse.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/pse.svg) !important;
+}
+
+.flag-icon-pyf {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/pyf.svg) !important;
+}
+.flag-icon-pyf.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/pyf.svg) !important;
+}
+
+.flag-icon-qat {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/qat.svg) !important;
+}
+.flag-icon-qat.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/qat.svg) !important;
+}
+
+.flag-icon-reu {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/reu.svg) !important;
+}
+.flag-icon-reu.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/reu.svg) !important;
+}
+
+.flag-icon-rou {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/rou.svg) !important;
+}
+.flag-icon-rou.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/rou.svg) !important;
+}
+
+.flag-icon-rus {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/rus.svg) !important;
+}
+.flag-icon-rus.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/rus.svg) !important;
+}
+
+.flag-icon-rwa {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/rwa.svg) !important;
+}
+.flag-icon-rwa.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/rwa.svg) !important;
+}
+
+.flag-icon-sau {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/sau.svg) !important;
+}
+.flag-icon-sau.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/sau.svg) !important;
+}
+
+.flag-icon-sco {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/sco.svg) !important;
+}
+.flag-icon-sco.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/sco.svg) !important;
+}
+
+.flag-icon-sdn {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/sdn.svg) !important;
+}
+.flag-icon-sdn.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/sdn.svg) !important;
+}
+
+.flag-icon-sen {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/sen.svg) !important;
+}
+.flag-icon-sen.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/sen.svg) !important;
+}
+
+.flag-icon-sgp {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/sgp.svg) !important;
+}
+.flag-icon-sgp.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/sgp.svg) !important;
+}
+
+.flag-icon-sgs {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/sgs.svg) !important;
+}
+.flag-icon-sgs.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/sgs.svg) !important;
+}
+
+.flag-icon-shn {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/shn.svg) !important;
+}
+.flag-icon-shn.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/shn.svg) !important;
+}
+
+.flag-icon-sjm {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/sjm.svg) !important;
+}
+.flag-icon-sjm.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/sjm.svg) !important;
+}
+
+.flag-icon-slb {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/slb.svg) !important;
+}
+.flag-icon-slb.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/slb.svg) !important;
+}
+
+.flag-icon-sle {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/sle.svg) !important;
+}
+.flag-icon-sle.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/sle.svg) !important;
+}
+
+.flag-icon-slv {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/slv.svg) !important;
+}
+.flag-icon-slv.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/slv.svg) !important;
+}
+
+.flag-icon-smr {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/smr.svg) !important;
+}
+.flag-icon-smr.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/smr.svg) !important;
+}
+
+.flag-icon-som {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/som.svg) !important;
+}
+.flag-icon-som.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/som.svg) !important;
+}
+
+.flag-icon-spm {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/spm.svg) !important;
+}
+.flag-icon-spm.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/spm.svg) !important;
+}
+
+.flag-icon-srb {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/srb.svg) !important;
+}
+.flag-icon-srb.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/srb.svg) !important;
+}
+
+.flag-icon-ssd {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/ssd.svg) !important;
+}
+.flag-icon-ssd.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/ssd.svg) !important;
+}
+
+.flag-icon-stp {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/stp.svg) !important;
+}
+.flag-icon-stp.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/stp.svg) !important;
+}
+
+.flag-icon-sun {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/sun.svg) !important;
+}
+.flag-icon-sun.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/sun.svg) !important;
+}
+
+.flag-icon-sur {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/sur.svg) !important;
+}
+.flag-icon-sur.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/sur.svg) !important;
+}
+
+.flag-icon-svk {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/svk.svg) !important;
+}
+.flag-icon-svk.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/svk.svg) !important;
+}
+
+.flag-icon-svn {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/svn.svg) !important;
+}
+.flag-icon-svn.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/svn.svg) !important;
+}
+
+.flag-icon-swe {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/swe.svg) !important;
+}
+.flag-icon-swe.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/swe.svg) !important;
+}
+
+.flag-icon-swz {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/swz.svg) !important;
+}
+.flag-icon-swz.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/swz.svg) !important;
+}
+
+.flag-icon-sxm {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/sxm.svg) !important;
+}
+.flag-icon-sxm.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/sxm.svg) !important;
+}
+
+.flag-icon-syc {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/syc.svg) !important;
+}
+.flag-icon-syc.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/syc.svg) !important;
+}
+
+.flag-icon-syr {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/syr.svg) !important;
+}
+.flag-icon-syr.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/syr.svg) !important;
+}
+
+.flag-icon-tca {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/tca.svg) !important;
+}
+.flag-icon-tca.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/tca.svg) !important;
+}
+
+.flag-icon-tcd {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/tcd.svg) !important;
+}
+.flag-icon-tcd.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/tcd.svg) !important;
+}
+
+.flag-icon-tgo {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/tgo.svg) !important;
+}
+.flag-icon-tgo.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/tgo.svg) !important;
+}
+
+.flag-icon-tha {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/tha.svg) !important;
+}
+.flag-icon-tha.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/tha.svg) !important;
+}
+
+.flag-icon-tjk {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/tjk.svg) !important;
+}
+.flag-icon-tjk.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/tjk.svg) !important;
+}
+
+.flag-icon-tkl {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/tkl.svg) !important;
+}
+.flag-icon-tkl.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/tkl.svg) !important;
+}
+
+.flag-icon-tkm {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/tkm.svg) !important;
+}
+.flag-icon-tkm.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/tkm.svg) !important;
+}
+
+.flag-icon-tls {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/tls.svg) !important;
+}
+.flag-icon-tls.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/tls.svg) !important;
+}
+
+.flag-icon-ton {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/ton.svg) !important;
+}
+.flag-icon-ton.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/ton.svg) !important;
+}
+
+.flag-icon-tto {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/tto.svg) !important;
+}
+.flag-icon-tto.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/tto.svg) !important;
+}
+
+.flag-icon-tun {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/tun.svg) !important;
+}
+.flag-icon-tun.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/tun.svg) !important;
+}
+
+.flag-icon-tur {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/tur.svg) !important;
+}
+.flag-icon-tur.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/tur.svg) !important;
+}
+
+.flag-icon-tuv {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/tuv.svg) !important;
+}
+.flag-icon-tuv.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/tuv.svg) !important;
+}
+
+.flag-icon-twn {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/twn.svg) !important;
+}
+.flag-icon-twn.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/twn.svg) !important;
+}
+
+.flag-icon-tza {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/tza.svg) !important;
+}
+.flag-icon-tza.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/tza.svg) !important;
+}
+
+.flag-icon-uga {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/uga.svg) !important;
+}
+.flag-icon-uga.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/uga.svg) !important;
+}
+
+.flag-icon-ukr {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/ukr.svg) !important;
+}
+.flag-icon-ukr.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/ukr.svg) !important;
+}
+
+.flag-icon-umi {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/umi.svg) !important;
+}
+.flag-icon-umi.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/umi.svg) !important;
+}
+
+.flag-icon-ury {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/ury.svg) !important;
+}
+.flag-icon-ury.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/ury.svg) !important;
+}
+
+.flag-icon-usa {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/usa.svg) !important;
+}
+.flag-icon-usa.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/usa.svg) !important;
+}
+
+.flag-icon-uzb {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/uzb.svg) !important;
+}
+.flag-icon-uzb.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/uzb.svg) !important;
+}
+
+.flag-icon-vat {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/vat.svg) !important;
+}
+.flag-icon-vat.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/vat.svg) !important;
+}
+
+.flag-icon-vct {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/vct.svg) !important;
+}
+.flag-icon-vct.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/vct.svg) !important;
+}
+
+.flag-icon-ven {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/ven.svg) !important;
+}
+.flag-icon-ven.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/ven.svg) !important;
+}
+
+.flag-icon-vgb {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/vgb.svg) !important;
+}
+.flag-icon-vgb.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/vgb.svg) !important;
+}
+
+.flag-icon-vir {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/vir.svg) !important;
+}
+.flag-icon-vir.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/vir.svg) !important;
+}
+
+.flag-icon-vnm {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/vnm.svg) !important;
+}
+.flag-icon-vnm.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/vnm.svg) !important;
+}
+
+.flag-icon-vut {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/vut.svg) !important;
+}
+.flag-icon-vut.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/vut.svg) !important;
+}
+
+.flag-icon-wal {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/wal.svg) !important;
+}
+.flag-icon-wal.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/wal.svg) !important;
+}
+
+.flag-icon-wlf {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/wlf.svg) !important;
+}
+.flag-icon-wlf.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/wlf.svg) !important;
+}
+
+.flag-icon-wsm {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/wsm.svg) !important;
+}
+.flag-icon-wsm.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/wsm.svg) !important;
+}
+
+.flag-icon-yem {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/yem.svg) !important;
+}
+.flag-icon-yem.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/yem.svg) !important;
+}
+
+.flag-icon-zaf {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/zaf.svg) !important;
+}
+.flag-icon-zaf.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/zaf.svg) !important;
+}
+
+.flag-icon-zmb {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/zmb.svg) !important;
+}
+.flag-icon-zmb.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/zmb.svg) !important;
+}
+
+.flag-icon-zwe {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/4x3/zwe.svg) !important;
+}
+.flag-icon-zwe.flag-icon-squared {
+  background-image: url(chrome-extension://__MSG_@@extension_id__/assets/flags/1x1/zwe.svg) !important;
+}

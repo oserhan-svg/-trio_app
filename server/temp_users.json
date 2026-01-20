@@ -1,38 +1,10 @@
 [
   {
-    "id": 1,
-    "email": "test_api@example.com",
-    "password_hash": "$2b$10$DYMAu2NYO5bhjUz0MIdN7OmypOkbLATNBhQNGPPU8WxwMAr4fxH.y",
-    "role": "admin",
-    "created_at": "2026-01-14T15:08:42.445Z"
-  },
-  {
-    "id": 4,
-    "email": "danisman@test.com",
-    "password_hash": "$2b$10$GcU4h6AGF6kb0Rs0rl.rYO14WQXR78g6PS1t4He8rZfDkR0sbrMrG",
-    "role": "consultant",
-    "created_at": "2026-01-17T09:09:42.037Z"
-  },
-  {
     "id": 5,
     "email": "danisman2@test.com",
     "password_hash": "$2b$10$wKiajACkNw5hWXpYGnEGMOm9/XZU.G8lFPci87PDLzaRgwlLQ4hPa",
     "role": "consultant",
     "created_at": "2026-01-17T09:14:17.328Z"
-  },
-  {
-    "id": 6,
-    "email": "temp_admin_1768643574813@test.com",
-    "password_hash": "$2b$10$hqEtslyt7K1cgS5fFpNjKeVybwe4204Xf2sw25BZqShkJxCuND9R6",
-    "role": "admin",
-    "created_at": "2026-01-17T09:52:55.019Z"
-  },
-  {
-    "id": 7,
-    "email": "temp_admin_1768643779779@test.com",
-    "password_hash": "$2b$10$JjU9ry3gEXKa1eSeW8GL5u7v3ej3XZJmDqel.vqmbdq.xuSwH.cxG",
-    "role": "admin",
-    "created_at": "2026-01-17T09:56:20.086Z"
   },
   {
     "id": 8,
@@ -42,16 +14,44 @@
     "created_at": "2026-01-17T15:08:46.947Z"
   },
   {
+    "id": 4,
+    "email": "danisman@test.com",
+    "password_hash": "$2b$10$ceFXsYtzk3TbESrQ6jW7FeDWWnJZdrFJksl6NDGzbNBlraq1DWYOO",
+    "role": "consultant",
+    "created_at": "2026-01-17T09:09:42.037Z"
+  },
+  {
+    "id": 6,
+    "email": "temp_admin_1768643574813@test.com",
+    "password_hash": "$2b$10$UxbwaibgsP6XfhBprBwajeFTKYVwZGMETfnLL5i98VLDO8rUIE26y",
+    "role": "admin",
+    "created_at": "2026-01-17T09:52:55.019Z"
+  },
+  {
+    "id": 7,
+    "email": "temp_admin_1768643779779@test.com",
+    "password_hash": "$2b$10$UxbwaibgsP6XfhBprBwajeFTKYVwZGMETfnLL5i98VLDO8rUIE26y",
+    "role": "admin",
+    "created_at": "2026-01-17T09:56:20.086Z"
+  },
+  {
     "id": 9,
     "email": "trio.emlak.ofisi@trioemlak.com",
-    "password_hash": "$2b$10$M2dtBNXMQ/SnepXDw69JdO2/pxQrsvFIC3jVD5w7W86iS0oaCyAPW",
+    "password_hash": "$2b$10$UxbwaibgsP6XfhBprBwajeFTKYVwZGMETfnLL5i98VLDO8rUIE26y",
     "role": "admin",
     "created_at": "2026-01-17T15:13:46.759Z"
   },
   {
+    "id": 1,
+    "email": "test_api@example.com",
+    "password_hash": "$2b$10$UxbwaibgsP6XfhBprBwajeFTKYVwZGMETfnLL5i98VLDO8rUIE26y",
+    "role": "admin",
+    "created_at": "2026-01-14T15:08:42.445Z"
+  },
+  {
     "id": 3,
     "email": "admin@emlak22.com",
-    "password_hash": "$2b$10$7L8YIWc6Y.95QJokPh8Iv.lGyDsj0Zv4lya3JcQb1pQg2mNZ6fIby",
+    "password_hash": "$2b$10$e1Xbve.ry.x4ibnPG8AZeuDTl15XlIMtdeg4mH71uUE11Dg3WDGnS",
     "role": "admin",
     "created_at": "2026-01-14T15:26:44.317Z"
   }

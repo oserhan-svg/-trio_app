@@ -22,7 +22,7 @@ const PropertyListingPage = () => {
 
     useEffect(() => {
         if (property) {
-            setTitle(property.title || ''); // Init Title
+            setTitle(property.title?.split('#')[0].trim() || ''); // Init Title
             setDescription(property.description || '');
             if (property.images && property.images.length > 0) {
                 setSelectedImage(property.images[0]);
@@ -190,6 +190,9 @@ const PropertyListingPage = () => {
                         <div className="print:hidden">
                             {/* Main Image */}
                             <div className="mb-4">
+                                <h1 className="text-3xl font-extrabold text-gray-900 leading-tight">
+                                    {property.title?.split('#')[0].trim()}
+                                </h1>
                                 <img
                                     src={selectedImage || property.images[0]}
                                     alt={property.title}
@@ -246,7 +249,7 @@ const PropertyListingPage = () => {
                         {property.rooms && (
                             <div className="bg-gray-50 p-4 rounded-lg print:p-3">
                                 <p className="text-sm text-gray-600 mb-1">Oda Sayısı</p>
-                                <p className="text-xl font-bold text-gray-900 print:text-lg">{property.rooms}</p>
+                                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">{property.title?.split('#')[0].trim()}</h1>
                             </div>
                         )}
                         {property.seller_type && (
@@ -287,7 +290,7 @@ const PropertyListingPage = () => {
                 {/* Features */}
                 {filteredFeatures.length > 0 && (
                     <div className="p-8 print:p-6 border-b">
-                        <h3 className="text-xl font-bold text-gray-900 mb-4">Özellikler</h3>
+                        <h3 className="font-bold text-gray-900 mb-2">{property.title?.split('#')[0].trim()}</h3>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 print:grid-cols-3">
                             {filteredFeatures.map((feature, idx) => (
                                 <div key={idx} className="flex items-center gap-2 text-gray-700">

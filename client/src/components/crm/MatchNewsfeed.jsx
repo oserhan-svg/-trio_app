@@ -44,49 +44,58 @@ const MatchNewsfeed = () => {
     if (matches.length === 0) return null;
 
     return (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col h-full">
-            <div className="p-4 bg-emerald-50 border-b border-emerald-100 flex justify-between items-center">
-                <h3 className="text-sm font-bold text-emerald-900 flex items-center gap-2">
-                    <Sparkles size={16} className="text-emerald-600" />
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col h-[600px]">
+            <div className="px-3 py-2 bg-gradient-to-r from-emerald-50 to-white border-b border-emerald-100 flex justify-between items-center">
+                <h3 className="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+                    <Sparkles size={14} className="text-emerald-600" />
                     Taze Eşleşmeler
                 </h3>
-                <span className="text-[10px] font-bold bg-emerald-600 text-white px-1.5 py-0.5 rounded-full">
+                <span className="text-[10px] font-bold bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full border border-emerald-200">
                     {matches.length} Yeni
                 </span>
             </div>
 
-            <div className="flex-1 overflow-y-auto divide-y divide-gray-50">
-                {matches.map((m) => (
+            <div className="flex-1 overflow-y-auto divide-y divide-gray-50 custom-scrollbar">
+                {matches.filter(m => m.property?.status !== 'removed').map((m) => (
                     <div
                         key={m.id}
-                        className="p-4 hover:bg-gray-50 transition-colors cursor-pointer group"
-                        onClick={() => navigate(`/client/${m.client_id}`)}
+                        className="px-3 py-2.5 hover:bg-gray-50 transition-colors cursor-pointer group relative"
+                        onClick={() => navigate(`/clients/${m.client_id}`)}
                     >
-                        <div className="flex gap-3">
-                            <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 flex-shrink-0">
-                                <User size={20} />
+                        <div className="flex gap-2.5 items-start">
+                            {/* Avatar */}
+                            <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 flex-shrink-0 mt-0.5 border border-blue-100">
+                                <User size={14} />
                             </div>
+
+                            {/* Content */}
                             <div className="flex-1 min-w-0">
-                                <div className="flex justify-between items-start mb-0.5">
-                                    <h4 className="font-bold text-gray-900 text-sm truncate">{m.client.name}</h4>
-                                    <span className="text-[10px] text-gray-400 flex items-center gap-0.5">
-                                        <Clock size={10} />
+                                {/* Header: Name & Time */}
+                                <div className="flex justify-between items-center mb-1">
+                                    <h4 className="font-bold text-gray-900 text-xs truncate pr-2">{m.client.name}</h4>
+                                    <span className="text-[9px] text-gray-400 flex items-center gap-0.5 whitespace-nowrap">
                                         {new Date(m.added_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
                                     </span>
                                 </div>
-                                <p className="text-xs text-gray-500 flex items-center gap-1 mb-2">
-                                    <Home size={10} />
-                                    {m.property.neighborhood} %85+ Uyum
-                                </p>
 
-                                <div className="bg-gray-50 rounded-lg p-2 border border-gray-100 group-hover:border-emerald-200 group-hover:bg-emerald-50/30 transition-all">
-                                    <p className="text-[10px] text-gray-600 font-medium truncate">{m.property.title}</p>
-                                    <div className="flex justify-between items-center mt-1">
-                                        <span className="text-xs font-bold text-emerald-700">
+                                {/* Property Snippet */}
+                                <div className="bg-white rounded border border-gray-100 p-1.5 group-hover:border-emerald-300 group-hover:shadow-sm transition-all">
+                                    <div className="flex justify-between items-center mb-0.5">
+                                        <span className="text-[10px] text-gray-500 flex items-center gap-1 truncate max-w-[60%]">
+                                            <Home size={8} /> {m.property.district} / {m.property.neighborhood}
+                                        </span>
+                                        <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1 rounded">
                                             {parseInt(m.property.price).toLocaleString()} ₺
                                         </span>
-                                        <ChevronRight size={12} className="text-gray-400 group-hover:text-emerald-600" />
                                     </div>
+                                    <p className="text-[10px] text-gray-700 truncate font-medium">{m.property.title?.split('#')[0].trim()}</p>
+                                </div>
+                            </div>
+
+                            {/* Hover Action Indicator */}
+                            <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="bg-white rounded-full p-1 shadow border border-gray-200 text-emerald-600">
+                                    <ChevronRight size={14} />
                                 </div>
                             </div>
                         </div>
@@ -96,10 +105,10 @@ const MatchNewsfeed = () => {
 
             <button
                 onClick={() => navigate('/clients')}
-                className="p-3 text-xs font-bold text-gray-500 hover:text-emerald-600 border-t border-gray-50 text-center flex items-center justify-center gap-1 hover:bg-gray-50 transition-all"
+                className="py-2 text-[10px] font-bold text-gray-500 hover:text-emerald-700 border-t border-gray-100 text-center flex items-center justify-center gap-1 hover:bg-gray-50 transition-all bg-gray-50/50"
             >
-                Tüm Müşterileri Yönet
-                <ArrowRight size={12} />
+                Tümünü Gör
+                <ArrowRight size={10} />
             </button>
         </div>
     );

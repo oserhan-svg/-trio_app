@@ -66,10 +66,15 @@ const OpportunityList = () => {
                             </div>
 
                             <div>
-                                <h3 className="font-semibold text-gray-800 line-clamp-1 group-hover:text-green-700 transition">
-                                    {prop.district} / {prop.neighborhood}
+                                <h3 className={`font-bold text-gray-800 text-xs leading-tight line-clamp-2`} title={prop.title}>
+                                    {prop.title?.split('#')[0].trim()}
                                 </h3>
-                                <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <div className="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
+                                    <MapPin size={14} /> {prop.district} / {prop.neighborhood}
+                                    <span className="mx-1">•</span>
+                                    <span>İlan No: {prop.external_id?.split('block')[0]}</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
                                     {/* Source Badge */}
                                     {prop.url && prop.url.includes('sahibinden') && (
                                         <span className="bg-yellow-100 text-yellow-800 text-[10px] px-1.5 py-0.5 rounded border border-yellow-200 font-bold">
@@ -82,12 +87,11 @@ const OpportunityList = () => {
                                         </span>
                                     )}
 
-                                    <span>{prop.rooms}</span>
-                                    <span>•</span>
-                                    <span>{prop.size_m2} m²</span>
-                                    <span className="font-mono text-xs bg-gray-100 px-1 rounded">
-                                        {Math.round(parseInt(prop.price) / prop.size_m2).toLocaleString()} TL/m²
-                                    </span>
+                                    {prop.seller_name && prop.seller_name !== 'Bilinmiyor' && (
+                                        <span className={`text-[10px] px-1.5 py-0.5 rounded border ${prop.seller_type === 'owner' ? 'bg-orange-50 text-orange-700 border-orange-100' : 'bg-gray-50 text-gray-600 border-gray-200'} font-bold`}>
+                                            {prop.seller_name}
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                         </div>

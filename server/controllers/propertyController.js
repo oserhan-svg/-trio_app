@@ -19,9 +19,16 @@ const getProperties = async (req, res) => {
         const limit = parseInt(req.query.limit) || 50;
         const skip = (page - 1) * limit;
 
-        const { minPrice, maxPrice, rooms, district, opportunity_filter, category, listingType, seller_type, sort } = req.query;
+        const { minPrice, maxPrice, rooms, district, opportunity_filter, category, listingType, seller_type, source, sort, status } = req.query;
 
         const where = { AND: [] };
+
+        if (status && status !== 'all') {
+            where.AND.push({ status: status });
+        } else if (!req.query.show_all) {
+            // Default to active unless show_all is requested
+            where.AND.push({ status: 'active' });
+        }
 
         if (category && category !== 'all') {
             const catLower = category.toLowerCase();
@@ -40,6 +47,16 @@ const getProperties = async (req, res) => {
 
         if (seller_type && seller_type !== 'all') {
             where.AND.push({ seller_type: seller_type });
+        }
+
+        if (source && source !== 'all') {
+            if (source === 'sahibinden') {
+                where.AND.push({ url: { contains: 'sahibinden.com' } });
+            } else if (source === 'hepsiemlak' || source === 'hemlak') {
+                where.AND.push({ url: { contains: 'hemlak.com' } });
+            } else if (source === 'emlakjet') {
+                where.AND.push({ url: { contains: 'emlakjet.com' } });
+            }
         }
 
         if (minPrice) {
@@ -88,14 +105,36 @@ const getProperties = async (req, res) => {
         }
 
         // console.log('Fetching properties...');
-        const total = await prisma.property.count({ where });
-        const properties = await prisma.property.findMany({
-            where,
-            orderBy: { created_at: 'desc' },
-            include: { history: true },
-            skip: skip,
-            take: limit
-        });
+        const baseWhere = { ...where };
+        if (!req.query.show_all) {
+            where.AND.push({ is_primary: true });
+        }
+
+        // If opportunity_filter is used, we need to fetch ALL potentially matching properties
+        // because scoring happens in JS, not in DB.
+        // For a small-medium dataset (1000-5000), this is acceptable.
+
+        let properties;
+        let total;
+
+        if (req.query.opportunity_filter) {
+            // Fetch everything that matches the base filters
+            properties = await prisma.property.findMany({
+                where,
+                orderBy: { created_at: 'desc' },
+                include: { history: true }
+            });
+            // Total will be updated after in-memory filtering
+        } else {
+            total = await prisma.property.count({ where });
+            properties = await prisma.property.findMany({
+                where,
+                orderBy: { created_at: 'desc' },
+                include: { history: true },
+                skip: skip,
+                take: limit
+            });
+        }
 
         // Upgrade images on the fly
         const propertiesWithHighResImages = properties.map(p => ({
@@ -123,7 +162,6 @@ const getProperties = async (req, res) => {
                         opportunity_label: analysis.label,
                         deviation: analysis.deviation,
                         roi: analysis.roi,
-                        roi: analysis.roi,
                         comparison_basis: analysis.comparisonBasis, // Exposed to frontend
                         comparison_price: analysis.comparisonPrice,
                         has_recent_price_drop: analysis.hasRecentPriceDrop
@@ -143,8 +181,11 @@ const getProperties = async (req, res) => {
                     return true;
                 });
 
-                // Auto-Sort: Best Opportunities First
-                // Criteria: Score (Desc) -> Deviation (Desc) -> Price (Asc)
+                // Update total for pagination
+                total = propertiesWithScore.length;
+
+                // Manual Paginate
+                propertiesWithScore = propertiesWithScore.slice(skip, skip + limit);
             }
 
             // Universal Sorting
@@ -253,8 +294,44 @@ const getPropertyById = async (req, res) => {
             images: upgradeImages(property.images)
         };
 
-        res.json(upgradedProperty);
+        // 3. Fetch other listings in the same group
+        let otherListings = [];
+        if (property.group_id) {
+            otherListings = await prisma.property.findMany({
+                where: {
+                    group_id: property.group_id,
+                    id: { not: parseInt(id) }
+                },
+                select: {
+                    id: true,
+                    url: true,
+                    price: true,
+                    external_id: true,
+                    listing_date: true
+                }
+            });
+
+            // 4. Combined Price History
+            const groupIds = [property.id, ...otherListings.map(l => l.id)];
+            const allHistories = await prisma.propertyHistory.findMany({
+                where: { property_id: { in: groupIds } },
+                orderBy: { changed_at: 'asc' }
+            });
+
+            // If we have multiple listings, we might have duplicate "initial" entries. 
+            // We'll keep them as they show when each portal picked it up.
+            property.merged_history = allHistories;
+        } else {
+            property.merged_history = property.history;
+        }
+
+        res.json({
+            ...upgradedProperty,
+            other_listings: otherListings,
+            merged_history: property.merged_history
+        });
     } catch (error) {
+        console.error('Get Property Detail Error:', error);
         res.status(500).json({ error: 'Failed to fetch property details' });
     }
 };

@@ -1,0 +1,10 @@
+{
+   "extension_description": {
+      "description": "Extension's description",
+      "message": "Подобрява Steam: автоматична продажба на скинове, евтини предмети от различни източници и много повече."
+   },
+   "langcode": {
+      "description": "",
+      "message": "bg"
+   }
+}

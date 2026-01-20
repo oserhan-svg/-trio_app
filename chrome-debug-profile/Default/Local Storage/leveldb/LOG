@@ -1,0 +1,17 @@
+2026/01/19-18:35:56.661 bb4 Creating DB C:\Users\ozanc\Downloads\emlak22\chrome-debug-profile\Default\Local Storage\leveldb since it was missing.
+2026/01/19-18:35:56.688 bb4 Reusing MANIFEST C:\Users\ozanc\Downloads\emlak22\chrome-debug-profile\Default\Local Storage\leveldb/MANIFEST-000001
+2026/01/19-19:36:59.464 ce8 Level-0 table #5: started
+2026/01/19-19:36:59.475 ce8 Level-0 table #5: 57690 bytes OK
+2026/01/19-19:36:59.478 ce8 Delete type=0 #3
+2026/01/19-19:37:57.786 ce8 Level-0 table #7: started
+2026/01/19-19:37:57.791 ce8 Level-0 table #7: 54674 bytes OK
+2026/01/19-19:37:57.793 ce8 Delete type=0 #4
+2026/01/19-19:39:27.833 ce8 Level-0 table #9: started
+2026/01/19-19:39:27.846 ce8 Level-0 table #9: 80836 bytes OK
+2026/01/19-19:39:27.849 ce8 Delete type=0 #6
+2026/01/19-19:40:43.514 ce8 Level-0 table #11: started
+2026/01/19-19:40:43.532 ce8 Level-0 table #11: 636385 bytes OK
+2026/01/19-19:40:43.534 ce8 Delete type=0 #8
+2026/01/19-19:45:43.538 ce8 Level-0 table #13: started
+2026/01/19-19:45:43.554 ce8 Level-0 table #13: 81012 bytes OK
+2026/01/19-19:45:43.557 ce8 Delete type=0 #10

@@ -1,0 +1,6 @@
+2026/01/19-19:12:34.364 3ee8 Creating DB C:\Users\ozanc\Downloads\emlak22\chrome-debug-profile\Default\IndexedDB\https_www.hepsiemlak.com_0.indexeddb.leveldb since it was missing.
+2026/01/19-19:12:34.369 3ee8 Reusing MANIFEST C:\Users\ozanc\Downloads\emlak22\chrome-debug-profile\Default\IndexedDB\https_www.hepsiemlak.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/01/19-19:12:34.376 1ee0 Level-0 table #5: started
+2026/01/19-19:12:34.377 1ee0 Level-0 table #5: 540 bytes OK
+2026/01/19-19:12:34.378 1ee0 Delete type=0 #3
+2026/01/19-19:12:34.379 1ee0 Manual compaction at level-0 from '\x00\x01\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x02\x00\x00\x00' @ 0 : 0; will stop at (end)

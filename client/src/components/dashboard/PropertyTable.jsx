@@ -21,7 +21,8 @@ const PropertyTable = ({ properties, onViewDetail }) => {
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                         {properties.map((prop) => {
-                            const isRecent = new Date() - new Date(prop.last_scraped) < 24 * 60 * 60 * 1000; // 24 hours
+                            const isRemoved = prop.status === 'removed';
+                            const isSold = prop.status === 'sold';
 
                             let source = 'Diğer';
                             let sourceClass = 'bg-gray-100 text-gray-800';
@@ -38,27 +39,40 @@ const PropertyTable = ({ properties, onViewDetail }) => {
                             }
 
                             return (
-                                <tr key={prop.id} className={`hover:bg-gray-50 transition-colors ${!isRecent ? 'opacity-60 bg-gray-50' : ''}`}>
-                                    <td className="px-6 py-4 font-medium text-gray-900 truncate max-w-xs" title={prop.title}>
-                                        <div className="font-semibold text-gray-900">{prop.title}</div>
-                                        {prop.seller_name && (
-                                            <div className="text-xs text-gray-400 mt-1 flex items-center gap-1">
-                                                <span className="truncate">{prop.seller_name}</span>
-                                            </div>
-                                        )}
+                                <tr key={prop.id} className={`hover:bg-gray-50 transition-colors ${isRemoved ? 'opacity-50 bg-gray-50' : ''}`}>
+                                    <td className="px-6 py-4">
+                                        <div className="text-sm font-medium text-gray-900 truncate max-w-xs" title={prop.title}>
+                                            <div className={`font-semibold ${isRemoved ? 'text-gray-400 line-through' : 'text-gray-900'}`}>{prop.title?.split('#')[0].trim()}</div>
+                                            {prop.seller_name && (
+                                                <div className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                                                    <span className="truncate">{prop.seller_name}</span>
+                                                </div>
+                                            )}
+                                        </div>
                                     </td>
-                                    <td className="px-6 py-4 text-emerald-600 font-bold whitespace-nowrap">
+                                    <td className={`px-6 py-4 font-bold whitespace-nowrap ${isRemoved ? 'text-gray-400' : 'text-emerald-600'}`}>
                                         ₺{parseFloat(prop.price).toLocaleString()}
                                     </td>
                                     <td className="px-6 py-4">{prop.size_m2 ? `${prop.size_m2} m²` : '-'}</td>
                                     <td className="px-6 py-4">{prop.rooms || '-'}</td>
                                     <td className="px-6 py-4">{prop.neighborhood || '-'}</td>
                                     <td className="px-6 py-4">
-                                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${isRecent ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                                            }`}>
-                                            <span className={`w-1.5 h-1.5 rounded-full ${isRecent ? 'bg-green-600' : 'bg-red-600'}`}></span>
-                                            {isRecent ? 'Aktif' : 'Pasif'}
-                                        </span>
+                                        {isRemoved ? (
+                                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-100 text-rose-800">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-rose-600"></span>
+                                                Kaldırıldı
+                                            </span>
+                                        ) : isSold ? (
+                                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                                                Satıldı
+                                            </span>
+                                        ) : (
+                                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                                                Aktif
+                                            </span>
+                                        )}
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`px-2 py-1 rounded text-xs font-semibold ${sourceClass}`}>

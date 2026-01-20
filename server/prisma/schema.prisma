@@ -46,12 +46,16 @@ model Property {
   floor_location String?           // e.g., '2. Kat', 'Bahçe Katı'
   assigned_user_id Int?
   assigned_user  User?             @relation("UserProperties", fields: [assigned_user_id], references: [id])
+  group_id       String?           // Group ID for deduplication
+  is_primary     Boolean           @default(true) // Main listing of a group
+  status         String            @default("active") // 'active', 'removed', 'sold'
   history        PropertyHistory[]
   client_properties ClientProperty[]
   listings       PropertyListing[]
   agenda_items   AgendaItem[]
 
   @@index([external_id])
+  @@index([group_id])
   @@index([last_scraped])
   @@index([price])
   @@index([category])
@@ -174,4 +178,17 @@ model AgendaItem {
   created_at  DateTime @default(now())
 
   @@map("agenda_items")
+}
+
+model ScraperProgress {
+  id            Int      @id @default(autoincrement())
+  provider      String   // 'hepsiemlak', 'sahibinden', 'emlakjet'
+  category      String   // 'daire', 'villa', 'arsa', etc.
+  type          String   // 'sale', 'rent'
+  last_page     Int      @default(1)
+  max_pages     Int      @default(50)
+  updated_at    DateTime @updatedAt
+
+  @@unique([provider, category, type])
+  @@map("scraper_progress")
 }

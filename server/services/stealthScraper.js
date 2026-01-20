@@ -103,9 +103,9 @@ async function organicWarmup(page) {
     }
 }
 
-async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 'residential') {
+async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 'residential', targetPages = [1, 2]) {
     const { saveListings } = require('./scraperService');
-    console.log(`🕵️ Stealth Scraper Starting for: ${url} [Category: ${category}]`);
+    console.log(`🕵️ Stealth Scraper Starting for: ${url} [Pages: ${targetPages.join(', ')}]`);
 
     let browser;
     try {
@@ -128,14 +128,12 @@ async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 
         }
 
         let allListings = [];
-        let pageNum = 0;
-        const maxPages = 5;
-        let hasNextPage = true;
 
-        while (hasNextPage && pageNum < maxPages) {
+        for (const pageNum1Based of targetPages) {
+            const pageNum = pageNum1Based - 1; // 0-based for offset
             const offset = pageNum * 20;
             const pageUrl = url.includes('?') ? `${url}&pagingOffset=${offset}` : `${url}?pagingOffset=${offset}`;
-            console.log(`📍 Page ${pageNum + 1}: Visiting ${pageUrl}`);
+            console.log(`📍 Page ${pageNum1Based}: Visiting ${pageUrl}`);
 
             // Navigate with random delay
             if (page.url() !== pageUrl) {
@@ -261,11 +259,10 @@ async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 
                     const roomsMatch = fullText.match(/(\d+\+\d+)|(Stüdyo)/i);
                     if (roomsMatch) rooms = roomsMatch[0].replace(/\s/g, '');
 
-                    let seller_type = forcedType || 'office';
-                    let seller_name = 'Bilinmiyor';
-
-                    const lowerText = fullText.toLowerCase();
-                    if (lowerText.includes('sahibinden') || lowerText.includes('bireysel')) {
+                    if (forcedType === 'owner') {
+                        seller_name = 'Sahibinden';
+                        seller_type = 'owner';
+                    } else if (lowerText.includes('sahibinden') || lowerText.includes('bireysel') || row.querySelector('.searchResultsTitleValue .text-glow')) {
                         seller_type = 'owner';
                         seller_name = 'Sahibinden';
                     } else if (lowerText.includes('banka')) {
@@ -275,9 +272,11 @@ async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 
                         // Attempt to extract store name from search results
                         const storeEl = row.querySelector('.searchResultsStoreName') ||
                             row.querySelector('a.searchResultsStoreLabel') ||
-                            row.querySelector('img[alt][title]');
+                            row.querySelector('span[class*="store"]');
+
                         if (storeEl) {
-                            seller_name = storeEl.innerText?.trim() || storeEl.getAttribute('alt') || storeEl.getAttribute('title') || 'Kurumsal';
+                            // Sometimes the name is in the title attribute if text is truncated
+                            seller_name = storeEl.innerText?.trim() || storeEl.getAttribute('title') || 'Kurumsal';
                         }
                     }
 
@@ -298,11 +297,11 @@ async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 
                 await saveListings(enriched);
 
                 allListings = [...allListings, ...pageListings];
-                pageNum++;
+
                 // Save state progressively
                 await saveBrowserState(page);
 
-                if (pageNum < maxPages) {
+                if (targetPages.indexOf(pageNum1Based) < targetPages.length - 1) {
                     await page.randomWait(3000, 6000);
                 }
             }
@@ -313,7 +312,7 @@ async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 
     } catch (err) {
         if (err.message === '403_BLOCK_REBOOT') {
             console.log('🔄 Restarting scrape after profile reboot...');
-            return await scrapeSahibindenStealth(url, forcedSellerType, category);
+            return await scrapeSahibindenStealth(url, forcedSellerType, category, targetPages);
         }
         console.error('❌ Scrape Failed:', err.message);
         throw err;

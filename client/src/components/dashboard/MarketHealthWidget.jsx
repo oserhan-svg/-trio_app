@@ -5,7 +5,7 @@ const MarketHealthWidget = ({ data = [], totalCount: propTotalCount }) => {
     // Basic heuristics based on scraped data
     const totalCount = propTotalCount || data.length;
     const ownerCount = data.filter(p => p.seller_type === 'owner').length;
-    const ownerRatio = totalCount > 0 ? (ownerCount / totalCount) * 100 : 0;
+    const ownerRatio = data.length > 0 ? (ownerCount / data.length) * 100 : 0;
 
     // Portal distribution
     const sahCount = data.filter(p => p.url?.includes('sahibinden.com')).length;
