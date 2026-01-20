@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Plus, Trash2, Tag, ArrowLeft, Phone, Mail, FileText, Edit2, X, ExternalLink, Search, Filter } from 'lucide-react';
+import { Users, Plus, Trash2, ArrowLeft, Phone, Mail, Search, Filter, ChevronLeft, ChevronRight, MoreHorizontal, FileText, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Button from '../components/ui/Button';
@@ -23,7 +23,7 @@ const Clients = () => {
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 9; // Show 9 cards per page (3x3 grid)
+    const pageSize = 15; // Increased for table view
 
     // Modals
     const [showAddClient, setShowAddClient] = useState(false);
@@ -43,17 +43,14 @@ const Clients = () => {
     useEffect(() => {
         let result = clients;
 
-        // 1. Status Filter
         if (statusFilter !== 'all') {
             result = result.filter(c => c.status === statusFilter);
         }
 
-        // 2. Type Filter
         if (typeFilter !== 'all') {
             result = result.filter(c => (c.type || 'buyer') === typeFilter);
         }
 
-        // 2. Search Filter
         if (searchTerm) {
             const lowerTerm = searchTerm.toLowerCase();
             result = result.filter(c =>
@@ -64,7 +61,7 @@ const Clients = () => {
         }
 
         setFilteredClients(result);
-        setCurrentPage(1); // Reset to first page on filter change
+        setCurrentPage(1);
     }, [clients, searchTerm, statusFilter, typeFilter]);
 
     // Derived Paginated List
@@ -94,12 +91,13 @@ const Clients = () => {
             fetchClients();
         } catch (error) {
             console.error('Create Client Error:', error);
-            const msg = error.response?.data?.error || error.response?.data?.message || 'Müşteri eklenirken hata oluştu';
+            const msg = error.response?.data?.error || 'Müşteri eklenirken hata oluştu';
             addToast(msg, 'error');
         }
     };
 
-    const handleDelete = async (id) => {
+    const handleDelete = async (e, id) => {
+        e.stopPropagation();
         if (!window.confirm('Bu müşteriyi silmek istediğinize emin misiniz?')) return;
         try {
             await api.delete(`/clients/${id}`);
@@ -111,15 +109,10 @@ const Clients = () => {
     };
 
     // Demand Handlers
-    const openAddDemandModal = (client) => {
+    const openAddDemandModal = (e, client) => {
+        e.stopPropagation();
         setSelectedClientForDemand(client);
-        setSelectedDemandToEdit(null); // Reset edit mode
-        setShowAddDemand(true);
-    };
-
-    const openEditDemandModal = (client, demand) => {
-        setSelectedClientForDemand(client);
-        setSelectedDemandToEdit(demand); // Set initial data
+        setSelectedDemandToEdit(null);
         setShowAddDemand(true);
     };
 
@@ -127,294 +120,250 @@ const Clients = () => {
         if (!selectedClientForDemand) return;
         try {
             if (selectedDemandToEdit) {
-                // Update existing
                 await api.put(`/clients/demands/${selectedDemandToEdit.id}`, formData);
                 addToast('Talep güncellendi');
             } else {
-                // Create new
                 await api.post(`/clients/${selectedClientForDemand.id}/demands`, formData);
                 addToast('Yeni talep eklendi');
             }
             setShowAddDemand(false);
             fetchClients();
         } catch (error) {
-            console.error('Save Demand Error:', error);
-            const msg = error.response?.data?.error || 'Talep kaydedilemedi';
-            addToast(msg, 'error');
-            throw error;
+            addToast('İşlem başarısız', 'error');
         }
     };
 
-    const handleDeleteDemand = async (demandId) => {
-        if (!confirm('Bu talebi silmek istiyor musunuz?')) return;
-        try {
-            await api.delete(`/clients/demands/${demandId}`);
-            addToast('Talep silindi');
-            fetchClients();
-        } catch {
-            addToast('Talep silinemedi', 'error');
-        }
-    };
-
-    const openMatchesModal = (client) => {
+    const openMatchesModal = (e, client) => {
+        e.stopPropagation();
         setSelectedClientForMatches(client);
         setShowMatches(true);
     };
 
+    const getStatusBadge = (status) => {
+        const styles = {
+            'Active': 'bg-emerald-100 text-emerald-800',
+            'Negotiation': 'bg-blue-100 text-blue-800',
+            'Closed Won': 'bg-purple-100 text-purple-800',
+            'Lost': 'bg-gray-100 text-gray-800',
+            'default': 'bg-slate-100 text-slate-800'
+        };
+        const labels = {
+            'Active': 'Aktif',
+            'Negotiation': 'Görüşülüyor',
+            'Closed Won': 'Kazanıldı',
+            'Lost': 'Kaybedildi'
+        };
+        return (
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${styles[status] || styles.default}`}>
+                {labels[status] || status || 'Belirsiz'}
+            </span>
+        );
+    };
+
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-slate-50 flex flex-col">
             {/* Header */}
-            <div className="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-10 shadow-sm">
-                <div className="max-w-7xl mx-auto space-y-4">
-                    <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-4">
-                            <button
-                                onClick={() => navigate('/dashboard')}
-                                className="p-2 hover:bg-gray-100 rounded-full text-gray-500 transition-colors"
-                            >
-                                <ArrowLeft size={20} />
-                            </button>
-                            <div>
-                                <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                                    <Users className="text-emerald-600" />
-                                    Müşteri Yönetimi
-                                </h1>
-                                <p className="text-sm text-gray-500">Müşterilerinizi ve taleplerini buradan yönetin</p>
-                            </div>
+            <div className="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex justify-between items-center py-4">
+                        <div className="flex items-center gap-3">
+                            <h1 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                <Users className="text-emerald-600" size={20} />
+                                Müşteri Listesi
+                                <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">
+                                    {filteredClients.length}
+                                </span>
+                            </h1>
                         </div>
-                        <Button onClick={() => setShowAddClient(true)} className="flex items-center gap-2">
-                            <Plus size={18} /> Yeni Müşteri
+                        <Button onClick={() => setShowAddClient(true)} size="sm" className="flex items-center gap-1.5 px-3">
+                            <Plus size={16} /> <span className="hidden sm:inline">Yeni Müşteri</span>
                         </Button>
                     </div>
 
-                    {/* Search & Filter Bar */}
-                    <div className="flex gap-4">
-                        <div className="relative flex-1 max-w-md">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    {/* Filters */}
+                    <div className="flex flex-col sm:flex-row gap-3 pb-4">
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                             <input
                                 type="text"
-                                placeholder="İsim, Telefon veya E-posta ile ara..."
-                                className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
+                                placeholder="İsim, telefon veya e-posta ile ara..."
+                                className="w-full pl-9 pr-4 py-1.5 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
-                        <div className="relative">
-                            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                            <select
-                                className="pl-9 pr-8 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 appearance-none cursor-pointer"
-                                value={statusFilter}
-                                onChange={(e) => setStatusFilter(e.target.value)}
-                            >
-                                <option value="all">Tüm Durumlar</option>
-                                <option value="Active">Aktif</option>
-                                <option value="Negotiation">Görüşülüyor</option>
-                                <option value="Closed Won">Kazanıldı</option>
-                                <option value="Lost">Kaybedildi</option>
-                            </select>
+                        <div className="flex gap-2">
+                            <div className="relative">
+                                <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+                                <select
+                                    className="pl-8 pr-8 py-1.5 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500 appearance-none cursor-pointer"
+                                    value={statusFilter}
+                                    onChange={(e) => setStatusFilter(e.target.value)}
+                                >
+                                    <option value="all">Tüm Durumlar</option>
+                                    <option value="Active">Aktif</option>
+                                    <option value="Negotiation">Görüşülüyor</option>
+                                    <option value="Closed Won">Kazanıldı</option>
+                                    <option value="Lost">Kaybedildi</option>
+                                </select>
+                            </div>
+                            <div className="flex bg-gray-100 p-0.5 rounded-md">
+                                <button
+                                    onClick={() => setTypeFilter('all')}
+                                    className={`px-3 py-1 text-xs font-medium rounded-sm transition-all ${typeFilter === 'all' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                >
+                                    Tümü
+                                </button>
+                                <button
+                                    onClick={() => setTypeFilter('buyer')}
+                                    className={`px-3 py-1 text-xs font-medium rounded-sm transition-all ${typeFilter === 'buyer' ? 'bg-white text-blue-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                >
+                                    Alıcı
+                                </button>
+                                <button
+                                    onClick={() => setTypeFilter('seller')}
+                                    className={`px-3 py-1 text-xs font-medium rounded-sm transition-all ${typeFilter === 'seller' ? 'bg-white text-purple-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                >
+                                    Satıcı
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Type Tabs */}
-            <div className="bg-white border-b border-gray-200">
-                <div className="max-w-7xl mx-auto px-6">
-                    <div className="flex gap-6">
-                        <button
-                            onClick={() => setTypeFilter('all')}
-                            className={`py-3 px-2 text-sm font-medium border-b-2 transition-colors ${typeFilter === 'all' ? 'border-emerald-500 text-emerald-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
-                        >
-                            Tümü
-                        </button>
-                        <button
-                            onClick={() => setTypeFilter('buyer')}
-                            className={`py-3 px-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${typeFilter === 'buyer' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
-                        >
-                            🏠 Alıcılar
-                        </button>
-                        <button
-                            onClick={() => setTypeFilter('seller')}
-                            className={`py-3 px-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${typeFilter === 'seller' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
-                        >
-                            🔑 Satıcılar
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div className="max-w-7xl mx-auto p-6">
-                {/* List */}
+            {/* Content Table */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-1">
                 {loading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {[1, 2, 3, 4, 5, 6].map((i) => (
-                            <div key={i} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="flex items-center gap-3">
-                                        <Skeleton className="w-10 h-10 rounded-full" />
-                                        <div className="space-y-2">
-                                            <Skeleton className="w-32 h-4" />
-                                            <Skeleton className="w-20 h-3" />
-                                        </div>
-                                    </div>
-                                    <Skeleton className="w-8 h-8 rounded-full" />
-                                </div>
-                                <div className="space-y-3 mb-6">
-                                    <Skeleton className="w-full h-4" />
-                                    <Skeleton className="w-2/3 h-4" />
-                                </div>
-                                <div className="border-t border-gray-100 pt-4">
-                                    <Skeleton className="w-full h-12 rounded-lg" />
-                                </div>
-                            </div>
+                    <div className="space-y-3">
+                        {[1, 2, 3, 4, 5].map(i => (
+                            <Skeleton key={i} className="w-full h-16 rounded-lg" />
                         ))}
                     </div>
                 ) : filteredClients.length === 0 ? (
-                    <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-300">
-                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Users className="text-gray-400" size={32} />
-                        </div>
-                        <h3 className="text-lg font-medium text-gray-900">Sonuç Bulunamadı</h3>
-                        <p className="text-gray-500 mb-6">Aradığınız kriterlere uygun müşteri yok.</p>
-                        {searchTerm || statusFilter !== 'all' ? (
-                            <button
-                                onClick={() => { setSearchTerm(''); setStatusFilter('all'); }}
-                                className="text-emerald-600 hover:text-emerald-700 font-medium"
-                            >
-                                Filtreleri Temizle
-                            </button>
-                        ) : (
-                            <Button variant="outline" onClick={() => setShowAddClient(true)}>+ İlk Müşteriyi Ekle</Button>
-                        )}
+                    <div className="text-center py-20 bg-white rounded-xl border border-dashed border-gray-300">
+                        <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                        <h3 className="text-base font-medium text-gray-900">Müşteri Bulunamadı</h3>
+                        <p className="text-sm text-gray-500">Arama kriterlerinizi değiştirin veya yeni ekleyin.</p>
                     </div>
                 ) : (
-                    <div className="space-y-8">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {paginatedClients.map(client => (
-                                <div key={client.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow overflow-hidden group">
-                                    {/* ... card content unchanged ... */}
-                                    <div className="p-5">
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center font-bold text-lg">
-                                                    {client.name.charAt(0).toUpperCase()}
-                                                </div>
-                                                <div onClick={() => navigate(`/clients/${client.id}`)} className="cursor-pointer group-hover:text-emerald-700 transition-colors">
-                                                    <h3 className="font-bold text-gray-900 line-clamp-1 flex items-center gap-1">
-                                                        {client.name}
-                                                        <ExternalLink size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
-                                                    </h3>
-                                                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full inline-block mt-1">
-                                                        {new Date(client.created_at).toLocaleDateString()}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <div className="flex gap-2">
-                                                <button
-                                                    onClick={() => openMatchesModal(client)}
-                                                    className="text-emerald-600 bg-emerald-50 hover:bg-emerald-100 transition-colors px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1"
-                                                    title="Eşleşmeleri Gör"
-                                                >
-                                                    ✨ Eşleşmeler
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(client.id)}
-                                                    className="text-gray-300 hover:text-red-500 transition-colors p-1"
-                                                    title="Sil"
-                                                >
-                                                    <Trash2 size={16} />
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-2 text-sm text-gray-600 mb-6">
-                                            <div className="flex items-center gap-2">
-                                                <Phone size={14} className="text-gray-400" />
-                                                {client.phone || <span className="text-gray-300 italic">Telefon yok</span>}
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <Mail size={14} className="text-gray-400" />
-                                                {client.email || <span className="text-gray-300 italic">E-posta yok</span>}
-                                            </div>
-                                            {client.notes && (
-                                                <div className="flex items-start gap-2 bg-yellow-50 p-2 rounded-lg text-xs text-yellow-800 border border-yellow-100">
-                                                    <FileText size={12} className="mt-0.5 flex-shrink-0" />
-                                                    <p className="line-clamp-2">{client.notes}</p>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="border-t border-gray-100 pt-4">
-                                            <div className="flex justify-between items-center mb-3">
-                                                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Aktif Talepler</span>
-                                                <button
-                                                    onClick={() => openAddDemandModal(client)}
-                                                    className="text-emerald-600 text-xs font-semibold hover:text-emerald-700 hover:bg-emerald-50 px-2 py-1 rounded transition-colors"
-                                                >
-                                                    + Kriter Ekle
-                                                </button>
-                                            </div>
-
-                                            <div className="space-y-2 max-h-32 overflow-y-auto pr-1 custom-scrollbar">
-                                                {client.demands.map(d => (
-                                                    <div key={d.id} className="bg-slate-50 text-slate-700 text-xs p-2 rounded-lg border border-slate-100 flex items-start gap-2 group/demand hover:border-blue-200 hover:bg-blue-50 transition-colors">
-                                                        <Tag size={12} className="mt-0.5 text-slate-400 flex-shrink-0" />
-                                                        <div className="flex-1 cursor-pointer" onClick={() => openEditDemandModal(client, d)}>
-                                                            <div className="font-medium">
-                                                                {d.district && d.neighborhood ? `${d.district} / ${d.neighborhood}` : (d.district || 'Bölge Farketmez')}
-                                                            </div>
-                                                            <div className="text-slate-500 mt-0.5">
-                                                                {d.rooms ? `${d.rooms}, ` : ''}
-                                                                {d.max_price ? `${parseInt(d.max_price).toLocaleString()} ₺'ye kadar` : 'Fiyat limitsiz'}
-                                                            </div>
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="bg-gray-50 border-b border-gray-200">
+                                        <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider w-1/3">Müşteri</th>
+                                        <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">İletişim</th>
+                                        <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Talepler</th>
+                                        <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Durum</th>
+                                        <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100">
+                                    {paginatedClients.map(client => (
+                                        <tr
+                                            key={client.id}
+                                            onClick={() => navigate(`/clients/${client.id}`)}
+                                            className="hover:bg-blue-50/30 cursor-pointer transition-colors group"
+                                        >
+                                            {/* Client Name & Avatar */}
+                                            <td className="px-6 py-3">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-9 h-9 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">
+                                                        {client.name.charAt(0).toUpperCase()}
+                                                    </div>
+                                                    <div>
+                                                        <div className="font-semibold text-sm text-gray-900 group-hover:text-emerald-700 transition-colors">
+                                                            {client.name}
                                                         </div>
-                                                        <button onClick={() => handleDeleteDemand(d.id)} className="opacity-0 group-hover/demand:opacity-100 text-gray-300 hover:text-red-500">
-                                                            <X size={14} strokeWidth={3} />
-                                                        </button>
+                                                        <div className="text-xs text-gray-400">
+                                                            Kayıt: {new Date(client.created_at).toLocaleDateString()}
+                                                        </div>
                                                     </div>
-                                                ))}
-                                                {client.demands.length === 0 && (
-                                                    <div className="text-center py-2 text-xs text-gray-400 italic bg-gray-50 rounded">
-                                                        Henüz talep kriteri girilmedi.
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
+                                                </div>
+                                            </td>
+
+                                            {/* Contact Info */}
+                                            <td className="px-6 py-3">
+                                                <div className="space-y-1">
+                                                    {client.phone && (
+                                                        <div className="flex items-center gap-2 text-xs text-gray-600">
+                                                            <Phone size={12} className="text-gray-400" /> {client.phone}
+                                                        </div>
+                                                    )}
+                                                    {client.email && (
+                                                        <div className="flex items-center gap-2 text-xs text-gray-600">
+                                                            <Mail size={12} className="text-gray-400" /> {client.email}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </td>
+
+                                            {/* Demands */}
+                                            <td className="px-6 py-3">
+                                                <div className="flex items-center gap-2">
+                                                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${client.demands?.length > 0 ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-gray-50 text-gray-400 border-gray-100'}`}>
+                                                        {client.demands?.length || 0} Talep
+                                                    </span>
+                                                    <button
+                                                        onClick={(e) => openAddDemandModal(e, client)}
+                                                        className="p-1 opacity-0 group-hover:opacity-100 hover:bg-emerald-100 text-emerald-600 rounded transition-all"
+                                                        title="Hızlı Talep Ekle"
+                                                    >
+                                                        <Plus size={14} />
+                                                    </button>
+                                                </div>
+                                            </td>
+
+                                            {/* Status */}
+                                            <td className="px-6 py-3">
+                                                {getStatusBadge(client.status)}
+                                            </td>
+
+                                            {/* Actions */}
+                                            <td className="px-6 py-3 text-right">
+                                                <div className="flex justify-end items-center gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+                                                    <button
+                                                        onClick={(e) => openMatchesModal(e, client)}
+                                                        className="text-xs font-medium text-emerald-600 hover:bg-emerald-50 px-2 py-1.5 rounded flex items-center gap-1 transition"
+                                                    >
+                                                        ✨ Eşleşmeler
+                                                    </button>
+                                                    <div className="w-px h-3 bg-gray-200"></div>
+                                                    <button
+                                                        onClick={(e) => handleDelete(e, client.id)}
+                                                        className="text-gray-400 hover:text-red-500 p-1.5 rounded hover:bg-red-50 transition"
+                                                        title="Sil"
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
 
-                        {/* Pagination UI */}
+                        {/* Pagination */}
                         {totalPages > 1 && (
-                            <div className="flex justify-center items-center gap-2 pt-4">
+                            <div className="border-t border-gray-200 px-6 py-3 flex items-center justify-between bg-gray-50">
                                 <button
                                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                                     disabled={currentPage === 1}
-                                    className="p-2 rounded-lg border border-gray-200 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+                                    className="p-1.5 rounded-md hover:bg-white border border-transparent hover:border-gray-200 text-gray-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                                 >
-                                    <ArrowLeft size={18} />
+                                    <ChevronLeft size={16} />
                                 </button>
-                                <div className="flex items-center gap-1">
-                                    {[...Array(totalPages)].map((_, i) => (
-                                        <button
-                                            key={i + 1}
-                                            onClick={() => setCurrentPage(i + 1)}
-                                            className={`w-10 h-10 rounded-lg text-sm font-medium transition-all ${currentPage === i + 1
-                                                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-200'
-                                                : 'text-gray-600 hover:bg-gray-100'
-                                                }`}
-                                        >
-                                            {i + 1}
-                                        </button>
-                                    ))}
-                                </div>
+                                <span className="text-xs text-gray-500 font-medium">
+                                    Sayfa {currentPage} / {totalPages}
+                                </span>
                                 <button
                                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                                     disabled={currentPage === totalPages}
-                                    className="p-2 rounded-lg border border-gray-200 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors rotate-180"
+                                    className="p-1.5 rounded-md hover:bg-white border border-transparent hover:border-gray-200 text-gray-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                                 >
-                                    <ArrowLeft size={18} />
+                                    <ChevronRight size={16} />
                                 </button>
                             </div>
                         )}

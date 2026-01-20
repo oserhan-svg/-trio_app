@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingDown, ArrowRight, Home } from 'lucide-react';
+import { TrendingDown, ArrowRight, Home, MapPin } from 'lucide-react';
 import api from '../services/api';
 
 const OpportunityList = () => {

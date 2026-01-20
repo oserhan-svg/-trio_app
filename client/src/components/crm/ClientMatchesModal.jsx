@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { X, ExternalLink, Home, TrendingDown, Archive, FileText, CheckCircle } from 'lucide-react';
+import { X, ExternalLink, Home, TrendingDown, Archive, FileText, CheckCircle, MapPin, Maximize2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
@@ -27,28 +27,22 @@ const ClientMatchesModal = ({ isOpen, onClose, client, onUpdate }) => {
         }
     };
 
-    const getSourceType = (url) => {
-        if (!url) return null;
-        if (url.includes('sahibinden.com')) return 'sahibinden';
-        if (url.includes('hepsiemlak.com')) return 'hepsiemlak';
-        return 'other';
-    };
-
     const SourceBadge = ({ url }) => {
-        const type = getSourceType(url);
-        if (!type || type === 'other') return null;
+        if (!url) return null;
+        let type = 'other';
+        if (url.includes('sahibinden.com')) type = 'sahibinden';
+        if (url.includes('hepsiemlak.com')) type = 'hepsiemlak';
+
+        if (type === 'other') return null;
 
         const styles = {
-            sahibinden: 'bg-yellow-400 text-yellow-900',
-            hepsiemlak: 'bg-red-500 text-white'
+            sahibinden: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+            hepsiemlak: 'bg-red-100 text-red-800 border-red-200'
         };
-        const labels = {
-            sahibinden: 'Sahibinden',
-            hepsiemlak: 'Hepsiemlak'
-        };
+        const labels = { sahibinden: 'S', hepsiemlak: 'H' };
 
         return (
-            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ml-2 ${styles[type]}`}>
+            <span className={`text-[9px] w-4 h-4 flex items-center justify-center rounded-full border font-bold ${styles[type]}`} title={type === 'sahibinden' ? 'Sahibinden' : 'Hepsiemlak'}>
                 {labels[type]}
             </span>
         );
@@ -58,126 +52,115 @@ const ClientMatchesModal = ({ isOpen, onClose, client, onUpdate }) => {
 
     return (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-            <div className="bg-white rounded-2xl p-0 w-full max-w-4xl shadow-2xl flex flex-col max-h-[90vh]">
+            <div className="bg-white rounded-xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[85vh]">
 
                 {/* Header */}
-                <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-2xl">
+                <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center bg-gray-50/80 rounded-t-xl">
                     <div>
-                        <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                        <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
                             ✨ Eşleşen İlanlar
-                            <span className="bg-emerald-100 text-emerald-800 text-xs px-2 py-0.5 rounded-full">
-                                {matches.length} İlan
+                            <span className="bg-emerald-100 text-emerald-800 text-[10px] px-1.5 py-0.5 rounded-full border border-emerald-200">
+                                {matches.length}
                             </span>
                         </h2>
-                        <p className="text-sm text-gray-500 mt-1">
-                            <span className="font-semibold text-gray-700">{client?.name}</span> için otomatik öneriler
+                        <p className="text-xs text-gray-500 mt-0.5">
+                            <span className="font-semibold">{client?.name}</span> için kriterlere uygun ilanlar
                         </p>
                     </div>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition">
-                        <X size={24} />
+                    <button onClick={onClose} className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-lg transition">
+                        <X size={18} />
                     </button>
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-6 custom-scrollbar bg-gray-50/50">
+                <div className="flex-1 overflow-y-auto p-4 custom-scrollbar bg-white">
                     {loading ? (
-                        <div className="text-center py-20 text-gray-500">Olası eşleşmeler aranıyor...</div>
+                        <div className="text-center py-20 text-sm text-gray-500">Olası eşleşmeler aranıyor...</div>
                     ) : matches.length === 0 ? (
                         <div className="text-center py-20">
-                            <Home className="w-16 h-16 text-gray-200 mx-auto mb-4" />
-                            <h3 className="text-lg font-medium text-gray-900">Eşleşme Bulunamadı</h3>
-                            <p className="text-gray-500">Müşteri kriterlerine uygun ilan şu an yok.</p>
+                            <Home className="w-10 h-10 text-gray-200 mx-auto mb-2" />
+                            <h3 className="text-sm font-medium text-gray-900">Eşleşme Bulunamadı</h3>
+                            <p className="text-xs text-gray-500">Kriterlere uygun ilan yok.</p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="flex flex-col gap-3">
                             {matches.map(prop => (
-                                <div key={prop.id} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow group flex gap-4">
-                                    {/* Image Thumb */}
-                                    <div className="w-24 h-24 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden relative">
+                                <div key={prop.id} className="flex gap-3 p-2 rounded-lg border border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all group relative">
+
+                                    {/* Compact Thumbnail */}
+                                    <div className="w-16 h-16 bg-gray-100 rounded-md flex-shrink-0 overflow-hidden relative border border-gray-100">
                                         {prop.images && prop.images.length > 0 ? (
-                                            <img src={prop.images[0]} alt={prop.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                            <img src={prop.images[0]} alt={prop.title} className="w-full h-full object-cover" />
                                         ) : (
-                                            <Home className="w-8 h-8 text-gray-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                                            <div className="w-full h-full flex items-center justify-center text-gray-300"><Home size={16} /></div>
                                         )}
-                                        {prop.opportunity_score >= 8 && (
-                                            <div className="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-[10px] font-bold px-1.5 py-0.5 rounded-bl">
-                                                ★ Fırsat
+                                        {/* Verification / Opportunity Badge Overly */}
+                                        {(prop.opportunity_score >= 8) && (
+                                            <div className="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-[8px] font-bold px-1 rounded-bl shadow-sm">
+                                                ★
                                             </div>
                                         )}
+                                        {/* Match Score Overlay */}
+                                        <div className={`absolute bottom-0 w-full text-[8px] font-bold text-center text-white py-0.5 ${(prop.match_quality || 90) >= 80 ? 'bg-emerald-500' : 'bg-orange-500'
+                                            }`}>
+                                            %{(prop.match_quality || 90)}
+                                        </div>
                                     </div>
 
-                                    {/* Info */}
-                                    <div className="flex-1 min-w-0">
+                                    {/* Info Columns */}
+                                    <div className="flex-1 min-w-0 flex flex-col justify-center">
                                         <div className="flex justify-between items-start">
-                                            <h4 className="font-bold text-gray-900 line-clamp-1 text-sm group-hover:text-emerald-600 transition flex items-center">
-                                                {prop.district} / {prop.neighborhood}
+                                            <h4 className="font-bold text-gray-900 text-sm truncate pr-2 flex items-center gap-1.5" title={prop.title}>
                                                 <SourceBadge url={prop.url} />
+                                                {prop.title?.split('#')[0].trim()}
                                             </h4>
-                                            <span className="text-emerald-700 font-bold text-sm">
+                                            <span className="font-bold text-emerald-700 text-sm whitespace-nowrap">
                                                 {parseInt(prop.price).toLocaleString()} ₺
                                             </span>
                                         </div>
 
-                                        <p className="text-xs text-gray-500 mt-1 line-clamp-2 min-h-[2.5em]">
-                                            {prop.rooms} • {prop.size_m2}m² • {prop.title?.split('#')[0].trim()}
-                                        </p>
-
-                                        {/* Match Badge */}
-                                        <div className="mt-2 flex items-center gap-2">
-                                            <div className="bg-blue-50 text-blue-700 text-[10px] px-2 py-1 rounded border border-blue-100 inline-flex items-center gap-1">
-                                                <TrendingDown size={10} />
-                                                Uygunluk: %{(prop.match_quality || 90)}
+                                        <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                                            <div className="flex items-center gap-1">
+                                                <MapPin size={10} /> {prop.district}/{prop.neighborhood}
                                             </div>
+                                            <span className="text-gray-300">|</span>
+                                            <span>{prop.rooms}</span>
+                                            <span className="text-gray-300">|</span>
+                                            <span>{prop.size_m2} m²</span>
                                         </div>
 
-                                        {/* Actions */}
-                                        <div className="mt-3 flex justify-between items-center border-t border-gray-100 pt-2">
+                                        {/* Action Bar (Hidden by default, shown on hover/focus) */}
+                                        <div className="flex items-center gap-2 mt-2 pt-1 border-t border-gray-50 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity">
+                                            {/* Add Button */}
                                             {client?.saved_properties?.some(saved => saved.property_id === prop.id) ? (
-                                                <button
-                                                    disabled
-                                                    className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded flex items-center gap-1 font-medium cursor-not-allowed"
-                                                >
-                                                    <CheckCircle size={12} /> Listede Ekli
+                                                <button disabled className="text-[10px] bg-gray-100 text-gray-400 px-2 py-1 rounded flex items-center gap-1 cursor-default">
+                                                    <CheckCircle size={10} /> Ekli
                                                 </button>
                                             ) : (
                                                 <button
                                                     onClick={async () => {
                                                         try {
                                                             await api.post(`/clients/${client.id}/properties`, {
-                                                                propertyId: prop.id,
-                                                                status: 'suggested'
+                                                                propertyId: prop.id, status: 'suggested'
                                                             });
-                                                            addToast('İlan portföye eklendi');
+                                                            addToast('Eklendi');
                                                             if (onUpdate) onUpdate();
-                                                        } catch (e) {
-                                                            const errorMsg = e.response?.data?.error || 'Bir hata oluştu';
-                                                            addToast(errorMsg, 'error');
-                                                            console.error('Add Prop Error:', e);
-                                                        }
+                                                        } catch (e) { addToast('Hata', 'error'); }
                                                     }}
-                                                    className="text-xs bg-emerald-50 text-emerald-700 px-2 py-1 rounded hover:bg-emerald-100 flex items-center gap-1 font-medium transition-colors"
+                                                    className="text-[10px] bg-emerald-600 text-white px-2 py-1 rounded hover:bg-emerald-700 flex items-center gap-1 transition-colors shadow-sm"
                                                 >
-                                                    <Archive size={12} /> Listeye Ekle
+                                                    <Archive size={10} /> Listeye Ekle
                                                 </button>
                                             )}
 
-                                            <div className="flex gap-2">
-                                                <button
-                                                    onClick={() => window.open(`/property-listing/${prop.id}`, '_blank')}
-                                                    className="text-xs bg-purple-50 text-purple-700 px-2 py-1 rounded hover:bg-purple-100 flex items-center gap-1 font-medium transition-colors"
-                                                    title="İlan Sayfası Oluştur"
-                                                >
-                                                    <FileText size={12} /> Sayfa
-                                                </button>
+                                            <div className="w-px h-3 bg-gray-200 mx-1"></div>
 
-                                                <Link
-                                                    to={`/property/${prop.id}`}
-                                                    target="_blank"
-                                                    className="text-gray-400 hover:text-emerald-600 text-xs flex items-center gap-1 font-medium transition-colors"
-                                                >
-                                                    İlanı Gör <ExternalLink size={12} />
-                                                </Link>
-                                            </div>
+                                            <button onClick={() => window.open(`/property-listing/${prop.id}`, '_blank')} className="text-[10px] text-gray-600 hover:text-purple-600 hover:bg-purple-50 px-2 py-1 rounded flex items-center gap-1 transition">
+                                                <FileText size={10} /> Sayfa
+                                            </button>
+                                            <Link to={`/property/${prop.id}`} target="_blank" className="text-[10px] text-gray-400 hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded flex items-center gap-1 transition ml-auto">
+                                                Orjinal <ExternalLink size={10} />
+                                            </Link>
                                         </div>
                                     </div>
                                 </div>
@@ -186,9 +169,9 @@ const ClientMatchesModal = ({ isOpen, onClose, client, onUpdate }) => {
                     )}
                 </div>
 
-                {/* Footer */}
-                <div className="p-4 border-t border-gray-100 bg-white rounded-b-2xl flex justify-end">
-                    <button onClick={onClose} className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition font-medium">
+                {/* Compact Footer */}
+                <div className="px-4 py-3 bg-gray-50 border-t border-gray-100 rounded-b-xl flex justify-end">
+                    <button onClick={onClose} className="px-4 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-200 bg-gray-100 rounded-md transition">
                         Kapat
                     </button>
                 </div>

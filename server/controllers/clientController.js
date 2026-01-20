@@ -1,5 +1,5 @@
 const prisma = require('../db');
-const { findMatchesForClient } = require('../services/matchingService');
+const { findMatchesForClient, calculateMatchScore } = require('../services/matchingService');
 const { jsonBigInt } = require('../utils/responseHelper');
 
 // Get matches for a client
@@ -68,6 +68,8 @@ const getClients = async (req, res) => {
     }
 };
 
+
+
 // Get a single client with all relations
 const getClient = async (req, res) => {
     const { id } = req.params;
@@ -88,8 +90,28 @@ const getClient = async (req, res) => {
             return res.status(404).json({ error: 'Client not found' });
         }
 
+        // Calculate dynamic match scores for saved properties
+        if (client.demands && client.demands.length > 0 && client.saved_properties && client.saved_properties.length > 0) {
+            client.saved_properties = client.saved_properties.map(sp => {
+                let bestScore = 0;
+                for (const demand of client.demands) {
+                    const { score } = calculateMatchScore(sp.property, demand);
+                    if (score > bestScore) bestScore = score;
+                }
+                return { ...sp, current_match_score: bestScore };
+            });
+            // Sort by match score (high to low), then by date
+            client.saved_properties.sort((a, b) => {
+                if (b.current_match_score !== a.current_match_score) {
+                    return b.current_match_score - a.current_match_score;
+                }
+                return new Date(b.added_at) - new Date(a.added_at);
+            });
+        }
+
         jsonBigInt(res, client);
     } catch (error) {
+        console.error('Get Client Error:', error);
         res.status(500).json({ error: 'Error fetching client' });
     }
 };
