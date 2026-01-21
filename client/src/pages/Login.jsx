@@ -52,9 +52,6 @@ const Login = () => {
                         </div>
                         <h1 className="text-2xl font-bold text-gray-900">Hoş Geldiniz</h1>
                         <p className="text-gray-500 text-sm mt-1">Trio App'e giriş yapın</p>
-                        <p className="text-emerald-600 text-[11px] font-medium bg-emerald-50 px-2 py-0.5 rounded mt-2">
-                            Yönetici: admin@emlak22.com | Şifre: 1234
-                        </p>
                     </div>
 
                     <form onSubmit={handleLogin} className="space-y-6">
@@ -62,7 +59,7 @@ const Login = () => {
                             id="email"
                             type="email"
                             label="E-posta Adresi"
-                            placeholder="admin@trioapp.com"
+                            placeholder="ornek@trioapp.com"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
@@ -72,7 +69,7 @@ const Login = () => {
                             id="password"
                             type="password"
                             label="Parola"
-                            placeholder="••••••••"
+                            placeholder=""
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required

@@ -19,7 +19,7 @@ import RemovedListingsViewer from '../components/apps/RemovedListingsViewer';
 
 import ContactImportModal from '../components/crm/ContactImportModal';
 import PendingContactsTable from '../components/crm/PendingContactsTable';
-import MyListings from '../components/consultant/MyListings';
+// import MyListings from '../components/consultant/MyListings'; // Legacy replaced by PortfolioDashboard
 import AdminManagement from './AdminManagement';
 
 const ConsultantPanel = () => {
@@ -117,9 +117,7 @@ const ConsultantPanel = () => {
                             </div>
                         </div>
 
-                        <div className="mb-6">
-                            <PortfolioDashboard mode="mine" userId={user?.id} />
-                        </div>
+
 
                         <ClientTracking
                             isAddModalOpen={showAddClientMatch}
@@ -135,7 +133,7 @@ const ConsultantPanel = () => {
 
                 {activeTab === 'mylistings' && (
                     <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                        <MyListings userId={user?.id} />
+                        <PortfolioDashboard mode="agency" userId={user?.id} />
                     </div>
                 )}
 

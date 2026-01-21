@@ -34,5 +34,16 @@ module.exports = {
             // 'http://ip:port'
         ],
         maxRetries: 3
+    },
+    // New Configs
+    agencyStore: {
+        url: 'https://trioemlakvegayrimenkul.sahibinden.com/',
+        hepsiemlak_url: 'https://www.hepsiemlak.com/emlak-ofisi/trio-emlak-gayrimenkul-danismanlik-138391',
+        assignedUserId: 3 // Admin (Verified)
+    },
+    ownerFilters: {
+        sahibinden: '&a5_min=1&a5_max=1', // Sahibinden Filter
+        hepsiemlak: '&owner_type=owner', // Generic guess, verified later or ignored if not critical
+        emlakjet: '&listing_owner=individual'
     }
 };

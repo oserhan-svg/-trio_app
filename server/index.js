@@ -45,6 +45,10 @@ app.use('/api/listings', propertyListingRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/agenda', require('./routes/agendaRoutes'));
 app.use('/api/performance', require('./routes/performanceRoutes'));
+app.use('/api/upload', require('./routes/uploadRoutes'));
+
+// Serve Uploads Static Directory
+app.use('/uploads', express.static('uploads'));
 
 // Start Scraper Scheduler
 // startScheduler();

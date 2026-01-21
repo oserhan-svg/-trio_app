@@ -185,7 +185,7 @@ const PropertyTable = ({ properties, currentSort, onSortChange, totalCount }) =>
                                             <span className="text-[10px] text-gray-400 italic">Sahiplik Bilgisi Yok</span>
                                         )}
                                         <div className="text-xs text-gray-500">
-                                            {prop.district} / {prop.neighborhood}
+                                            {[prop.district, prop.neighborhood].filter(Boolean).join(' / ') || '-'}
                                         </div>
                                     </div>
                                 </div>
@@ -207,7 +207,7 @@ const PropertyTable = ({ properties, currentSort, onSortChange, totalCount }) =>
                             <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 border-t border-b border-gray-100 py-2">
                                 <div>
                                     <span className="block text-gray-400 text-[10px]">Konum</span>
-                                    {prop.district} / {prop.neighborhood}
+                                    {[prop.district, prop.neighborhood].filter(Boolean).join(' / ') || '-'}
                                 </div>
                                 <div>
                                     <span className="block text-gray-400 text-[10px]">Özellikler</span>
@@ -329,7 +329,7 @@ const PropertyTable = ({ properties, currentSort, onSortChange, totalCount }) =>
                                         )}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                        {prop.neighborhood}, {prop.district}
+                                        {[prop.neighborhood, prop.district].filter(Boolean).join(', ') || '-'}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                                         <div className="flex flex-col gap-0.5">

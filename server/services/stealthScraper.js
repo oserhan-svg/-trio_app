@@ -200,14 +200,14 @@ async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 
                     // Store Mode Extraction
                     const data = [];
                     storeItems.forEach(row => {
+                        const titleEl = row.querySelector('.info .title a') || row.querySelector('.image a img');
+                        const title = titleEl ? (titleEl.getAttribute('alt') || titleEl.innerText.trim()) : 'No Title';
                         const urlEl = row.querySelector('.info .title a') || row.querySelector('.image a');
                         if (!urlEl) return;
 
-                        const title = urlEl.innerText.trim();
                         const fullUrl = urlEl.href;
                         const idMatch = fullUrl.match(/-(\d+)\/detay/);
-                        const id = idMatch ? idMatch[1] : null; // Fallback if no ID found
-                        if (!id) return;
+                        const id = idMatch ? idMatch[1] : null;
 
                         const priceEl = row.querySelector('.price');
                         let price = 0;
@@ -220,7 +220,15 @@ async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 
                         // We can leave blank or try to parse text.
                         const location = '';
 
-                        data.push({ external_id: id, title, price, url: fullUrl, location, district: '', neighborhood: '', seller_type: 'office', rooms: '', size_m2: 0 });
+                        // Try to extract consultant name from listing card (if available in store view)
+                        // In some store themes, it's in a specific class or title
+                        const consultantEl = row.querySelector('.consultantName') || row.querySelector('.real-estate-consultant');
+                        let seller_name = consultantEl ? consultantEl.innerText.trim() : '';
+
+                        // If empty, it might be the store owner (Admin) which we handle later via fallback.
+                        // But let's leave it empty to trigger "Bilinmiyor" or fallback logic.
+
+                        data.push({ external_id: id, title, price, url: fullUrl, location, district: '', neighborhood: '', seller_type: 'office', seller_name, rooms: '', size_m2: 0 });
                     });
                     return data;
                 }
@@ -341,7 +349,11 @@ async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 
         console.error('❌ Scrape Failed:', err.message);
         throw err;
     } finally {
-        if (browser) await browser.disconnect();
+        // Only disconnect if we are NOT using an injected page (interactive mode)
+        // In interactive mode, the main loop manages the browser lifecycle.
+        if (browser && !injectedPage) {
+            await browser.disconnect();
+        }
     }
 }
 
@@ -536,4 +548,62 @@ async function scrapeSahibindenDetails(url, existingPage = null) {
     }
 }
 
-module.exports = { scrapeSahibindenStealth, getOrLaunchBrowser, scrapeSahibindenDetails };
+
+
+async function scrapeSahibindenTeam(url, existingPage = null) {
+    console.log(`👥 Scraping Team Page: ${url}`);
+    let browser, page;
+    try {
+        if (existingPage) {
+            page = existingPage;
+        } else {
+            browser = await getOrLaunchBrowser();
+            page = await browser.newPage();
+            await humanizePage(page);
+        }
+
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+        // await checkBlock(page); // Skip block check on attached page for now to be safe
+        // await page.mouseMoveOrganic('body'); // Removed to prevent crash
+
+        // Wait for team list
+        try {
+            await page.waitForSelector('.some-team-selector-or-body', { timeout: 5000 });
+        } catch (e) { }
+
+        const teamMembers = await page.evaluate(() => {
+            const members = [];
+
+            // Verified Strategy: Store Facelift "Ekibimiz" structure
+            const userCards = document.querySelectorAll('.consultants-list .consultant');
+
+            userCards.forEach(card => {
+                const nameEl = card.querySelector('.info .name');
+                const phoneEl = card.querySelector('.contact-info .phone');
+                const imgEl = card.querySelector('.photo img');
+
+                const name = nameEl ? nameEl.innerText.trim() : '';
+                // Prefer data-phone attribute if available, else text
+                const phone = phoneEl ? (phoneEl.getAttribute('data-phone') || phoneEl.innerText.trim()) : '';
+                const img = imgEl ? imgEl.src : '';
+
+                if (name) {
+                    members.push({ name, phone, img });
+                }
+            });
+
+            return members;
+        });
+
+        console.log(`👥 Found ${teamMembers.length} team members.`);
+        return teamMembers;
+
+    } catch (e) {
+        console.error('❌ Team Scrape Failed:', e.message);
+        return [];
+    } finally {
+        if (!existingPage && browser) await browser.close();
+    }
+}
+
+module.exports = { scrapeSahibindenStealth, getOrLaunchBrowser, scrapeSahibindenDetails, scrapeSahibindenTeam };

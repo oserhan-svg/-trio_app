@@ -274,6 +274,15 @@ const getProperties = async (req, res) => {
             where.AND.push({ assigned_user_id: parseInt(req.query.assigned_user_id) });
         }
 
+        // Portfolio Mode Handling
+        // 'agency': Show all assigned listings (Internal Portfolio)
+        // 'mine': Show listings assigned to current user (already handled by assigned_user_id if passed, but reinforcing)
+        if (req.query.portfolio === 'agency') {
+            where.AND.push({ assigned_user_id: { not: null } });
+        } else if (req.query.portfolio === 'mine' && req.query.assigned_user_id) {
+            where.AND.push({ assigned_user_id: parseInt(req.query.assigned_user_id) });
+        }
+
         if (minPrice) {
             where.AND.push({ price: { gte: parseFloat(minPrice) } });
         }
