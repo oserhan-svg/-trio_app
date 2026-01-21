@@ -129,6 +129,16 @@ async function launchRealBrowser(options = {}) {
             ignoreAllFlags: false
         });
 
+        // WAKE UP CALL: Navigate to Google to ensure browser is responsive and not stuck on about:blank
+        try {
+            console.log('🌍 Verifying browser responsiveness (Navigating to Google)...');
+            await page.goto('https://www.google.com', { waitUntil: 'domcontentloaded', timeout: 30000 });
+            console.log('✅ Browser is responsive.');
+        } catch (navErr) {
+            console.warn('⚠️ Initial navigation check failed or timed out:', navErr.message);
+            // We don't throw here, we try to proceed, but it's a bad sign.
+        }
+
         // Inject Cookies
         await loadImportedCookies(page);
 

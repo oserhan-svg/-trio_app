@@ -1,6 +1,7 @@
 const prisma = require('../db');
 const { findMatchesForClient, calculateMatchScore } = require('../services/matchingService');
 const { jsonBigInt } = require('../utils/responseHelper');
+const { stripHtml } = require('../utils/sanitize');
 
 // Get matches for a client
 const getClientMatches = async (req, res) => {
@@ -101,13 +102,27 @@ const getClient = async (req, res) => {
                 }
                 return { ...sp, current_match_score: bestScore };
             });
-            // Sort by match score (high to low), then by date
+            // Sort by Date Added (Newest First) - User Preference
             client.saved_properties.sort((a, b) => {
-                if (b.current_match_score !== a.current_match_score) {
-                    return b.current_match_score - a.current_match_score;
-                }
                 return new Date(b.added_at) - new Date(a.added_at);
             });
+        }
+
+        // Deduplicate saved_properties (Keep highest score or newest)
+        if (client.saved_properties && client.saved_properties.length > 0) {
+            const seenUrls = new Set();
+            client.saved_properties = client.saved_properties.filter(sp => {
+                if (!sp.property || !sp.property.url) return true; // Keep odd ones
+                const normUrl = sp.property.url.split('?')[0].replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '').toLowerCase();
+
+                if (seenUrls.has(normUrl)) {
+                    console.log(`Deduplicating Client Property: ${sp.property.id} (${normUrl})`);
+                    return false;
+                }
+                seenUrls.add(normUrl);
+                return true;
+            });
+            console.log(`Client Deduplication: Reduced to ${client.saved_properties.length} unique properties.`);
         }
 
         jsonBigInt(res, client);
@@ -118,7 +133,7 @@ const getClient = async (req, res) => {
 };
 
 // Create a new client (Assigned to Creator)
-const { stripHtml } = require('../utils/sanitize');
+// Create a new client (Assigned to Creator)
 
 const createClient = async (req, res) => {
     let { name, phone, email, notes, type } = req.body;
@@ -142,6 +157,53 @@ const createClient = async (req, res) => {
     } catch (error) {
         console.error('Error creating client:', error);
         res.status(500).json({ error: 'Error creating client' });
+    }
+};
+
+// Bulk Create Clients (CSV Import)
+const bulkCreateClients = async (req, res) => {
+    const clientsData = req.body; // Array of { name, phone, email, notes, type }
+
+    if (!Array.isArray(clientsData)) {
+        return res.status(400).json({ error: 'Invalid data format. Expected an array.' });
+    }
+
+    try {
+        const consultantId = req.user.id;
+
+        // 1. Sanitize and Filter Invalid Data In-Memory
+        const validClients = clientsData
+            .filter(c => c.name && c.phone)
+            .map(c => ({
+                name: stripHtml(c.name),
+                phone: c.phone.trim(),
+                email: c.email ? c.email.trim() : null,
+                notes: c.notes ? stripHtml(c.notes) : null,
+                consultant_id: consultantId
+            }));
+
+        if (validClients.length === 0) {
+            return res.json({ message: 'No valid contacts to import.', results: { added: 0, skipped: 0, errors: clientsData.length } });
+        }
+
+        // 2. Insert into PendingContact (No Deduplication required for Staging, or minimal)
+        // createMany is much faster
+        const batchResult = await prisma.pendingContact.createMany({
+            data: validClients
+        });
+
+        const stats = {
+            added: batchResult.count,
+            skipped: 0,
+            errors: clientsData.length - validClients.length
+        };
+
+        res.json({ message: 'Import completed', results: stats });
+
+    } catch (error) {
+        console.error('Bulk Create Error:', error);
+        // Return the actual error message safely
+        res.status(500).json({ error: 'Error processing bulk import', details: error.message });
     }
 };
 
@@ -235,10 +297,114 @@ const deleteDemand = async (req, res) => {
     const { id } = req.params;
     try {
         await prisma.demand.delete({ where: { id: parseInt(id) } });
-        res.json({ message: 'Demand deleted' });
+        res.json({ message: 'Demand deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Error deleting demand' });
     }
 };
 
-module.exports = { getClients, getClient, createClient, updateClient, addDemand, deleteClient, getClientMatches, getRecentMatches, updateDemand, deleteDemand };
+// Add a property to client's saved list
+const addPropertyToClient = async (req, res) => {
+    const { id } = req.params;
+    // Support both casings
+    const { property_id, propertyId, manual_match } = req.body;
+    const pIdRaw = property_id || propertyId;
+
+    try {
+        // Check for valid IDs
+        const cId = parseInt(id);
+        const pId = parseInt(pIdRaw);
+
+        if (isNaN(cId) || isNaN(pId)) {
+            return res.status(400).json({ error: 'Invalid client or property ID' });
+        }
+
+        const savedProperty = await prisma.clientProperty.create({
+            data: {
+                client: { connect: { id: cId } },
+                property: { connect: { id: pId } },
+                status: 'concierge',
+                added_at: new Date()
+            }
+        });
+        res.json(savedProperty);
+    } catch (error) {
+        // Unique constraint violation (already added) is common, handle gracefully
+        if (error.code === 'P2002') {
+            return res.status(400).json({ error: 'Property already added to client' });
+        }
+        console.error('Error adding property to client:', error);
+        res.status(500).json({ error: 'Error adding property to client' });
+    }
+};
+
+// Remove a property from client's saved list
+const removePropertyFromClient = async (req, res) => {
+    const { id, propertyId } = req.params;
+    try {
+        await prisma.clientProperty.deleteMany({
+            where: {
+                client_id: parseInt(id),
+                property_id: parseInt(propertyId)
+            }
+        });
+        res.json({ message: 'Property removed successfully' });
+    } catch (error) {
+        console.error('Error removing property from client:', error);
+        res.status(500).json({ error: 'Error removing property from client' });
+    }
+};
+
+// Update property note
+const updatePropertyNote = async (req, res) => {
+    const { id, propertyId } = req.params;
+    const { note } = req.body;
+    try {
+        // We need to find the specific SavedProperty record first, or use updateMany
+        // Since (client_id, property_id) is unique, updateMany is safe
+        await prisma.clientProperty.updateMany({
+            where: {
+                client_id: parseInt(id),
+                property_id: parseInt(propertyId)
+            },
+            data: { note }
+        });
+        res.json({ message: 'Note updated' });
+    } catch (error) {
+        console.error('Error updating property note:', error);
+        res.status(500).json({ error: 'Error updating property note' });
+    }
+};
+
+// Remove ALL properties for a client
+const removeAllProperties = async (req, res) => {
+    const { id } = req.params;
+    try {
+        await prisma.clientProperty.deleteMany({
+            where: { client_id: parseInt(id) }
+        });
+        res.json({ message: 'All properties removed' });
+    } catch (error) {
+        console.error('Remove All Properties Error:', error);
+        res.status(500).json({ error: 'Error removing properties' });
+    }
+};
+
+module.exports = {
+    getClients,
+    getClientById: getClient, // Export alias if needed, or just getClient
+    getClient, // Ensure getClient is exported
+    createClient,
+    addDemand,
+    deleteDemand,
+    updateDemand, // Export updateDemand
+    deleteClient, // Export deleteClient
+    addPropertyToClient,
+    removePropertyFromClient,
+    removeAllProperties,
+    updatePropertyNote,
+    getClientMatches,
+    getRecentMatches,
+    updateClient,
+    bulkCreateClients
+};

@@ -327,15 +327,37 @@ async function getOrLaunchBrowser() {
     const puppeteer = require('puppeteer-extra');
     const path = require('path');
     const fs = require('fs');
+    const os = require('os');
 
     try {
         // FAST path: Connect to existing debugger
         return await puppeteer.connect({ browserURL: 'http://127.0.0.1:9222', defaultViewport: null });
     } catch (err) {
-        console.log('⚠️ Existing Chrome 9222 not found. Launching optimized browser...');
-        return await require('./browserFactory').createStealthBrowser({
-            proxy: scraperConfig.stealth.useProxy ? scraperConfig.stealth.proxyUrl : null
-        });
+        console.log('⚠️ Existing Chrome 9222 not found/connect failed:', err.message);
+
+        try {
+            console.log('🚀 Launching fresh optimized browser (Default Profile)...');
+            return await require('./browserFactory').createStealthBrowser({
+                proxy: scraperConfig.stealth.useProxy ? scraperConfig.stealth.proxyUrl : null
+            });
+        } catch (launchErr) {
+            // Check for profile lock error
+            if (launchErr.message && (launchErr.message.includes('already running') || launchErr.message.includes('EBUSY') || launchErr.message.includes('locked'))) {
+                console.log('🔒 Default profile is LOCKED. Launching with TEMPORARY profile for this scrape...');
+
+                const tempDir = path.join(os.tmpdir(), `emlak22-temp-${Date.now()}`);
+
+                // Copy cookies if possible to preserve some session?
+                // It might risk locking if we copy to a locked dir, but we are writing TO temp.
+                // Reading from the main cookie file should be safe (read-only).
+
+                return await require('./browserFactory').createStealthBrowser({
+                    proxy: scraperConfig.stealth.useProxy ? scraperConfig.stealth.proxyUrl : null,
+                    userDataDir: tempDir
+                });
+            }
+            throw launchErr;
+        }
     }
 }
 
@@ -407,6 +429,17 @@ async function scrapeSahibindenDetails(url, existingPage = null) {
         } catch (e) { }
 
         const data = await page.evaluate(() => {
+            // CHECK FOR REMOVED LISTING INDICATORS
+            const bodyText = document.body.innerText;
+            const removedMsg = document.querySelector('.classified-expired-status') ||
+                document.querySelector('.classified-not-active') ||
+                bodyText.includes('Bu ilan yayında değildir') ||
+                bodyText.includes('İlan yayında değil');
+
+            if (removedMsg) {
+                return { isRemoved: true };
+            }
+
             const description = document.querySelector('#classifiedDescription')?.innerText.trim() || '';
 
             // Images
@@ -452,6 +485,13 @@ async function scrapeSahibindenDetails(url, existingPage = null) {
             // Fallback for single image
             const mainImg = await page.$eval('.classifiedDetailMainPhoto img', img => img.src).catch(() => null);
             if (mainImg) data.images.push(mainImg);
+        }
+
+        if (data.isRemoved) {
+            console.log(`⚠️ Listing REMOVED detected (Sahibinden): ${url}`);
+            const error = new Error('ListingRemoved');
+            error.code = 'LISTING_REMOVED';
+            throw error;
         }
 
         return data;

@@ -18,7 +18,8 @@ app.use(helmet());
 
 app.use(cors()); // Allow all origins temporarily for debugging
 app.use(morgan('dev'));
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Rate Limiting
 const { apiLimiter } = require('./middleware/rateLimiter');
@@ -91,7 +92,16 @@ app.get('/test-db', async (req, res) => {
 app.use(errorHandler);
 
 // Start Server
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
-    initDb(); // Run DB init after port is bound to satisfy Render's health check
+    console.log('*************************************************');
+    console.log('*  CRASH FIX LOADED - VERSION: 1.11             *');
+    console.log('*  RENDER DEPLOYMENT OPTIMIZED                  *');
+    console.log('*************************************************');
+
+    // Validating Health Check Response first
+    console.log('Waiting 5s before running heavy DB tasks to allow Health Check...');
+    setTimeout(() => {
+        initDb();
+    }, 5000);
 });

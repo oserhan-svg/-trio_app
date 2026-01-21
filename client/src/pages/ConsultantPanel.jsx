@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Briefcase, Users, Calculator, Calendar, Plus, FileText, Radar } from 'lucide-react';
+import { ArrowLeft, Briefcase, Users, Calculator, Calendar, Plus, FileText, Radar, Upload, LayoutGrid, TrendingUp, Wallet, BarChart2, UserPlus, Search, Trash2 } from 'lucide-react';
 import ClientTracking from '../components/crm/ClientTracking';
 import Button from '../components/ui/Button';
 
@@ -15,14 +15,18 @@ import Agenda from '../components/agenda/Agenda';
 import PerformanceDashboard from '../components/admin/PerformanceDashboard';
 import MatchNewsfeed from '../components/crm/MatchNewsfeed';
 import MarketSupplyDemandChart from '../components/dashboard/MarketSupplyDemandChart';
-import { LayoutGrid, TrendingUp, Wallet, BarChart2 } from 'lucide-react';
+import RemovedListingsViewer from '../components/apps/RemovedListingsViewer';
+
+import ContactImportModal from '../components/crm/ContactImportModal';
+import PendingContactsTable from '../components/crm/PendingContactsTable';
 
 const ConsultantPanel = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('clients'); // 'clients', 'apps', 'tools', 'agenda'
     const [activeTool, setActiveTool] = useState(null); // 'calculator-gain', etc.
-    const [activeApp, setActiveApp] = useState(null); // 'opportunity-generator'
-    const [showAddClientMatch, setShowAddClientMatch] = useState(false); // Trigger for ClientTracking
+    const [activeApp, setActiveApp] = useState(null);
+    const [showAddClientMatch, setShowAddClientMatch] = useState(false);
+    const [showImportModal, setShowImportModal] = useState(false);
 
     const [user] = useState(() => {
         try {
@@ -36,108 +40,85 @@ const ConsultantPanel = () => {
 
     const panelTitle = user?.role === 'admin' ? 'Admin Paneli' : 'Danışman Paneli';
 
+    const TabButton = ({ id, label, icon: Icon }) => (
+        <button
+            onClick={() => setActiveTab(id)}
+            className={`pb-3 text-sm font-medium flex items-center gap-2 transition-all border-b-2 whitespace-nowrap px-1 ${activeTab === id
+                ? 'border-brand-red text-brand-red'
+                : 'border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300'
+                }`}
+        >
+            <Icon size={16} className={activeTab === id ? 'stroke-[2.5px]' : ''} />
+            {label}
+        </button>
+    );
+
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-brand-gray font-sans text-brand-dark">
             {/* Header */}
-            <div className="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-20 shadow-sm">
-                <div className="max-w-7xl mx-auto flex justify-between items-center">
+            <div className="bg-white border-b border-brand-border px-6 py-3 sticky top-0 z-20">
+                <div className="max-w-[1400px] mx-auto flex justify-between items-center">
                     <div className="flex items-center gap-4">
                         <button
                             onClick={() => navigate('/dashboard')}
-                            className="p-2 hover:bg-gray-100 rounded-full text-gray-500 transition-colors"
+                            className="p-1.5 hover:bg-gray-100 rounded-full text-gray-500 transition-colors"
                         >
                             <ArrowLeft size={20} />
                         </button>
                         <div>
-                            <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                                <Briefcase className="text-emerald-600" />
+                            <h1 className="text-lg font-bold text-brand-dark flex items-center gap-2">
+                                <Briefcase className="text-brand-red" size={20} />
                                 {panelTitle}
                             </h1>
-                            <p className="text-sm text-gray-500">Müşteri takibi ve danışmanlık araçları</p>
                         </div>
                     </div>
                     {/* Right Side Actions */}
                     {activeTab === 'clients' && (
-                        <Button onClick={() => setShowAddClientMatch(true)} className="flex items-center gap-2">
-                            <Plus size={18} /> Yeni Müşteri
-                        </Button>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setShowImportModal(true)}
+                                className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded hover:bg-gray-50 transition"
+                            >
+                                <Upload size={14} /> <span className="hidden sm:inline">İçe Aktar</span>
+                            </button>
+                            <button
+                                onClick={() => setShowAddClientMatch(true)}
+                                className="flex items-center gap-2 px-3 py-1.5 bg-brand-dark text-white text-sm font-medium rounded hover:bg-black transition shadow-sm"
+                            >
+                                <Plus size={14} /> <span className="hidden sm:inline">Yeni Müşteri</span>
+                            </button>
+                        </div>
                     )}
                 </div>
 
                 {/* Tabs */}
-                <div className="max-w-7xl mx-auto mt-6 flex gap-8 overflow-x-auto">
-                    <button
-                        onClick={() => setActiveTab('clients')}
-                        className={`pb-3 text-sm font-medium flex items-center gap-2 transition-all border-b-2 whitespace-nowrap ${activeTab === 'clients'
-                            ? 'border-emerald-500 text-emerald-600'
-                            : 'border-transparent text-gray-500 hover:text-gray-700'
-                            }`}
-                    >
-                        <Users size={18} />
-                        Müşteri Takip
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('apps')}
-                        className={`pb-3 text-sm font-medium flex items-center gap-2 transition-all border-b-2 whitespace-nowrap ${activeTab === 'apps'
-                            ? 'border-purple-500 text-purple-600'
-                            : 'border-transparent text-gray-500 hover:text-gray-700'
-                            }`}
-                    >
-                        <LayoutGrid size={18} />
-                        Uygulamalar
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('tools')}
-                        className={`pb-3 text-sm font-medium flex items-center gap-2 transition-all border-b-2 whitespace-nowrap ${activeTab === 'tools'
-                            ? 'border-blue-500 text-blue-600'
-                            : 'border-transparent text-gray-500 hover:text-gray-700'
-                            }`}
-                    >
-                        <Calculator size={18} />
-                        Diğer Enstrümanlar
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('agenda')}
-                        className={`pb-3 text-sm font-medium flex items-center gap-2 transition-all border-b-2 whitespace-nowrap ${activeTab === 'agenda'
-                            ? 'border-gray-500 text-gray-600'
-                            : 'border-transparent text-gray-500 hover:text-gray-700'
-                            }`}
-                    >
-                        <Calendar size={18} />
-                        Ajanda
-                    </button>
-
+                <div className="max-w-[1400px] mx-auto mt-4 flex gap-6 overflow-x-auto no-scrollbar">
+                    <TabButton id="clients" label="Müşteri Takip" icon={Users} />
+                    <TabButton id="pending" label="Aday Havuzu" icon={UserPlus} />
+                    <TabButton id="apps" label="Uygulamalar" icon={LayoutGrid} />
+                    <TabButton id="tools" label="Araçlar" icon={Calculator} />
+                    <TabButton id="agenda" label="Ajanda" icon={Calendar} />
                     {user?.role === 'admin' && (
-                        <button
-                            onClick={() => setActiveTab('performance')}
-                            className={`pb-3 text-sm font-medium flex items-center gap-2 transition-all border-b-2 whitespace-nowrap ${activeTab === 'performance'
-                                ? 'border-orange-500 text-orange-600'
-                                : 'border-transparent text-gray-500 hover:text-gray-700'
-                                }`}
-                        >
-                            <BarChart2 size={18} />
-                            Performans
-                        </button>
+                        <TabButton id="performance" label="Performans" icon={BarChart2} />
                     )}
                 </div>
             </div>
 
             {/* Content Area */}
-            <div className="max-w-7xl mx-auto p-6">
+            <div className="max-w-[1400px] mx-auto p-4 sm:p-6">
                 {activeTab === 'clients' && (
                     <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                        {/* Top Section: Neighborhood Chart & Match Feed */}
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-                            <div className="lg:col-span-2">
+                        {/* Compact Grid Layout */}
+                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+                            <div className="lg:col-span-3">
                                 <MarketSupplyDemandChart />
                             </div>
-                            <div className="lg:col-span-1">
+                            <div className="lg:col-span-1 h-full">
                                 <MatchNewsfeed />
                             </div>
                         </div>
 
-                        {/* Portfolio Dashboard */}
-                        <div className="mb-8">
+                        <div className="mb-6">
                             <PortfolioDashboard mode="mine" userId={user?.id} />
                         </div>
 
@@ -145,6 +126,17 @@ const ConsultantPanel = () => {
                             isAddModalOpen={showAddClientMatch}
                             onCloseAddModal={() => setShowAddClientMatch(false)}
                         />
+                        <ContactImportModal
+                            isOpen={showImportModal}
+                            onClose={() => setShowImportModal(false)}
+                            onImportSuccess={() => window.location.reload()}
+                        />
+                    </div>
+                )}
+
+                {activeTab === 'pending' && (
+                    <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        <PendingContactsTable />
                     </div>
                 )}
 
@@ -156,46 +148,42 @@ const ConsultantPanel = () => {
                             <MarketRadar onBack={() => setActiveApp(null)} />
                         ) : activeApp === 'weekly-report' ? (
                             <WeeklyReportGenerator onBack={() => setActiveApp(null)} />
+                        ) : activeApp === 'removed-listings' ? (
+                            <RemovedListingsViewer onBack={() => setActiveApp(null)} />
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {/* Opportunity Generator App Card */}
-                                <div
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <AppCard
+                                    title="Fırsat Bülteni"
+                                    desc="Danışmanlara özel liste hazırla."
+                                    icon={FileText}
                                     onClick={() => setActiveApp('opportunity-generator')}
-                                    className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center text-center hover:shadow-md transition-all cursor-pointer group hover:border-purple-300"
-                                >
-                                    <div className="w-14 h-14 bg-purple-50 rounded-full flex items-center justify-center text-purple-600 mb-4 group-hover:scale-110 transition-transform group-hover:bg-purple-100">
-                                        <FileText size={28} />
-                                    </div>
-                                    <h3 className="font-bold text-gray-800 mb-2 truncate w-full">Fırsat Bülteni Oluşturucu</h3>
-                                    <p className="text-sm text-gray-500 line-clamp-2">Danışmanlara göndermek için fırsat listesi hazırlayın.</p>
-                                    <span className="mt-4 text-xs bg-purple-600 text-white px-3 py-1 rounded-full font-medium">Yeni</span>
-                                </div>
-
-                                {/* Market Radar App Card */}
-                                <div
+                                    color="text-brand-red"
+                                    bg="bg-red-50"
+                                />
+                                <AppCard
+                                    title="Fırsat Radarı"
+                                    desc="Piyasadaki en iyi fırsatları yakala."
+                                    icon={Radar}
                                     onClick={() => setActiveApp('market-radar')}
-                                    className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center text-center hover:shadow-md transition-all cursor-pointer group hover:border-rose-300"
-                                >
-                                    <div className="w-14 h-14 bg-rose-50 rounded-full flex items-center justify-center text-rose-600 mb-4 group-hover:scale-110 transition-transform group-hover:bg-rose-100">
-                                        <Radar size={28} />
-                                    </div>
-                                    <h3 className="font-bold text-gray-800 mb-2 truncate w-full">Fırsat Radarı</h3>
-                                    <p className="text-sm text-gray-500 line-clamp-2">Daire, Villa, Arsa ve Zeytinlik kategorilerinde en iyi fırsatları yakalayın.</p>
-                                    <span className="mt-4 text-xs bg-rose-600 text-white px-3 py-1 rounded-full font-medium">Popüler</span>
-                                </div>
-
-                                {/* Weekly Report App Card */}
-                                <div
+                                    color="text-brand-dark"
+                                    bg="bg-gray-100"
+                                />
+                                <AppCard
+                                    title="Pazar Raporu"
+                                    desc="Haftalık piyasa analizi oluştur."
+                                    icon={TrendingUp}
                                     onClick={() => setActiveApp('weekly-report')}
-                                    className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center text-center hover:shadow-md transition-all cursor-pointer group hover:border-emerald-300"
-                                >
-                                    <div className="w-14 h-14 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 mb-4 group-hover:scale-110 transition-transform group-hover:bg-emerald-100">
-                                        <TrendingUp size={28} />
-                                    </div>
-                                    <h3 className="font-bold text-gray-800 mb-2 truncate w-full">Haftalık Pazar Raporu</h3>
-                                    <p className="text-sm text-gray-500 line-clamp-2">Müşterileriniz için profesyonel piyasa analiz raporları oluşturun.</p>
-                                    <span className="mt-4 text-xs bg-emerald-600 text-white px-3 py-1 rounded-full font-medium">Yeni</span>
-                                </div>
+                                    color="text-brand-dark"
+                                    bg="bg-gray-100"
+                                />
+                                <AppCard
+                                    title="Pasif İlanlar"
+                                    desc="Portallardan kalkan ilanları incele."
+                                    icon={Trash2}
+                                    onClick={() => setActiveApp('removed-listings')}
+                                    color="text-gray-600"
+                                    bg="bg-gray-100"
+                                />
                             </div>
                         )}
                     </div>
@@ -210,54 +198,31 @@ const ConsultantPanel = () => {
                         ) : activeTool === 'mortgage-calculator' ? (
                             <MortgageCalculator onBack={() => setActiveTool(null)} />
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {/* Capital Gains Tool Card */}
-                                <div
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <AppCard
+                                    title="Değer Artış Kazancı"
+                                    desc="Vergi ve 5 yıl kuralı hesabı."
+                                    icon={TrendingUp}
                                     onClick={() => setActiveTool('calculator-gain')}
-                                    className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center text-center hover:shadow-md transition-all cursor-pointer group hover:border-blue-300"
-                                >
-                                    <div className="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 mb-4 group-hover:scale-110 transition-transform group-hover:bg-blue-100">
-                                        <TrendingUp size={28} />
-                                    </div>
-                                    <h3 className="font-bold text-gray-800 mb-2 truncate w-full">Değer Artış Kazancı</h3>
-                                    <p className="text-sm text-gray-500 line-clamp-2">Gayrimenkul alım-satım vergisini ve 5 yıl kuralını hesaplayın.</p>
-                                    <span className="mt-4 text-xs bg-blue-600 text-white px-3 py-1 rounded-full font-medium">Yeni</span>
-                                </div>
-
-                                {/* Title Deed Fee Tool Card */}
-                                <div
+                                    color="text-blue-600"
+                                    bg="bg-blue-50"
+                                />
+                                <AppCard
+                                    title="Tapu Harcı"
+                                    desc="Alım-satım masrafları."
+                                    icon={Wallet}
                                     onClick={() => setActiveTool('tapu-calculator')}
-                                    className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center text-center hover:shadow-md transition-all cursor-pointer group hover:border-emerald-300"
-                                >
-                                    <div className="w-14 h-14 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 mb-4 group-hover:scale-110 transition-transform group-hover:bg-emerald-100">
-                                        <Wallet size={28} />
-                                    </div>
-                                    <h3 className="font-bold text-gray-800 mb-2 truncate w-full">Tapu Harcı Hesapla</h3>
-                                    <p className="text-sm text-gray-500 line-clamp-2">Alıcı ve satıcı tapu harcı ile döner sermaye bedellerini görün.</p>
-                                    <span className="mt-4 text-xs bg-emerald-600 text-white px-3 py-1 rounded-full font-medium">Yeni</span>
-                                </div>
-
-                                {/* Mortgage Calculator Tool Card */}
-                                <div
+                                    color="text-emerald-600"
+                                    bg="bg-emerald-50"
+                                />
+                                <AppCard
+                                    title="Kredi Hesaplama"
+                                    desc="Faiz ve ödeme planı."
+                                    icon={Calculator}
                                     onClick={() => setActiveTool('mortgage-calculator')}
-                                    className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center text-center hover:shadow-md transition-all cursor-pointer group hover:border-indigo-300"
-                                >
-                                    <div className="w-14 h-14 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600 mb-4 group-hover:scale-110 transition-transform group-hover:bg-indigo-100">
-                                        <Calculator size={28} />
-                                    </div>
-                                    <h3 className="font-bold text-gray-800 mb-2">Kredi Hesaplama</h3>
-                                    <p className="text-sm text-gray-500 line-clamp-2">Konut kredisi faiz ve ödeme planı hesaplayıcısı.</p>
-                                    <span className="mt-4 text-xs bg-indigo-600 text-white px-3 py-1 rounded-full font-medium">Yeni</span>
-                                </div>
-
-                                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center text-center hover:shadow-md transition-shadow cursor-pointer group opacity-60">
-                                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 mb-4">
-                                        <Briefcase size={24} />
-                                    </div>
-                                    <h3 className="font-bold text-gray-800 mb-2">Komisyon Hesaplama</h3>
-                                    <p className="text-sm text-gray-500">Hizmet bedeli ve fatura hesaplama aracı.</p>
-                                    <span className="mt-4 text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded">Yakında</span>
-                                </div>
+                                    color="text-indigo-600"
+                                    bg="bg-indigo-50"
+                                />
                             </div>
                         )}
                     </div>
@@ -278,5 +243,19 @@ const ConsultantPanel = () => {
         </div>
     );
 };
+
+// Helper Component for consistency
+const AppCard = ({ title, desc, icon: Icon, onClick, color, bg }) => (
+    <div
+        onClick={onClick}
+        className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm hover:shadow-md hover:border-gray-300 transition-all cursor-pointer group flex flex-col items-start"
+    >
+        <div className={`w-10 h-10 ${bg} rounded-lg flex items-center justify-center ${color} mb-3 group-hover:scale-105 transition-transform`}>
+            <Icon size={20} />
+        </div>
+        <h3 className="font-bold text-brand-dark text-base mb-1">{title}</h3>
+        <p className="text-xs text-gray-500 leading-relaxed">{desc}</p>
+    </div>
+);
 
 export default ConsultantPanel;

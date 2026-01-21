@@ -273,15 +273,33 @@ const ClientDetail = () => {
                             <h3 className="font-semibold text-gray-800 flex items-center gap-2">
                                 <Star size={14} className="text-yellow-500 fill-yellow-500" /> Seçilenler
                             </h3>
-                            <span className="text-[10px] font-bold bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded-full">
-                                {savedProperties.filter(p => p && p.property).length}
-                            </span>
+                            <div className="flex items-center gap-1">
+                                {savedProperties.length > 0 && (
+                                    <button
+                                        onClick={async () => {
+                                            if (!confirm('Tüm seçili ilanları kaldırmak istediğinize emin misiniz?')) return;
+                                            try {
+                                                await api.delete(`/clients/${client.id}/properties`);
+                                                addToast('Liste temizlendi');
+                                                fetchClientData();
+                                            } catch (e) { addToast('Hata', 'error'); }
+                                        }}
+                                        className="text-[10px] text-red-400 hover:text-red-600 hover:bg-red-50 px-2 py-0.5 rounded transition"
+                                    >
+                                        Temizle
+                                    </button>
+                                )}
+                                <span className="text-[10px] font-bold bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded-full">
+                                    {savedProperties.filter(p => p && p.property).length}
+                                </span>
+                            </div>
                         </div>
-                        <div className="divide-y divide-gray-100">
+                        <div className="divide-y divide-gray-100 max-h-96 overflow-y-auto custom-scrollbar">
                             {(() => {
                                 const validProps = savedProperties.filter(p => p && p.property)
-                                    .sort((a, b) => (b.current_match_score || 0) - (a.current_match_score || 0))
-                                    .slice(0, 3);
+                                    // Removed sort to keep "Newest First" from backend
+                                    // .slice(0, 3) -> Removed slice to show all (or limit to 50)
+                                    .slice(0, 50);
 
                                 if (validProps.length === 0) {
                                     return <div className="p-4 text-center text-xs text-gray-400 italic">Henüz seçim yok.</div>;

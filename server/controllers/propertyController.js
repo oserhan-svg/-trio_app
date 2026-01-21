@@ -4,13 +4,198 @@ const { jsonBigInt } = require('../utils/responseHelper');
 // Helper to upgrade image quality on the fly
 const upgradeImages = (images) => {
     if (!images || !Array.isArray(images)) return [];
-    return images.map(src => {
-        // Hepsiemlak: Remove /mnresize/width/height/
-        if (src.includes('hemlak.com') && src.includes('/mnresize/')) {
-            return src.replace(/\/mnresize\/\d+\/\d+\//, '/');
+    const processed = images
+        .filter(img => typeof img === 'string')
+        .filter(img => !img.startsWith('data:image/gif')) // Remove lazy-load placeholders
+        .map(src => {
+            let clean = src;
+            // Hepsiemlak: Remove /mnresize/width/height/ (Handles hecdn and hemlak domains)
+            if (clean && (clean.includes('hemlak.com') || clean.includes('hecdn.com')) && clean.includes('/mnresize/')) {
+                clean = clean.replace(/\/mnresize\/\d+\/\d+\//, '/');
+            }
+            return clean;
+        });
+
+    // Deduplicate aggressively
+    const unique = [];
+    const seen = new Set();
+
+    processed.forEach(src => {
+        let key = src;
+        // For Hepsiemlak numeric filenames (timestamp-listingId.jpg), use listingId as key to prevent visual clones
+        // Example: 1768843594696-45955610.jpg -> 45955610.jpg
+        if (src.includes('hemlak.com') || src.includes('hecdn.com')) {
+            const hMatch = src.match(/\/(\d+)-(\d+)\.jpg/);
+            if (hMatch) {
+                // Key is: directory_path + listingId
+                // We keep the first occurrence of each listingId in the same path
+                key = src.replace(/\/\d+-(\d+)\.jpg/, '/$1.jpg');
+            }
         }
-        return src;
+
+        if (!seen.has(key)) {
+            seen.add(key);
+            unique.push(src);
+        }
     });
+
+    return unique;
+};
+
+// ... (getProperties remains the same)
+
+const getPropertyById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const property = await prisma.property.findUnique({
+            where: { id: parseInt(id) },
+            include: {
+                history: { orderBy: { changed_at: 'asc' } }
+            }
+        });
+
+        if (!property) {
+            return res.status(404).json({ error: 'Property not found' });
+        }
+
+        // Upgrade images
+        const upgradedProperty = {
+            ...property,
+            images: upgradeImages(property.images)
+        };
+
+        if (id == 4826) {
+            console.log('DEBUG 4826 IMAGES:', upgradedProperty.images.slice(0, 3));
+        }
+
+
+        // 3. Fetch other listings in the same group
+        let otherListings = [];
+        try {
+            if (property.group_id) {
+                otherListings = await prisma.property.findMany({
+                    where: {
+                        group_id: property.group_id,
+                        id: { not: parseInt(id) }
+                    },
+                    select: {
+                        id: true,
+                        url: true,
+                        price: true,
+                        external_id: true,
+                        listing_date: true
+                    }
+                });
+
+
+                // Deduplicate by URL (Aggressive Normalization)
+                // Deduplicate by Domain (Show only 1 per portal, prioritizing newest)
+                const domainMap = new Map();
+
+                // 1. Identify Current Domain
+                let currentDomain = '';
+                if (property.url) {
+                    if (property.url.includes('sahibinden.com')) currentDomain = 'sahibinden';
+                    else if (property.url.includes('hemlak') || property.url.includes('hepsiemlak')) currentDomain = 'hepsiemlak';
+                    else if (property.url.includes('emlakjet')) currentDomain = 'emlakjet';
+                }
+
+                // 2. Process other listings
+                otherListings = otherListings.filter(l => {
+                    if (!l.url) return false;
+
+                    let domain = 'other';
+                    if (l.url.includes('sahibinden.com')) domain = 'sahibinden';
+                    else if (l.url.includes('hemlak') || l.url.includes('hepsiemlak')) domain = 'hepsiemlak';
+                    else if (l.url.includes('emlakjet')) domain = 'emlakjet';
+
+                    // If same domain as current property, we generally skip unless it's a wildly different valid listing.
+                    // But usually "Other Portals" implies *other* portals. 
+                    // User feedback suggests they see "Hepsiemlak" multiple times.
+                    // Let's strictly limit to 1 per domain.
+
+                    const existing = domainMap.get(domain);
+                    if (!existing) {
+                        domainMap.set(domain, l);
+                        return true;
+                    } else {
+                        // Keep the newer one (sort logic in memory)
+                        const existingDate = new Date(existing.listing_date || 0);
+                        const currentDate = new Date(l.listing_date || 0);
+                        if (currentDate > existingDate) {
+                            domainMap.set(domain, l);
+                            // We need to re-filter the array effectively or just build a new one from map values.
+                            // Since filter runs once, we can't easily swap. 
+                            // Better strategy: Sort first, then pick unique domains.
+                            return false;
+                        }
+                        return false;
+                    }
+                });
+
+                // Re-do correctly: Sort by date desc, then uniq by domain
+                otherListings.sort((a, b) => new Date(b.listing_date) - new Date(a.listing_date));
+                const distinctListings = [];
+                const seenDomains = new Set();
+
+                // Add current domain to seen if we want to hide same-portal generic duplicates
+                // seenDomains.add(currentDomain); 
+                // Actually, sometimes seeing a duplicate on the same site is useful if it's a different price?
+                // The user said "Wrong", implying they don't want the noise.
+                // Let's showing 1 per external domain. And maybe 1 from same domain if it's substantially different?
+                // Simplest fix for "Wrong": One per domain.
+
+                if (currentDomain) seenDomains.add(currentDomain); // Don't show same portal links in "Other Portals"
+
+                for (const l of otherListings) {
+                    let domain = 'other';
+                    if (l.url.includes('sahibinden.com')) domain = 'sahibinden';
+                    else if (l.url.includes('hemlak') || l.url.includes('hepsiemlak')) domain = 'hepsiemlak';
+                    else if (l.url.includes('emlakjet')) domain = 'emlakjet';
+
+                    if (!seenDomains.has(domain)) {
+                        seenDomains.add(domain);
+                        distinctListings.push(l);
+                    }
+                }
+                otherListings = distinctListings;
+
+                // 4. Combined Price History
+                const groupIds = [property.id, ...otherListings.map(l => l.id)];
+                const allHistories = await prisma.propertyHistory.findMany({
+                    where: { property_id: { in: groupIds } },
+                    orderBy: { changed_at: 'asc' }
+                });
+
+                // If we have multiple listings, we might have duplicate "initial" entries. 
+                // We'll keep them as they show when each portal picked it up.
+                property.merged_history = allHistories;
+            } else {
+                property.merged_history = property.history;
+            }
+        } catch (groupError) {
+            console.error('Group processing error:', groupError);
+            // Fallback to basic history if grouping fails
+            property.merged_history = property.history;
+        }
+
+        // Use safe serializer
+        jsonBigInt(res, {
+            ...upgradedProperty,
+            other_listings: otherListings,
+            merged_history: property.merged_history
+        });
+    } catch (error) {
+        console.error('Get Property Detail Error:', error);
+        try {
+            const fs = require('fs');
+            const path = require('path');
+            const logPath = path.join(__dirname, '..', 'crash_log.txt');
+            fs.appendFileSync(logPath, `\n[${new Date().toISOString()}] Error in getPropertyById: ${error.message}\nStack: ${error.stack}\n`);
+        } catch (fError) { console.error('Failed to write log', fError); }
+
+        res.status(500).json({ error: 'Failed to fetch property details: ' + error.message });
+    }
 };
 
 const getProperties = async (req, res) => {
@@ -23,12 +208,33 @@ const getProperties = async (req, res) => {
 
         const where = { AND: [] };
 
+        // Support for specific IDs (Priority High)
+        // If IDs are requested, we generally want exactly these records, regardless of primary status.
+        let isSpecificIdRequest = false;
+        if (req.query.ids !== undefined) {
+            isSpecificIdRequest = true;
+            const idList = req.query.ids.split(',').map(id => parseInt(id)).filter(n => !isNaN(n));
+
+            if (idList.length > 0) {
+                where.AND.push({ id: { in: idList } });
+                // If specific IDs are requested, we bypass the default limit
+                if (!req.query.limit) {
+                    req.query.limit = idList.length;
+                }
+            } else {
+                where.AND.push({ id: -1 });
+            }
+        }
+
         if (status && status !== 'all') {
             where.AND.push({ status: status });
-        } else if (!req.query.show_all) {
-            // Default to active unless show_all is requested
+        } else if (!req.query.show_all && !isSpecificIdRequest && !req.query.ids) {
+            // Default to active unless show_all is requested OR specific IDs are requested
             where.AND.push({ status: 'active' });
         }
+
+        // IDs handled at top level now
+
 
         if (category && category !== 'all') {
             const catLower = category.toLowerCase();
@@ -106,9 +312,11 @@ const getProperties = async (req, res) => {
 
         // console.log('Fetching properties...');
         const baseWhere = { ...where };
-        if (!req.query.show_all) {
+        if (!req.query.show_all && !isSpecificIdRequest) {
             where.AND.push({ is_primary: true });
         }
+
+        console.log('DEBUG: Final Where Clause:', JSON.stringify(where, null, 2));
 
         // If opportunity_filter is used, we need to fetch ALL potentially matching properties
         // because scoring happens in JS, not in DB.
@@ -144,6 +352,16 @@ const getProperties = async (req, res) => {
 
         // JS Room Filtering Removed - Now handled in DB
         let filteredProperties = propertiesWithHighResImages;
+
+        // EMERGENCY SAFETY NET:
+        // Ensure that if specific IDs were requested, result ONLY contains those IDs.
+        // This protects against any logic errors in the SQL construction or fallback defaults.
+        if (isSpecificIdRequest && req.query.ids) {
+            const requestedIds = req.query.ids.split(',').map(Number);
+            const beforeCount = filteredProperties.length;
+            filteredProperties = filteredProperties.filter(p => requestedIds.includes(p.id));
+            console.log(`DEBUG: Safety Net. Requested: ${requestedIds.length}, Fetched: ${beforeCount}, Filtered: ${filteredProperties.length}`);
+        }
 
         // Calculate Opportunity Scores
         let propertiesWithScore = filteredProperties;
@@ -241,7 +459,9 @@ const getProperties = async (req, res) => {
                     page,
                     limit,
                     total,
-                    totalPages: Math.ceil(Number(total) / limit)
+                    totalPages: Math.ceil(Number(total) / limit),
+                    server_version: 'patched_safe_net_v1', // Verify server update
+                    debug_ids: req.query.ids || 'none'
                 }
             });
         } catch (jsonErr) {
@@ -274,67 +494,7 @@ const getPropertyHistory = async (req, res) => {
 
 const { scrapeDetails } = require('../services/scraperService');
 
-const getPropertyById = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const property = await prisma.property.findUnique({
-            where: { id: parseInt(id) },
-            include: {
-                history: { orderBy: { changed_at: 'asc' } }
-            }
-        });
 
-        if (!property) {
-            return res.status(404).json({ error: 'Property not found' });
-        }
-
-        // Upgrade images
-        const upgradedProperty = {
-            ...property,
-            images: upgradeImages(property.images)
-        };
-
-        // 3. Fetch other listings in the same group
-        let otherListings = [];
-        if (property.group_id) {
-            otherListings = await prisma.property.findMany({
-                where: {
-                    group_id: property.group_id,
-                    id: { not: parseInt(id) }
-                },
-                select: {
-                    id: true,
-                    url: true,
-                    price: true,
-                    external_id: true,
-                    listing_date: true
-                }
-            });
-
-            // 4. Combined Price History
-            const groupIds = [property.id, ...otherListings.map(l => l.id)];
-            const allHistories = await prisma.propertyHistory.findMany({
-                where: { property_id: { in: groupIds } },
-                orderBy: { changed_at: 'asc' }
-            });
-
-            // If we have multiple listings, we might have duplicate "initial" entries. 
-            // We'll keep them as they show when each portal picked it up.
-            property.merged_history = allHistories;
-        } else {
-            property.merged_history = property.history;
-        }
-
-        res.json({
-            ...upgradedProperty,
-            other_listings: otherListings,
-            merged_history: property.merged_history
-        });
-    } catch (error) {
-        console.error('Get Property Detail Error:', error);
-        res.status(500).json({ error: 'Failed to fetch property details' });
-    }
-};
 
 const scrapePropertyDetails = async (req, res) => {
     try {
@@ -367,6 +527,21 @@ const scrapePropertyDetails = async (req, res) => {
         res.json(updated);
     } catch (error) {
         console.error('Scrape Details Error:', error);
+
+        if (error.code === 'LISTING_REMOVED' || error.message.includes('ListingRemoved')) {
+            await prisma.property.update({
+                where: { id: parseInt(id) },
+                data: { status: 'removed' }
+            });
+            return res.json({ message: 'İlan yayından kalkmış olarak tespit edildi ve güncellendi.', status: 'removed' });
+        }
+
+        try {
+            const fs = require('fs');
+            const path = require('path');
+            const logPath = path.join(__dirname, '..', 'crash_log.txt');
+            fs.appendFileSync(logPath, `\n[${new Date().toISOString()}] Error in scrapePropertyDetails: ${error.message}\nStack: ${error.stack}\n`);
+        } catch (fError) { }
         res.status(500).json({ error: 'Failed to scrape details: ' + error.message });
     }
 };

@@ -188,14 +188,7 @@ const PropertyListingPublic = () => {
                                 <p className="text-xl font-bold text-gray-900 print:text-lg">{property.rooms}</p>
                             </div>
                         )}
-                        {property.seller_type && (
-                            <div className="bg-gray-50 p-4 rounded-lg print:p-3">
-                                <p className="text-sm text-gray-600 mb-1">Satıcı Tipi</p>
-                                <p className="text-xl font-bold text-gray-900 print:text-lg capitalize">
-                                    {property.seller_type === 'owner' ? 'Sahibinden' : 'Emlak Ofisi'}
-                                </p>
-                            </div>
-                        )}
+
                     </div>
                 </div>
 

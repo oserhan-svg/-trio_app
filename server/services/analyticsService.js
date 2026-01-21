@@ -2,8 +2,18 @@ const prisma = require('../db');
 
 const getMarketStats = async () => {
     // 1. Get all properties to calculate medians/outliers
+    // FILTER UPDATE: Only use listings updated in the last 90 days to reflect CURRENT market.
+    // FILTER UPDATE: Exclude tiny (<20m2) and huge (>400m2) to avoid skewing averages.
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setDate(threeMonthsAgo.getDate() - 90);
+
     const properties = await prisma.property.findMany({
-        where: { price: { gt: 0 }, size_m2: { gt: 0 } },
+        where: {
+            price: { gt: 0 },
+            size_m2: { gt: 20, lt: 400 },
+            last_scraped: { gte: threeMonthsAgo },
+            status: 'active'
+        },
         select: { neighborhood: true, district: true, price: true, size_m2: true }
     });
 
@@ -197,7 +207,6 @@ const scoreProperty = (property, statsMap, history = []) => {
         h.change_type === 'price_decrease' &&
         new Date(h.changed_at) > new Date(new Date().setDate(new Date().getDate() - 30))
     ));
-    // ------------------------
 
     // STRICT OWNER FILTER: Only owner listings are eligible for opportunity scoring
     if (property.seller_type !== 'owner') {
@@ -206,7 +215,7 @@ const scoreProperty = (property, statsMap, history = []) => {
             label: 'Emlak Ofisi',
             comparisonBasis: 'None',
             comparisonPrice: 0,
-            hasRecentPriceDrop: hasRecentPriceDrop // Ensure this is returned
+            hasRecentPriceDrop: hasRecentPriceDrop
         };
     }
 
@@ -238,10 +247,9 @@ const scoreProperty = (property, statsMap, history = []) => {
     const combinedText = `${property.title || ''} ${property.description || ''}`;
 
     if (urgencyKeywords.test(combinedText)) {
-        urgencyBoost = 0.95; // 5% Boost for urgent keywords
+        urgencyBoost = 0.95; // 5% Discount equivalent
     }
     ratio *= urgencyBoost;
-    // ------------------------------------------
 
     // --- PREMIUM FEATURE DETECTION ---
     let isPremium = false;
@@ -252,25 +260,29 @@ const scoreProperty = (property, statsMap, history = []) => {
     if (!isPremium && premiumKeywords.test(combinedText)) {
         isPremium = true;
     }
-    // ---------------------------------
+
+    // PREMIUM BOOST: Premium properties are allowed to be more expensive.
+    if (isPremium) {
+        ratio *= 0.85;
+    }
 
     // --- PRICE DROP BOOST ---
     if (hasRecentPriceDrop) {
         ratio *= 0.95; // 5% Boost score
     }
-    // ------------------------
 
-    // --- AGE CORRECTION (Regex) ---
-    // Zero/New buildings are naturally more expensive. 
-    // We shouldn't penalize them for being 10-15% above average.
-    // We "discount" their ratio to make them comparable to the average stock.
+    // --- AGE CORRECTION ---
     let age = 10; // Default old
-    if (Array.isArray(property.features)) {
-        // Look for features containing age-related keywords
-        const ageFeature = property.features.find(f => /yaş|bina yaşı|durumu|yapım yılı/i.test(f));
 
+    // Priority: Structured DB Column -> Regex from Features -> Default
+    if (property.building_age) {
+        const val = property.building_age.toLowerCase();
+        if (val === '0' || val.includes('sıfır') || val.includes('yeni')) age = 0;
+        else if (['1', '2', '3', '4', '1-5'].some(v => val.includes(v))) age = 3;
+        else if (val.includes('5-10')) age = 8;
+    } else if (Array.isArray(property.features)) {
+        const ageFeature = property.features.find(f => /yaş|bina yaşı|durumu|yapım yılı/i.test(f));
         if (ageFeature) {
-            // Strict regex with word boundaries to avoid matching "10" as "0"
             if (/\b(0|sıfır|yeni)\b/i.test(ageFeature)) age = 0;
             else if (/\b(1|bir)\b/i.test(ageFeature)) age = 1;
             else if (/\b(2|iki)\b/i.test(ageFeature)) age = 2;
@@ -280,10 +292,10 @@ const scoreProperty = (property, statsMap, history = []) => {
         }
     }
 
-    if (age === 0) ratio *= 0.85;
-    else if (age <= 4) ratio *= 0.90;
-    // ----------------------
+    if (age === 0) ratio *= 0.85; // New buildings allowed to be 15% more expensive
+    else if (age <= 4) ratio *= 0.90; // Young buildings allowed to be 10% more expensive
 
+    // --- SCORING ---
     let score = 5;
     let label = 'Normal';
 

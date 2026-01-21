@@ -22,8 +22,8 @@ router.post('/scrape', authenticateToken, scrapeLimiter, async (req, res) => {
 router.get('/', authenticateToken, getProperties);
 router.get('/export', authenticateToken, exportPropertiesToExcel);
 router.get('/:id', authenticateToken, getPropertyById); // Move basic detail fetch here too
-router.post('/:id/scrape-details', authenticateToken, scrapeLimiter, scrapePropertyDetails);
 router.get('/:id/history', authenticateToken, getPropertyHistory);
+router.post('/:id/scrape-details', authenticateToken, scrapeLimiter, scrapePropertyDetails);
 router.put('/:id/assign', authenticateToken, require('../controllers/propertyController').assignProperty);
 
 module.exports = router;

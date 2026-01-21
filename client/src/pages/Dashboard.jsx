@@ -164,7 +164,10 @@ const Dashboard = () => {
         <div className="min-h-screen bg-gray-100 pb-20 md:pb-0"> {/* Added padding bottom for mobile if needed */}
             {/* Desktop Navbar */}
             <nav className="hidden md:flex bg-white shadow-sm px-6 py-4 justify-between items-center sticky top-0 z-50">
-                <div className="flex items-center gap-2">
+                <div
+                    className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => window.location.reload()}
+                >
                     <span className="text-2xl font-bold text-blue-600">TrioApp</span>
                     <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">v2.1</span>
                 </div>
@@ -194,7 +197,12 @@ const Dashboard = () => {
             <div className="md:hidden bg-white shadow-sm px-4 py-3 sticky top-0 z-50 flex justify-between items-center">
                 <div className="flex items-center gap-2">
                     <MobileNav user={user} handleScrape={handleScrape} handleLogout={handleLogout} propertiesCount={properties.length} />
-                    <span className="text-xl font-bold text-blue-600 ml-2">TrioApp</span>
+                    <span
+                        className="text-xl font-bold text-blue-600 ml-2 cursor-pointer"
+                        onClick={() => window.location.reload()}
+                    >
+                        TrioApp
+                    </span>
                 </div>
                 <div className="text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded flex flex-col items-center leading-tight">
                     <span className="font-bold">{meta.total || properties.length} İlan</span>

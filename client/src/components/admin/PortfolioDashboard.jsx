@@ -22,7 +22,8 @@ const PortfolioDashboard = ({ mode = 'agency', userId }) => {
                 ...(mode === 'mine' && { user_id: userId })
             };
             const response = await api.get('/properties', { params });
-            const data = response.data;
+            const responseData = response.data;
+            const data = Array.isArray(responseData) ? responseData : (responseData.data || []);
 
             // Calculate Stats
             const totalValue = data.reduce((acc, curr) => acc + parseFloat(curr.price), 0);

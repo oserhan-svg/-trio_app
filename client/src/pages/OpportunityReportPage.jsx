@@ -1,57 +1,86 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
-import { MapPin, Phone, Building, ExternalLink, Download } from 'lucide-react';
+import { MapPin, Phone, Building, ExternalLink, Download, RefreshCw, AlertCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const OpportunityReportPage = () => {
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+
+    const fetchProperties = async () => {
+        try {
+            let queryString = window.location.search;
+            if (!queryString && window.location.hash.includes('?')) {
+                queryString = window.location.hash.split('?')[1];
+                queryString = '?' + queryString;
+            }
+
+            const searchParams = new URLSearchParams(queryString);
+            const urlIds = searchParams.get('ids');
+
+            let ids = [];
+            if (urlIds !== null) {
+                ids = urlIds.split(',').map(Number);
+                localStorage.removeItem('report_selected_ids');
+            } else {
+                ids = [];
+            }
+
+            if (!Array.isArray(ids) || ids.length === 0) {
+                setLoading(false);
+                return;
+            }
+
+            const response = await api.get(`/properties?ids=${ids.join(',')}&limit=1000`);
+            const raw = response.data;
+            const all = Array.isArray(raw) ? raw : (raw.data || []);
+            const requestedIdSet = new Set(ids);
+            const strictFiltered = all.filter(p => requestedIdSet.has(p.id));
+
+            setProperties(strictFiltered);
+        } catch (error) {
+            console.error('Report fetch failed', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchProperties = async () => {
-            try {
-                // 1. Try getting IDs from URL Params first (Shareable Link)
-                const searchParams = new URLSearchParams(window.location.search);
-                const urlIds = searchParams.get('ids');
-
-                let ids = [];
-
-                if (urlIds) {
-                    ids = urlIds.split(',').map(Number);
-                } else {
-                    // 2. Fallback to LocalStorage (Local Navigation)
-                    try {
-                        const stored = localStorage.getItem('report_selected_ids');
-                        if (stored) {
-                            ids = JSON.parse(stored);
-                        }
-                    } catch (e) {
-                        console.error('Failed to parse stored report IDs', e);
-                        ids = [];
-                    }
-                }
-
-                if (!Array.isArray(ids) || ids.length === 0) {
-                    setLoading(false);
-                    return;
-                }
-
-                // Fetch properties
-                const response = await api.get('/properties');
-                const raw = response.data;
-                const all = Array.isArray(raw) ? raw : (raw.data || []);
-                const safeIds = ids.map(id => parseInt(id)).filter(n => !isNaN(n));
-                const selected = all.filter(p => safeIds.includes(p.id));
-                setProperties(selected);
-
-            } catch (error) {
-                console.error('Report fetch failed', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchProperties();
     }, []);
+
+    const missingDataProps = properties.filter(p =>
+        (!p.images || p.images.length === 0) ||
+        (!p.description || p.description.length < 50)
+    );
+
+    const handleRefreshMissingData = async () => {
+        if (missingDataProps.length === 0) return;
+
+        const confirmMsg = `${missingDataProps.length} adet ilanın eksik verileri (resim/açıklama) tamamlanacak. Bu işlem biraz zaman alabilir. Devam edilsin mi?`;
+        if (!window.confirm(confirmMsg)) return;
+
+        setRefreshing(true);
+        let successCount = 0;
+        const toastId = toast.loading('Veriler tamamlanıyor...');
+
+        for (const p of missingDataProps) {
+            try {
+                toast.loading(`Taranıyor: ${p.title.substring(0, 20)}...`, { id: toastId });
+                await api.post(`/properties/${p.id}/scrape-details`);
+                successCount++;
+            } catch (error) {
+                console.error(`Failed to refresh property ${p.id}:`, error);
+                const errMsg = error.response?.data?.error || error.message;
+                toast.error(`Hata (${p.external_id}): ${errMsg}`, { id: toastId, duration: 4000 });
+            }
+        }
+
+        toast.success(`${successCount} ilanın verileri tamamlandı!`, { id: toastId });
+        setRefreshing(false);
+        fetchProperties();
+    };
 
     if (loading) return <div className="p-8 text-center text-gray-500">Bülten hazırlanıyor...</div>;
     if (properties.length === 0) return <div className="p-8 text-center text-red-500">Bülten için seçili ilan bulunamadı. URL hatalı veya ilanlar silinmiş olabilir.</div>;
@@ -64,14 +93,22 @@ const OpportunityReportPage = () => {
                     Bu sayfa yazdırılmak üzere tasarlanmıştır. Tarayıcınızın "Yazdır" (Ctrl+P) özelliğini kullanarak PDF olarak kaydedebilirsiniz.
                 </div>
                 <div className="flex gap-3">
+                    {missingDataProps.length > 0 && (
+                        <button
+                            onClick={handleRefreshMissingData}
+                            disabled={refreshing}
+                            className="bg-orange-100 text-orange-700 border border-orange-200 px-4 py-2 rounded-lg text-sm font-bold hover:bg-orange-200 transition flex items-center gap-2 shadow-sm disabled:opacity-50"
+                        >
+                            <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
+                            {refreshing ? 'Tamamlanıyor...' : `Eksik Verileri Tamamla (${missingDataProps.length})`}
+                        </button>
+                    )}
+
                     <button
                         onClick={() => {
-                            // Generate Shareable Link
                             const ids = properties.map(p => p.id).join(',');
                             const shareUrl = `${window.location.origin}/reports/opportunities?ids=${ids}`;
-
                             const text = `🌟 *Trio App Fırsat Bülteni*\n\nSizin için seçtiğimiz fırsat ilanlarını incelemek için aşağıdaki linke tıklayın:\n\n🔗 ${shareUrl}`;
-
                             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
                         }}
                         className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-600 transition flex items-center gap-2 shadow-sm"
@@ -106,14 +143,23 @@ const OpportunityReportPage = () => {
                     {properties.map((p) => (
                         <div key={p.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm break-inside-avoid">
                             {/* Image & Score Header */}
-                            <div className="h-48 bg-gray-100 relative overflow-hidden">
+                            <div className="h-48 bg-gray-100 relative overflow-hidden group">
                                 {p.images && p.images.length > 0 ? (
                                     <img src={p.images[0]} className="w-full h-full object-cover" alt="" />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
+                                    <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-400 gap-2">
                                         <Building size={32} />
+                                        <span className="text-xs font-medium">Görsel Yok</span>
                                     </div>
                                 )}
+
+                                {/* Overlay for missing data indication (Screen only) */}
+                                {(!p.images?.length || p.description?.length < 50) && (
+                                    <div className="absolute inset-0 bg-orange-500/10 border-2 border-orange-500/50 pointer-events-none print:hidden flex items-center justify-center">
+
+                                    </div>
+                                )}
+
                                 <div className="absolute top-2 right-2 bg-emerald-600 text-white text-xs font-bold px-2 py-1 rounded shadow-md">
                                     Fırsat Puanı: {p.opportunity_score}/10
                                 </div>
@@ -159,6 +205,7 @@ const OpportunityReportPage = () => {
                                         target="_blank"
                                         className="text-gray-400 hover:text-blue-600 print:hidden"
                                         title="İlana Git"
+                                        rel="noreferrer"
                                     >
                                         <ExternalLink size={16} />
                                     </a>

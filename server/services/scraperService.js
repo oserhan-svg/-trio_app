@@ -193,6 +193,17 @@ async function scrapeProperties(provider = 'all') {
         // await configureStealthPage(page); // RealBrowser handles stealth
         // await humanizePage(page); // RealBrowser handles fingerprinting
 
+        if (provider === 'all' || provider === 'sahibinden') {
+            for (const cat of CATEGORIES) {
+                const pages = await getPageRange('sahibinden', cat.category, cat.type);
+                console.log(`Targeting Sahibinden Category: ${cat.name} | Pages: ${pages.join(',')}`);
+                const { scrapeSahibindenStealth } = require('./stealthScraper');
+                await scrapeSahibindenStealth(cat.sahibinden, null, cat.category, pages);
+                await new Promise(r => setTimeout(r, 10000 + Math.random() * 10000));
+            }
+            await markRemovedListings('sahibinden');
+        }
+
         if (provider === 'all' || provider === 'hepsiemlak') {
             for (const cat of CATEGORIES) {
                 const pages = await getPageRange('hepsiemlak', cat.category, cat.type);
@@ -205,6 +216,7 @@ async function scrapeProperties(provider = 'all') {
                 }
                 await new Promise(r => setTimeout(r, 5000 + Math.random() * 5000));
             }
+            await markRemovedListings('hepsiemlak');
         }
 
         if (provider === 'all' || provider === 'emlakjet') {
@@ -214,24 +226,10 @@ async function scrapeProperties(provider = 'all') {
                 await scrapeEmlakjet(page, cat.emlakjet, cat.category, pages);
                 await new Promise(r => setTimeout(r, 5000 + Math.random() * 5000));
             }
+            await markRemovedListings('emlakjet');
         }
 
-        if (provider === 'all' || provider === 'sahibinden') {
-            for (const cat of CATEGORIES) {
-                const pages = await getPageRange('sahibinden', cat.category, cat.type);
-                console.log(`Targeting Sahibinden Category: ${cat.name} | Pages: ${pages.join(',')}`);
-                const { scrapeSahibindenStealth } = require('./stealthScraper');
-                await scrapeSahibindenStealth(cat.sahibinden, null, cat.category, pages);
-                await new Promise(r => setTimeout(r, 10000 + Math.random() * 10000));
-            }
-        }
 
-        // --- REMOVAL DETECTION ---
-        // After all categories are scanned for a provider, any 'active' listing from that provider 
-        // that wasn't updated in the last 12 hours is likely removed.
-        const providerName = provider === 'all' ? null : provider;
-        await markRemovedListings(providerName);
-        // ------------------------
 
     } catch (error) {
         console.error('Global Scraper Error:', error);
@@ -244,78 +242,45 @@ async function scrapeProperties(provider = 'all') {
 }
 
 // The library handles Turnstile automatically, so this function is now just a verification/backup
+// Polling-based robust solver
 async function solveCloudflareChallenge(page) {
-    console.log('🛡️ Cloudflare detected. RealBrowser should auto-solve...');
+    console.log('🛡️ Cloudflare/Block detected. Waiting for solution (Auto or Manual)...');
 
-    // Wait for the library's internal solver or just wait for navigation
-    // Increased to 30s to allow slower Turnstile verification on Render
-    await new Promise(r => setTimeout(r, 30000));
+    let attempts = 0;
+    const maxAttempts = 30; // 30 * 10s = 5 minutes wait time
 
-    try {
-        const title = await page.title();
-        console.log(`🛡️ Check status: ${title}`);
+    while (attempts < maxAttempts) {
+        try {
+            const title = await page.title();
+            const isBlocked = title.includes('Just a moment') ||
+                title.includes('Bir dakika') ||
+                title.includes('Attention Required') ||
+                title.includes('Olağan dışı') ||
+                title.includes('Unusual activity') ||
+                title.includes('Verify you are human');
 
-        // If the title has changed, it means the challenge might have been solved
-        if (!title.includes('Just a moment') && !title.includes('Bir dakika') && !title.includes('Attention Required')) {
-            console.log('✅ Challenge seems to be solved (title changed). Returning early.');
-            return true;
-        }
-
-        if (title.includes('Just a moment') || title.includes('Bir dakika') || title.includes('Attention Required')) {
-            console.log('⚠️ RealBrowser auto-solve might struggle. Trying robust interaction...');
-
-            const frames = page.frames();
-            console.log(`📦 Detected ${frames.length} frames.`);
-            // Log frame URLs for debugging if needed
-            for (let i = 0; i < frames.length; i++) {
-                try {
-                    console.log(`  Frame ${i}: ${frames[i].url().substring(0, 100)}...`);
-                } catch (e) {
-                    console.log(`  Frame ${i}: [Error getting URL: ${e.message}]`);
-                }
+            if (!isBlocked) {
+                console.log(`✅ Challenge/Block passed! Current title: ${title}`);
+                return true;
             }
 
-            // Try specific Turnstile iframe selector 
+            console.log(`⏳ Waiting for bypass... (${attempts + 1}/${maxAttempts}) - Status: ${title}`);
+
+            // Basic Mouse Wiggle to simulate life
             try {
-                // Find frame that likely contains turnstile
-                const frameHandle = await page.$('iframe[src*="turnstile"]') ||
-                    await page.$('iframe[src*="cloudflare"]') ||
-                    await page.$('iframe[id*="cf-"]');
+                await page.mouse.move(Math.random() * 500, Math.random() * 500);
+            } catch (e) { }
 
-                if (frameHandle) {
-                    console.log('🎯 Turnstile frame element found. Clicking center...');
-                    const box = await frameHandle.boundingBox();
-                    if (box) {
-                        // Click slightly offset from center to hit the checkbox if it exists
-                        await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
-                        console.log('🖱️ Clicked coordinates of potential Turnstile widget.');
-                        await new Promise(r => setTimeout(r, 5000));
-                    }
-                }
-            } catch (err) {
-                console.log('Error active clicking turnstile:', err.message);
-            }
-
-            // Fallback: Click all small bodies (generic checkbox attempt)
-            for (const frame of frames) {
-                try {
-                    const url = frame.url();
-                    if (url.includes('turnstile') || url.includes('cloudflare')) {
-                        const body = await frame.$('body');
-                        if (body) {
-                            await body.click({ delay: 50 }).catch(() => { });
-                        }
-                    }
-                } catch (e) {
-                    // Ignore detached frame errors
-                }
-            }
+            await new Promise(r => setTimeout(r, 10000)); // Check every 10 seconds
+            attempts++;
+        } catch (e) {
+            console.log('⚠️ Error checking title during wait:', e.message);
+            await new Promise(r => setTimeout(r, 5000));
         }
-    } catch (e) {
-        console.log('Error checking CF status:', e.message);
     }
 
-    return true;
+    console.warn('❌ Timeout waiting for challenge solution.');
+    return false;
 }
 
 
@@ -603,6 +568,68 @@ async function saveListings(listings) {
     }
 }
 
+async function scrapeSingleListing(url) {
+    console.log(`🔍 Scraping single listing details: ${url}`);
+    let browser = null;
+    try {
+        browser = await createStealthBrowser();
+        const page = await browser.newPage();
+        await configureStealthPage(page);
+
+        // Organic entry to building trust
+        await organicNav(page, url);
+
+        // Cloudflare Check
+        await solveCloudflareChallenge(page);
+
+        // Wait for key elements
+        try {
+            await page.waitForSelector('.img-wrapper img, .he-gallery-image', { timeout: 30000 });
+        } catch (e) {
+            console.log('⚠️ Timeout waiting for detail page elements. Saving state and retrying...');
+            await saveBrowserState(page);
+            await page.reload({ waitUntil: 'domcontentloaded' });
+            await page.waitForSelector('.img-wrapper img, .he-gallery-image', { timeout: 30000 });
+        }
+
+        const details = await page.evaluate(() => {
+            const data = { images: [], description: '', features: [] };
+
+            // Extract Images
+            const imgEls = document.querySelectorAll('.img-wrapper img, .he-gallery-image, .pswp__img');
+            imgEls.forEach(img => {
+                const src = img.getAttribute('data-src') || img.src;
+                if (src && !src.includes('data:image')) {
+                    // High-res conversion for Hepsiemlak
+                    let clean = src;
+                    if (clean.includes('/mnresize/')) {
+                        clean = clean.replace(/\/mnresize\/\d+\/\d+\//, '/');
+                    }
+                    data.images.push(clean);
+                }
+            });
+
+            // Description
+            const descEl = document.querySelector('.description-content') || document.querySelector('#description');
+            if (descEl) data.description = descEl.innerText.trim();
+
+            return data;
+        });
+
+        // Deduplicate images
+        details.images = [...new Set(details.images)];
+
+        console.log(`✅ Scraped ${details.images.length} images for ${url}`);
+        return details;
+
+    } catch (error) {
+        console.error(`❌ Error scraping single listing ${url}:`, error.message);
+        throw error;
+    } finally {
+        if (browser) await browser.close();
+    }
+}
+
 async function scrapeEmlakjet(page, url, category = 'residential') {
     console.log(`--- Scraping Emlakjet (${url}) [Category: ${category}] ---`);
     let allListings = [];
@@ -707,7 +734,68 @@ const startScheduler = () => {
 const { scrapeSahibindenDetails } = require('./stealthScraper');
 async function scrapeDetails(url) {
     if (url.includes('sahibinden.com')) return await scrapeSahibindenDetails(url);
-    // Hepsiemlak detail logic...
+    if (url.includes('sahibinden.com')) return await scrapeSahibindenDetails(url);
+
+    // Emlakjet Logic
+    if (url.includes('emlakjet.com')) {
+        console.log(`--- Scraping Emlakjet Details (${url}) ---`);
+        let browser;
+        try {
+            const { getOrLaunchBrowser } = require('./stealthScraper');
+            browser = await getOrLaunchBrowser();
+            const page = await browser.newPage();
+            // Emlakjet often needs a specific viewport or it hides elements
+            await page.setViewport({ width: 1366, height: 768 });
+
+            await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+
+            const data = await page.evaluate(() => {
+                // EMLAKJET REMOVED DETECTION
+                const isRemoved = document.body.innerText.includes('Bu ilan yayından kaldırılmıştır') ||
+                    document.body.innerText.includes('İlan Yayında Değil') ||
+                    document.querySelector('.listing-not-active');
+
+                if (isRemoved) return { isRemoved: true };
+
+                const description = document.querySelector('#aciklama .desc')?.innerText.trim() ||
+                    document.querySelector('.description')?.innerText.trim() || '';
+
+                const images = [];
+                document.querySelectorAll('.gallery-container img, .swiper-slide img').forEach(img => {
+                    const src = img.src || img.getAttribute('data-src');
+                    if (src) images.push(src);
+                });
+
+                const features = [];
+                document.querySelectorAll('.feature-item').forEach(i => features.push(i.innerText.trim()));
+
+                // Basic info map extraction could go here if needed...
+                // For now focused on passive detection and basic details
+
+                return { description, images: [...new Set(images)], features, isRemoved: false };
+            });
+
+            if (data.isRemoved) {
+                console.log(`⚠️ Listing REMOVED detected (Emlakjet): ${url}`);
+                const error = new Error('ListingRemoved');
+                error.code = 'LISTING_REMOVED';
+                throw error;
+            }
+
+            return data;
+
+        } catch (e) {
+            console.error('Emlakjet Scrape Error:', e.message);
+            throw e;
+        } finally {
+            if (browser) {
+                const pages = await browser.pages();
+                if (pages.length > 2) await pages[pages.length - 1].close();
+            }
+        }
+    }
+
+    // fallback to Hepsiemlak detail logic (default)...
     console.log(`--- Scraping Hepsiemlak Details (${url}) ---`);
     let browser;
     try {
@@ -719,9 +807,35 @@ async function scrapeDetails(url) {
         await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
         const data = await page.evaluate(() => {
+            // CHECK FOR REMOVED LISTING INDICATORS
+            const removedMsg = document.querySelector('.listing-removed-message') ||
+                document.querySelector('.no-listing-content') ||
+                document.body.innerText.includes('Bu ilan yayında değildir');
+
+            if (removedMsg) {
+                return { isRemoved: true };
+            }
+
             const description = document.querySelector('.description-content')?.innerText.trim() || '';
             let images = [];
-            document.querySelectorAll('.detail-gallery img').forEach(img => images.push(img.src));
+
+            // Try multiple gallery selectors
+            const selectors = [
+                '.detail-gallery img',
+                '.img-wrapper img',
+                '.swiper-wrapper img',
+                '.fancy-gallery img'
+            ];
+
+            selectors.forEach(sel => {
+                document.querySelectorAll(sel).forEach(img => {
+                    const src = img.getAttribute('data-src') || img.getAttribute('data-lazy') || img.src;
+                    if (src && !src.startsWith('data:image/gif')) {
+                        images.push(src);
+                    }
+                });
+            });
+
             images = [...new Set(images)];
             const features = [];
             document.querySelectorAll('.spec-item').forEach(item => {
@@ -742,6 +856,14 @@ async function scrapeDetails(url) {
             const seller_phone = document.querySelector('.phone-number')?.innerText.trim() || null;
             return { description, images, features, seller_name, seller_phone, building_age, heating_type, floor_location, size_m2, rooms };
         });
+
+        if (data.isRemoved) {
+            console.log(`⚠️ Listing REMOVED detected: ${url}`);
+            const error = new Error('ListingRemoved');
+            error.code = 'LISTING_REMOVED';
+            throw error;
+        }
+
         return data;
     } catch (e) {
         console.error('Hepsiemlak Detail Scrape Error:', e);
@@ -795,7 +917,10 @@ async function getPageRange(provider, category, type = 'sale') {
             });
         }
 
-        const windowSize = 3; // Scrape 3 deep pages per run
+        let windowSize = 3; // Default for others
+        if (provider === 'sahibinden') {
+            windowSize = 5; // Prioritize Sahibinden with deeper scraping
+        }
         const pages = [1]; // Always include page 1 for fresh listings
 
         let current = progress.last_page + 1;

@@ -23,7 +23,10 @@ server/scripts/*.json
 # Puppeteer & Browser Profiles
 .cache/
 chrome-stealth-profile/
+chrome-stealth-profile-v2/
 server/chrome-stealth-profile/
+server/chrome-stealth-profile-v2/
+manual_cookies.json
 server/browser_data/
 browser_data/
 .local-chromium/

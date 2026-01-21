@@ -11,7 +11,7 @@ module.exports = {
     paths: {
         cookies: path.join(__dirname, '../browser_data/cookies.json'),
         localStorage: path.join(__dirname, '../browser_data/localStorage.json'),
-        userDataDir: path.join(__dirname, '../../chrome-stealth-profile')
+        userDataDir: path.join(__dirname, '../../chrome-stealth-profile-v2')
     },
     selectors: {
         listingTable: '#searchResultsTable',

@@ -14,7 +14,7 @@ const MarketRadar = ({ onBack }) => {
 
     const fetchProperties = async () => {
         try {
-            const response = await api.get('/properties?limit=100');
+            const response = await api.get('/properties?limit=3000');
             // Handle paginated response ({ data: [...], meta: ... }) or legacy array
             const data = Array.isArray(response.data) ? response.data : (response.data.data || []);
             setProperties(data);

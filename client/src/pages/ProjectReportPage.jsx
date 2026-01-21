@@ -83,10 +83,10 @@ const ProjectReportPage = () => {
                         <div>
                             <h3 className="text-lg font-bold text-gray-900 mb-2 border-b border-gray-200 pb-1">📊 Danışman Araçları</h3>
                             <ul className="list-disc list-inside text-gray-700 space-y-1 text-sm">
-                                <li><strong>Fırsat Bülteni:</strong> Danışmanlara özel yazdırılabilir fırsat listesi (PDF).</li>
+                                <li><strong>🎯 Fırsat Radarı:</strong> Anlık piyasa taraması, kategori (Villa, Arsa, vb.) ve "Sadece Sahibinden" filtresi.</li>
+                                <li><strong>📋 Fırsat Bülteni:</strong> Manuel seçim kontrollü, güvenlik korumalı ve yazdırılabilir özel liste.</li>
                                 <li><strong>Panel Yönetimi:</strong> Admin ve Danışmanlar için özelleşmiş dinamik paneller.</li>
                                 <li><strong>İlan Sahibi İletişim:</strong> Sahibinden ilanlarda satıcı adı ve telefonu (otomatik çekim).</li>
-                                <li><strong>Fırsat Puanı (1-10):</strong> Bölgesel fiyat/performans kıyaslaması.</li>
                             </ul>
                         </div>
 
@@ -95,7 +95,7 @@ const ProjectReportPage = () => {
                             <ul className="list-disc list-inside text-gray-700 space-y-1 text-sm">
                                 <li><strong>Responsive Grid:</strong> Cihaza göre dinamik sütun yapısı.</li>
                                 <li><strong>Akıllı Sıralama:</strong> En iyi fırsatları otomatik öne çıkarma.</li>
-                                <li><strong>Dinamik Başlıklar:</strong> Kullanıcı rolüne (Admin/Danışman) göre değişen arayüz.</li>
+                                <li><strong>Güvenli Erişim:</strong> Token tabanlı kimlik doğrulama.</li>
                             </ul>
                         </div>
 
@@ -113,7 +113,7 @@ const ProjectReportPage = () => {
                 {/* Section 3: Technical Specs */}
                 <section className="mb-8 bg-gray-50 p-6 rounded-lg border border-gray-200 print:bg-gray-50 print:border-gray-300">
                     <h2 className="text-2xl font-bold text-blue-800 border-l-4 border-blue-600 pl-3 mb-4 flex items-center gap-2">
-                        <BarChart2 size={24} /> 3. Teknik Altyapı
+                        <BarChart2 size={24} /> 3. Teknik Altyapı ve Güvenlik
                     </h2>
 
                     <div className="grid grid-cols-3 gap-6">
@@ -122,8 +122,8 @@ const ProjectReportPage = () => {
                             <ul className="text-sm text-gray-700 space-y-1">
                                 <li>• Node.js & Express.js</li>
                                 <li>• SQLite & Prisma ORM</li>
-                                <li>• Puppeteer Scraper (Stealth)</li>
-                                <li>• Role-Based Access Control (RBAC)</li>
+                                <li>• <strong>Real-Browser Scraper</strong> (Cloudflare Bypass)</li>
+                                <li>• Güvenli Veri Filtreleme (Strict Mode)</li>
                             </ul>
                         </div>
                         <div>
@@ -131,15 +131,15 @@ const ProjectReportPage = () => {
                             <ul className="text-sm text-gray-700 space-y-1">
                                 <li>• React.js (Vite)</li>
                                 <li>• Tailwind CSS Styling</li>
-                                <li>• Lucide Icon Set</li>
-                                <li>• LocalStorage State Mgmt</li>
+                                <li>• Hibrit URL/Cache Yönetimi</li>
+                                <li>• Özel Raporlama Motoru</li>
                             </ul>
                         </div>
                         <div>
                             <h4 className="font-bold text-gray-900 mb-2">Algoritmalar</h4>
                             <ul className="text-sm text-gray-700 space-y-1">
                                 <li>• 5 Yıl Değer Artış Matrahı</li>
-                                <li>• Bölgesel Ortalama (Fallback)</li>
+                                <li>• Fırsat Puanlama (1-10)</li>
                                 <li>• Otomatik Vergi Dilimi Hesabı</li>
                             </ul>
                         </div>

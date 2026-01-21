@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { MapPin, Calendar, Home, Ruler, ExternalLink, ArrowLeft, RefreshCw, Image as ImageIcon, MessageCircle } from 'lucide-react';
+import { MapPin, Calendar, Home, Ruler, ExternalLink, ArrowLeft, RefreshCw, Image as ImageIcon, MessageCircle, FileText } from 'lucide-react';
 import api from '../services/api';
 
 const PropertyDetail = () => {
@@ -80,9 +80,9 @@ const PropertyDetail = () => {
                     >
                         <ArrowLeft size={24} />
                     </button>
-                    <h1 className="text-xl font-bold text-gray-800 truncate flex-1">{property.title?.split('#')[0].trim()}</h1>
+                    <h1 className="text-xl font-bold text-gray-800 truncate flex-1">{(property.title || 'Başlıksız İlan').split('#')[0].trim()}</h1>
                     <span className="text-2xl font-bold text-blue-600 whitespace-nowrap">
-                        {parseFloat(property.price).toLocaleString('tr-TR')} TL
+                        {parseFloat(property.price || 0).toLocaleString('tr-TR')} TL
                     </span>
                 </div>
             </div>
@@ -111,6 +111,7 @@ const PropertyDetail = () => {
                                         alt="Main Property"
                                         fetchPriority="high"
                                         className="w-full h-full object-contain bg-black"
+                                        onError={(e) => { e.target.style.display = 'none'; }}
                                     />
                                     <div className="absolute bottom-4 right-4 flex gap-2">
                                         <div className="bg-black/60 text-white px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm">
@@ -211,8 +212,8 @@ const PropertyDetail = () => {
                             <ExternalLink size={20} /> Orjinal İlana Git
                         </a>
                         <div className="text-xs text-gray-500 text-center mb-3">
-                            İlan No: {property.external_id?.split('block')[0]} <br />
-                            Son Güncelleme: {new Date(property.last_scraped).toLocaleString('tr-TR')}
+                            İlan No: {(property.external_id || '').split('block')[0]} <br />
+                            Son Güncelleme: {property.last_scraped ? new Date(property.last_scraped).toLocaleString('tr-TR') : '-'}
                         </div>
 
                         <button
@@ -261,7 +262,7 @@ const PropertyDetail = () => {
                                 <div className="space-y-2">
                                     {property.other_listings.map((other) => {
                                         const portal = other.url.includes('sahibinden.com') ? 'Sahibinden' :
-                                            other.url.includes('hepsiemlak.com') ? 'Hepsiemlak' :
+                                            (other.url.includes('hepsiemlak.com') || other.url.includes('hemlak.com')) ? 'Hepsiemlak' :
                                                 other.url.includes('emlakjet.com') ? 'Emlakjet' : 'Diğer Portal';
                                         const portalColor = portal === 'Sahibinden' ? 'bg-yellow-50 text-yellow-700' :
                                             portal === 'Hepsiemlak' ? 'bg-rose-50 text-rose-700' :
