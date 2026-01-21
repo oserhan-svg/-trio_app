@@ -25,5 +25,6 @@ router.get('/:id', authenticateToken, getPropertyById); // Move basic detail fet
 router.get('/:id/history', authenticateToken, getPropertyHistory);
 router.post('/:id/scrape-details', authenticateToken, scrapeLimiter, scrapePropertyDetails);
 router.put('/:id/assign', authenticateToken, require('../controllers/propertyController').assignProperty);
+router.put('/:id', authenticateToken, require('../controllers/propertyController').updateProperty);
 
 module.exports = router;

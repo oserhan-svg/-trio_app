@@ -54,6 +54,11 @@ model Property {
   client_properties ClientProperty[]
   listings       PropertyListing[]
   agenda_items   AgendaItem[]
+  
+  // Authorization / Yetki Belgesi
+  auth_doc_url    String?          // URL to the authorization document
+  auth_start_date DateTime?        // Start date of authorization
+  auth_end_date   DateTime?        // End date of authorization
 
   @@index([external_id])
   @@index([group_id])

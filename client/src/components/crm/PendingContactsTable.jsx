@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Check, Trash2, UserPlus, Loader, Search, ArrowUpDown, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
+import { Check, Trash2, UserPlus, Loader, Search, ArrowUpDown, ChevronLeft, ChevronRight, Filter, Upload } from 'lucide-react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 
-const PendingContactsTable = () => {
+const PendingContactsTable = ({ onImportClick }) => {
     const [contacts, setContacts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedIds, setSelectedIds] = useState(new Set());
@@ -201,6 +201,13 @@ const PendingContactsTable = () => {
                         </select>
                         <ArrowUpDown className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={12} />
                     </div>
+
+                    <button
+                        onClick={onImportClick}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs font-medium rounded hover:bg-gray-50 transition"
+                    >
+                        <Upload size={12} /> <span className="">İçe Aktar</span>
+                    </button>
                 </div>
 
                 {/* Bulk Actions & Selection Info */}

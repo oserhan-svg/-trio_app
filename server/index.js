@@ -32,6 +32,7 @@ const clientRoutes = require('./routes/clientRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const imageRoutes = require('./routes/imageRoutes');
 const propertyListingRoutes = require('./routes/propertyListingRoutes');
+const userRoutes = require('./routes/userRoutes');
 const { startScheduler } = require('./services/scraperService');
 
 app.use('/api/auth', authRoutes);
@@ -41,6 +42,7 @@ app.use('/api/settings', require('./routes/settingRoutes')); // Register Setting
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/images', imageRoutes);
 app.use('/api/listings', propertyListingRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/agenda', require('./routes/agendaRoutes'));
 app.use('/api/performance', require('./routes/performanceRoutes'));
 

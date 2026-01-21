@@ -170,16 +170,24 @@ const CATEGORIES = [
     }
 ];
 
-async function scrapeProperties(provider = 'all') {
+async function scrapeProperties(provider = 'all', injectedPage = null) {
     console.log(`Starting scrape job for: ${provider}`);
 
     let browser, page;
     try {
-        // PLAN B: Real Browser Switch
-        const { launchRealBrowser } = require('./realBrowser');
-        const { browser: rb, page: rp } = await launchRealBrowser();
-        browser = rb;
-        page = rp;
+        if (injectedPage) {
+            console.log('ℹ️ Using Injected Browser Page for Interactive Mode');
+            page = injectedPage;
+            browser = page.browser();
+            // Ensure viewport is set for consistency
+            try { await page.setViewport({ width: 1920, height: 1080 }); } catch (e) { }
+        } else {
+            // PLAN B: Real Browser Switch
+            const { launchRealBrowser } = require('./realBrowser');
+            const { browser: rb, page: rp } = await launchRealBrowser();
+            browser = rb;
+            page = rp;
+        }
 
     } catch (err) {
         console.error('CRITICAL: Could not launch Real Browser.', err);
@@ -198,7 +206,7 @@ async function scrapeProperties(provider = 'all') {
                 const pages = await getPageRange('sahibinden', cat.category, cat.type);
                 console.log(`Targeting Sahibinden Category: ${cat.name} | Pages: ${pages.join(',')}`);
                 const { scrapeSahibindenStealth } = require('./stealthScraper');
-                await scrapeSahibindenStealth(cat.sahibinden, null, cat.category, pages);
+                await scrapeSahibindenStealth(cat.sahibinden, null, cat.category, pages, page);
                 await new Promise(r => setTimeout(r, 10000 + Math.random() * 10000));
             }
             await markRemovedListings('sahibinden');

@@ -19,10 +19,12 @@ import RemovedListingsViewer from '../components/apps/RemovedListingsViewer';
 
 import ContactImportModal from '../components/crm/ContactImportModal';
 import PendingContactsTable from '../components/crm/PendingContactsTable';
+import MyListings from '../components/consultant/MyListings';
+import AdminManagement from './AdminManagement';
 
 const ConsultantPanel = () => {
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('clients'); // 'clients', 'apps', 'tools', 'agenda'
+    const [activeTab, setActiveTab] = useState('clients'); // 'clients', 'mylistings', 'apps', 'tools', 'agenda'
     const [activeTool, setActiveTool] = useState(null); // 'calculator-gain', etc.
     const [activeApp, setActiveApp] = useState(null);
     const [showAddClientMatch, setShowAddClientMatch] = useState(false);
@@ -76,12 +78,6 @@ const ConsultantPanel = () => {
                     {activeTab === 'clients' && (
                         <div className="flex gap-2">
                             <button
-                                onClick={() => setShowImportModal(true)}
-                                className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded hover:bg-gray-50 transition"
-                            >
-                                <Upload size={14} /> <span className="hidden sm:inline">İçe Aktar</span>
-                            </button>
-                            <button
                                 onClick={() => setShowAddClientMatch(true)}
                                 className="flex items-center gap-2 px-3 py-1.5 bg-brand-dark text-white text-sm font-medium rounded hover:bg-black transition shadow-sm"
                             >
@@ -94,12 +90,15 @@ const ConsultantPanel = () => {
                 {/* Tabs */}
                 <div className="max-w-[1400px] mx-auto mt-4 flex gap-6 overflow-x-auto no-scrollbar">
                     <TabButton id="clients" label="Müşteri Takip" icon={Users} />
-                    <TabButton id="pending" label="Aday Havuzu" icon={UserPlus} />
+                    <TabButton id="mylistings" label="İlanlarım" icon={FileText} />
+                    <TabButton id="pending" label="Müşteri Havuzu" icon={UserPlus} />
                     <TabButton id="apps" label="Uygulamalar" icon={LayoutGrid} />
                     <TabButton id="tools" label="Araçlar" icon={Calculator} />
                     <TabButton id="agenda" label="Ajanda" icon={Calendar} />
                     {user?.role === 'admin' && (
-                        <TabButton id="performance" label="Performans" icon={BarChart2} />
+                        <>
+                            <TabButton id="performance" label="Performans" icon={BarChart2} />
+                        </>
                     )}
                 </div>
             </div>
@@ -134,9 +133,15 @@ const ConsultantPanel = () => {
                     </div>
                 )}
 
+                {activeTab === 'mylistings' && (
+                    <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        <MyListings userId={user?.id} />
+                    </div>
+                )}
+
                 {activeTab === 'pending' && (
                     <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                        <PendingContactsTable />
+                        <PendingContactsTable onImportClick={() => setShowImportModal(true)} />
                     </div>
                 )}
 
@@ -239,6 +244,8 @@ const ConsultantPanel = () => {
                         <PerformanceDashboard />
                     </div>
                 )}
+
+
             </div>
         </div>
     );

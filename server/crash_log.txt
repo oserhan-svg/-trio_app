@@ -1,0 +1,159 @@
+
+[2026-01-20T12:23:21.720Z] Error in scrapePropertyDetails: The browser is already running for C:\Users\ozanc\Downloads\emlak22\chrome-stealth-profile. Use a different `userDataDir` or stop the running browser first.
+Stack: Error: The browser is already running for C:\Users\ozanc\Downloads\emlak22\chrome-stealth-profile. Use a different `userDataDir` or stop the running browser first.
+    at ChromeLauncher.launch (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\node\BrowserLauncher.js:174:23)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async PuppeteerExtra.launch (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-extra\dist\index.cjs.js:128:25)
+    at async Object.createStealthBrowser (C:\Users\ozanc\Downloads\emlak22\server\services\browserFactory.js:167:21)
+    at async getOrLaunchBrowser (C:\Users\ozanc\Downloads\emlak22\server\services\stealthScraper.js:336:16)
+    at async scrapeDetails (C:\Users\ozanc\Downloads\emlak22\server\services\scraperService.js:715:19)
+    at async scrapePropertyDetails (C:\Users\ozanc\Downloads\emlak22\server\controllers\propertyController.js:389:25)
+
+[2026-01-20T12:23:28.212Z] Error in scrapePropertyDetails: The browser is already running for C:\Users\ozanc\Downloads\emlak22\chrome-stealth-profile. Use a different `userDataDir` or stop the running browser first.
+Stack: Error: The browser is already running for C:\Users\ozanc\Downloads\emlak22\chrome-stealth-profile. Use a different `userDataDir` or stop the running browser first.
+    at ChromeLauncher.launch (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\node\BrowserLauncher.js:174:23)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async PuppeteerExtra.launch (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-extra\dist\index.cjs.js:128:25)
+    at async Object.createStealthBrowser (C:\Users\ozanc\Downloads\emlak22\server\services\browserFactory.js:167:21)
+    at async getOrLaunchBrowser (C:\Users\ozanc\Downloads\emlak22\server\services\stealthScraper.js:336:16)
+    at async scrapeDetails (C:\Users\ozanc\Downloads\emlak22\server\services\scraperService.js:715:19)
+    at async scrapePropertyDetails (C:\Users\ozanc\Downloads\emlak22\server\controllers\propertyController.js:389:25)
+
+[2026-01-20T12:24:52.789Z] Error in scrapePropertyDetails: The browser is already running for C:\Users\ozanc\Downloads\emlak22\chrome-stealth-profile. Use a different `userDataDir` or stop the running browser first.
+Stack: Error: The browser is already running for C:\Users\ozanc\Downloads\emlak22\chrome-stealth-profile. Use a different `userDataDir` or stop the running browser first.
+    at ChromeLauncher.launch (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\node\BrowserLauncher.js:174:23)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async PuppeteerExtra.launch (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-extra\dist\index.cjs.js:128:25)
+    at async Object.createStealthBrowser (C:\Users\ozanc\Downloads\emlak22\server\services\browserFactory.js:167:21)
+    at async getOrLaunchBrowser (C:\Users\ozanc\Downloads\emlak22\server\services\stealthScraper.js:336:16)
+    at async scrapeDetails (C:\Users\ozanc\Downloads\emlak22\server\services\scraperService.js:715:19)
+    at async scrapePropertyDetails (C:\Users\ozanc\Downloads\emlak22\server\controllers\propertyController.js:389:25)
+
+[2026-01-20T13:35:18.849Z] Error in getPropertyById: res.setHeader is not a function
+Stack: TypeError: res.setHeader is not a function
+    at jsonBigInt (C:\Users\ozanc\Downloads\emlak22\server\utils\responseHelper.js:11:9)
+    at getPropertyById (C:\Users\ozanc\Downloads\emlak22\server\controllers\propertyController.js:183:9)
+    at async testEndpoints (C:\Users\ozanc\Downloads\emlak22\server\scripts\test_api_endpoints.js:50:13)
+
+[2026-01-20T13:36:10.309Z] Error in getPropertyById: res.status(...).send is not a function
+Stack: TypeError: res.status(...).send is not a function
+    at jsonBigInt (C:\Users\ozanc\Downloads\emlak22\server\utils\responseHelper.js:12:28)
+    at getPropertyById (C:\Users\ozanc\Downloads\emlak22\server\controllers\propertyController.js:183:9)
+    at async testEndpoints (C:\Users\ozanc\Downloads\emlak22\server\scripts\test_api_endpoints.js:60:13)
+
+[2026-01-20T13:36:28.271Z] Error in getPropertyById: res.status(...).send is not a function
+Stack: TypeError: res.status(...).send is not a function
+    at jsonBigInt (C:\Users\ozanc\Downloads\emlak22\server\utils\responseHelper.js:12:28)
+    at getPropertyById (C:\Users\ozanc\Downloads\emlak22\server\controllers\propertyController.js:183:9)
+    at async testEndpoints (C:\Users\ozanc\Downloads\emlak22\server\scripts\test_api_endpoints.js:60:13)
+
+[2026-01-20T14:57:32.857Z] Error in scrapePropertyDetails: The browser is already running for C:\Users\ozanc\Downloads\emlak22\chrome-stealth-profile. Use a different `userDataDir` or stop the running browser first.
+Stack: Error: The browser is already running for C:\Users\ozanc\Downloads\emlak22\chrome-stealth-profile. Use a different `userDataDir` or stop the running browser first.
+    at ChromeLauncher.launch (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\node\BrowserLauncher.js:174:23)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async PuppeteerExtra.launch (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-extra\dist\index.cjs.js:128:25)
+    at async Object.createStealthBrowser (C:\Users\ozanc\Downloads\emlak22\server\services\browserFactory.js:167:21)
+    at async getOrLaunchBrowser (C:\Users\ozanc\Downloads\emlak22\server\services\stealthScraper.js:336:16)
+    at async scrapeDetails (C:\Users\ozanc\Downloads\emlak22\server\services\scraperService.js:715:19)
+    at async scrapePropertyDetails (C:\Users\ozanc\Downloads\emlak22\server\controllers\propertyController.js:447:25)
+
+[2026-01-20T16:58:03.442Z] Error in scrapePropertyDetails: Protocol error (Page.reload): Session closed. Most likely the page has been closed.
+Stack: TargetCloseError: Protocol error (Page.reload): Session closed. Most likely the page has been closed.
+    at CdpCDPSession.send (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\cdp\CdpSession.js:72:35)
+    at next (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-extra-plugin-stealth\evasions\sourceurl\index.js:34:41)
+    at CdpCDPSession.send (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-extra-plugin-stealth\evasions\sourceurl\index.js:67:18)
+    at CdpPage.reload (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\cdp\Page.js:702:39)
+    at scrapeSingleListing (C:\Users\ozanc\Downloads\emlak22\server\services\scraperService.js:624:24)
+    at async scrapePropertyDetails (C:\Users\ozanc\Downloads\emlak22\server\controllers\propertyController.js:504:25)
+
+[2026-01-20T16:58:07.995Z] Error in scrapePropertyDetails: Attempted to use detached Frame '6852DEF56FDBCC2D43714EFBF7E4CD6B'.
+Stack: Error: Attempted to use detached Frame '6852DEF56FDBCC2D43714EFBF7E4CD6B'.
+    at CdpFrame.<anonymous> (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\util\decorators.js:107:23)
+    at CdpPage.goto (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\api\Page.js:580:43)
+    at organicNav (C:\Users\ozanc\Downloads\emlak22\server\services\scraperService.js:57:16)
+    at async scrapeSingleListing (C:\Users\ozanc\Downloads\emlak22\server\services\scraperService.js:613:9)
+    at async scrapePropertyDetails (C:\Users\ozanc\Downloads\emlak22\server\controllers\propertyController.js:504:25)
+
+[2026-01-21T08:59:15.035Z] Error in scrapePropertyDetails: Waiting for selector `.img-wrapper img, .he-gallery-image` failed
+Stack: TimeoutError: Waiting for selector `.img-wrapper img, .he-gallery-image` failed
+    at CSSQueryHandler.waitFor (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\common\QueryHandler.js:214:46)
+    at async CdpFrame.waitForSelector (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\api\Frame.js:544:21)
+    at async CdpPage.waitForSelector (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\api\Page.js:1385:20)
+    at async scrapeSingleListing (C:\Users\ozanc\Downloads\emlak22\server\services\scraperService.js:625:13)
+    at async scrapePropertyDetails (C:\Users\ozanc\Downloads\emlak22\server\controllers\propertyController.js:504:25)
+
+[2026-01-21T08:59:20.263Z] Error in scrapePropertyDetails: Attempted to use detached Frame 'ED1FB9177405EE73DFB7A98CC51861D4'.
+Stack: Error: Attempted to use detached Frame 'ED1FB9177405EE73DFB7A98CC51861D4'.
+    at CdpFrame.<anonymous> (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\util\decorators.js:107:23)
+    at CdpPage.goto (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\api\Page.js:580:43)
+    at organicNav (C:\Users\ozanc\Downloads\emlak22\server\services\scraperService.js:57:16)
+    at async scrapeSingleListing (C:\Users\ozanc\Downloads\emlak22\server\services\scraperService.js:613:9)
+    at async scrapePropertyDetails (C:\Users\ozanc\Downloads\emlak22\server\controllers\propertyController.js:504:25)
+
+[2026-01-21T09:01:00.764Z] Error in scrapePropertyDetails: Waiting for selector `.img-wrapper img, .he-gallery-image` failed
+Stack: TimeoutError: Waiting for selector `.img-wrapper img, .he-gallery-image` failed
+    at CSSQueryHandler.waitFor (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\common\QueryHandler.js:214:46)
+    at async CdpFrame.waitForSelector (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\api\Frame.js:544:21)
+    at async CdpPage.waitForSelector (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\api\Page.js:1385:20)
+    at async scrapeSingleListing (C:\Users\ozanc\Downloads\emlak22\server\services\scraperService.js:625:13)
+    at async scrapePropertyDetails (C:\Users\ozanc\Downloads\emlak22\server\controllers\propertyController.js:504:25)
+
+[2026-01-21T09:02:40.667Z] Error in scrapePropertyDetails: Waiting for selector `.img-wrapper img, .he-gallery-image` failed
+Stack: TimeoutError: Waiting for selector `.img-wrapper img, .he-gallery-image` failed
+    at CSSQueryHandler.waitFor (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\common\QueryHandler.js:214:46)
+    at async CdpFrame.waitForSelector (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\api\Frame.js:544:21)
+    at async CdpPage.waitForSelector (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\api\Page.js:1385:20)
+    at async scrapeSingleListing (C:\Users\ozanc\Downloads\emlak22\server\services\scraperService.js:625:13)
+    at async scrapePropertyDetails (C:\Users\ozanc\Downloads\emlak22\server\controllers\propertyController.js:504:25)
+
+[2026-01-21T09:04:20.578Z] Error in scrapePropertyDetails: Waiting for selector `.img-wrapper img, .he-gallery-image` failed
+Stack: TimeoutError: Waiting for selector `.img-wrapper img, .he-gallery-image` failed
+    at CSSQueryHandler.waitFor (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\common\QueryHandler.js:214:46)
+    at async CdpFrame.waitForSelector (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\api\Frame.js:544:21)
+    at async CdpPage.waitForSelector (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\api\Page.js:1385:20)
+    at async scrapeSingleListing (C:\Users\ozanc\Downloads\emlak22\server\services\scraperService.js:625:13)
+    at async scrapePropertyDetails (C:\Users\ozanc\Downloads\emlak22\server\controllers\propertyController.js:504:25)
+
+[2026-01-21T09:05:04.385Z] Error in scrapePropertyDetails: The browser is already running for C:\Users\ozanc\Downloads\emlak22\chrome-stealth-profile. Use a different `userDataDir` or stop the running browser first.
+Stack: Error: The browser is already running for C:\Users\ozanc\Downloads\emlak22\chrome-stealth-profile. Use a different `userDataDir` or stop the running browser first.
+    at ChromeLauncher.launch (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\node\BrowserLauncher.js:174:23)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async PuppeteerExtra.launch (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-extra\dist\index.cjs.js:128:25)
+    at async createStealthBrowser (C:\Users\ozanc\Downloads\emlak22\server\services\browserFactory.js:167:21)
+    at async scrapeSingleListing (C:\Users\ozanc\Downloads\emlak22\server\services\scraperService.js:608:19)
+    at async scrapePropertyDetails (C:\Users\ozanc\Downloads\emlak22\server\controllers\propertyController.js:504:25)
+
+[2026-01-21T09:05:04.665Z] Error in scrapePropertyDetails: The browser is already running for C:\Users\ozanc\Downloads\emlak22\chrome-stealth-profile. Use a different `userDataDir` or stop the running browser first.
+Stack: Error: The browser is already running for C:\Users\ozanc\Downloads\emlak22\chrome-stealth-profile. Use a different `userDataDir` or stop the running browser first.
+    at ChromeLauncher.launch (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\node\BrowserLauncher.js:174:23)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async PuppeteerExtra.launch (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-extra\dist\index.cjs.js:128:25)
+    at async createStealthBrowser (C:\Users\ozanc\Downloads\emlak22\server\services\browserFactory.js:167:21)
+    at async scrapeSingleListing (C:\Users\ozanc\Downloads\emlak22\server\services\scraperService.js:608:19)
+    at async scrapePropertyDetails (C:\Users\ozanc\Downloads\emlak22\server\controllers\propertyController.js:504:25)
+
+[2026-01-21T09:05:04.886Z] Error in scrapePropertyDetails: The browser is already running for C:\Users\ozanc\Downloads\emlak22\chrome-stealth-profile. Use a different `userDataDir` or stop the running browser first.
+Stack: Error: The browser is already running for C:\Users\ozanc\Downloads\emlak22\chrome-stealth-profile. Use a different `userDataDir` or stop the running browser first.
+    at ChromeLauncher.launch (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\node\BrowserLauncher.js:174:23)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async PuppeteerExtra.launch (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-extra\dist\index.cjs.js:128:25)
+    at async createStealthBrowser (C:\Users\ozanc\Downloads\emlak22\server\services\browserFactory.js:167:21)
+    at async scrapeSingleListing (C:\Users\ozanc\Downloads\emlak22\server\services\scraperService.js:608:19)
+    at async scrapePropertyDetails (C:\Users\ozanc\Downloads\emlak22\server\controllers\propertyController.js:504:25)
+
+[2026-01-21T09:05:05.151Z] Error in scrapePropertyDetails: The browser is already running for C:\Users\ozanc\Downloads\emlak22\chrome-stealth-profile. Use a different `userDataDir` or stop the running browser first.
+Stack: Error: The browser is already running for C:\Users\ozanc\Downloads\emlak22\chrome-stealth-profile. Use a different `userDataDir` or stop the running browser first.
+    at ChromeLauncher.launch (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\node\BrowserLauncher.js:174:23)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async PuppeteerExtra.launch (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-extra\dist\index.cjs.js:128:25)
+    at async createStealthBrowser (C:\Users\ozanc\Downloads\emlak22\server\services\browserFactory.js:167:21)
+    at async scrapeSingleListing (C:\Users\ozanc\Downloads\emlak22\server\services\scraperService.js:608:19)
+    at async scrapePropertyDetails (C:\Users\ozanc\Downloads\emlak22\server\controllers\propertyController.js:504:25)
+
+[2026-01-21T09:06:00.748Z] Error in scrapePropertyDetails: Waiting for selector `.img-wrapper img, .he-gallery-image` failed
+Stack: TimeoutError: Waiting for selector `.img-wrapper img, .he-gallery-image` failed
+    at CSSQueryHandler.waitFor (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\common\QueryHandler.js:214:46)
+    at async CdpFrame.waitForSelector (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\api\Frame.js:544:21)
+    at async CdpPage.waitForSelector (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\api\Page.js:1385:20)
+    at async scrapeSingleListing (C:\Users\ozanc\Downloads\emlak22\server\services\scraperService.js:625:13)
+    at async scrapePropertyDetails (C:\Users\ozanc\Downloads\emlak22\server\controllers\propertyController.js:504:25)

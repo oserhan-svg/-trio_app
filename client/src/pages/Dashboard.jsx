@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Map, List, LogOut, Search, Users, RefreshCw, FileText } from 'lucide-react';
+import { Map, List, LogOut, Search, Users, UserPlus, RefreshCw, FileText } from 'lucide-react';
 import api from '../services/api';
 import PriceInput from '../components/ui/PriceInput';
 import MapView from '../components/MapView';
@@ -180,6 +180,12 @@ const Dashboard = () => {
                         <Users size={18} />
                         <span className="hidden md:inline">{user?.role === 'admin' ? 'Admin Paneli' : 'Danışman Paneli'}</span>
                     </button>
+                    {user?.role === 'admin' && (
+                        <button onClick={() => navigate('/admin/management')} className="flex items-center gap-1 text-gray-600 hover:text-purple-600 font-medium border-l pl-4">
+                            <UserPlus size={18} />
+                            <span className="hidden md:inline">Kullanıcı Yönetimi</span>
+                        </button>
+                    )}
                     <div className="text-sm text-gray-500 hidden md:flex flex-col items-end leading-none">
                         <span className="font-bold text-blue-600">{meta.total || properties.length} ilan</span>
                         {stats.totalProperties && <span className="text-[10px] opacity-70">veri tabanında {stats.totalProperties} kayıt</span>}

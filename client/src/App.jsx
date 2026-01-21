@@ -14,6 +14,7 @@ const PropertyListingPage = React.lazy(() => import('./pages/PropertyListingPage
 const PropertyListingPublic = React.lazy(() => import('./pages/PropertyListingPublic'));
 const ProjectReportPage = React.lazy(() => import('./pages/ProjectReportPage'));
 const OpportunityReportPage = React.lazy(() => import('./pages/OpportunityReportPage'));
+const AdminManagement = React.lazy(() => import('./pages/AdminManagement'));
 
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem('token');
@@ -87,6 +88,12 @@ function App() {
             <Route path="/reports/opportunities" element={
               <PrivateRoute>
                 <OpportunityReportPage />
+              </PrivateRoute>
+            } />
+
+            <Route path="/admin/management" element={
+              <PrivateRoute>
+                <AdminManagement />
               </PrivateRoute>
             } />
 

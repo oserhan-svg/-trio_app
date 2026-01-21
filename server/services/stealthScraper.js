@@ -103,28 +103,37 @@ async function organicWarmup(page) {
     }
 }
 
-async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 'residential', targetPages = [1, 2]) {
+async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 'residential', targetPages = [1, 2], injectedPage = null) {
     const { saveListings } = require('./scraperService');
     console.log(`🕵️ Stealth Scraper Starting for: ${url} [Pages: ${targetPages.join(', ')}]`);
 
     let browser;
     try {
-        browser = await getOrLaunchBrowser();
-        if (!browser) throw new Error('Browser initialization failed.');
-
-        const pages = await browser.pages();
-        let page = pages.find(p => p.url().includes('sahibinden.com'));
-
-        if (page) {
-            console.log('♻️ Reusing existing Sahibinden tab!');
-            await page.bringToFront();
-            await humanizePage(page); // Re-attach utilities
-        } else {
-            console.log('📄 Opening new tab...');
-            page = await browser.newPage();
-            try { await page.setViewport({ width: 1920, height: 1080 }); } catch (e) { }
+        let page;
+        if (injectedPage) {
+            console.log('ℹ️ Using Injected Browser Page (Interactive Mode)');
+            page = injectedPage;
+            browser = page.browser();
             await humanizePage(page);
-            await organicWarmup(page);
+            // Don't close injected browser
+        } else {
+            browser = await getOrLaunchBrowser();
+            if (!browser) throw new Error('Browser initialization failed.');
+
+            const pages = await browser.pages();
+            page = pages.find(p => p.url().includes('sahibinden.com'));
+
+            if (page) {
+                console.log('♻️ Reusing existing Sahibinden tab!');
+                await page.bringToFront();
+                await humanizePage(page); // Re-attach utilities
+            } else {
+                console.log('📄 Opening new tab...');
+                page = await browser.newPage();
+                try { await page.setViewport({ width: 1920, height: 1080 }); } catch (e) { }
+                await humanizePage(page);
+                await organicWarmup(page);
+            }
         }
 
         let allListings = [];
@@ -237,20 +246,35 @@ async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 
 
                     const locationEl = row.querySelector('.searchResultsLocationValue');
                     let location = locationEl ? locationEl.innerText.replace(/\n/g, ' ').trim() : '';
+                    // Debugging removed
                     let district = '';
                     let neighborhood = '';
 
                     if (location) {
-                        const parts = location.split('/').map(s => s.trim());
-                        if (parts.length >= 2) district = parts[1];
+                        // Fix for missing location: Split by newline OR slash
+                        // Example: "Balıkesir \n Ayvalık \n Cunda" OR "Balıkesir / Ayvalık / Cunda"
+                        const parts = location.split(/[\/\n\r]+/).map(s => s.trim()).filter(s => s.length > 0);
+
                         if (parts.length >= 3) {
+                            district = parts[1];
                             let raw = parts[2];
                             raw = raw.replace(/\s+Mahallesi/i, '').replace(/\s+Mah\.?/i, '').replace(/\s+Mh\.?/i, '').trim();
                             neighborhood = raw + ' Mah.';
+                        } else if (parts.length === 2) {
+                            // Case: "Küçükköy \n Küçükköy Mh." (City omitted)
+                            district = parts[0];
+                            let raw = parts[1];
+                            raw = raw.replace(/\s+Mahallesi/i, '').replace(/\s+Mah\.?/i, '').replace(/\s+Mh\.?/i, '').trim();
+                            neighborhood = raw + ' Mah.';
+                        } else if (parts.length === 1) {
+                            district = parts[0]; // Best guess
                         }
                     }
 
                     const fullText = row.innerText + ' ' + title;
+                    const lowerText = fullText.toLowerCase();
+                    let seller_type = forcedType || 'office';
+                    let seller_name = 'Bilinmiyor';
                     let size_m2 = 0;
                     const m2Match = fullText.match(/(\d+)\s*m[²2]/i);
                     if (m2Match) size_m2 = parseInt(m2Match[1]);
@@ -312,7 +336,7 @@ async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 
     } catch (err) {
         if (err.message === '403_BLOCK_REBOOT') {
             console.log('🔄 Restarting scrape after profile reboot...');
-            return await scrapeSahibindenStealth(url, forcedSellerType, category, targetPages);
+            return await scrapeSahibindenStealth(url, forcedSellerType, category, targetPages, injectedPage);
         }
         console.error('❌ Scrape Failed:', err.message);
         throw err;

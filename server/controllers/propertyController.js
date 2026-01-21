@@ -259,10 +259,19 @@ const getProperties = async (req, res) => {
             if (source === 'sahibinden') {
                 where.AND.push({ url: { contains: 'sahibinden.com' } });
             } else if (source === 'hepsiemlak' || source === 'hemlak') {
-                where.AND.push({ url: { contains: 'hemlak.com' } });
+                where.AND.push({
+                    OR: [
+                        { url: { contains: 'hemlak.com' } },
+                        { url: { contains: 'hepsiemlak.com' } }
+                    ]
+                });
             } else if (source === 'emlakjet') {
                 where.AND.push({ url: { contains: 'emlakjet.com' } });
             }
+        }
+
+        if (req.query.assigned_user_id) {
+            where.AND.push({ assigned_user_id: parseInt(req.query.assigned_user_id) });
         }
 
         if (minPrice) {
@@ -565,4 +574,32 @@ const assignProperty = async (req, res) => {
     }
 };
 
-module.exports = { getProperties, getPropertyHistory, getPropertyById, scrapePropertyDetails, assignProperty };
+const updateProperty = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const {
+            auth_doc_url,
+            auth_start_date,
+            auth_end_date,
+            status
+        } = req.body;
+
+        const dataToUpdate = {};
+        if (auth_doc_url !== undefined) dataToUpdate.auth_doc_url = auth_doc_url;
+        if (auth_start_date !== undefined) dataToUpdate.auth_start_date = auth_start_date ? new Date(auth_start_date) : null;
+        if (auth_end_date !== undefined) dataToUpdate.auth_end_date = auth_end_date ? new Date(auth_end_date) : null;
+        if (status !== undefined) dataToUpdate.status = status;
+
+        const updated = await prisma.property.update({
+            where: { id: parseInt(id) },
+            data: dataToUpdate
+        });
+
+        res.json(updated);
+    } catch (error) {
+        console.error('Update Property Error:', error);
+        res.status(500).json({ error: 'Failed to update property' });
+    }
+};
+
+module.exports = { getProperties, getPropertyHistory, getPropertyById, scrapePropertyDetails, assignProperty, updateProperty };

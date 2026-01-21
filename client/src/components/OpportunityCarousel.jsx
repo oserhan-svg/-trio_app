@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingDown, ArrowRight, Home, ChevronRight, ChevronLeft, Calendar } from 'lucide-react';
+import { TrendingDown, ArrowRight, Home, ChevronRight, ChevronLeft, Calendar, Palmtree, TreeDeciduous, Building } from 'lucide-react';
 import api from '../services/api';
 
 const OpportunityCarousel = ({ compact = false }) => {
@@ -14,7 +14,7 @@ const OpportunityCarousel = ({ compact = false }) => {
         const fetchOpportunities = async () => {
             try {
                 const response = await api.get('/properties');
-                const allProps = response.data;
+                const allProps = response.data.data || [];
                 // Filter for high-score deals AND Owner listings (from ANY portal)
                 const ops = allProps
                     .filter(p =>

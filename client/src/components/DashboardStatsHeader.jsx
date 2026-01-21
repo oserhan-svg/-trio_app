@@ -6,7 +6,7 @@ import RentalRateWidget from './dashboard/RentalRateWidget';
 
 const DashboardStatsHeader = ({ properties, stats }) => {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 relative z-50">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 relative z-10">
             {/* 1. Rental Rate Widget */}
             <div className="h-44">
                 <RentalRateWidget />
