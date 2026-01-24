@@ -99,9 +99,13 @@ app.get('/', (req, res) => {
     res.send('Emlak Takip API Running');
 });
 
+app.get('/', (req, res) => {
+    res.send('Emlak Takip API Running v1.12');
+});
+
 // Health Check for Render / Wakeup Handling
 app.get('/api/health', (req, res) => {
-    res.status(200).json({ status: 'OK', timestamp: new Date() });
+    res.status(200).json({ status: 'OK', version: '1.12', timestamp: new Date() });
 });
 
 // Database Initialization Helper
@@ -148,7 +152,7 @@ app.use(errorHandler);
 const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
     console.log('*************************************************');
-    console.log('*  CRASH FIX LOADED - VERSION: 1.11             *');
+    console.log('*  CRASH FIX LOADED - VERSION: 1.12             *');
     console.log('*  RENDER DEPLOYMENT OPTIMIZED                  *');
     console.log('*************************************************');
 
