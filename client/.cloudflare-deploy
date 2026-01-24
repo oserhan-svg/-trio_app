@@ -1,0 +1,11 @@
+# Cloudflare Pages Deployment Trigger
+# Last deployment: 2026-01-24T23:08:43+03:00
+# This file is used to trigger Cloudflare Pages deployments
+
+Build Configuration:
+- Framework: Vite
+- Build Command: npm run build
+- Build Output: dist
+- Root Directory: client
+
+Deployment will be triggered automatically when pushed to GitHub.
