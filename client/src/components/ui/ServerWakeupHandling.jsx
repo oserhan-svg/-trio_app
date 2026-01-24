@@ -16,7 +16,16 @@ const ServerWakeupHandling = () => {
                 await api.get('/health', { timeout: 5000 });
                 if (isMounted) setStatus('awake');
             } catch (error) {
-                console.warn("Server health check failed, likely sleeping:", error);
+                console.warn("Server health check failed:", error);
+
+                // If the server responded with ANY status code (like 404), it means it's AWAKE.
+                // We only stay in 'sleeping' if there was no response (timeout/network error)
+                if (error.response) {
+                    console.log("Server responded but route not found. Server is AWAKE.");
+                    if (isMounted) setStatus('awake');
+                    return;
+                }
+
                 if (isMounted) {
                     setStatus('sleeping');
                     // Retry after delay
