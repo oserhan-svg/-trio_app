@@ -56,8 +56,12 @@ const PortfolioDashboard = ({ mode: initialMode = 'agency', user }) => {
             setStats(response.data);
         } catch (error) {
             console.error('Failed to fetch stats:', error);
-            const msg = error.response?.data?.details || error.response?.data?.error || error.message;
-            setStatsError(msg);
+            if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+                setStatsError('Oturum Süresi Doldu');
+            } else {
+                const msg = error.response?.data?.details || error.response?.data?.error || error.message;
+                setStatsError(msg);
+            }
         }
     };
 
@@ -101,10 +105,10 @@ const PortfolioDashboard = ({ mode: initialMode = 'agency', user }) => {
                         </p>
                     </div>
                     <div className="flex gap-2">
-                        {statsError && (
+                        {statsError && statsError !== 'Oturum Süresi Doldu' && (
                             <div className="flex items-center gap-2 px-3 py-1 bg-rose-500/20 border border-rose-500/50 text-rose-400 rounded text-[10px] font-bold">
                                 <AlertCircle size={10} />
-                                BACKEND ERROR DETECTED
+                                BACKEND ERROR: {statsError ? statsError.toUpperCase() : 'UNKNOWN'}
                             </div>
                         )}
                         <button

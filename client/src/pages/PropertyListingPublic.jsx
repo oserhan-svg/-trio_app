@@ -141,7 +141,16 @@ const PropertyListingPublic = () => {
                 </div>
 
                 {/* Image Gallery */}
-                {property.images && property.images.length > 0 && (
+                {(!property.images || property.images.length === 0) ? (
+                    <div className="p-8 print:p-6 border-b">
+                        <div className="w-full h-[400px] bg-gray-100 rounded-lg flex flex-col items-center justify-center text-gray-400">
+                            <svg className="w-24 h-24 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span className="text-lg font-medium">Görseller Hazırlanıyor</span>
+                        </div>
+                    </div>
+                ) : (
                     <div className="p-8 print:p-6 border-b">
                         {/* Interactive Gallery for Screen */}
                         <div className="print:hidden">

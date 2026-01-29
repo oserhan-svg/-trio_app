@@ -1,10 +1,19 @@
 import io from 'socket.io-client';
 
-const SOCKET_URL = import.meta.env.VITE_API_URL
-    ? import.meta.env.VITE_API_URL.replace('/api', '')
-    : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.startsWith('192.168.') || window.location.hostname.startsWith('10.') || window.location.hostname.endsWith('.local')
-        ? `http://${window.location.hostname}:5005`
-        : 'https://trio-app-server.onrender.com');
+const isLocal = typeof window !== 'undefined' && (
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1' ||
+    window.location.hostname.startsWith('192.168.') ||
+    window.location.hostname.startsWith('10.') ||
+    window.location.hostname.endsWith('.local')
+);
+
+const envApiUrl = import.meta.env.VITE_API_URL;
+const isEnvLocalhost = envApiUrl && envApiUrl.includes('localhost');
+
+const SOCKET_URL = isLocal
+    ? `http://${window.location.hostname}:5005`
+    : (isEnvLocalhost ? 'https://trio-app-server.onrender.com' : (envApiUrl ? envApiUrl.replace('/api', '') : 'https://trio-app-server.onrender.com'));
 
 class SocketService {
     constructor() {

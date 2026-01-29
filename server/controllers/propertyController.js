@@ -395,6 +395,9 @@ const getPortfolioStats = async (req, res) => {
 const getPropertyById = async (req, res) => {
     try {
         const { id } = req.params;
+        if (isNaN(parseInt(id))) {
+            return res.status(400).json({ error: 'Invalid ID format' });
+        }
         const property = await prisma.property.findUnique({ where: { id: parseInt(id) }, include: { history: { orderBy: { changed_at: 'asc' } } } });
         if (!property) return res.status(404).json({ error: 'Property not found' });
 

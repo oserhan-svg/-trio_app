@@ -8,16 +8,23 @@ const isLocal = typeof window !== 'undefined' && (
     window.location.hostname.endsWith('.local')
 );
 
-const API_URL = import.meta.env.VITE_API_URL || (isLocal ? `http://${window.location.hostname}:5005/api` : 'https://trio-app-server.onrender.com/api');
+const envApiUrl = import.meta.env.VITE_API_URL;
+const isEnvLocalhost = envApiUrl && envApiUrl.includes('localhost');
+
+const API_URL = (isLocal)
+    ? `http://${window.location.hostname}:5005/api`
+    : (isEnvLocalhost ? 'https://trio-app-server.onrender.com/api' : (envApiUrl || 'https://trio-app-server.onrender.com/api'));
 
 console.log('Current API URL:', API_URL);
 
-// Simple safety check for Pages.dev + localhost mismatch
+// Double check for Pages.dev mismatch
 let finalApiUrl = API_URL;
-if (typeof window !== 'undefined' && window.location.hostname.includes('pages.dev') && (API_URL.includes('localhost'))) {
-    console.warn('⚠️ Detected localhost API config on production! Auto-correcting to Render API.');
+if (!isLocal && API_URL.includes('localhost')) {
+    console.warn('⚠️ Critical: Localhost API config detected on Production! switching to Render.');
     finalApiUrl = 'https://trio-app-server.onrender.com/api';
 }
+
+// (Duplicate block removed)
 
 const api = axios.create({
     baseURL: finalApiUrl,

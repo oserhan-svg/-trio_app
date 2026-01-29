@@ -33,6 +33,7 @@ const getPropertyPool = async () => {
             district: true,
             listing_type: true,
             size_m2: true,
+            images: true, // Needed for quality scoring
             created_at: true
         }
     });
@@ -266,6 +267,15 @@ const calculateMatchScore = (property, demand, aiSummary = null) => {
     } else if (daysOld <= 5) {
         score += 5;
         reasons.push('Yeni İlan (Son 5 Gün)');
+    }
+
+    // 7. Visual Quality Check (Critical for AI Portfolio)
+    // Penalize listings without images heavily, as they look bad in portfolios
+    if (!property.images || property.images.length === 0) {
+        score -= 30;
+        reasons.push('Görsel Eksik (-30)');
+    } else {
+        score += 5; // Small bonus for having visuals
     }
 
     return {
