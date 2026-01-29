@@ -75,4 +75,14 @@ const refreshRentalRate = async (req, res) => {
     }
 };
 
-module.exports = { getSettings, updateSetting, refreshRentalRate };
+const getCompanyConfig = async (req, res) => {
+    try {
+        // Use require to load the JSON file
+        const config = require('../config/companyConfig.json');
+        res.json(config);
+    } catch (error) {
+        res.status(500).json({ error: 'Firma ayarları bulunamadı.' });
+    }
+};
+
+module.exports = { getSettings, updateSetting, refreshRentalRate, getCompanyConfig };

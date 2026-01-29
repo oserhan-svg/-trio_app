@@ -16,11 +16,15 @@ const AgendaItemModal = ({ isOpen, onClose, onSave, item = null }) => {
         property_id: ''
     });
     const [clients, setClients] = useState([]);
+    const [clientSearch, setClientSearch] = useState('');
+    const [properties, setProperties] = useState([]);
+    const [propertySearch, setPropertySearch] = useState('');
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
             fetchClients();
+            fetchProperties();
             if (item) {
                 // Format date for datetime-local input (YYYY-MM-DDTHH:mm)
                 const date = new Date(item.start_at);
@@ -68,6 +72,15 @@ const AgendaItemModal = ({ isOpen, onClose, onSave, item = null }) => {
         }
     };
 
+    const fetchProperties = async () => {
+        try {
+            const res = await api.get('/properties', { params: { limit: 100, status: 'active' } });
+            setProperties(res.data.data || []);
+        } catch (error) {
+            console.error('Error fetching properties for agenda', error);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -79,6 +92,20 @@ const AgendaItemModal = ({ isOpen, onClose, onSave, item = null }) => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const [conflict, setConflict] = useState(null);
+
+    useEffect(() => {
+        if (formData.start_at) {
+            checkConflict(formData.start_at);
+        }
+    }, [formData.start_at]);
+
+    const checkConflict = async (startAt) => {
+        // Simple client-side check if we had existing items, 
+        // but it's better to hit an endpoint or search local items prop if available.
+        // For now, let's assume we might receive existing items as a prop for a quick check.
     };
 
     if (!isOpen) return null;
@@ -140,6 +167,37 @@ const AgendaItemModal = ({ isOpen, onClose, onSave, item = null }) => {
                     </div>
 
                     <div className="space-y-1">
+                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-1">
+                            <Home size={12} /> İlişkili Emlak
+                        </label>
+                        <div className="relative group">
+                            <input
+                                type="text"
+                                placeholder="Emlak ara (Başlık, İlçe, Mahalle)..."
+                                className="w-full px-4 py-2 text-xs border border-gray-100 rounded-t-lg focus:ring-1 focus:ring-blue-400 focus:outline-none bg-gray-50/50"
+                                value={propertySearch}
+                                onChange={e => setPropertySearch(e.target.value)}
+                            />
+                            <select
+                                className="w-full px-4 py-3 rounded-b-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm bg-white"
+                                value={formData.property_id}
+                                onChange={e => setFormData({ ...formData, property_id: e.target.value })}
+                            >
+                                <option value="">Seçilmedi</option>
+                                {properties
+                                    .filter(p =>
+                                        p.title.toLowerCase().includes(propertySearch.toLowerCase()) ||
+                                        (p.district && p.district.toLowerCase().includes(propertySearch.toLowerCase())) ||
+                                        (p.neighborhood && p.neighborhood.toLowerCase().includes(propertySearch.toLowerCase()))
+                                    )
+                                    .map(p => (
+                                        <option key={p.id} value={p.id}>{p.title} ({p.district})</option>
+                                    ))}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="space-y-1">
                         <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Açıklama</label>
                         <div className="relative">
                             <AlignLeft size={16} className="absolute left-3 top-3 text-gray-400" />
@@ -157,16 +215,27 @@ const AgendaItemModal = ({ isOpen, onClose, onSave, item = null }) => {
                             <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-1">
                                 <Users size={12} /> İlişkili Müşteri
                             </label>
-                            <select
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm bg-white"
-                                value={formData.client_id}
-                                onChange={e => setFormData({ ...formData, client_id: e.target.value })}
-                            >
-                                <option value="">Seçilmedi</option>
-                                {clients.map(c => (
-                                    <option key={c.id} value={c.id}>{c.name}</option>
-                                ))}
-                            </select>
+                            <div className="relative group">
+                                <input
+                                    type="text"
+                                    placeholder="Müşteri ara..."
+                                    className="w-full px-4 py-2 text-xs border border-gray-100 rounded-t-lg focus:ring-1 focus:ring-blue-400 focus:outline-none bg-gray-50/50"
+                                    value={clientSearch}
+                                    onChange={e => setClientSearch(e.target.value)}
+                                />
+                                <select
+                                    className="w-full px-4 py-3 rounded-b-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm bg-white"
+                                    value={formData.client_id}
+                                    onChange={e => setFormData({ ...formData, client_id: e.target.value })}
+                                >
+                                    <option value="">Seçilmedi</option>
+                                    {clients
+                                        .filter(c => c.name.toLowerCase().includes(clientSearch.toLowerCase()))
+                                        .map(c => (
+                                            <option key={c.id} value={c.id}>{c.name}</option>
+                                        ))}
+                                </select>
+                            </div>
                         </div>
                         <div className="space-y-1">
                             <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-1">

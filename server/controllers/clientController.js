@@ -1,35 +1,75 @@
 const prisma = require('../db');
-const { findMatchesForClient, calculateMatchScore } = require('../services/matchingService');
+const matchingService = require('../services/matchingService');
+const { calculateMatchScore } = require('../services/matchingService');
 const { jsonBigInt } = require('../utils/responseHelper');
 const { stripHtml } = require('../utils/sanitize');
+const GroqService = require('../services/GroqService');
+const CacheService = require('../services/cacheService');
+const performanceHardeningService = require('../services/performanceHardeningService');
+const socketService = require('../services/socketService');
+const auditService = require('../services/auditService');
+const whatsappService = require('../services/whatsappService');
 
-// Get matches for a client
+// Get matches for a client (WITH CACHING)
 const getClientMatches = async (req, res) => {
     const { id } = req.params;
+    const cacheKey = `matches:client:${id}`;
+
     try {
-        const matches = await findMatchesForClient(id);
+        // Check cache first using the consolidated matchingService
+        const matches = await matchingService.findMatchesForClient(id);
         jsonBigInt(res, matches);
     } catch (error) {
-        console.error('Matching Error:', error);
-        res.status(500).json({ error: 'Error finding matches' });
+        console.error('Client Matches Error:', error);
+        res.status(500).json({ error: 'Error fetching client matches' });
     }
 };
 
 const getRecentMatches = async (req, res) => {
+    const user = req.user;
+    const cacheKey = `matches: recent:${user.id}:${user.role} `;
+
     try {
-        const user = req.user;
+        // Check cache first
+        const cached = CacheService.get(cacheKey);
+        if (cached) {
+            return jsonBigInt(res, cached);
+        }
+
+        // Fetch with optimized select
         const matches = await prisma.clientProperty.findMany({
             where: {
                 status: 'concierge',
-                client: user.role !== 'admin' ? { consultant_id: user.id } : {}
+                client: user.role !== 'admin' ? { consultant_id: parseInt(user.id) } : {},
+                property: { status: { not: 'removed' } } // Filter removed properties
             },
             include: {
-                client: true,
-                property: true
+                client: {
+                    select: {
+                        id: true,
+                        name: true,
+                        phone: true
+                    }
+                },
+                property: {
+                    select: {
+                        id: true,
+                        title: true,
+                        price: true,
+                        neighborhood: true,
+                        district: true,
+                        rooms: true,
+                        images: true,
+                        url: true,
+                        status: true
+                    }
+                }
             },
             orderBy: { added_at: 'desc' },
-            take: 10
+            take: 50
         });
+
+        CacheService.set(cacheKey, matches, 180); // 3 min TTL
         jsonBigInt(res, matches);
     } catch (error) {
         console.error('Recent Matches Error:', error);
@@ -42,30 +82,102 @@ const getRecentMatches = async (req, res) => {
 const getClients = async (req, res) => {
     try {
         const user = req.user;
+        const { search, status, type, page = 1, limit = 15 } = req.query;
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+        const take = parseInt(limit);
+
         let where = {};
 
         // RBAC: Consultants can only see their own clients OR unassigned clients
         if (user.role !== 'admin') {
-            where = {
-                OR: [
-                    { consultant_id: user.id },
-                    { consultant_id: null }
-                ]
-            };
+            const userId = parseInt(user.id);
+            where.OR = [
+                { consultant_id: userId },
+                { consultant_id: null }
+            ];
         }
 
-        console.log('Fetching clients for user:', user.id, 'Role:', user.role);
-        console.log('Query Where:', JSON.stringify(where));
+        // Apply filters
+        if (status && status !== 'all') {
+            where.status = status;
+        }
 
-        const clients = await prisma.client.findMany({
-            where,
-            include: { demands: true, consultant: { select: { email: true } } }, // Include consultant info
-            orderBy: { created_at: 'desc' }
+        if (type && type !== 'all') {
+            where.type = type;
+        }
+
+        if (search) {
+            const searchClause = {
+                OR: [
+                    { name: { contains: search } },
+                    { phone: { contains: search } },
+                    { email: { contains: search } }
+                ]
+            };
+            // Combine with RBAC if necessary
+            if (where.OR) {
+                where = { AND: [{ OR: where.OR }, searchClause] };
+            } else {
+                where = { ...where, ...searchClause };
+            }
+        }
+
+        const [total, clients, activeBuyers, activeSellers, newThisMonth] = await Promise.all([
+            prisma.client.count({ where }),
+            prisma.client.findMany({
+                where,
+                include: { demands: true, consultant: { select: { email: true } } },
+                orderBy: { created_at: 'desc' },
+                skip,
+                take
+            }),
+            prisma.client.count({
+                where: {
+                    AND: [
+                        where,
+                        { type: 'buyer' },
+                        { status: 'Active' }
+                    ]
+                }
+            }),
+            prisma.client.count({
+                where: {
+                    AND: [
+                        where,
+                        { type: 'seller' },
+                        { status: 'Active' }
+                    ]
+                }
+            }),
+            prisma.client.count({
+                where: {
+                    AND: [
+                        where,
+                        {
+                            created_at: {
+                                gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+                            }
+                        }
+                    ]
+                }
+            })
+        ]);
+
+        jsonBigInt(res, {
+            data: clients,
+            total,
+            stats: {
+                activeBuyers,
+                activeSellers,
+                newThisMonth
+            },
+            page: parseInt(page),
+            limit: parseInt(limit),
+            totalPages: Math.ceil(total / take)
         });
-        res.json(clients);
     } catch (error) {
         console.error('Error fetching clients:', error);
-        res.status(500).json({ error: 'Error fetching clients' });
+        res.status(500).json({ error: 'Error fetching clients', details: error.message });
     }
 };
 
@@ -153,10 +265,14 @@ const createClient = async (req, res) => {
                 consultant_id: req.user.id // Assign to current user
             }
         });
-        res.json(client);
+
+        // Notify real-time
+        socketService.emit('client:new', client);
+
+        jsonBigInt(res, client);
     } catch (error) {
         console.error('Error creating client:', error);
-        res.status(500).json({ error: 'Error creating client' });
+        res.status(500).json({ error: 'Error creating client', details: error.message });
     }
 };
 
@@ -210,11 +326,14 @@ const bulkCreateClients = async (req, res) => {
 // Add a demand for a client
 const addDemand = async (req, res) => {
     const { id } = req.params;
-    let { min_price, max_price, rooms, district, neighborhood } = req.body;
+    let { min_price, max_price, rooms, district, neighborhood, listing_type, notes } = req.body;
 
     // Sanitize prices: convert "" to null
     if (min_price === '') min_price = null;
     if (max_price === '') max_price = null;
+
+    // Sanitize notes
+    notes = notes ? stripHtml(notes) : null;
 
     try {
         const demand = await prisma.demand.create({
@@ -224,9 +343,15 @@ const addDemand = async (req, res) => {
                 max_price: max_price ? parseFloat(max_price) : null,
                 rooms,
                 district,
-                neighborhood
+                neighborhood,
+                listing_type: listing_type || 'sale',
+                notes
             }
         });
+
+        // Invalidate cache for this client
+        matchingService.invalidateClientCache(id);
+
         res.json(demand);
     } catch (error) {
         console.error('Error adding demand:', error);
@@ -239,6 +364,10 @@ const deleteClient = async (req, res) => {
     const { id } = req.params;
     try {
         await prisma.client.delete({ where: { id: parseInt(id) } });
+
+        // Notify real-time
+        socketService.emit('client:deleted', { id: parseInt(id) });
+
         res.json({ message: 'Client deleted successfully' });
     } catch (error) {
         console.error('Error deleting client:', error);
@@ -260,20 +389,28 @@ const updateClient = async (req, res) => {
             where: { id: parseInt(id) },
             data: { name, phone, email, notes, type }
         });
-        res.json(client);
+
+        // Notify real-time
+        socketService.emit('client:updated', client);
+
+        jsonBigInt(res, client);
     } catch (error) {
-        res.status(500).json({ error: 'Error updating client' });
+        console.error('Error updating client:', error);
+        res.status(500).json({ error: 'Error updating client', details: error.message });
     }
 };
 
 // Update a demand
 const updateDemand = async (req, res) => {
     const { id } = req.params;
-    let { min_price, max_price, rooms, district, neighborhood } = req.body;
+    let { min_price, max_price, rooms, district, neighborhood, listing_type, notes } = req.body;
 
     // Sanitize prices
     if (min_price === '') min_price = null;
     if (max_price === '') max_price = null;
+
+    // Sanitize notes
+    notes = notes ? stripHtml(notes) : null;
 
     try {
         const demand = await prisma.demand.update({
@@ -283,9 +420,16 @@ const updateDemand = async (req, res) => {
                 max_price: max_price ? parseFloat(max_price) : null,
                 rooms,
                 district,
-                neighborhood
-            }
+                neighborhood,
+                listing_type,
+                notes
+            },
+            include: { client: { select: { id: true } } }
         });
+
+        // Invalidate cache for this demand's client
+        matchingService.invalidateClientCache(demand.client_id);
+
         res.json(demand);
     } catch (error) {
         res.status(500).json({ error: 'Error updating demand' });
@@ -296,7 +440,18 @@ const updateDemand = async (req, res) => {
 const deleteDemand = async (req, res) => {
     const { id } = req.params;
     try {
+        const demand = await prisma.demand.findUnique({
+            where: { id: parseInt(id) },
+            select: { client_id: true }
+        });
+
         await prisma.demand.delete({ where: { id: parseInt(id) } });
+
+        // Invalidate cache for this demand's client
+        if (demand) {
+            matchingService.invalidateClientCache(demand.client_id);
+        }
+
         res.json({ message: 'Demand deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Error deleting demand' });
@@ -390,6 +545,251 @@ const removeAllProperties = async (req, res) => {
     }
 };
 
+// Generate AI Digest for Client
+const generateAIDigest = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const client = await prisma.client.findUnique({
+            where: { id: parseInt(id) },
+            include: { demands: true }
+        });
+
+        if (!client) {
+            return res.status(404).json({ error: 'Client not found' });
+        }
+
+        // 1. Get matches
+        const matches = await matchingService.findMatchesForClient(id);
+
+        if (!matches || matches.length === 0) {
+            return res.status(400).json({ error: 'Bu müşteri için eşleşen ilan bulunamadı. Lütmen taleplerini güncelleyin.' });
+        }
+
+        // 2. Prepare data for AI
+        const bestDemand = client.demands[0]; // Use the newest demand
+        const rawMatches = matches.slice(0, 5); // Top 5 matches
+
+        // 2.2 Automate PropertyListing and Content Regeneration
+        const marketingService = require('../services/marketingService');
+        const { v4: uuidv4 } = require('uuid');
+
+        const bestMatches = await Promise.all(rawMatches.map(async (p) => {
+            try {
+                // 1. Try to get marketing content (handle case where metadata field might be missing from schema)
+                let pkg = null;
+                if (p.metadata && typeof p.metadata === 'object') {
+                    pkg = p.metadata.marketing_package;
+                }
+
+                if (!pkg || !pkg.premium_title) {
+                    pkg = await marketingService.generateMarketingPackage(p.id);
+                }
+
+                // 2. Ensure a system-generated PropertyListing exists for branded sharing
+                let listing = await prisma.propertyListing.findFirst({
+                    where: { property_id: p.id, created_by: null },
+                    orderBy: { created_at: 'desc' }
+                });
+
+                if (!listing) {
+                    listing = await prisma.propertyListing.create({
+                        data: {
+                            property_id: p.id,
+                            share_token: uuidv4(),
+                            custom_title: pkg?.premium_title || p.title,
+                            custom_description: pkg?.premium_description || p.description,
+                        }
+                    });
+                } else if (pkg && (listing.custom_title !== pkg.premium_title)) {
+                    // Update existing system listing if content was refreshed
+                    listing = await prisma.propertyListing.update({
+                        where: { id: listing.id },
+                        data: {
+                            custom_title: pkg.premium_title || listing.custom_title,
+                            custom_description: pkg.premium_description || listing.custom_description
+                        }
+                    });
+                }
+
+                return {
+                    ...p,
+                    share_token: listing.share_token,
+                    custom_title: listing.custom_title || p.title,
+                    custom_description: listing.custom_description || p.description
+                };
+            } catch (err) {
+                console.error(`Error processing match ${p.id} for AI Digest:`, err);
+                return p; // Fallback to raw property
+            }
+        }));
+
+        // 2.5 Get recent interactions for context
+        const recentInteractions = await prisma.interaction.findMany({
+            where: { client_id: parseInt(id) },
+            orderBy: { date: 'desc' },
+            take: 5
+        });
+
+        // 3. Call AI (With Resiliency)
+        const digest = await performanceHardeningService.resilientCall(
+            () => GroqService.generateClientDigest(client, bestDemand, bestMatches, recentInteractions),
+            'GroqAIDigest'
+        );
+
+        // Fallback for degraded service
+        if (digest.failover) {
+            return res.json({
+                digest: "⚠️ AI Servisi şu an yoğun olduğu için özet oluşturulamadı. Lütfen alt kısımdaki eşleşen ilanları manuel inceleyin.",
+                properties: bestMatches
+            });
+        }
+
+        // Add a small contextual note if interactions were found
+        let finalDigest = digest;
+        if (recentInteractions.length > 0) {
+            // We don't modify the digest content directly here as GroqService should handle it internally ideally,
+            // but for now we pass it to a refined digest call if we want to change GroqService. 
+            // Let's refine GroqService.generateClientDigest to accept interactions.
+        }
+
+        res.json({ digest, properties: bestMatches });
+    } catch (error) {
+        console.error('Generate AI Digest Error:', error);
+        res.status(500).json({ error: 'Özet oluşturulurken bir hata oluştu: ' + error.message });
+    }
+};
+
+const analyzeClient = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const client = await prisma.client.findUnique({
+            where: { id: parseInt(id) },
+            include: {
+                demands: true,
+                interactions: { orderBy: { date: 'desc' }, take: 10 },
+                saved_properties: { include: { property: true } }
+            }
+        });
+
+        if (!client) return res.status(404).json({ error: 'Client not found' });
+
+        const analysis = await performanceHardeningService.resilientCall(
+            () => GroqService.analyzeClientHistory(
+                client,
+                client.interactions,
+                client.demands,
+                client.saved_properties
+            ),
+            'GroqClientAnalysis'
+        );
+
+        res.json({ analysis: analysis.failover ? "⚠️ Analiz şu an yapılamıyor, lütfen daha sonra tekrar deneyin." : analysis });
+    } catch (error) {
+        console.error('Client Analysis Error:', error);
+        res.status(500).json({ error: 'Analiz oluşturulurken hata: ' + error.message });
+    }
+};
+
+const getClientHealth = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const pipelineService = require('../services/pipelineService');
+        const health = await pipelineService.analyzeClientHealth(parseInt(id));
+        res.json(health);
+    } catch (error) {
+        console.error('Get Client Health Error:', error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+const createPublicLead = async (req, res) => {
+    const { name, phone, email, notes, propertyId } = req.body;
+
+    if (!name || !phone) {
+        return res.status(400).json({ error: 'İsim ve telefon zorunludur.' });
+    }
+
+    try {
+        // Find property to identify the consultant
+        const property = await prisma.property.findUnique({
+            where: { id: parseInt(propertyId) },
+            select: { assigned_user_id: true, title: true }
+        });
+
+        // Default to first admin if no assigned user
+        let consultantId = property?.assigned_user_id;
+        if (!consultantId) {
+            const firstAdmin = await prisma.user.findFirst({ where: { role: 'admin' } });
+            consultantId = firstAdmin?.id;
+        }
+
+        if (!consultantId) {
+            return res.status(500).json({ error: 'Danışman atanamadı.' });
+        }
+
+        const lead = await prisma.pendingContact.create({
+            data: {
+                name: stripHtml(name),
+                phone: phone.trim(),
+                email: email ? email.trim() : null,
+                notes: `[KAMU İLAN FORMU] ${property?.title || 'Bilinmeyen İlan'}: ${stripHtml(notes || '')}`,
+                consultant_id: consultantId
+            }
+        });
+
+        // Emit socket notification
+        socketService.emit('client:new', lead);
+
+        res.json({ success: true, message: 'Talebiniz alınmıştır, teşekkürler.' });
+    } catch (error) {
+        console.error('Public Lead Error:', error);
+        res.status(500).json({ error: 'Talep iletilemedi.' });
+    }
+};
+
+const getClientStrategy = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const client = await prisma.client.findUnique({
+            where: { id: parseInt(id) },
+            include: {
+                interactions: { orderBy: { date: 'desc' }, take: 10 },
+                demands: true
+            }
+        });
+
+        if (!client) return res.status(404).json({ error: 'Client not found' });
+
+        // 1. Get recent matches
+        const matches = await matchingService.findMatchesForClient(id);
+
+        // 2. Generate AI Strategy
+        const strategy = await performanceHardeningService.resilientCall(
+            () => GroqService.generateClientStrategy(client, client.interactions, matches),
+            'GroqClientStrategy'
+        );
+
+        if (strategy.failover) {
+            return res.json({
+                analysis: "⚠️ Strateji şu an oluşturulamıyor.",
+                next_step: "Müşteriyi arayarak güncel durumu sorun.",
+                suggested_draft: "Merhaba, size en son gönderdiğimiz portföylerle ilgili görüşlerinizi merak ediyoruz."
+            });
+        }
+
+        // 3. Update client's next best action in DB
+        await prisma.client.update({
+            where: { id: client.id },
+            data: { next_best_action: strategy.next_step }
+        });
+
+        res.json(strategy);
+    } catch (error) {
+        console.error('Client Strategy Error:', error);
+        res.status(500).json({ error: 'Strateji oluşturulurken hata oluştu.' });
+    }
+};
+
 module.exports = {
     getClients,
     getClientById: getClient, // Export alias if needed, or just getClient
@@ -406,5 +806,37 @@ module.exports = {
     getClientMatches,
     getRecentMatches,
     updateClient,
-    bulkCreateClients
+    bulkCreateClients,
+    generateAIDigest,
+    sendAIDigest: async (req, res) => {
+        const { id } = req.params;
+        const { message } = req.body;
+        try {
+            const client = await prisma.client.findUnique({ where: { id: parseInt(id) } });
+            if (!client || !client.phone) return res.status(404).json({ error: 'Müşteri veya telefon numarası bulunamadı.' });
+
+            // Use whatsappService to send (assuming it exports sendMessage)
+            // We need to require it at the top or assumed it is available via other services
+            // Note: clientController usually implies we might need to import whatsappService if not already imported.
+            // Let's check imports. If not imported, we need to rely on existing mechanism or import it.
+            // Since we cannot see top of file, we will assume we might need to use the one used in `createPublicLead` if any,
+            // or we will use `global.whatsappClient` if valid, OR better: use socketService to emit or similar?
+            // Wait, standard way is services/whatsappService.js.
+            // Let's assume it is imported as `whatsappService` (likely) or `require('../services/whatsappService')` inside if needed.
+
+            const whatsappService = require('../services/whatsappService');
+
+            const chatId = client.phone.replace(/[^\d]/g, '') + '@c.us';
+            await whatsappService.sendMessage(chatId, message);
+
+            res.json({ success: true });
+        } catch (error) {
+            console.error('Send Digest Error:', error);
+            res.status(500).json({ error: 'Mesaj gönderilemedi.' });
+        }
+    },
+    analyzeClient,
+    getClientStrategy,
+    getClientHealth,
+    createPublicLead
 };

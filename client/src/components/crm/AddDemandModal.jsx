@@ -10,7 +10,8 @@ const AddDemandModal = ({ isOpen, onClose, onSave, clientName, initialData = nul
         max_price: '',
         rooms: '',
         district: '', // Town usually
-        neighborhood: ''
+        neighborhood: '',
+        notes: ''
     });
     const [loading, setLoading] = useState(false);
 
@@ -22,10 +23,11 @@ const AddDemandModal = ({ isOpen, onClose, onSave, clientName, initialData = nul
                     max_price: initialData.max_price || '',
                     rooms: initialData.rooms || '',
                     district: initialData.district || '',
-                    neighborhood: initialData.neighborhood || ''
+                    neighborhood: initialData.neighborhood || '',
+                    notes: initialData.notes || ''
                 });
             } else {
-                setFormData({ min_price: '', max_price: '', rooms: '', district: '', neighborhood: '' });
+                setFormData({ min_price: '', max_price: '', rooms: '', district: '', neighborhood: '', notes: '' });
             }
         }
     }, [isOpen, initialData]);
@@ -114,6 +116,16 @@ const AddDemandModal = ({ isOpen, onClose, onSave, clientName, initialData = nul
                                 onChange={val => setFormData({ ...formData, neighborhood: val })}
                             />
                         </div>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-sm font-medium text-gray-700">Detay Bilgi / Notlar</label>
+                        <textarea
+                            className="px-3 py-2 rounded-xl border border-gray-300 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm min-h-[100px] resize-none"
+                            placeholder="Örn: Deniz manzaralı, asansörlü, site içerisinde..."
+                            value={formData.notes || ''}
+                            onChange={e => setFormData({ ...formData, notes: e.target.value })}
+                        />
                     </div>
 
                     <div className="flex justify-end gap-3 mt-6">

@@ -1,24 +1,121 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  --font-family: 'Outfit', sans-serif;
+  --bg-app: #f0f4f8;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --accent-blue: #2563eb;
+  --accent-glow: 0 0 15px rgba(37, 99, 235, 0.2);
+  --soft-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05);
+  --text-main: #1a1a1a;
+}
 
-  color-scheme: light;
-  color: #1a1a1a;
-  background-color: #f9f9f9;
+.dark {
+  --bg-app: #020617;
+  /* Slate 950 for deeper black */
+  --glass-bg: rgba(15, 23, 42, 0.8);
+  /* Slate 900 */
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --accent-blue: #3b82f6;
+  --accent-glow: 0 0 20px rgba(59, 130, 246, 0.15);
+  --soft-shadow: 0 4px 30px -5px rgba(0, 0, 0, 0.3);
+  --text-main: #f8fafc;
+}
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+* {
+  font-family: var(--font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 body {
   margin: 0;
-  min-width: 320px;
+  background-color: var(--bg-app);
+  color: var(--text-main);
   min-height: 100vh;
+}
+
+@layer components {
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+  }
+
+  .glass-dark {
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .glow-blue {
+    box-shadow: var(--accent-glow);
+  }
+
+  .modern-shadow {
+    box-shadow: var(--soft-shadow);
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Force Sahibinden Badge Yellow Background */
+.sahibinden-badge {
+  background-color: #ffdb15 !important;
+  color: #000 !important;
+  border-color: #f59e0b !important;
+}
+
+/* Global utility for scrollbars */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.1);
 }

@@ -23,7 +23,9 @@ const Clients = () => {
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 15; // Increased for table view
+    const [totalClients, setTotalClients] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const pageSize = 15;
 
     // Modals
     const [showAddClient, setShowAddClient] = useState(false);
@@ -37,51 +39,37 @@ const Clients = () => {
 
     useEffect(() => {
         fetchClients();
-    }, []);
-
-    // Filtering Logic
-    useEffect(() => {
-        let result = clients;
-
-        if (statusFilter !== 'all') {
-            result = result.filter(c => c.status === statusFilter);
-        }
-
-        if (typeFilter !== 'all') {
-            result = result.filter(c => (c.type || 'buyer') === typeFilter);
-        }
-
-        if (searchTerm) {
-            const lowerTerm = searchTerm.toLowerCase();
-            result = result.filter(c =>
-                c.name.toLowerCase().includes(lowerTerm) ||
-                (c.phone && c.phone.includes(searchTerm)) ||
-                (c.email && c.email.toLowerCase().includes(lowerTerm))
-            );
-        }
-
-        setFilteredClients(result);
-        setCurrentPage(1);
-    }, [clients, searchTerm, statusFilter, typeFilter]);
-
-    // Derived Paginated List
-    const totalPages = Math.ceil(filteredClients.length / pageSize);
-    const paginatedClients = filteredClients.slice(
-        (currentPage - 1) * pageSize,
-        currentPage * pageSize
-    );
+    }, [currentPage, searchTerm, statusFilter, typeFilter]);
 
     const fetchClients = async () => {
+        setLoading(true);
         try {
-            const response = await api.get('/clients');
-            setClients(response.data);
-            setFilteredClients(response.data);
+            const response = await api.get('/clients', {
+                params: {
+                    page: currentPage,
+                    limit: pageSize,
+                    search: searchTerm,
+                    status: statusFilter,
+                    type: typeFilter
+                }
+            });
+
+            // Backend returns { data: [], total: X, totalPages: Y }
+            setClients(response.data.data || []);
+            setTotalClients(response.data.total || 0);
+            setTotalPages(response.data.totalPages || 0);
         } catch (error) {
             console.error('Error fetching clients:', error);
+            addToast('Müşteriler yüklenirken hata oluştu', 'error');
         } finally {
             setLoading(false);
         }
     };
+
+    // Reset page when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, statusFilter, typeFilter]);
 
     const handleCreateClient = async (formData) => {
         try {
@@ -171,7 +159,7 @@ const Clients = () => {
                                 <Users className="text-emerald-600" size={20} />
                                 Müşteri Listesi
                                 <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">
-                                    {filteredClients.length}
+                                    {totalClients}
                                 </span>
                             </h1>
                         </div>
@@ -240,7 +228,7 @@ const Clients = () => {
                             <Skeleton key={i} className="w-full h-16 rounded-lg" />
                         ))}
                     </div>
-                ) : filteredClients.length === 0 ? (
+                ) : clients.length === 0 ? (
                     <div className="text-center py-20 bg-white rounded-xl border border-dashed border-gray-300">
                         <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                         <h3 className="text-base font-medium text-gray-900">Müşteri Bulunamadı</h3>
@@ -260,7 +248,7 @@ const Clients = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
-                                    {paginatedClients.map(client => (
+                                    {clients.map(client => (
                                         <tr
                                             key={client.id}
                                             onClick={() => navigate(`/clients/${client.id}`)}

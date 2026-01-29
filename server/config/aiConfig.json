@@ -1,0 +1,50 @@
+{
+  "caching": {
+    "systemContextTTL": 60,
+    "companyConfigTTL": 300,
+    "knowledgeBaseTTL": 120,
+    "aiStatsTTL": 60
+  },
+  "scoring": {
+    "intentWeight": 30,
+    "propertyTypeWeight": 15,
+    "urgencyHighWeight": 25,
+    "urgencyMediumWeight": 15,
+    "detailWeight": 10,
+    "locationWeight": 10,
+    "positiveEngagementWeight": 5,
+    "negativeReduction": 50,
+    "shortMessagePenalty": 10,
+    "longMessageBonus": 10,
+    "conversationHistoryBonus": 15,
+    "minLeadScore": 30,
+    "mediumLeadThreshold": 50,
+    "highLeadThreshold": 70
+  },
+  "limits": {
+    "conversationHistory": 15,
+    "whatsappHistoryForAI": 10,
+    "propertiesPerSearch": 50,
+    "knowledgeItems": 5,
+    "learnedRules": 10,
+    "latestPropertiesForContext": 3,
+    "agendaItemsForContext": 5,
+    "syncChatLimit": 30,
+    "syncMessagesPerChat": 20,
+    "testResults": 50
+  },
+  "ai": {
+    "groqModel": "llama-3.3-70b-versatile",
+    "discoveryModel": "llama-3.1-8b-instant",
+    "temperature": 0.1,
+    "simulatedDelayMs": 300,
+    "propertyDescriptionDelayMs": 800
+  },
+  "features": {
+    "enableAutoLearning": true,
+    "enableWhatsAppAI": true,
+    "enableConsultantDetection": true,
+    "enableLeadExtraction": true,
+    "enableCaching": true
+  }
+}

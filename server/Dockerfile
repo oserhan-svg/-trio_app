@@ -26,11 +26,14 @@ RUN npm install
 # Copy source code
 COPY . .
 
+# Grant execute permissions to start.sh
+RUN chmod +x ./start.sh
+
 # Generate Prisma Client
 RUN npx prisma generate
 
 # Expose API port
 EXPOSE 5000
 
-# Start command
-CMD ["npm", "start"]
+# Start command: Run DB push in background and start Node server instantly
+CMD sh -c "npx prisma db push --accept-data-loss & npm start"

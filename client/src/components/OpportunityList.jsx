@@ -1,38 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { TrendingDown, ArrowRight, Home, MapPin } from 'lucide-react';
-import api from '../services/api';
+import useOpportunities from '../hooks/useOpportunities';
 
-const OpportunityList = () => {
-    const [opportunities, setOpportunities] = useState([]);
-    const [loading, setLoading] = useState(true);
+const OpportunityList = React.memo(() => {
+    const { opportunities: allOpportunities, loading, filterOpportunities } = useOpportunities({
+        minScore: 8,
+        limit: 100 // Get more data, filter locally
+    });
 
-    useEffect(() => {
-        const fetchOpportunities = async () => {
-            try {
-                // We reuse the main properties endpoint but filter client-side for now 
-                // or we could add a specific endpoint. 
-                // For MVP, filtering the existing "All" list is fast enough if < 1000 items.
-                const response = await api.get('/properties');
-                const allProps = response.data;
-
-                // Filter for "Kelepir" (Super Opportunity) and "Fırsat" (Good Deal)
-                // Sort by score (descending) or deviation/price ratio
-                const ops = allProps
-                    .filter(p => p.opportunity_score >= 8) // 8, 9, 10
-                    .sort((a, b) => b.opportunity_score - a.opportunity_score || b.deviation - a.deviation)
-                    .slice(0, 5);
-
-                setOpportunities(ops);
-            } catch (error) {
-                console.error('Failed to fetch opportunities:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchOpportunities();
-    }, []);
+    // Memoize filtered and sorted opportunities
+    const opportunities = useMemo(() => {
+        return filterOpportunities(allOpportunities).slice(0, 5);
+    }, [allOpportunities, filterOpportunities]);
 
     if (loading) return <div className="p-4 text-gray-500">Fırsatlar yükleniyor...</div>;
     if (opportunities.length === 0) return null; // Don't show if no deals
@@ -77,7 +57,10 @@ const OpportunityList = () => {
                                 <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
                                     {/* Source Badge */}
                                     {prop.url && prop.url.includes('sahibinden') && (
-                                        <span className="bg-yellow-100 text-yellow-800 text-[10px] px-1.5 py-0.5 rounded border border-yellow-200 font-bold">
+                                        <span
+                                            className="text-[10px] px-1.5 py-0.5 rounded shadow-sm font-bold"
+                                            style={{ backgroundColor: '#ffdb15', color: '#000' }}
+                                        >
                                             SAHİBİNDEN
                                         </span>
                                     )}
@@ -88,7 +71,10 @@ const OpportunityList = () => {
                                     )}
 
                                     {prop.seller_name && prop.seller_name !== 'Bilinmiyor' && (
-                                        <span className={`text-[10px] px-1.5 py-0.5 rounded border ${prop.seller_type === 'owner' ? 'bg-orange-50 text-orange-700 border-orange-100' : 'bg-gray-50 text-gray-600 border-gray-200'} font-bold`}>
+                                        <span
+                                            className={`text-[10px] px-1.5 py-0.5 rounded border ${prop.url.includes('sahibinden') ? 'border-yellow-400 font-black' : (prop.seller_type === 'owner' ? 'bg-orange-50 text-orange-700 border-orange-100' : 'bg-gray-50 text-gray-600 border-gray-200')} font-bold`}
+                                            style={prop.url.includes('sahibinden') ? { backgroundColor: '#ffdb15', color: '#000' } : {}}
+                                        >
                                             {prop.seller_name}
                                         </span>
                                     )}
@@ -112,6 +98,6 @@ const OpportunityList = () => {
             </div>
         </div>
     );
-};
+});
 
 export default OpportunityList;

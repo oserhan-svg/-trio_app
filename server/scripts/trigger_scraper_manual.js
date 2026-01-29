@@ -3,7 +3,7 @@ const { scrapeProperties } = require('../services/scraperService');
 (async () => {
     console.log("🚀 Manually triggering scraper...");
     try {
-        await scrapeProperties('sahibinden'); // Focus on the most difficult anti-bot target
+        await scrapeProperties('all'); // Run full scrape job (Sahibinden + Hepsiemlak + Others)
     } catch (e) {
         console.error("Scraper failed:", e);
     }

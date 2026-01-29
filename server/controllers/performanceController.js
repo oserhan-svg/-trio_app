@@ -13,7 +13,8 @@ exports.getConsultantPerformance = async (req, res) => {
                         agenda_items: true,
                         properties: true
                     }
-                }
+                },
+                name: true
             }
         });
 
@@ -66,6 +67,7 @@ exports.getConsultantPerformance = async (req, res) => {
             return {
                 id: c.id,
                 email: c.email,
+                name: c.name,
                 stats: {
                     total_clients: c._count.clients,
                     active_sale: saleCount,

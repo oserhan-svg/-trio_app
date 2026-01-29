@@ -157,3 +157,4633 @@ Stack: TimeoutError: Waiting for selector `.img-wrapper img, .he-gallery-image` 
     at async CdpPage.waitForSelector (C:\Users\ozanc\Downloads\emlak22\server\node_modules\puppeteer-core\lib\cjs\puppeteer\api\Page.js:1385:20)
     at async scrapeSingleListing (C:\Users\ozanc\Downloads\emlak22\server\services\scraperService.js:625:13)
     at async scrapePropertyDetails (C:\Users\ozanc\Downloads\emlak22\server\controllers\propertyController.js:504:25)
+
+[2026-01-25T11:39:08.584Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T11:41:19.849Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T11:41:21.183Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T11:43:16.528Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T11:48:13.537Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T11:48:13.542Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T11:51:07.538Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T11:51:07.545Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T11:52:00.242Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T11:52:00.561Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T11:54:23.609Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T11:54:23.616Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T11:54:36.812Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T11:54:36.822Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T11:54:47.497Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T11:54:48.742Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T11:55:29.075Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T11:55:29.163Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T11:59:19.529Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T12:01:21.507Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T12:01:21.809Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T13:55:19.711Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T13:55:19.714Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T13:56:03.278Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T13:56:03.285Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T13:58:28.025Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T13:58:28.040Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T13:58:33.678Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T13:58:33.685Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:00:06.771Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:00:06.777Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:00:24.471Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:00:24.476Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:00:30.534Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:00:30.541Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:05:24.339Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:05:24.355Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:07:24.500Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:07:24.505Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:07:41.451Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:07:41.463Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:07:58.514Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:07:58.519Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:12:08.398Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:12:08.403Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:12:13.977Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:12:15.354Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:12:46.911Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:12:46.926Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:13:16.238Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:13:54.499Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:13:54.505Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:53:06.199Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:53:06.316Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:53:06.321Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:53:06.328Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation in
+D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:48
+
+  47 const getPropertyById = async (req, res) => {
+  48     try {
+  49         const { id } = req.params;
+→ 50         const property = await prisma.property.findUnique({
+               where: {
+             +   id: Int
+               },
+               include: {
+                 history: {
+                   orderBy: {
+                     changed_at: "asc"
+                   }
+                 }
+               }
+             })
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:57:17.039Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:57:17.046Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:57:17.051Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:57:17.055Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:57:22.117Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:57:22.122Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:57:22.130Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:57:22.136Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:57:51.929Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:57:51.937Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:57:51.948Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T14:57:51.955Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T15:03:43.298Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T15:03:43.303Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T15:03:55.282Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:03:55.451Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:03:55.457Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:04:08.141Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:06:42.120Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:06:42.127Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:06:53.145Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:07:23.646Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:08:58.996Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:08:59.002Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:09:13.453Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:09:13.460Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:09:18.665Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:11:51.513Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:11:51.518Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:13:41.243Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:13:41.250Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:13:48.883Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:13:50.161Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:14:01.198Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:16:25.303Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:16:25.308Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:17:12.358Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:17:12.366Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:18:21.706Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:18:21.714Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:19:07.411Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:20:57.704Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:20:57.709Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:21:01.834Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:25:06.462Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)
+
+[2026-01-25T16:25:06.470Z] Error in getPropertyById: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+Stack: PrismaClientValidationError: 
+Invalid `prisma.property.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  include: {
+    history: {
+      orderBy: {
+        changed_at: "asc"
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+    at En (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at Mn.handleRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6981)
+    at Mn.handleAndLogRequestError (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6663)
+    at Mn.request (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:121:6370)
+    at async l (D:\GRAVITY\TRIO\emlak22\server\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async getPropertyById (D:\GRAVITY\TRIO\emlak22\server\controllers\propertyController.js:50:26)

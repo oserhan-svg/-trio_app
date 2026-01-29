@@ -7,6 +7,7 @@ const getUsers = async (req, res) => {
             select: {
                 id: true,
                 email: true,
+                name: true,
                 role: true,
                 created_at: true
             },
@@ -20,52 +21,60 @@ const getUsers = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
-    const { email, password, role } = req.body;
+    const { email, password, role, name } = req.body;
 
-    if (!email || !password || !role) {
-        return res.status(400).json({ error: 'Email, password and role are required' });
+    if (!email || !password || !role || !name) {
+        return res.status(400).json({ error: 'Ad Soyad, email, şifre ve rol zorunludur.' });
     }
 
     try {
         const existingUser = await prisma.user.findUnique({ where: { email } });
         if (existingUser) {
-            return res.status(400).json({ error: 'User already exists' });
+            return res.status(400).json({ error: 'Bu kullanıcı zaten mevcut.' });
         }
 
         const password_hash = await bcrypt.hash(password, 10);
         const user = await prisma.user.create({
             data: {
                 email,
+                name,
                 password_hash,
                 role
             },
-            select: { id: true, email: true, role: true }
+            select: { id: true, email: true, name: true, role: true }
         });
 
         res.status(201).json(user);
     } catch (error) {
         console.error('createUser error:', error);
-        res.status(500).json({ error: 'Failed to create user' });
+        res.status(500).json({ error: 'Kullanıcı oluşturulamadı.' });
     }
 };
 
 const updateUser = async (req, res) => {
     const { id } = req.params;
-    const { email, role, password } = req.body;
+    const { email, role, password, name } = req.body;
+
+    console.log(`[UPDATE USER] ID: ${id}, Body:`, req.body);
 
     try {
-        const updateData = { email, role };
+        const updateData = {};
 
-        if (password) {
+        if (email !== undefined) updateData.email = email;
+        if (role !== undefined) updateData.role = role;
+        if (name !== undefined) updateData.name = name;
+
+        if (password && password.trim() !== '') {
             updateData.password_hash = await bcrypt.hash(password, 10);
         }
 
         const user = await prisma.user.update({
             where: { id: parseInt(id) },
             data: updateData,
-            select: { id: true, email: true, role: true }
+            select: { id: true, email: true, name: true, role: true }
         });
 
+        console.log('[UPDATE SUCCESS] User:', user);
         res.json(user);
     } catch (error) {
         console.error('updateUser error:', error);

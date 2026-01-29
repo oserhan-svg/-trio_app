@@ -12,6 +12,7 @@ const AdminManagement = ({ isEmbedded = false }) => {
     const [editingUser, setEditingUser] = useState(null);
     const [formData, setFormData] = useState({
         email: '',
+        name: '',
         password: '',
         role: 'consultant'
     });
@@ -43,8 +44,8 @@ const AdminManagement = ({ isEmbedded = false }) => {
             }
             setShowModal(false);
             setEditingUser(null);
-            setFormData({ email: '', password: '', role: 'consultant' });
-            fetchUsers();
+            setFormData({ email: '', name: '', password: '', role: 'consultant' });
+            await fetchUsers(); // Wait for list refresh
         } catch (error) {
             toast.error(error.response?.data?.error || 'İşlem başarısız');
         }
@@ -65,6 +66,7 @@ const AdminManagement = ({ isEmbedded = false }) => {
         setEditingUser(user);
         setFormData({
             email: user.email,
+            name: user.name || '',
             password: '', // Don't show existing password
             role: user.role
         });
@@ -124,12 +126,13 @@ const AdminManagement = ({ isEmbedded = false }) => {
                         <thead className="bg-gray-50/50">
                             <tr>
                                 <th className="px-4 py-2.5 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Kullanıcı</th>
+                                <th className="px-4 py-2.5 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Ad Soyad</th>
                                 <th className="px-4 py-2.5 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Rol</th>
                                 <th className="px-4 py-2.5 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Kayıt</th>
                                 <th className="px-4 py-2.5 text-right text-[10px] font-bold text-gray-400 uppercase tracking-wider">İşlem</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-50">
+                        <tbody className="divide-y divide-gray-5">
                             {loading ? (
                                 <tr><td colSpan="4" className="px-4 py-8 text-center text-gray-400 text-sm italic">Yükleniyor...</td></tr>
                             ) : users.map(user => (
@@ -141,6 +144,9 @@ const AdminManagement = ({ isEmbedded = false }) => {
                                             </div>
                                             <div className="text-xs font-semibold text-gray-700">{user.email}</div>
                                         </div>
+                                    </td>
+                                    <td className="px-4 py-2 whitespace-nowrap">
+                                        <div className="text-xs font-medium text-gray-900">{user.name || '-'}</div>
                                     </td>
                                     <td className="px-4 py-2 whitespace-nowrap">
                                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold ${user.role === 'admin' ? 'bg-purple-50 text-purple-700' : 'bg-emerald-50 text-emerald-700'
@@ -189,17 +195,23 @@ const AdminManagement = ({ isEmbedded = false }) => {
                         </div>
                         <form onSubmit={handleSubmit} className="p-6 space-y-4">
                             <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Ad Soyad</label>
+                                <input
+                                    type="text"
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                />
+                            </div>
+                            <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">E-posta Adresi</label>
-                                <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                                    <input
-                                        type="email"
-                                        required
-                                        className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition"
-                                        value={formData.email}
-                                        onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                    />
-                                </div>
+                                <input
+                                    type="email"
+                                    required
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                    value={formData.email}
+                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -208,29 +220,38 @@ const AdminManagement = ({ isEmbedded = false }) => {
                                 <input
                                     type="password"
                                     required={!editingUser}
-                                    className="w-full px-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition"
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                     value={formData.password}
-                                    onChange={e => setFormData({ ...formData, password: e.target.value })}
+                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Yetki Rolü</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Kullanıcı Rolü</label>
                                 <select
-                                    className="w-full px-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition bg-white"
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                                     value={formData.role}
-                                    onChange={e => setFormData({ ...formData, role: e.target.value })}
+                                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                                 >
                                     <option value="consultant">Danışman</option>
                                     <option value="admin">Yönetici (Admin)</option>
                                 </select>
                             </div>
-                            <button
-                                type="submit"
-                                className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition flex items-center justify-center gap-2 mt-4 shadow-lg shadow-blue-200"
-                            >
-                                <Save size={20} />
-                                {editingUser ? 'Güncelle' : 'Kullanıcıyı Kaydet'}
-                            </button>
+
+                            <div className="pt-2 flex gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowModal(false)}
+                                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+                                >
+                                    İptal
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-md transition-colors"
+                                >
+                                    Kaydet
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>

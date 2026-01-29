@@ -26,13 +26,15 @@ const PropertyTable = ({ properties, onViewDetail }) => {
 
                             let source = 'Diğer';
                             let sourceClass = 'bg-gray-100 text-gray-800';
+                            let sourceStyle = {};
 
                             if (prop.url?.includes('hepsiemlak')) {
                                 source = 'Hepsiemlak';
                                 sourceClass = 'bg-red-100 text-red-800';
                             } else if (prop.url?.includes('sahibinden')) {
                                 source = 'Sahibinden';
-                                sourceClass = 'bg-yellow-100 text-yellow-800';
+                                sourceClass = 'font-bold shadow-sm';
+                                sourceStyle = { backgroundColor: '#ffdb15', color: '#000', borderColor: '#f59e0b' };
                             } else if (prop.url?.includes('emlakjet')) {
                                 source = 'Emlakjet';
                                 sourceClass = 'bg-blue-100 text-blue-800';
@@ -44,8 +46,13 @@ const PropertyTable = ({ properties, onViewDetail }) => {
                                         <div className="text-sm font-medium text-gray-900 truncate max-w-xs" title={prop.title}>
                                             <div className={`font-semibold ${isRemoved ? 'text-gray-400 line-through' : 'text-gray-900'}`}>{prop.title?.split('#')[0].trim()}</div>
                                             {prop.seller_name && (
-                                                <div className="text-xs text-gray-400 mt-1 flex items-center gap-1">
-                                                    <span className="truncate">{prop.seller_name}</span>
+                                                <div className="mt-1 flex items-center gap-1">
+                                                    <span
+                                                        className={`text-[10px] truncate px-1.5 py-0.5 rounded font-black ${prop.url?.includes('sahibinden') ? 'shadow-sm' : 'text-gray-400'}`}
+                                                        style={prop.url?.includes('sahibinden') ? { backgroundColor: '#ffdb15', color: '#000' } : {}}
+                                                    >
+                                                        {prop.seller_name}
+                                                    </span>
                                                 </div>
                                             )}
                                         </div>
@@ -75,7 +82,10 @@ const PropertyTable = ({ properties, onViewDetail }) => {
                                         )}
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className={`px-2 py-1 rounded text-xs font-semibold ${sourceClass}`}>
+                                        <span
+                                            className={`px-2 py-1 rounded text-xs font-semibold ${sourceClass}`}
+                                            style={source === 'Sahibinden' ? sourceStyle : {}}
+                                        >
                                             {source}
                                         </span>
                                     </td>

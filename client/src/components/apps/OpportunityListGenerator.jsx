@@ -1,40 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Check, Printer, ArrowLeft } from 'lucide-react';
+import { FileText, Check, Printer, ArrowLeft, ChevronLeft, ChevronRight, RefreshCw, AlertTriangle, ExternalLink, Trash2 } from 'lucide-react';
 import api from '../../services/api';
 import Button from '../ui/Button';
 import toast from 'react-hot-toast';
 
 const OpportunityListGenerator = ({ onBack }) => {
-    // eslint-disable-next-line no-unused-vars
     const navigate = useNavigate();
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedIds, setSelectedIds] = useState(new Set());
+
+    // Pagination & Filter State
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalResults, setTotalResults] = useState(0);
     const [filter, setFilter] = useState('opportunity'); // 'opportunity' or 'all'
+    const [selectedCategory, setSelectedCategory] = useState('all');
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
-    useEffect(() => {
-        fetchProperties();
-    }, []);
-
-    const fetchProperties = async () => {
+    const fetchProperties = useCallback(async () => {
+        setLoading(true);
         try {
-            // Fetch all listings for selection (Owner + Agency)
-            const response = await api.get('/properties', {
-                params: {
-                    limit: 3000,
-                    status: 'active'
-                }
-            });
+            const params = {
+                page,
+                limit: 50,
+                status: 'active',
+                radar_category: selectedCategory !== 'all' ? selectedCategory : undefined,
+            };
+
+            if (filter === 'opportunity') {
+                params.opportunity_filter = 'opportunity';
+            }
+
+            const response = await api.get('/properties', { params });
             const raw = response.data;
-            const allProps = Array.isArray(raw) ? raw : (raw.data || []);
+            const data = raw.data || [];
+            const meta = raw.meta || {};
 
-            // Sort by Opportunity Score Desc
-            allProps.sort((a, b) => (b.opportunity_score || 0) - (a.opportunity_score || 0));
-
-            setProperties(allProps);
-            // Start with empty selection so user is in full control
-            setSelectedIds(new Set());
+            setProperties(data);
+            setTotalPages(meta.totalPages || 1);
+            setTotalResults(meta.total || 0);
 
         } catch (error) {
             console.error('Failed to fetch properties:', error);
@@ -42,7 +48,16 @@ const OpportunityListGenerator = ({ onBack }) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [page, filter, selectedCategory]);
+
+    useEffect(() => {
+        fetchProperties();
+    }, [fetchProperties]);
+
+    // Reset page when filters change
+    useEffect(() => {
+        setPage(1);
+    }, [filter, selectedCategory]);
 
     const toggleSelection = (id) => {
         const newSet = new Set(selectedIds);
@@ -54,15 +69,21 @@ const OpportunityListGenerator = ({ onBack }) => {
         setSelectedIds(newSet);
     };
 
-    const handleSelectAll = () => {
-        if (selectedIds.size === filteredProperties.length && filteredProperties.every(p => selectedIds.has(p.id))) {
-            // If all filtered ones are already selected, clear selection
-            setSelectedIds(new Set());
+    const handleSelectCurrentPage = () => {
+        const newSet = new Set(selectedIds);
+        const allInPageSelected = properties.every(p => newSet.has(p.id));
+
+        if (allInPageSelected) {
+            properties.forEach(p => newSet.delete(p.id));
         } else {
-            // Otherwise select all currently filtered ones
-            const newSet = new Set(selectedIds);
-            filteredProperties.forEach(p => newSet.add(p.id));
-            setSelectedIds(newSet);
+            properties.forEach(p => newSet.add(p.id));
+        }
+        setSelectedIds(newSet);
+    };
+
+    const handleClearSelection = () => {
+        if (window.confirm('Tüm seçimi temizlemek istediğinize emin misiniz?')) {
+            setSelectedIds(new Set());
         }
     };
 
@@ -78,52 +99,56 @@ const OpportunityListGenerator = ({ onBack }) => {
         window.open(`/reports/opportunities?ids=${idsString}`, '_blank');
     };
 
-    const handleClearSelection = () => {
-        setSelectedIds(new Set());
+    const handleScrapeDetails = async (id, e) => {
+        e.stopPropagation();
+        try {
+            toast.loading('Veriler güncelleniyor...', { id: 'scrape-loading' });
+            await api.post(`/properties/${id}/scrape-details`);
+            toast.success('İlan verileri güncellendi.', { id: 'scrape-loading' });
+            fetchProperties();
+        } catch (error) {
+            console.error('Scrape error:', error);
+            toast.error('Veri güncellenirken hata oluştu.', { id: 'scrape-loading' });
+        }
     };
 
-    // Filter Logic
-    const [selectedCategory, setSelectedCategory] = useState('all');
+    const handleBatchScrape = async () => {
+        const missingDataIds = properties
+            .filter(p => selectedIds.has(p.id))
+            .filter(p => !p.images || p.images.length === 0 || !p.description || p.description.length < 50)
+            .map(p => p.id);
 
-    // Filter Logic
-    const filteredProperties = properties.filter(p => {
-        // 1. Opportunity Score Filter
-        const meetsOpportunity = filter === 'opportunity' ? (Number(p.opportunity_score) || 0) >= 7 : true;
-        if (!meetsOpportunity) return false;
-
-        // 2. Category Filter
-        if (selectedCategory === 'all') return true;
-
-        const cat = (p.category || '').toLowerCase();
-        const title = (p.title || '').toLowerCase();
-
-        if (selectedCategory === 'residence') {
-            return cat === 'residential' || cat === 'daire' || title.includes('daire') || title.includes('rezidans');
-        }
-        if (selectedCategory === 'villa') {
-            return cat === 'villa' || cat === 'mustakil' || title.includes('villa') || title.includes('müstakil') || title.includes('yazlık');
-        }
-        if (selectedCategory === 'land') {
-            return cat === 'land' || cat === 'tarla' || cat === 'zeytinlik' || cat === 'arsa' ||
-                title.includes('arsa') || title.includes('tarla') || title.includes('zeytinlik') || title.includes('arazi') || title.includes('bahçe');
-        }
-        if (selectedCategory === 'commercial') {
-            return cat === 'commercial' || cat === 'tourism' || cat === 'isyeri' ||
-                title.includes('dükkan') || title.includes('mağaza') || title.includes('otel') || title.includes('pansiyon') || title.includes('ofis');
+        if (missingDataIds.length === 0) {
+            return toast.error('Seçili ilanlar arasında verisi eksik olan bulunamadı.');
         }
 
-        return true;
-    });
+        if (!window.confirm(`${missingDataIds.length} ilanın verileri güncellenecek. Devam edilsin mi?`)) return;
 
-    // Missing Data Logic Removed
+        setIsRefreshing(true);
+        let completed = 0;
+        const toastId = toast.loading(`${completed}/${missingDataIds.length} tamamlandı...`);
 
-    if (loading) return <div className="p-8 text-center text-gray-500">Yükleniyor...</div>;
+        for (const id of missingDataIds) {
+            try {
+                await api.post(`/properties/${id}/scrape-details`);
+                completed++;
+                toast.loading(`${completed}/${missingDataIds.length} tamamlandı...`, { id: toastId });
+            } catch (err) {
+                console.error(`Failed to scrape ${id}`, err);
+            }
+        }
+
+        toast.success(`${completed} ilan güncellendi.`, { id: toastId });
+        setIsRefreshing(false);
+        fetchProperties();
+    };
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="p-6 border-b border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col h-full max-h-[85vh]">
+            {/* Header */}
+            <div className="p-6 border-b border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4 bg-white z-10">
                 <div>
-                    <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <h2 className="text-xl font-black text-gray-900 flex items-center gap-2">
                         {onBack && (
                             <button
                                 onClick={onBack}
@@ -135,139 +160,270 @@ const OpportunityListGenerator = ({ onBack }) => {
                         <FileText className="text-purple-600" />
                         Fırsat Bülteni Oluşturucu
                     </h2>
-                    <p className="text-sm text-gray-500">Danışmanlara göndermek için fırsat listesi hazırlayın.</p>
+                    <p className="text-sm text-gray-500 font-medium">Danışmanlara göndermek için profesyonel fırsat listesi hazırlayın.</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <div className="text-sm text-gray-600 font-medium">
-                        {selectedIds.size} ilan seçildi
+                <div className="flex items-center gap-4">
+                    <div className="flex flex-col items-end">
+                        <span className="text-sm font-black text-purple-600">{selectedIds.size} ilan seçildi</span>
+                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Maksimum 20 önerilir</span>
                     </div>
 
-                    <Button onClick={handleCreateList} className="flex items-center gap-2">
+                    <Button
+                        onClick={handleCreateList}
+                        className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-2.5 rounded-xl shadow-lg shadow-purple-200 transition-all font-bold"
+                        disabled={selectedIds.size === 0}
+                    >
                         <Printer size={18} />
                         Bülteni Oluştur
                     </Button>
                 </div>
             </div>
 
-            <div className="p-4 bg-gray-50 flex gap-4 overflow-x-auto border-b border-gray-200 justify-between items-center">
-                <div className="flex gap-2 items-center">
-                    <button
-                        onClick={() => setFilter('opportunity')}
-                        className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${filter === 'opportunity'
-                            ? 'bg-purple-100 text-purple-700 border border-purple-200'
-                            : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-                            }`}
-                    >
-                        Fırsatlar (Puan 7+)
-                    </button>
-                    <button
-                        onClick={() => setFilter('all')}
-                        className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${filter === 'all'
-                            ? 'bg-purple-100 text-purple-700 border border-purple-200'
-                            : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-                            }`}
-                    >
-                        Tüm İlanlar
-                    </button>
+            {/* Filters Bar */}
+            <div className="p-4 bg-slate-50/80 backdrop-blur-sm flex flex-wrap gap-4 border-b border-gray-100 items-center justify-between sticky top-0 z-10">
+                <div className="flex flex-wrap gap-3 items-center">
+                    <div className="flex bg-white p-1 rounded-2xl border border-gray-200 shadow-sm">
+                        <button
+                            onClick={() => setFilter('opportunity')}
+                            className={`px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${filter === 'opportunity'
+                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+                                : 'text-slate-400 hover:text-slate-600'
+                                }`}
+                        >
+                            Fırsatlar
+                        </button>
+                        <button
+                            onClick={() => setFilter('all')}
+                            className={`px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${filter === 'all'
+                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+                                : 'text-slate-400 hover:text-slate-600'
+                                }`}
+                        >
+                            Tümü
+                        </button>
+                    </div>
 
-                    <div className="h-6 w-px bg-gray-300 mx-2"></div>
+                    <div className="h-4 w-px bg-gray-300 mx-1 hidden sm:block"></div>
 
                     <select
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
+                        className="px-4 py-2.5 rounded-xl border border-gray-200 text-xs font-black focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm cursor-pointer hover:border-blue-300 transition-colors"
                     >
-                        <option value="all">Tüm Tipler</option>
-                        <option value="residence">Konut / Daire</option>
-                        <option value="villa">Villa / Müstakil</option>
-                        <option value="land">Arsa / Tarla / Zeytinlik</option>
-                        <option value="commercial">Ticari / Turistik</option>
+                        <option value="all">TÜM TİPLER</option>
+                        <option value="residence">🏠 KONUT / DAİRE</option>
+                        <option value="villa">🏡 VİLLA / MÜSTAKİL</option>
+                        <option value="land">🌳 ARSA / TARLA</option>
+                        <option value="commercial">🏢 TİCARİ / TURİSTİK</option>
                     </select>
+
+                    <span className="text-xs text-gray-400 font-bold ml-2">
+                        {totalResults} ilan bulundu
+                    </span>
                 </div>
 
                 <div className="flex gap-2">
-                    <button
-                        onClick={handleSelectAll}
-                        className="text-sm font-bold text-gray-700 hover:text-purple-600 transition-colors flex items-center gap-2 px-3 py-1.5 rounded hover:bg-gray-200"
-                    >
-                        <Check size={16} />
-                        {selectedIds.size >= filteredProperties.length && filteredProperties.length > 0 ? 'Tümünü Kaldır' : 'Tümünü Seç'}
-                    </button>
                     {selectedIds.size > 0 && (
-                        <button
-                            onClick={handleClearSelection}
-                            className="text-sm font-bold text-red-600 hover:text-red-700 transition-colors flex items-center gap-2 px-3 py-1.5 rounded hover:bg-red-50"
-                        >
-                            Seçimi Sıfırla
-                        </button>
+                        <>
+                            <button
+                                onClick={handleBatchScrape}
+                                disabled={isRefreshing}
+                                className="text-xs font-black text-orange-600 hover:text-orange-700 transition-all flex items-center gap-2 px-4 py-2 rounded-xl border border-orange-100 bg-orange-50/50 hover:bg-orange-50"
+                            >
+                                <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
+                                EKSİK VERİLERİ ÇEK
+                            </button>
+                            <button
+                                onClick={handleClearSelection}
+                                className="text-xs font-black text-red-500 hover:text-red-600 transition-all flex items-center gap-2 px-4 py-2 rounded-xl border border-red-50 hover:bg-red-50"
+                            >
+                                <Trash2 size={14} />
+                                SEÇİMİ SIFIRLA
+                            </button>
+                        </>
                     )}
+                    <button
+                        onClick={handleSelectCurrentPage}
+                        className="text-xs font-black text-gray-700 hover:text-purple-600 transition-all flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 shadow-sm"
+                    >
+                        <Check size={14} />
+                        SAYFAYI SEÇ/BIRAK
+                    </button>
                 </div>
             </div>
 
-            <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                    <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
+            {/* Table Area */}
+            <div className="overflow-auto flex-grow relative">
+                {loading && (
+                    <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] z-20 flex items-center justify-center">
+                        <div className="flex flex-col items-center gap-3">
+                            <div className="w-10 h-10 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+                            <span className="text-xs font-black text-purple-600 uppercase tracking-widest">Yükleniyor...</span>
+                        </div>
+                    </div>
+                )}
+
+                <table className="w-full text-left text-sm border-separate border-spacing-0">
+                    <thead className="bg-white sticky top-0 z-10">
                         <tr>
-                            <th className="px-4 py-3 w-10">Seç</th>
-                            <th className="px-4 py-3">İlan Başlığı</th>
-                            <th className="px-4 py-3">Bölge</th>
-                            <th className="px-4 py-3">Fiyat</th>
-                            <th className="px-4 py-3 text-center">Puan</th>
-                            <th className="px-4 py-3 text-right">M² / Oda</th>
+                            <th className="px-6 py-4 w-12 border-b border-gray-100"></th>
+                            <th className="px-4 py-4 border-b border-gray-100 font-black text-[10px] text-gray-400 uppercase tracking-wider">İlan Başlığı</th>
+                            <th className="px-4 py-4 border-b border-gray-100 font-black text-[10px] text-gray-400 uppercase tracking-wider">Bölge</th>
+                            <th className="px-4 py-4 border-b border-gray-100 font-black text-[10px] text-gray-400 uppercase tracking-wider">Fiyat</th>
+                            <th className="px-4 py-4 border-b border-gray-100 font-black text-[10px] text-gray-400 uppercase tracking-wider text-center">Puan</th>
+                            <th className="px-4 py-4 border-b border-gray-100 font-black text-[10px] text-gray-400 uppercase tracking-wider text-right">Detaylar</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        {filteredProperties.length > 0 ? (
-                            filteredProperties.map(p => (
-                                <tr
-                                    key={p.id}
-                                    className={`hover:bg-purple-50 transition-colors cursor-pointer ${selectedIds.has(p.id) ? 'bg-purple-50/50' : ''}`}
-                                    onClick={() => toggleSelection(p.id)}
-                                >
-                                    <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedIds.has(p.id)}
-                                            onChange={() => toggleSelection(p.id)}
-                                            className="w-4 h-4 rounded text-purple-600 focus:ring-purple-500 cursor-pointer"
-                                        />
-                                    </td>
-                                    <td className="px-4 py-3 font-medium text-gray-900 max-w-xs truncate" title={p.title}>
-                                        <div className="flex flex-col">
-                                            <span>{p.title}</span>
-                                            {(!p.images || p.images.length === 0) && (
-                                                <span className="text-[10px] text-orange-600 font-bold bg-orange-100 px-1.5 py-0.5 rounded w-fit mt-1">Resimsiz</span>
-                                            )}
-                                        </div>
-                                        <div className="text-xs text-gray-400 font-normal mt-0.5">{p.seller_name || 'Sahibinden'}</div>
-                                    </td>
-                                    <td className="px-4 py-3 text-gray-600">
-                                        {p.neighborhood}, {p.district}
-                                    </td>
-                                    <td className="px-4 py-3 font-bold text-emerald-600 whitespace-nowrap">
-                                        {parseFloat(p.price).toLocaleString()} ₺
-                                    </td>
-                                    <td className="px-4 py-3 text-center">
-                                        <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full font-bold text-xs ${p.opportunity_score >= 8 ? 'bg-emerald-100 text-emerald-700' :
-                                            p.opportunity_score >= 5 ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-600'
-                                            }`}>
-                                            {p.opportunity_score || 0}
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-3 text-right text-gray-500">
-                                        {p.rooms} • {p.size_m2}m²
-                                    </td>
-                                </tr>
-                            ))
+                    <tbody className="divide-y divide-gray-50">
+                        {properties.length > 0 ? (
+                            properties.map(p => {
+                                const isMissing = !p.images || p.images.length === 0 || !p.description || p.description.length < 50;
+                                return (
+                                    <tr
+                                        key={p.id}
+                                        className={`hover:bg-slate-50 transition-colors cursor-pointer group ${selectedIds.has(p.id) ? 'bg-purple-50/40' : ''}`}
+                                        onClick={() => toggleSelection(p.id)}
+                                    >
+                                        <td className="px-6 py-4" onClick={e => e.stopPropagation()}>
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedIds.has(p.id)}
+                                                onChange={() => toggleSelection(p.id)}
+                                                className="w-5 h-5 rounded-lg text-purple-600 border-gray-300 focus:ring-purple-500 cursor-pointer transition-all"
+                                            />
+                                        </td>
+                                        <td className="px-4 py-4 max-w-md">
+                                            <div className="flex flex-col gap-1">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-bold text-gray-900 group-hover:text-purple-700 transition-colors truncate">{p.title}</span>
+                                                    {isMissing && (
+                                                        <span className="inline-flex items-center gap-1 text-[9px] font-black bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full uppercase">
+                                                            <AlertTriangle size={10} /> Eksik Veri
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <span
+                                                        className="text-[10px] text-black font-black px-1.5 py-0.5 rounded uppercase"
+                                                        style={{ backgroundColor: '#ffdb15' }}
+                                                    >
+                                                        {p.seller_name || 'Sahibinden'}
+                                                    </span>
+                                                    <span className="text-[10px] text-gray-400 font-bold uppercase">#{p.external_id}</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-4">
+                                            <div className="flex flex-col text-xs">
+                                                <span className="font-bold text-gray-700">{p.district}</span>
+                                                <span className="text-gray-500">{p.neighborhood}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-4">
+                                            <div className="flex flex-col">
+                                                <span className="font-black text-emerald-600 text-base">
+                                                    {parseFloat(p.price).toLocaleString()} ₺
+                                                </span>
+                                                {p.deviation < 0 && (
+                                                    <span className="text-[10px] font-bold text-emerald-500">
+                                                        Piyasa altı: %{Math.abs(p.deviation)}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-4 text-center">
+                                            <span className={`inline-flex items-center justify-center w-9 h-9 rounded-2xl font-black text-xs shadow-sm transition-all group-hover:scale-110 ${p.opportunity_score >= 80 ? 'bg-emerald-100 text-emerald-700' :
+                                                p.opportunity_score >= 60 ? 'bg-yellow-100 text-yellow-700' :
+                                                    'bg-slate-100 text-slate-500'
+                                                }`}>
+                                                {p.opportunity_score || 0}
+                                            </span>
+                                        </td>
+                                        <td className="px-4 py-4 text-right" onClick={e => e.stopPropagation()}>
+                                            <div className="flex items-center justify-end gap-2">
+                                                {isMissing && (
+                                                    <button
+                                                        onClick={(e) => handleScrapeDetails(p.id, e)}
+                                                        className="p-2 text-orange-400 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-all"
+                                                        title="Verileri Güncelle"
+                                                    >
+                                                        <RefreshCw size={16} />
+                                                    </button>
+                                                )}
+                                                <a
+                                                    href={p.url}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                                                >
+                                                    <ExternalLink size={16} />
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            })
                         ) : (
                             <tr>
-                                <td colSpan="6" className="p-10 text-center text-gray-500">
-                                    Bu filtreye uygun ilan bulunamadı.
+                                <td colSpan="6" className="py-20 text-center">
+                                    <div className="flex flex-col items-center gap-2 opacity-40">
+                                        <FileText size={48} className="text-gray-300" />
+                                        <p className="text-sm font-bold text-gray-500">Bu filtreye uygun ilan bulunamadı.</p>
+                                    </div>
                                 </td>
                             </tr>
                         )}
                     </tbody>
                 </table>
+            </div>
+
+            {/* Pagination Footer */}
+            <div className="p-4 border-t border-gray-100 bg-white flex items-center justify-between">
+                <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                    Sayfa {page} / {totalPages}
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => setPage(p => Math.max(1, p - 1))}
+                        disabled={page === 1}
+                        className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-30 disabled:hover:bg-transparent transition-all"
+                    >
+                        <ChevronLeft size={20} className="text-gray-600" />
+                    </button>
+
+                    <div className="flex items-center gap-1">
+                        {[...Array(Math.min(5, totalPages))].map((_, i) => {
+                            let pageNum = page;
+                            if (page <= 3) pageNum = i + 1;
+                            else if (page >= totalPages - 2) pageNum = totalPages - 4 + i;
+                            else pageNum = page - 2 + i;
+
+                            if (pageNum <= 0 || pageNum > totalPages) return null;
+
+                            return (
+                                <button
+                                    key={pageNum}
+                                    onClick={() => setPage(pageNum)}
+                                    className={`w-10 h-10 rounded-xl text-xs font-black transition-all ${page === pageNum
+                                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-200 scale-110'
+                                        : 'hover:bg-gray-50 text-gray-500'
+                                        }`}
+                                >
+                                    {pageNum}
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    <button
+                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                        disabled={page === totalPages}
+                        className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-30 disabled:hover:bg-transparent transition-all"
+                    >
+                        <ChevronRight size={20} className="text-gray-600" />
+                    </button>
+                </div>
             </div>
         </div>
     );

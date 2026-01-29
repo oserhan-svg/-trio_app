@@ -1,0 +1,106 @@
+[
+    {
+        "id": 1,
+        "priority": 1,
+        "action": {
+            "type": "modifyHeaders",
+            "responseHeaders": [
+                {
+                    "header": "x-frame-options",
+                    "operation": "remove"
+                },
+                {
+                    "header": "content-security-policy",
+                    "operation": "remove"
+                },
+                {
+                    "header": "cross-origin-opener-policy",
+                    "operation": "remove"
+                },
+                {
+                    "header": "cross-origin-embedder-policy",
+                    "operation": "remove"
+                },
+                {
+                    "header": "cross-origin-resource-policy",
+                    "operation": "remove"
+                },
+                {
+                    "header": "referrer-policy",
+                    "operation": "remove"
+                },
+                {
+                    "header": "feature-policy",
+                    "operation": "remove"
+                },
+                {
+                    "header": "permissions-policy",
+                    "operation": "remove"
+                }
+            ],
+            "requestHeaders": [
+                {
+                    "header": "referer",
+                    "operation": "set",
+                    "value": "https://web.whatsapp.com/"
+                },
+                {
+                    "header": "origin",
+                    "operation": "set",
+                    "value": "https://web.whatsapp.com/"
+                },
+                {
+                    "header": "sec-fetch-dest",
+                    "operation": "set",
+                    "value": "document"
+                },
+                {
+                    "header": "sec-fetch-mode",
+                    "operation": "set",
+                    "value": "navigate"
+                },
+                {
+                    "header": "sec-fetch-site",
+                    "operation": "set",
+                    "value": "none"
+                }
+            ]
+        },
+        "condition": {
+            "urlFilter": "||web.whatsapp.com",
+            "resourceTypes": [
+                "main_frame",
+                "sub_frame"
+            ]
+        }
+    },
+    {
+        "id": 2,
+        "priority": 1,
+        "action": {
+            "type": "modifyHeaders",
+            "requestHeaders": [
+                {
+                    "header": "referer",
+                    "operation": "set",
+                    "value": "https://web.whatsapp.com/"
+                },
+                {
+                    "header": "origin",
+                    "operation": "set",
+                    "value": "https://web.whatsapp.com/"
+                }
+            ]
+        },
+        "condition": {
+            "urlFilter": "||web.whatsapp.com",
+            "resourceTypes": [
+                "xmlhttprequest",
+                "websocket",
+                "image",
+                "script",
+                "stylesheet"
+            ]
+        }
+    }
+]

@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+    darkMode: 'class',
     content: [
         "./index.html",
         "./src/**/*.{js,ts,jsx,tsx}",
@@ -12,6 +13,9 @@ export default {
                     dark: '#1A1A1A',     // Headings, Text
                     gray: '#F5F5F5',     // Backgrounds
                     border: '#E5E5E5',   // Borders
+                },
+                yellow: {
+                    400: '#ffdb15',      // Sahibinden Yellow - Override default Tailwind yellow
                 }
             },
             fontFamily: {

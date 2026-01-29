@@ -108,6 +108,24 @@ async function launchRealBrowser(options = {}) {
     // Render specific config
     const isRender = process.env.RENDER || process.env.NODE_ENV === 'production';
 
+    // Try connecting to an existing debug session (Clean Mode)
+    try {
+        console.log('🔌 Checking for active Clean Chrome Mode (Port 9222)...');
+        const puppeteer = require('puppeteer-extra');
+        const browser = await puppeteer.connect({
+            browserURL: 'http://127.0.0.1:9222',
+            defaultViewport: null
+        });
+
+        // Wrap for real-browser compatibility if needed, though most methods are same
+        console.log('✅ Connected to existing Chrome instance on port 9222.');
+        const pages = await browser.pages();
+        const page = pages[0] || await browser.newPage();
+        return { browser, page };
+    } catch (e) {
+        console.log('ℹ️ No active Clean Chrome Mode found. Launching fresh Real Browser.');
+    }
+
     try {
         const { browser, page } = await connect({
             headless: isRender ? 'new' : false,

@@ -1,12 +1,27 @@
+require('dotenv').config();
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'npasaran@gmail.com', // Replace with real email or env var
-        pass: 'your-app-password' // Replace with real app password or env var
+        user: process.env.SMTP_USER || 'npasaran@gmail.com',
+        pass: process.env.SMTP_PASS || 'your-app-password'
     }
 });
+
+// Verify connection configuration on startup
+if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+    console.log('📬 Initializing SMTP for:', process.env.SMTP_USER);
+    transporter.verify((error, success) => {
+        if (error) {
+            console.warn('⚠️ SMTP Connection Warning:', error.message);
+        } else {
+            console.log('✅ SMTP Server is ready to take our messages');
+        }
+    });
+} else {
+    console.warn('⚠️ SMTP Credentials missing in .env. Notifications will fail.');
+}
 
 const sendNewListingNotification = async (property) => {
     try {

@@ -5,6 +5,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -19,8 +20,16 @@ model User {
   pending_contacts PendingContact[]
   agenda_items  AgendaItem[]
   properties    Property[] @relation("UserProperties")
+  sessions      AIChatSession[]
+  ai_usages     AIUsage[]
+  google_refresh_token String?
+  google_access_token  String?
+  google_token_expiry   DateTime?
   created_at    DateTime @default(now())
-
+  deals         Deal[]
+  audit_logs    AuditLog[]
+  
+  @@index([phone])
   @@map("users")
 }
 
@@ -28,7 +37,7 @@ model Property {
   id             Int               @id @default(autoincrement())
   external_id    String?           @unique
   title          String
-  price          Decimal           @db.Decimal(12, 2)
+  price          Decimal           @db.Decimal(15, 2)
   size_m2        Decimal?          @db.Decimal(10, 2)
   rooms          String?
   district       String?
@@ -53,15 +62,21 @@ model Property {
   group_id       String?           // Group ID for deduplication
   is_primary     Boolean           @default(true) // Main listing of a group
   status         String            @default("active") // 'active', 'removed', 'sold'
+  deleted_at     DateTime?         // Soft delete
   history        PropertyHistory[]
   client_properties ClientProperty[]
   listings       PropertyListing[]
   agenda_items   AgendaItem[]
+  deals          Deal[]
   
   // Authorization / Yetki Belgesi
   auth_doc_url    String?          // URL to the authorization document
   auth_start_date DateTime?        // Start date of authorization
   auth_end_date   DateTime?        // End date of authorization
+  embedding       Json?            // Vector embedding (mock or float array) for semantic search
+  metadata        Json?            // Marketing packages, AI tags, etc.
+  engagements     PropertyEngagement[]
+  status_history  PropertyStatus[]
 
   @@index([external_id])
   @@index([group_id])
@@ -73,6 +88,8 @@ model Property {
   @@index([rooms])
   @@index([district])
   @@index([neighborhood])
+  @@index([district, rooms, price])
+  @@index([status, created_at])
   @@map("properties")
 }
 
@@ -80,7 +97,7 @@ model PropertyHistory {
   id          Int      @id @default(autoincrement())
   property_id Int
   property    Property @relation(fields: [property_id], references: [id], onDelete: Cascade)
-  price       Decimal  @db.Decimal(12, 2)
+  price       Decimal  @db.Decimal(15, 2)
   change_type String?  // 'initial', 'price_increase', 'price_decrease'
   changed_at  DateTime @default(now())
 
@@ -92,6 +109,7 @@ model Client {
   name        String
   phone       String?
   email       String?
+  profile_pic_url String?  // WhatsApp profile picture URL
   notes       String?
   consultant_id Int?     // Linked Consultant
   consultant    User?    @relation(fields: [consultant_id], references: [id])
@@ -102,7 +120,21 @@ model Client {
   interactions Interaction[]
   saved_properties ClientProperty[]
   agenda_items  AgendaItem[]
+  whatsapp_messages WhatsAppMessage[]
+  deals         Deal[]
+  ai_delegated  Boolean  @default(false)
+  ai_summary    Json?
+  last_ai_interaction DateTime?
+  priority_score      Int?     @default(0)
+  last_intent_tag     String?
+  last_sentiment      String?
+  sentiment_history   Json?
+  next_best_action    String?
+  ai_usages           AIUsage[]
+  is_stale            Boolean  @default(false)
+  deleted_at          DateTime? // Soft delete
 
+  @@index([status, priority_score])
   @@map("clients")
 }
 
@@ -125,11 +157,14 @@ model Demand {
   id            Int      @id @default(autoincrement())
   client_id     Int
   client        Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
-  min_price     Decimal? @db.Decimal(12, 2)
-  max_price     Decimal? @db.Decimal(12, 2)
+  min_price     Decimal? @db.Decimal(15, 2)
+  max_price     Decimal? @db.Decimal(15, 2)
   rooms         String?
   district      String?
   neighborhood  String?
+  listing_type  String?  @default("sale") // 'sale' or 'rent'
+  notes         String?  // Detailed information about the demand
+  embedding     Json?    // Vector embedding for semantic matching
   created_at    DateTime @default(now())
 
   @@map("demands")
@@ -171,6 +206,7 @@ model PropertyListing {
   view_count   Int      @default(0)
   custom_title       String? // Store the AI/Marketing title here
   custom_description String? // Store the AI/Marketing description here
+  marketing_content  Json?   // AI-Generated Social Media Content { instagram: "", stories: [], hashtags: [] }
 
   @@map("property_listings")
 }
@@ -199,6 +235,7 @@ model AgendaItem {
   client      Client?  @relation(fields: [client_id], references: [id], onDelete: SetNull)
   property_id Int?
   property    Property? @relation(fields: [property_id], references: [id], onDelete: SetNull)
+  google_event_id String?   @unique
   created_at  DateTime @default(now())
 
   @@map("agenda_items")
@@ -215,4 +252,257 @@ model ScraperProgress {
 
   @@unique([provider, category, type])
   @@map("scraper_progress")
+}
+
+model WhatsAppMessage {
+  id            Int      @id @default(autoincrement())
+  whatsapp_id   String   @unique
+  from          String
+  to            String
+  content       String?
+  sender_name   String?  // Store WhatsApp pushname
+  media_url     String?  // Path to stored media file
+  media_type    String?  // 'image', 'video', 'audio', 'document'
+  mime_type     String?  // e.g., 'image/jpeg'
+  metadata      Json?    // Store properties, tool calls etc.
+  timestamp     DateTime
+  is_viewed     Boolean  @default(false)
+  
+  client_id     Int?
+  client        Client?  @relation(fields: [client_id], references: [id])
+  
+  recommendations AIRecommendation[]
+
+  @@index([from])
+  @@index([to])
+  @@index([client_id])
+  @@index([timestamp])
+  @@map("whatsapp_messages")
+}
+
+model AIRecommendation {
+  id                Int      @id @default(autoincrement())
+  message_id        Int
+  message           WhatsAppMessage @relation(fields: [message_id], references: [id])
+  recommendation    String
+  suggested_action  String? // 'call', 'meeting', 'reminder', 'create_lead'
+  score             Int      @default(0)
+  metadata          Json?   // Store extracted data like name, phone, budget, etc.
+  is_applied        Boolean  @default(false)
+  feedback          Json?    // Store { is_helpful: boolean, comment: string }
+  created_at        DateTime @default(now())
+
+  @@index([message_id])
+  @@index([is_applied])
+  @@map("ai_recommendations")
+}
+
+model AIChatSession {
+  id          Int             @id @default(autoincrement())
+  user_id     Int
+  user        User            @relation(fields: [user_id], references: [id])
+  title       String?
+  created_at  DateTime        @default(now())
+  updated_at  DateTime        @updatedAt
+  messages    AIChatMessage[]
+
+  @@map("ai_chat_sessions")
+}
+
+model AIChatMessage {
+  id          Int           @id @default(autoincrement())
+  session_id  Int
+  session     AIChatSession @relation(fields: [session_id], references: [id], onDelete: Cascade)
+  role        String        // 'user', 'assistant', 'system'
+  content     String
+  metadata    Json?         // Store tools calls, property lists, etc.
+  created_at  DateTime      @default(now())
+
+  @@map("ai_chat_messages")
+}
+
+model AIKnowledge {
+  id         Int      @id @default(autoincrement())
+  category   String   @default("regional") // 'regional', 'general', 'instruction'
+  title      String
+  content    String
+  status     String   @default("active") // 'active', 'proposed', 'rejected'
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("ai_knowledge")
+}
+
+model AITestCase {
+  id              Int      @id @default(autoincrement())
+  input_message   String
+  expected_intent String?
+  expected_keywords String[]
+  category        String   @default("property_search") // 'property_search', 'calendar', 'qa'
+  is_golden       Boolean  @default(true) // Golden cases are human-verified
+  created_at      DateTime @default(now())
+  results         AITestResult[]
+
+  @@map("ai_test_cases")
+}
+
+model AITestResult {
+  id              Int      @id @default(autoincrement())
+  test_case_id    Int
+  test_case       AITestCase @relation(fields: [test_case_id], references: [id], onDelete: Cascade)
+  actual_response String
+  is_success      Boolean
+  score           Int?     // Quality score 0-100
+  error_message   String?
+  run_id          String   // Grouping results by run
+  created_at      DateTime @default(now())
+
+  @@map("ai_test_results")
+}
+
+model AIBotLog {
+  id          Int      @id @default(autoincrement())
+  action      String   // 'audit', 'test', 'learn', 're-order'
+  status      String   // 'running', 'success', 'failed'
+  message     String?
+  metadata    Json?
+  created_at  DateTime @default(now())
+
+  @@map("ai_bot_logs")
+}
+
+model Deal {
+  id              Int      @id @default(autoincrement())
+  property_id     Int?
+  property        Property? @relation(fields: [property_id], references: [id], onDelete: SetNull)
+  client_id       Int?
+  client          Client?  @relation(fields: [client_id], references: [id], onDelete: SetNull)
+  consultant_id   Int
+  consultant      User     @relation(fields: [consultant_id], references: [id])
+  
+  sale_price      Decimal  @db.Decimal(15, 2)
+  commission_rate Decimal  @db.Decimal(5, 2)
+  commission_amount Decimal @db.Decimal(15, 2)
+  consultant_share Decimal @db.Decimal(15, 2)
+  
+  status          String   @default("closed")
+  deal_date       DateTime @default(now())
+  notes           String?
+  
+  created_at      DateTime @default(now())
+
+  @@map("deals")
+}
+
+model AIImpactMetric {
+  id                Int      @id @default(autoincrement())
+  feature_name      String   // e.g., 'semantic_match', 'negotiation_assist', 'proactive_pitch'
+  user_id           Int?
+  client_id         Int?
+  property_id       Int?
+  deal_id           Int?
+  
+  action_type       String   // 'recommendation', 'automation', 'generation'
+  was_accepted      Boolean  @default(false)
+  conversion_value  Decimal? @db.Decimal(15, 2)  // If led to deal
+  time_saved_mins   Int?     // Estimated consultant time saved
+  
+  metadata          Json?    // Feature-specific data
+  created_at        DateTime @default(now())
+
+  @@index([feature_name])
+  @@index([user_id])
+  @@index([created_at])
+  @@map("ai_impact_metrics")
+}
+
+model PropertyEngagement {
+  id                Int      @id @default(autoincrement())
+  property_id       Int
+  property          Property @relation(fields: [property_id], references: [id], onDelete: Cascade)
+  
+  engagement_type   String   // 'view', 'share', 'whatsapp_share', 'print', 'save'
+  user_id           Int?     // Consultant who performed action
+  client_id         Int?     // Client who performed action (if tracked)
+  
+  metadata          Json?    // Additional context (e.g., which platform shared to)
+  created_at        DateTime @default(now())
+
+  @@index([property_id])
+  @@index([engagement_type])
+  @@index([created_at])
+  @@map("property_engagements")
+}
+
+model PropertyStatus {
+  id                Int      @id @default(autoincrement())
+  property_id       Int
+  property          Property @relation(fields: [property_id], references: [id], onDelete: Cascade)
+  
+  status            String   // 'new', 'contacted', 'showing_scheduled', 'offer_made', 'negotiating', 'sold', 'lost'
+  notes             String?
+  changed_by        Int?     // User who changed status
+  
+  created_at        DateTime @default(now())
+
+  @@index([property_id])
+  @@index([status])
+  @@map("property_statuses")
+}
+
+model BackgroundJob {
+  id            Int      @id @default(autoincrement())
+  job_type      String   // 'scraper_sync', 'ai_matching', 'roi_recalc'
+  status        String   @default("pending") // 'pending', 'processing', 'completed', 'failed'
+  payload       Json?
+  result        Json?
+  error         String?
+  attempts      Int      @default(0)
+  max_attempts  Int      @default(3)
+  next_run_at   DateTime @default(now())
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  @@index([status, next_run_at])
+  @@map("background_jobs")
+}
+
+model AuditLog {
+  id            Int      @id @default(autoincrement())
+  user_id       Int?
+  user          User?    @relation(fields: [user_id], references: [id])
+  action        String   // 'CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'EXPORT'
+  entity_type   String   // 'Property', 'Client', 'User', 'System'
+  entity_id     Int?
+  details       Json?    // Stores what changed (old vs new)
+  ip_address    String?
+  user_agent    String?
+  created_at    DateTime @default(now())
+
+  @@index([entity_type, entity_id])
+  @@index([user_id])
+  @@index([created_at])
+  @@map("audit_logs")
+}
+
+model AIUsage {
+  id            Int      @id @default(autoincrement())
+  user_id       Int?
+  user          User?    @relation(fields: [user_id], references: [id])
+  client_id     Int?
+  client        Client?  @relation(fields: [client_id], references: [id])
+  
+  provider      String   // 'openai', 'groq', 'gemini'
+  model         String   // 'gpt-4', 'llama3-70b', 'gemini-pro'
+  tokens_input  Int      @default(0)
+  tokens_output Int      @default(0)
+  total_tokens  Int      @default(0)
+  
+  context       String?  // 'transcription', 'chat', 'draft_generation', 'analysis'
+  created_at    DateTime @default(now())
+
+  @@index([user_id])
+  @@index([provider])
+  @@index([created_at])
+  @@map("ai_usage")
 }

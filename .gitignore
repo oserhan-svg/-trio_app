@@ -22,14 +22,19 @@ server/scripts/*.json
 
 # Puppeteer & Browser Profiles
 .cache/
-chrome-stealth-profile/
-chrome-stealth-profile-v2/
-server/chrome-stealth-profile/
-server/chrome-stealth-profile-v2/
+.wwebjs_auth/
+.wwebjs_cache/
+chrome-stealth-profile*/
+server/chrome-stealth-profile*/
 manual_cookies.json
 server/browser_data/
 browser_data/
 .local-chromium/
+chrome-debug-profile/
+error_screenshot.png
+*.pdf
+sync_debug.log
+server/run_debug_output.txt
 
 # Database
 server/prisma/dev.db
@@ -39,5 +44,6 @@ server/emlak22.db-journal
 
 # OS specific
 .DS_Store
-Thumbs.db
-Desktop.ini
+
+# User uploads
+server/uploads/

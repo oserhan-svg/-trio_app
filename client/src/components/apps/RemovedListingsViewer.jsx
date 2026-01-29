@@ -40,9 +40,14 @@ const RemovedListingsViewer = ({ onBack }) => {
         return 'Diğer';
     };
 
+    const getPortalStyle = (portal) => {
+        if (portal === 'Sahibinden') return { backgroundColor: '#ffdb15', color: '#000' };
+        return {};
+    };
+
     const getPortalBadgeColor = (portal) => {
         switch (portal) {
-            case 'Sahibinden': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+            case 'Sahibinden': return 'border-yellow-400 font-bold shadow-sm';
             case 'Hepsiemlak': return 'bg-red-100 text-red-800 border-red-200';
             case 'Emlakjet': return 'bg-purple-100 text-purple-800 border-purple-200';
             default: return 'bg-gray-100 text-gray-800 border-gray-200';
@@ -56,10 +61,15 @@ const RemovedListingsViewer = ({ onBack }) => {
         return id.replace(/block\d+$/i, '').replace(/-block.*$/i, '');
     };
 
-    const filteredProperties = properties.filter(p =>
-        p.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.neighborhood?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Memoize filtered properties to prevent recalculation on every render
+    const filteredProperties = React.useMemo(() => {
+        if (!searchTerm) return properties;
+        const lowerSearch = searchTerm.toLowerCase();
+        return properties.filter(p =>
+            p.title?.toLowerCase().includes(lowerSearch) ||
+            p.neighborhood?.toLowerCase().includes(lowerSearch)
+        );
+    }, [properties, searchTerm]);
 
     if (loading) return (
         <div className="flex justify-center items-center h-64 text-gray-500">
@@ -122,7 +132,10 @@ const RemovedListingsViewer = ({ onBack }) => {
                                     <tr key={p.id} className="hover:bg-gray-50 transition-colors group">
                                         <td className="px-4 py-2 whitespace-nowrap">
                                             <div className="flex flex-col gap-1">
-                                                <span className={`px-2 py-0.5 rounded text-[10px] font-medium border ${getPortalBadgeColor(portal)} w-fit`}>
+                                                <span
+                                                    className={`px-2 py-0.5 rounded text-[10px] font-medium border ${getPortalBadgeColor(portal)} w-fit`}
+                                                    style={getPortalStyle(portal)}
+                                                >
                                                     {portal}
                                                 </span>
                                                 <span className="text-[10px] text-gray-500 font-mono">

@@ -1,0 +1,23 @@
+{
+  "ignore": [
+    "*.log",
+    "uploads/*",
+    ".wwebjs_auth/*",
+    ".wwebjs_auth_debug/*",
+    ".wwebjs_cache/*",
+    "chrome-stealth-profile/*",
+    "browser_data/*",
+    "temp_properties.json",
+    "crash_log.txt",
+    "dump_output.txt"
+  ],
+  "watch": [
+    "index.js",
+    "routes/",
+    "controllers/",
+    "services/",
+    "middleware/",
+    "db.js"
+  ],
+  "ext": "js,json,prisma"
+}

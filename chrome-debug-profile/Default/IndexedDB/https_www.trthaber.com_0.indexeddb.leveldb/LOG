@@ -1,3 +1,7 @@
-2026/01/19-19:41:04.129 3ee8 Reusing MANIFEST C:\Users\ozanc\Downloads\emlak22\chrome-debug-profile\Default\IndexedDB\https_www.trthaber.com_0.indexeddb.leveldb/MANIFEST-000001
-2026/01/19-19:41:04.130 3ee8 Recovering log #3
-2026/01/19-19:41:04.130 3ee8 Reusing old log C:\Users\ozanc\Downloads\emlak22\chrome-debug-profile\Default\IndexedDB\https_www.trthaber.com_0.indexeddb.leveldb/000003.log 
+2026/01/22-18:48:11.601 3ff0 Reusing MANIFEST C:\Users\ozanc\Downloads\emlak22\chrome-debug-profile\Default\IndexedDB\https_www.trthaber.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/01/22-18:48:11.601 3ff0 Recovering log #3
+2026/01/22-18:48:11.602 3ff0 Reusing old log C:\Users\ozanc\Downloads\emlak22\chrome-debug-profile\Default\IndexedDB\https_www.trthaber.com_0.indexeddb.leveldb/000003.log 
+2026/01/22-19:01:23.094 3ff0 Level-0 table #5: started
+2026/01/22-19:01:23.095 3ff0 Level-0 table #5: 2045 bytes OK
+2026/01/22-19:01:23.096 3ff0 Delete type=0 #3
+2026/01/22-19:01:23.097 3ff0 Manual compaction at level-0 from (begin) .. (end); will stop at (end)

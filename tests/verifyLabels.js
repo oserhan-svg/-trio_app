@@ -9,13 +9,13 @@ const mockStatsMap = {
 const testCases = [
     {
         name: 'Context Check: Neighborhood',
-        property: { neighborhood: 'Sarımsaklı', district: 'Ayvalık', price: 4000000, size_m2: 100 },
+        property: { neighborhood: 'Sarımsaklı', district: 'Ayvalık', price: 4000000, size_m2: 100, seller_type: 'owner' },
         expectedBasis: 'Neighborhood',
         expectedPrice: 40000
     },
     {
         name: 'Context Check: District Fallback',
-        property: { neighborhood: 'Unknown', district: 'Ayvalık', price: 3500000, size_m2: 100 },
+        property: { neighborhood: 'Unknown', district: 'Ayvalık', price: 3500000, size_m2: 100, seller_type: 'owner' },
         expectedBasis: 'District',
         expectedPrice: 35000
     },
@@ -25,7 +25,8 @@ const testCases = [
             neighborhood: 'Sarımsaklı',
             district: 'Ayvalık',
             price: 3600000, // 36k/m2. Ratio = 0.9. Normally 'Uygun' (<=0.95) but not 'Fırsat' (<=0.85).
-            size_m2: 100
+            size_m2: 100,
+            seller_type: 'owner'
         },
         history: [
             { change_type: 'price_decrease', changed_at: new Date().toISOString() } // Recent drop

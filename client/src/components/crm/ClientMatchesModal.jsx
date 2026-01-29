@@ -36,13 +36,18 @@ const ClientMatchesModal = ({ isOpen, onClose, client, onUpdate }) => {
         if (type === 'other') return null;
 
         const styles = {
-            sahibinden: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+            sahibinden: 'text-black border-yellow-400 font-black shadow-sm',
+            sahibindenStyle: { backgroundColor: '#ffdb15' },
             hepsiemlak: 'bg-red-100 text-red-800 border-red-200'
         };
         const labels = { sahibinden: 'S', hepsiemlak: 'H' };
 
         return (
-            <span className={`text-[9px] w-4 h-4 flex items-center justify-center rounded-full border font-bold ${styles[type]}`} title={type === 'sahibinden' ? 'Sahibinden' : 'Hepsiemlak'}>
+            <span
+                className={`text-[9px] w-4 h-4 flex items-center justify-center rounded-full border font-bold ${styles[type]}`}
+                title={type === 'sahibinden' ? 'Sahibinden' : 'Hepsiemlak'}
+                style={type === 'sahibinden' ? styles.sahibindenStyle : {}}
+            >
                 {labels[type]}
             </span>
         );
@@ -96,7 +101,10 @@ const ClientMatchesModal = ({ isOpen, onClose, client, onUpdate }) => {
                                         )}
                                         {/* Verification / Opportunity Badge Overly */}
                                         {(prop.opportunity_score >= 8) && (
-                                            <div className="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-[8px] font-bold px-1 rounded-bl shadow-sm">
+                                            <div
+                                                className="absolute top-0 right-0 text-yellow-900 text-[8px] font-bold px-1 rounded-bl shadow-sm"
+                                                style={{ backgroundColor: '#ffdb15' }}
+                                            >
                                                 ★
                                             </div>
                                         )}
@@ -129,8 +137,19 @@ const ClientMatchesModal = ({ isOpen, onClose, client, onUpdate }) => {
                                             <span>{prop.size_m2} m²</span>
                                         </div>
 
+                                        {/* Match Reasons Badges */}
+                                        {prop.match_reasons && prop.match_reasons.length > 0 && (
+                                            <div className="flex flex-wrap gap-1 mt-2 mb-1">
+                                                {prop.match_reasons.map((reason, idx) => (
+                                                    <span key={idx} className="text-[9px] px-1.5 py-0.5 rounded border bg-blue-50 border-blue-100 text-blue-600">
+                                                        {reason}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
+
                                         {/* Action Bar (Hidden by default, shown on hover/focus) */}
-                                        <div className="flex items-center gap-2 mt-2 pt-1 border-t border-gray-50 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="flex items-center gap-2 mt-1 pt-1 border-t border-gray-50 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity">
                                             {/* Add Button */}
                                             {client?.saved_properties?.some(saved => saved.property_id === prop.id) ? (
                                                 <button disabled className="text-[10px] bg-gray-100 text-gray-400 px-2 py-1 rounded flex items-center gap-1 cursor-default">

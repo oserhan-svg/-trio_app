@@ -1,11 +1,15 @@
-2026/01/19-18:35:56.552 924 Creating DB C:\Users\ozanc\Downloads\emlak22\chrome-debug-profile\Default\Sync Data\LevelDB since it was missing.
-2026/01/19-18:35:56.603 924 Reusing MANIFEST C:\Users\ozanc\Downloads\emlak22\chrome-debug-profile\Default\Sync Data\LevelDB/MANIFEST-000001
-2026/01/19-18:40:53.282 924 Level-0 table #5: started
-2026/01/19-18:40:53.290 924 Level-0 table #5: 236474 bytes OK
-2026/01/19-18:40:53.292 924 Delete type=0 #3
-2026/01/19-19:36:45.739 924 Level-0 table #7: started
-2026/01/19-19:36:45.745 924 Level-0 table #7: 107847 bytes OK
-2026/01/19-19:36:45.746 924 Delete type=0 #4
-2026/01/19-19:42:07.790 924 Level-0 table #9: started
-2026/01/19-19:42:07.801 924 Level-0 table #9: 103464 bytes OK
-2026/01/19-19:42:07.802 924 Delete type=0 #6
+2026/01/22-18:44:21.856 3ff0 Reusing MANIFEST C:\Users\ozanc\Downloads\emlak22\chrome-debug-profile\Default\Sync Data\LevelDB/MANIFEST-000001
+2026/01/22-18:44:21.858 3ff0 Recovering log #14
+2026/01/22-18:44:21.862 3ff0 Reusing old log C:\Users\ozanc\Downloads\emlak22\chrome-debug-profile\Default\Sync Data\LevelDB/000014.log 
+2026/01/22-18:51:58.993 5f58 Level-0 table #18: started
+2026/01/22-18:51:59.000 5f58 Level-0 table #18: 108727 bytes OK
+2026/01/22-18:51:59.001 5f58 Delete type=0 #14
+2026/01/22-18:51:59.002 5f58 Compacting 4@0 + 1@1 files
+2026/01/22-18:51:59.016 5f58 Generated table #19@0: 268 keys, 90134 bytes
+2026/01/22-18:51:59.016 5f58 Compacted 4@0 + 1@1 files => 90134 bytes
+2026/01/22-18:51:59.016 5f58 compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/01/22-18:51:59.017 5f58 Delete type=2 #7
+2026/01/22-18:51:59.017 5f58 Delete type=2 #9
+2026/01/22-18:51:59.018 5f58 Delete type=2 #12
+2026/01/22-18:51:59.018 5f58 Delete type=2 #15
+2026/01/22-18:51:59.018 5f58 Delete type=2 #18

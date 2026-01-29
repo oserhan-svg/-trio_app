@@ -1,6 +1,7 @@
 const prisma = require('../db');
 const { v4: uuidv4 } = require('uuid');
 const { generatePropertyDescription } = require('../services/aiService');
+const marketingService = require('../services/marketingService');
 
 // Generate a shareable link for a property
 const generateListing = async (req, res) => {
@@ -43,10 +44,10 @@ const generateListing = async (req, res) => {
     }
 };
 
-// Generate AI Description
 const generateDescription = async (req, res) => {
     try {
         const { propertyId } = req.params;
+        const { use_llm } = req.query;
 
         const property = await prisma.property.findUnique({
             where: { id: parseInt(propertyId) }
@@ -56,13 +57,44 @@ const generateDescription = async (req, res) => {
             return res.status(404).json({ error: 'Property not found' });
         }
 
-        const aiResult = await generatePropertyDescription(property);
-        // aiResult is { title, description }
+        if (use_llm === 'true') {
+            const pkg = await marketingService.generateMarketingPackage(property.id);
+            return res.json({
+                success: true,
+                data: {
+                    title: property.title,
+                    description: pkg.premium_description,
+                    package: pkg
+                }
+            });
+        }
 
+        const aiResult = await generatePropertyDescription(property);
         res.json({ success: true, data: aiResult });
     } catch (error) {
         console.error('AI Gen Error:', error);
         res.status(500).json({ error: error.message || 'AI description generation failed' });
+    }
+};
+
+const getMarketingPackage = async (req, res) => {
+    try {
+        const { propertyId } = req.params;
+        const property = await prisma.property.findUnique({
+            where: { id: parseInt(propertyId) }
+        });
+
+        if (!property) return res.status(404).json({ error: 'Property not found' });
+
+        let pkg = property.metadata?.marketing_package;
+        if (!pkg) {
+            pkg = await marketingService.generateMarketingPackage(property.id);
+        }
+
+        res.json({ success: true, data: pkg });
+    } catch (error) {
+        console.error('Marketing Pkg Error:', error);
+        res.status(500).json({ error: 'Failed to get marketing package' });
     }
 };
 
@@ -149,10 +181,61 @@ const deleteListing = async (req, res) => {
     }
 };
 
+const getAppraisalPitch = async (req, res) => {
+    try {
+        const { propertyId } = req.params;
+
+        // Use a mock response or internal call to get twins data (keeping it simple for now)
+        // Alternatively, we can refactor propertyController to export the logic
+        // But for this task, we can re-query or use a helper
+        const property = await prisma.property.findUnique({ where: { id: parseInt(propertyId) } });
+        if (!property) return res.status(404).json({ error: 'Property not found' });
+
+        // Minimal twin logic to get market baseline for the pitch
+        const size = Number(property.size_m2);
+        const twins = await prisma.property.findMany({
+            where: {
+                id: { not: parseInt(propertyId) },
+                status: 'active',
+                neighborhood: property.neighborhood,
+                district: property.district,
+                category: property.category,
+                rooms: property.rooms,
+                size_m2: { gte: size * 0.7, lte: size * 1.3 }
+            },
+            select: { price: true, size_m2: true }
+        });
+
+        const targetPricePerM2 = size > 0 ? Number(property.price) / size : 0;
+        let avgPricePerM2 = 0;
+        if (twins.length > 0) {
+            const sumPricePerM2 = twins.reduce((acc, t) => acc + (Number(t.price) / Number(t.size_m2)), 0);
+            avgPricePerM2 = sumPricePerM2 / twins.length;
+        }
+
+        const twinsData = {
+            market: {
+                avg_price_per_m2: avgPricePerM2,
+                deviation: avgPricePerM2 > 0 ? ((targetPricePerM2 - avgPricePerM2) / avgPricePerM2) * 100 : 0,
+                sample_size: twins.length
+            },
+            target: { price: Number(property.price), price_per_m2: targetPricePerM2 }
+        };
+
+        const pitch = await marketingService.generateAppraisalPitch(property.id, twinsData);
+        res.json({ success: true, data: pitch });
+    } catch (error) {
+        console.error('Appraisal Pitch Controller Error:', error);
+        res.status(500).json({ error: 'Failed to generate appraisal pitch' });
+    }
+};
+
 module.exports = {
     generateListing,
     getListingByToken,
     getListingsByProperty,
     deleteListing,
-    generateDescription
+    generateDescription,
+    getMarketingPackage,
+    getAppraisalPitch
 };

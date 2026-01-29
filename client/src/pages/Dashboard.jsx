@@ -1,16 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Map, List, LogOut, Search, Users, UserPlus, RefreshCw, FileText } from 'lucide-react';
+import { Map, List, LogOut, Search, Users, FileText, Settings, Activity } from 'lucide-react';
 import api from '../services/api';
 import PriceInput from '../components/ui/PriceInput';
 import MapView from '../components/MapView';
 import PropertyTable from '../components/PropertyTable';
-import DashboardStatsHeader from '../components/DashboardStatsHeader';
-import HeatmapView from '../components/HeatmapView';
+// import DashboardStatsHeader from '../components/DashboardStatsHeader';
+// import HeatmapView from '../components/HeatmapView';
 
 import toast from 'react-hot-toast';
 import MobileNav from '../components/MobileNav';
+// import MarketHealthWidget from '../components/dashboard/MarketHealthWidget';
+import AILocationHeatmap from '../components/dashboard/AILocationHeatmap';
+import ErrorBoundary from '../components/ErrorBoundary';
+import FilterBar from '../components/dashboard/FilterBar';
 import MarketHealthWidget from '../components/dashboard/MarketHealthWidget';
+import MarketSupplyDemandChart from '../components/dashboard/MarketSupplyDemandChart';
+import RentalRateWidget from '../components/dashboard/RentalRateWidget';
+import AIOpportunitiesFeed from '../components/dashboard/AIOpportunitiesFeed';
 
 const Dashboard = () => {
     const navigate = useNavigate();
@@ -19,101 +26,125 @@ const Dashboard = () => {
     const [viewMode, setViewMode] = useState('list');
     const [loading, setLoading] = useState(true);
     const [errorMsg, setErrorMsg] = useState(null);
+    const [filterMetadata, setFilterMetadata] = useState({ categories: [], rooms: [], districts: [] });
+    const [hasMore, setHasMore] = useState(true);
+    const [isFetchingNextPage, setIsFetchingNextPage] = useState(false);
 
     // Filters
     const [filters, setFilters] = useState({
+        search: '',
         minPrice: '',
         maxPrice: '',
+        minSize: '',
+        maxSize: '',
         rooms: '',
         district: '',
+        neighborhood: '',
         source: '',
         seller_type: 'all',
         opportunity_filter: '',
         category: 'all',
         listingType: 'all',
-        sort: 'newest'
+        sort: 'newest',
+        building_age: '',
+        heating_type: '',
+        floor_location: ''
     });
 
     const [meta, setMeta] = useState({ page: 1, totalPages: 1 });
 
 
-    const fetchAllData = React.useCallback(async (currentFilters, page = 1, append = false) => {
-        setLoading(true);
+    const fetchAllData = React.useCallback(async (currentFilters, pageParam = 1, append = false) => {
+        if (append) setIsFetchingNextPage(true);
+        else setLoading(true);
+
         try {
             const params = new URLSearchParams();
-            params.append('page', page);
-            params.append('limit', 50);
+            params.append('page', pageParam);
+            params.append('limit', 15);
 
+            if (currentFilters.search) params.append('search', currentFilters.search);
             if (currentFilters.minPrice) params.append('minPrice', currentFilters.minPrice);
             if (currentFilters.maxPrice) params.append('maxPrice', currentFilters.maxPrice);
-            if (currentFilters.rooms && currentFilters.rooms !== 'Tümü') params.append('rooms', currentFilters.rooms);
+            if (currentFilters.minSize) params.append('minSize', currentFilters.minSize);
+            if (currentFilters.maxSize) params.append('maxSize', currentFilters.maxSize);
+            if (currentFilters.rooms && currentFilters.rooms !== 'Tümü' && currentFilters.rooms !== '') {
+                params.append('rooms', Array.isArray(currentFilters.rooms) ? currentFilters.rooms.join(',') : currentFilters.rooms);
+            }
             if (currentFilters.district) params.append('district', currentFilters.district);
+            if (currentFilters.neighborhood) params.append('neighborhood', currentFilters.neighborhood);
             if (currentFilters.source) params.append('source', currentFilters.source);
             if (currentFilters.seller_type && currentFilters.seller_type !== 'all') params.append('seller_type', currentFilters.seller_type);
             if (currentFilters.opportunity_filter) params.append('opportunity_filter', currentFilters.opportunity_filter);
             if (currentFilters.category && currentFilters.category !== 'all') params.append('category', currentFilters.category);
             if (currentFilters.listingType && currentFilters.listingType !== 'all') params.append('listingType', currentFilters.listingType);
             if (currentFilters.sort) params.append('sort', currentFilters.sort);
+            if (currentFilters.building_age) params.append('building_age', currentFilters.building_age);
+            if (currentFilters.heating_type) params.append('heating_type', currentFilters.heating_type);
+            if (currentFilters.floor_location) params.append('floor_location', currentFilters.floor_location);
 
-            // Parallel fetch for properties and stats
-            // Only fetch stats on initial load (page 1) to save bandwidth
             const requests = [api.get(`/properties?${params.toString()}`)];
-            if (page === 1) requests.push(api.get('/analytics'));
+            if (!append && pageParam === 1) requests.push(api.get('/analytics'));
 
             const results = await Promise.allSettled(requests);
 
-            // 1. Handle Property Response
             const propResult = results[0];
             if (propResult.status === 'fulfilled') {
                 const propRes = propResult.value;
-                if (propRes.data && propRes.data.data && Array.isArray(propRes.data.data)) {
-                    if (append) {
-                        setProperties(prev => [...prev, ...propRes.data.data]);
-                    } else {
-                        setProperties(propRes.data.data);
-                    }
-                    if (propRes.data.meta) setMeta(propRes.data.meta);
-                } else if (Array.isArray(propRes.data)) {
-                    setProperties(propRes.data); // Legacy fallback
+                const newProps = propRes.data.data || propRes.data || [];
+
+                if (append) {
+                    setProperties(prev => [...prev, ...newProps]);
                 } else {
-                    setProperties([]);
+                    setProperties(newProps);
+                }
+
+                if (propRes.data.meta) {
+                    setMeta(propRes.data.meta);
+                    setHasMore(propRes.data.meta.page < propRes.data.meta.totalPages);
+                } else {
+                    setHasMore(newProps.length === 15);
                 }
             } else {
-                console.error('Properties fetch failed:', propResult.reason);
-                throw propResult.reason; // Rethrow property error as it's critical
+                throw propResult.reason;
             }
 
-            // 2. Handle Analytics Response (Optional)
-            if (page === 1 && results[1]) {
+            if (!append && pageParam === 1 && results[1]) {
                 const analyticsResult = results[1];
                 if (analyticsResult.status === 'fulfilled') {
-                    setStats(analyticsResult.value.data);
-                } else {
-                    console.error('Analytics fetch failed (Non-critical):', analyticsResult.reason);
-                    // Do not throw, just log. UI allows missing stats.
-                    toast.error('İstatistikler yüklenemedi, ancak ilanlar listeleniyor.');
+                    setStats(analyticsResult.value.data.marketStats || []);
                 }
             }
 
         } catch (error) {
             console.error('Error fetching data:', error);
-            setErrorMsg(error.message + (error.response ? ` (${error.response.status})` : ''));
-            if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-                localStorage.removeItem('token');
-                navigate('/login');
-            }
+            setErrorMsg(error.message);
         } finally {
             setLoading(false);
+            setIsFetchingNextPage(false);
         }
-    }, [navigate]); // Added dependencies (filters is passed as arg, so not needed in dependency unless used from closure)
+    }, [navigate]);
+
+    useEffect(() => {
+        const fetchMetadata = async () => {
+            try {
+                const res = await api.get('/properties/metadata');
+                setFilterMetadata(res.data);
+            } catch (err) {
+                console.error('Failed to fetch filter metadata:', err);
+            }
+        };
+        fetchMetadata();
+    }, []);
 
     useEffect(() => {
         fetchAllData(filters);
     }, [fetchAllData, filters]);
 
     const handleLoadMore = () => {
-        if (meta.page < meta.totalPages) {
-            fetchAllData(filters, meta.page + 1, true);
+        if (!isFetchingNextPage && hasMore) {
+            const nextPage = meta.page + 1;
+            fetchAllData(filters, nextPage, true);
         }
     };
 
@@ -122,12 +153,30 @@ const Dashboard = () => {
         setFilters(prev => ({ ...prev, [name]: value }));
     };
 
-    const handlePriceFilterChange = (name, val) => {
-        setFilters(prev => ({ ...prev, [name]: val }));
+    const handleClearFilters = () => {
+        setFilters({
+            search: '',
+            minPrice: '',
+            maxPrice: '',
+            minSize: '',
+            maxSize: '',
+            rooms: '',
+            district: '',
+            neighborhood: '',
+            source: '',
+            seller_type: 'all',
+            opportunity_filter: '',
+            category: 'all',
+            listingType: 'all',
+            sort: 'newest',
+            building_age: '',
+            heating_type: '',
+            floor_location: ''
+        });
     };
 
     const handleSearch = (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
         fetchAllData(filters);
     };
 
@@ -137,18 +186,6 @@ const Dashboard = () => {
         toast.success('Başarıyla çıkış yapıldı.');
     };
 
-    const handleScrape = async () => {
-        if (!confirm('Veri güncelleme işlemini başlatmak istiyor musunuz? Bu işlem birkaç dakika sürebilir.')) return;
-
-        toast.promise(
-            api.post('/properties/scrape'),
-            {
-                loading: 'Veri toplama arka planda başlatıldı...',
-                success: 'Scraper tetiklendi! Birkaç dakika içinde veriler güncellenecek.',
-                error: 'Güncelleme başlatılamadı.'
-            }
-        );
-    };
 
     const [user] = useState(() => {
         try {
@@ -161,267 +198,159 @@ const Dashboard = () => {
     });
 
     return (
-        <div className="min-h-screen bg-gray-100 pb-20 md:pb-0"> {/* Added padding bottom for mobile if needed */}
-            {/* Desktop Navbar */}
-            <nav className="hidden md:flex bg-white shadow-sm px-6 py-4 justify-between items-center sticky top-0 z-50">
-                <div
-                    className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
-                    onClick={() => window.location.reload()}
-                >
-                    <span className="text-2xl font-bold text-blue-600">TrioApp</span>
-                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">v2.1</span>
-                </div>
-                <div className="flex items-center gap-4">
-                    <button onClick={handleScrape} className="flex items-center gap-1 text-gray-600 hover:text-green-600 font-medium">
-                        <RefreshCw size={18} />
-                        <span className="hidden md:inline">Verileri Güncelle</span>
-                    </button>
-                    <button onClick={() => navigate('/consultant-panel')} className="flex items-center gap-1 text-gray-600 hover:text-blue-600 font-medium">
-                        <Users size={18} />
-                        <span className="hidden md:inline">{user?.role === 'admin' ? 'Admin Paneli' : 'Danışman Paneli'}</span>
-                    </button>
-                    {user?.role === 'admin' && (
-                        <button onClick={() => navigate('/admin/management')} className="flex items-center gap-1 text-gray-600 hover:text-purple-600 font-medium border-l pl-4">
-                            <UserPlus size={18} />
-                            <span className="hidden md:inline">Kullanıcı Yönetimi</span>
-                        </button>
-                    )}
-                    <div className="text-sm text-gray-500 hidden md:flex flex-col items-end leading-none">
-                        <span className="font-bold text-blue-600">{meta.total || properties.length} ilan</span>
-                        {stats.totalProperties && <span className="text-[10px] opacity-70">veri tabanında {stats.totalProperties} kayıt</span>}
-                    </div>
-                    <button onClick={() => navigate('/report')} className="flex items-center gap-1 text-gray-500 hover:text-purple-600 transition" title="Proje Raporu">
-                        <FileText size={20} />
-                    </button>
-                    <button onClick={handleLogout} className="text-gray-500 hover:text-red-600 transition">
-                        <LogOut size={20} />
-                    </button>
-                </div>
-            </nav>
-
-            {/* Mobile Navbar */}
-            <div className="md:hidden bg-white shadow-sm px-4 py-3 sticky top-0 z-50 flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                    <MobileNav user={user} handleScrape={handleScrape} handleLogout={handleLogout} propertiesCount={properties.length} />
-                    <span
-                        className="text-xl font-bold text-blue-600 ml-2 cursor-pointer"
-                        onClick={() => window.location.reload()}
-                    >
-                        TrioApp
-                    </span>
-                </div>
-                <div className="text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded flex flex-col items-center leading-tight">
-                    <span className="font-bold">{meta.total || properties.length} İlan</span>
-                    {stats.totalProperties && <span className="opacity-70 text-[8px]">{stats.totalProperties} veri</span>}
-                </div>
-            </div>
-
-            {/* Main Content */}
-            <main className="p-3 md:p-6 max-w-7xl mx-auto space-y-4 md:space-y-6">
-
-                {/* Market Health Indicators */}
-                <MarketHealthWidget data={properties} totalCount={meta.total} />
-
-                {/* Stats Header now includes Rental Widget */}
-                <DashboardStatsHeader properties={properties} stats={stats} totalCount={meta.total} />
-
-                {/* Filters */}
-                <form onSubmit={handleSearch} className="bg-white p-4 rounded-lg shadow-sm grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-end relative z-40">
-                    <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">İlan Türü</label>
-                        <select name="listingType" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" value={filters.listingType} onChange={handleFilterChange}>
-                            <option value="all">Tümü (Satılık/Kiralık)</option>
-                            <option value="sale">Satılık</option>
-                            <option value="rent">Kiralık</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">Kategori</label>
-                        <select name="category" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" value={filters.category} onChange={handleFilterChange}>
-                            <option value="all">Tümü (Daire/Villa/...)</option>
-                            <option value="daire">Daire</option>
-                            <option value="villa">Villa</option>
-                            <option value="mustakil">Müstakil Ev</option>
-                            <option value="land">Arsa</option>
-                            <option value="zeytinlik">Zeytinlik</option>
-                            <option value="tarla">Tarla</option>
-                            <option value="commercial">İşyeri</option>
-                            <option value="tourism">Turistik Tesis</option>
-                        </select>
-                    </div>
-                    {/* ... filter inputs ... */}
-                    <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">En Az Fiyat</label>
-                        <PriceInput
-                            name="minPrice"
-                            placeholder="Örn: 1.000.000"
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={filters.minPrice}
-                            onChange={(val) => handlePriceFilterChange('minPrice', val)}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">En Çok Fiyat</label>
-                        <PriceInput
-                            name="maxPrice"
-                            placeholder="Örn: 5.000.000"
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={filters.maxPrice}
-                            onChange={(val) => handlePriceFilterChange('maxPrice', val)}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">Oda Sayısı</label>
-                        <select name="rooms" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" value={filters.rooms} onChange={handleFilterChange}>
-                            <option value="">Tümü</option>
-                            <option value="1+1">1+1 ve Stüdyo</option>
-                            <option value="2+1">2+1 ve Türevleri</option>
-                            <option value="3+1">3+1 ve Türevleri</option>
-                            <option value="4+">4 Odalılar</option>
-                            <option value="5+">5+ ve Üzeri</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">Fırsat Filtresi</label>
-                        <select name="opportunity_filter" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" value={filters.opportunity_filter} onChange={handleFilterChange}>
-                            <option value="">Tümü</option>
-                            <option value="price_drop">📉 Fiyatı Düşenler</option>
-                            <option value="opportunity">⚡ Fırsat ve Kelepir</option>
-                            <option value="bargain">🔥 Sadece Kelepir</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">Portal</label>
-                        <select name="source" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" value={filters.source} onChange={handleFilterChange}>
-                            <option value="">Tümü</option>
-                            <option value="hepsiemlak">Hepsiemlak</option>
-                            <option value="sahibinden">Sahibinden</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">Kimden (Satıcı)</label>
-                        <select name="seller_type" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" value={filters.seller_type} onChange={handleFilterChange}>
-                            <option value="all">Tümü</option>
-                            <option value="owner">Bireysel (Sahibinden)</option>
-                            <option value="office">Emlak Ofisi / Kurumsal</option>
-                        </select>
-                    </div>
-                    <div className="flex gap-2">
-                        <div className="flex-1">
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Bölge / İlan No</label>
-                            <input type="text" name="district" placeholder="Mahalle..." className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" value={filters.district} onChange={handleFilterChange} />
+        <ErrorBoundary>
+            <div className="space-y-8 pb-20">
+                {/* Dashboard Header & Primary Actions */}
+                <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 px-1">
+                    <div className="space-y-1">
+                        <div className="flex items-center gap-2 mb-1">
+                            <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+                            <span className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em]">SİSTEM AKTİF</span>
                         </div>
-                        <button type="submit" className="bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition flex items-center justify-center translate-y-[-1px]">
-                            <Search size={20} />
-                        </button>
-                    </div>
-
-                    {/* Quick Sort Options */}
-                    <div className="col-span-full flex flex-wrap items-center gap-3 pt-2 border-t border-gray-50">
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Sıralama:</span>
-                        {[
-                            { id: 'newest', label: 'En Yeni' },
-                            { id: 'score', label: 'En İyi Fırsat' },
-                            { id: 'deviation', label: 'En Kelepir (%)' },
-                            { id: 'price_asc', label: 'En Ucuz' },
-                            { id: 'price_desc', label: 'En Pahalı' }
-                        ].map(s => (
-                            <button
-                                key={s.id}
-                                type="button"
-                                onClick={() => handleFilterChange({ target: { name: 'sort', value: s.id } })}
-                                className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${filters.sort === s.id
-                                    ? 'bg-blue-600 text-white shadow-md'
-                                    : 'bg-white text-gray-500 border border-gray-200 hover:border-blue-300'
-                                    }`}
-                            >
-                                {s.label}
-                            </button>
-                        ))}
-                    </div>
-                </form>
-
-
-                {/* Debug / Error Message */}
-                {/* Error Message */}
-                {errorMsg && (
-                    <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
-                        <div className="flex">
-                            <div className="ml-3">
-                                <p className="text-sm text-red-700">
-                                    <span className="font-bold">Bağlantı Hatası:</span> {errorMsg}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Empty State - No Results */}
-                {(!errorMsg && !loading && properties.length === 0) && (
-                    <div className="text-center py-12 bg-white rounded-lg border border-gray-200 border-dashed">
-                        <div className="mx-auto w-12 h-12 text-gray-400 mb-3">
-                            <Search size={48} />
-                        </div>
-                        <h3 className="text-lg font-medium text-gray-900">Sonuç Bulunamadı</h3>
-                        <p className="text-gray-500 max-w-sm mx-auto mt-1">
-                            Arama kriterlerinize uygun ilan bulunamadı. Filtreleri genişleterek tekrar deneyiniz.
+                        <h1 className="text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+                            Emlak <span className="text-blue-600 dark:text-blue-500">Portföyü</span>
+                        </h1>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+                            Şu anda <span className="text-slate-900 dark:text-slate-200 font-bold">{meta.total || properties.length}</span> ilan analiz ediliyor.
                         </p>
                     </div>
-                )}
 
-                {/* View Toggler & Content */}
-                <div className="space-y-4">
-                    <div className="flex justify-end gap-2">
-                        <button onClick={() => setViewMode('list')} className={`flex items-center gap-2 px-4 py-2 rounded-md transition ${viewMode === 'list' ? 'bg-gray-800 text-white' : 'bg-white text-gray-700 border'}`}>
-                            <List size={18} /> Liste
-                        </button>
-                        <button onClick={() => setViewMode('map')} className={`flex items-center gap-2 px-4 py-2 rounded-md transition ${viewMode === 'map' ? 'bg-gray-800 text-white' : 'bg-white text-gray-700 border'}`}>
-                            <Map size={18} /> Harita
-                        </button>
-                        <button onClick={() => setViewMode('heatmap')} className={`flex items-center gap-2 px-4 py-2 rounded-md transition ${viewMode === 'heatmap' ? 'bg-gray-800 text-white' : 'bg-white text-gray-700 border'}`}>
-                            <Map size={18} /> Isı Haritası
-                        </button>
+                </div>
+
+                {/* AI & Market Widgets Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-2">
+                        {/* Advanced FilterBar */}
+                        <div className="relative group z-[48] h-full">
+                            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-[2.5rem] blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+                            <div className="relative z-10 h-full">
+                                <FilterBar
+                                    filters={filters}
+                                    metadata={filterMetadata}
+                                    properties={properties}
+                                    onChange={handleFilterChange}
+                                    onClearAll={handleClearFilters}
+                                    totalResults={meta.total || properties.length}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="lg:col-span-1 space-y-6">
+                        <AIOpportunitiesFeed />
+                        <AILocationHeatmap />
+                    </div>
+                </div>
+
+                {/* Content Area - Explicitly lower stacking priority to prevent table elements mixing with filter dropdowns */}
+                <div className="space-y-6 relative z-0">
+                    {/* View Toggler & Content Header */}
+                    <div className="flex items-center justify-between px-1">
+                        <div className="flex items-center gap-1.5 bg-slate-200/50 dark:bg-slate-800/50 backdrop-blur-md p-1.5 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 w-fit">
+                            <ViewTab active={viewMode === 'list'} onClick={() => setViewMode('list')} icon={List} label="Liste Görünümü" />
+                            <ViewTab active={viewMode === 'map'} onClick={() => setViewMode('map')} icon={Map} label="Harita Keşfi" />
+                            <ViewTab active={viewMode === 'heatmap'} onClick={() => setViewMode('heatmap')} icon={Settings} label="Pazar Analizi" />
+                        </div>
+
+                        {!errorMsg && !loading && (
+                            <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                                <Activity size={14} className="text-blue-500" />
+                                <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none">
+                                    Canlı Veri: {properties.length} Kayıt Gösteriliyor
+                                </span>
+                            </div>
+                        )}
                     </div>
 
+                    <div className="min-h-[500px]">
+                        {errorMsg && (
+                            <div className="bg-rose-50 border border-rose-100 rounded-3xl p-10 text-center animate-in zoom-in duration-300">
+                                <div className="w-16 h-16 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                    <LogOut size={32} className="rotate-90" />
+                                </div>
+                                <h3 className="text-xl font-black text-rose-900 mb-2">Bağlantı Hatası</h3>
+                                <p className="text-sm text-rose-800/70 font-medium max-w-sm mx-auto">{errorMsg}</p>
+                            </div>
+                        )}
 
-                    {loading ? (
-                        <div className="text-center py-20 text-gray-500">Yükleniyor...</div>
-                    ) : (
-                        viewMode === 'list' ? (
-                            <>
-                                <PropertyTable
-                                    properties={properties}
-                                    currentSort={filters.sort}
-                                    onSortChange={(val) => handleFilterChange({ target: { name: 'sort', value: val } })}
-                                    totalCount={meta.total}
-                                />
-
-                                {/* Load More Button */}
-                                {meta.page < meta.totalPages && !loading && (
-                                    <div className="flex justify-center pt-6 pb-4">
-                                        <button
-                                            onClick={handleLoadMore}
-                                            className="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-md shadow-sm hover:bg-gray-50 transition flex items-center gap-2"
-                                        >
-                                            Daha Fazla Yükle ({properties.length} / {meta.total})
-                                        </button>
-                                    </div>
-                                )}
-                            </>
-                        ) : viewMode === 'map' ? (
-                            <div className="bg-white rounded-lg shadow-lg p-1 h-[600px]">
-                                <MapView properties={properties} />
+                        {loading && !properties.length ? (
+                            <div className="flex flex-col items-center justify-center py-32 gap-6">
+                                <div className="relative">
+                                    <div className="w-16 h-16 border-4 border-blue-100 rounded-full" />
+                                    <div className="absolute top-0 w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-slate-900 dark:text-slate-100 font-black text-lg tracking-tight">Veriler İşleniyor</p>
+                                    <p className="text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">Lütfen bekleyin...</p>
+                                </div>
                             </div>
                         ) : (
-                            <div className="bg-white rounded-lg shadow-lg p-1">
-                                <HeatmapView />
+                            properties.length === 0 && !loading && (
+                                <div className="bg-white dark:bg-slate-800/30 rounded-[3rem] border border-slate-200 dark:border-slate-700 border-dashed py-32 text-center shadow-sm">
+                                    <div className="mx-auto w-24 h-24 bg-slate-50 dark:bg-slate-800 text-slate-200 dark:text-slate-700 rounded-full flex items-center justify-center mb-6 animate-pulse">
+                                        <Search size={48} />
+                                    </div>
+                                    <h3 className="text-2xl font-black text-slate-900 dark:text-slate-100">Sonuç Bulunamadı</h3>
+                                    <p className="text-slate-500 dark:text-slate-400 text-sm max-w-xs mx-auto mt-3 font-medium leading-relaxed">
+                                        Uygulanan filtreler sonucunda ilan bulunamadı. Filtre kombinasyonlarınızı gözden geçirebilirsiniz.
+                                    </p>
+                                </div>
+                            )
+                        )}
+
+                        {properties.length > 0 && (
+                            <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+                                {viewMode === 'list' && (
+                                    <PropertyTable
+                                        properties={properties}
+                                        currentSort={filters.sort}
+                                        onSortChange={(val) => handleFilterChange({ target: { name: 'sort', value: val } })}
+                                        hasMore={hasMore}
+                                        onLoadMore={handleLoadMore}
+                                        isLoadingMore={isFetchingNextPage}
+                                    />
+                                )}
+
+                                {viewMode === 'map' && (
+                                    <div className="bg-white dark:bg-slate-800 rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 h-[750px] glow-blue">
+                                        <MapView properties={properties} />
+                                    </div>
+                                )}
+
+                                {viewMode === 'heatmap' && (
+                                    <div className="space-y-8">
+                                        <MarketHealthWidget data={properties} totalCount={meta.total} />
+                                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                            <div className="lg:col-span-2">
+                                                <MarketSupplyDemandChart />
+                                            </div>
+                                            <div className="lg:col-span-1">
+                                                <RentalRateWidget />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                        )
-                    )}
+                        )}
+                    </div>
                 </div>
-            </main>
-        </div>
+            </div>
+        </ErrorBoundary >
     );
 };
+
+const ViewTab = ({ active, onClick, icon: Icon, label }) => (
+    <button
+        onClick={onClick}
+        className={`
+            flex items-center gap-2.5 px-5 py-3 rounded-xl text-sm font-black transition-all duration-300 relative overflow-hidden group
+            ${active
+                ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-md translate-y-[-1px]'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/50 dark:hover:bg-slate-800/50'}
+        `}
+    >
+        <Icon size={18} className={active ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-600 group-hover:text-slate-600 dark:group-hover:text-slate-300'} />
+        <span className="tracking-tight">{label}</span>
+    </button>
+);
 
 export default Dashboard;

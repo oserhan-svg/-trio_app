@@ -5,12 +5,13 @@ import {
     User, Phone, Mail, ArrowLeft, Calendar,
     MessageSquare, Clock, MapPin, TrendingUp,
     CheckCircle, XCircle, Star, Send, Plus, Edit2, X, FileText, Trash2,
-    Briefcase, MoreHorizontal, Filter, Home
+    Briefcase, MoreHorizontal, Filter, Home, Sparkles, Brain, Loader2, Share2
 } from 'lucide-react';
 import Button from '../components/ui/Button';
 import { useToast } from '../context/ToastContext';
 import AddDemandModal from '../components/crm/AddDemandModal';
 import ClientMatchesModal from '../components/crm/ClientMatchesModal';
+import ClientAIDigestModal from '../components/crm/ClientAIDigestModal';
 
 const ClientDetail = () => {
     const { id } = useParams();
@@ -31,14 +32,36 @@ const ClientDetail = () => {
     const [showDemandModal, setShowDemandModal] = useState(false);
     const [selectedDemand, setSelectedDemand] = useState(null);
     const [showMatchModal, setShowMatchModal] = useState(false);
+    const [showAIDigestModal, setShowAIDigestModal] = useState(false);
+    const [isSuggesting, setIsSuggesting] = useState(false);
 
     // Property Note Editing
     const [editingPropertyNote, setEditingPropertyNote] = useState(null);
     const [tempPropertyNote, setTempPropertyNote] = useState('');
 
+    // AI Analysis State
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [analysisResult, setAnalysisResult] = useState(null);
+    const [showAnalysis, setShowAnalysis] = useState(false);
+    const [health, setHealth] = useState(null);
+    const [isFetchingHealth, setIsFetchingHealth] = useState(false);
+
     useEffect(() => {
         fetchClientData();
+        fetchHealthData();
     }, [id]);
+
+    const fetchHealthData = async () => {
+        try {
+            setIsFetchingHealth(true);
+            const res = await api.get(`/clients/${id}/health`);
+            setHealth(res.data);
+        } catch (error) {
+            console.error('Health Fetch Error:', error);
+        } finally {
+            setIsFetchingHealth(false);
+        }
+    };
 
     const fetchClientData = async () => {
         try {
@@ -98,13 +121,18 @@ const ClientDetail = () => {
         if (type === 'other') return null;
 
         const styles = {
-            sahibinden: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+            sahibinden: 'text-black border-yellow-400 font-black shadow-sm',
+            sahibindenStyle: { backgroundColor: '#ffdb15' },
             hepsiemlak: 'bg-red-100 text-red-800 border-red-200'
         };
         const labels = { sahibinden: 'S', hepsiemlak: 'H' };
 
         return (
-            <span className={`text-[10px] w-5 h-5 flex items-center justify-center rounded-full border font-bold ${styles[type]}`} title={type === 'sahibinden' ? 'Sahibinden' : 'Hepsiemlak'}>
+            <span
+                className={`text-[10px] w-5 h-5 flex items-center justify-center rounded-full border font-bold ${styles[type]}`}
+                title={type === 'sahibinden' ? 'Sahibinden' : 'Hepsiemlak'}
+                style={type === 'sahibinden' ? styles.sahibindenStyle : {}}
+            >
                 {labels[type]}
             </span>
         );
@@ -144,43 +172,200 @@ const ClientDetail = () => {
         }
     };
 
+    const handleRunAnalysis = async () => {
+        try {
+            setIsAnalyzing(true);
+            setShowAnalysis(true);
+            const response = await api.post(`/clients/${id}/analyze`);
+            setAnalysisResult(response.data.analysis);
+        } catch (error) {
+            console.error('Analysis Error:', error);
+            addToast('Analiz raporu oluşturulamadı.', 'error');
+            setShowAnalysis(false);
+        } finally {
+            setIsAnalyzing(false);
+        }
+    };
+
+    const handleSuggestMatches = async () => {
+        try {
+            setIsSuggesting(true);
+            const response = await api.post(`/whatsapp/clients/${id}/suggest-matches`);
+            if (response.data.success) {
+                addToast(response.data.message);
+            } else {
+                addToast(response.data.message || 'Eşleşme bulunamadı.', 'info');
+            }
+        } catch (error) {
+            console.error('Suggest Matches Error:', error);
+            addToast('Eşleşme önerisi gönderilemedi.', 'error');
+        } finally {
+            setIsSuggesting(false);
+        }
+    };
+
     if (loading) return <div className="p-10 text-center text-sm text-gray-500">Yükleniyor...</div>;
     if (!client) return <div className="p-10 text-center text-sm">Bulunamadı.</div>;
 
     return (
-        <div className="min-h-screen bg-gray-50/50 flex flex-col font-sans text-sm">
-            {/* Compact Header */}
-            <div className="bg-white border-b px-4 py-3 flex items-center justify-between sticky top-0 z-20 shadow-sm/50">
-                <div className="flex items-center gap-3">
-                    <button onClick={() => navigate('/consultant-panel')} className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500 transition">
-                        <ArrowLeft size={18} />
+        <div className="space-y-6">
+            {/* Client Sub-Header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-6 mb-6">
+                <div className="flex flex-col gap-2">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="flex items-center gap-1.5 text-blue-600 font-bold text-xs uppercase tracking-widest hover:text-blue-700 transition-colors w-fit mb-1"
+                    >
+                        <ArrowLeft size={14} /> Geri Dön
                     </button>
-                    <div>
-                        <h1 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                    <div className="flex items-center gap-3">
+                        {client.profile_pic_url && (
+                            <img
+                                src={client.profile_pic_url}
+                                alt={client.name}
+                                className="w-12 h-12 rounded-full border-2 border-white shadow-md object-cover"
+                                onError={(e) => e.target.style.display = 'none'}
+                            />
+                        )}
+                        <h1 className="text-2xl font-black text-slate-800 tracking-tight">
                             {client.name}
-                            <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${client.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                        </h1>
+                        <div className="flex items-center gap-2">
+                            <span className={`text-[10px] uppercase font-black px-2.5 py-1 rounded-full border ${client.status === 'Active' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
                                 {client.status}
                             </span>
-                        </h1>
+                            {client.priority_score > 0 && (
+                                <span className="bg-orange-100 text-orange-700 border border-orange-200 text-[10px] font-black px-2 py-1 rounded-full flex items-center gap-1">
+                                    <TrendingUp size={10} /> {client.priority_score} Skor
+                                </span>
+                            )}
+                        </div>
                     </div>
+                    <p className="text-sm text-slate-500 font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-md">
+                        {client.phone || client.email || 'İletişim bilgisi yok'} • Son Etkileşim: {interactions[0] ? new Date(interactions[0].date).toLocaleDateString('tr-TR') : 'Yok'}
+                    </p>
                 </div>
-                <div className="flex gap-2">
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => setShowMatchModal(true)}
-                        className="h-8 text-xs flex items-center justify-center gap-1.5 border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-300 shadow-sm transition-all"
+                <div className="flex gap-3">
+                    <button
+                        onClick={handleRunAnalysis}
+                        className="flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-200 hover:bg-slate-800 hover:scale-[1.02] transition-all"
                     >
-                        <Star size={14} className="text-yellow-500 fill-yellow-500" />
-                        Akıllı Eşleştirme
-                    </Button>
+                        <Brain size={16} className="text-blue-400" /> AI Stratejik Analiz
+                    </button>
+                    <button
+                        onClick={() => setShowMatchModal(true)}
+                        className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-emerald-100 hover:shadow-emerald-200 hover:scale-[1.02] transition-all"
+                    >
+                        <Sparkles size={16} /> Akıllı Eşleştirme
+                    </button>
+                    <button
+                        onClick={handleSuggestMatches}
+                        disabled={isSuggesting || !client.demands || client.demands.length === 0}
+                        className="flex items-center gap-2 px-5 py-2.5 bg-orange-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-orange-100 hover:shadow-orange-200 hover:scale-[1.02] transition-all disabled:opacity-50"
+                    >
+                        <Share2 size={16} /> {isSuggesting ? 'Hazırlanıyor...' : 'AI Eşleşme Bildir'}
+                    </button>
+                    <button
+                        onClick={() => setShowAIDigestModal(true)}
+                        className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-100 hover:shadow-blue-200 hover:scale-[1.02] transition-all disabled:opacity-50"
+                        disabled={!client.demands || client.demands.length === 0}
+                    >
+                        <MessageSquare size={16} /> AI Portföy Özeti
+                    </button>
                 </div>
             </div>
 
             <div className="flex-1 max-w-7xl mx-auto w-full p-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
 
+                {/* AI Analysis View (Full Width) */}
+                {showAnalysis && (
+                    <div className="lg:col-span-12 animate-in slide-in-from-top duration-300">
+                        <div className="bg-slate-50 border-2 border-slate-200 rounded-2xl p-6 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-4">
+                                <button onClick={() => setShowAnalysis(false)} className="text-slate-400 hover:text-slate-600"><X size={20} /></button>
+                            </div>
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="p-2 bg-slate-900 rounded-xl text-blue-400">
+                                    <Brain size={24} />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-black text-slate-800">AI Stratejik Analiz Raporu</h3>
+                                    <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Müşteri Geçmişi ve Portföy Analizi</p>
+                                </div>
+                            </div>
+
+                            {isAnalyzing ? (
+                                <div className="py-12 flex flex-col items-center justify-center gap-4">
+                                    <Loader2 size={40} className="animate-spin text-blue-500" />
+                                    <p className="text-sm font-black text-slate-500 animate-pulse uppercase tracking-[0.2em]">Veriler analiz ediliyor...</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-6">
+                                    <div className="prose prose-slate max-w-none">
+                                        <div className="text-slate-700 text-sm leading-relaxed whitespace-pre-wrap font-medium">
+                                            {analysisResult}
+                                        </div>
+                                    </div>
+
+                                    {health && health.isStagnant && health.followUpDraft && (
+                                        <div className="mt-6 bg-orange-50 border border-orange-100 rounded-xl p-4">
+                                            <div className="flex items-center gap-2 mb-2 text-orange-800">
+                                                <Clock size={16} className="text-orange-600" />
+                                                <span className="text-xs font-black uppercase tracking-tight">AI Re-Engagement: Müşteri Takip Taslağı</span>
+                                            </div>
+                                            <p className="text-sm text-slate-700 leading-relaxed mb-4 italic font-medium p-3 bg-white/50 rounded-lg border border-orange-100">
+                                                "{health.followUpDraft}"
+                                            </p>
+                                            <button
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(health.followUpDraft);
+                                                    addToast('Taslak kopyalandı! WhatsApp\'a yapıştırabilirsiniz.');
+                                                }}
+                                                className="flex items-center gap-2 px-4 py-2 bg-white text-orange-600 text-xs font-bold rounded-lg border border-orange-200 hover:bg-orange-50 transition-colors shadow-sm"
+                                            >
+                                                <FileText size={14} /> Taslağı Kopyala
+                                            </button>
+                                        </div>
+                                    )}
+                                    <div className="mt-4 flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                        <span>Trio AI Assistant tarafından hazırlandı</span>
+                                        <span>Son Güncelleme: {new Date().toLocaleTimeString()}</span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
                 {/* Left Sidebar (3Cols) - sticky */}
                 <div className="lg:col-span-3 space-y-4 h-fit lg:sticky lg:top-20">
+
+                    {/* AI Insight Card (Enriched Phase 2) */}
+                    {client.ai_summary && (
+                        <div className="bg-slate-900 rounded-xl p-4 text-white border border-slate-800 shadow-xl overflow-hidden relative group">
+                            <div className="absolute -right-4 -top-4 opacity-10 group-hover:rotate-12 transition-transform">
+                                <Brain size={80} />
+                            </div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <div className="p-1.5 bg-blue-500 rounded-lg shadow-sm">
+                                    <Sparkles size={14} />
+                                </div>
+                                <h4 className="text-xs font-black uppercase tracking-widest text-blue-400">AI Müşteri Analizi</h4>
+                            </div>
+                            <p className="text-sm leading-relaxed text-slate-300 font-medium">
+                                {typeof client.ai_summary === 'string' ? client.ai_summary : (client.ai_summary.paragraph || 'Analiz yapılıyor...')}
+                            </p>
+                            {client.ai_summary.keywords && (
+                                <div className="mt-3 flex flex-wrap gap-1.5">
+                                    {client.ai_summary.keywords.map((kw, idx) => (
+                                        <span key={idx} className="px-2 py-0.5 bg-slate-800 border border-slate-700 rounded text-[9px] font-bold text-slate-400">
+                                            #{kw}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     {/* Compact Contact Card */}
                     <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
@@ -254,6 +439,11 @@ const ClientDetail = () => {
                                         <div className="text-[10px] text-gray-500 mt-0.5">
                                             {d.rooms || 'Oda farketmez'} • {d.max_price ? `${parseInt(d.max_price / 1000)}k ₺` : 'Limit yok'}
                                         </div>
+                                        {d.notes && (
+                                            <div className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded mt-1 line-clamp-2 italic">
+                                                {d.notes}
+                                            </div>
+                                        )}
                                     </div>
                                     <button
                                         onClick={(e) => handleDeleteDemand(e, d.id)}
@@ -522,10 +712,15 @@ const ClientDetail = () => {
                 isOpen={showDemandModal}
                 onClose={() => setShowDemandModal(false)}
                 onSave={async (data) => {
-                    await api.post(`/clients/${id}/demands`, data);
+                    if (selectedDemand) {
+                        await api.put(`/clients/demands/${selectedDemand.id}`, data);
+                        addToast('Talep güncellendi');
+                    } else {
+                        await api.post(`/clients/${id}/demands`, data);
+                        addToast('Talep eklendi');
+                    }
                     setShowDemandModal(false);
                     fetchClientData();
-                    addToast('Talep eklendi');
                 }}
                 clientName={client.name}
                 initialData={selectedDemand}
@@ -536,6 +731,12 @@ const ClientDetail = () => {
                 onClose={() => setShowMatchModal(false)}
                 client={client}
                 onUpdate={fetchClientData}
+            />
+
+            <ClientAIDigestModal
+                isOpen={showAIDigestModal}
+                onClose={() => setShowAIDigestModal(false)}
+                client={client}
             />
         </div>
     );

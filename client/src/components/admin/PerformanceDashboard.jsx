@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
 import PerformanceDetailModal from './PerformanceDetailModal';
-import PortfolioDashboard from './PortfolioDashboard';
 import {
-    Users, Home, TrendingUp, CheckCircle, PhoneCall,
-    Calendar, BarChart2, Award, Star
+    Users, TrendingUp, PhoneCall, Calendar,
+    BarChart2, Award, Star, Search, Filter,
+    Briefcase, CheckCircle2, MoreHorizontal
 } from 'lucide-react';
 
 const PerformanceDashboard = () => {
@@ -12,6 +12,7 @@ const PerformanceDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedConsultant, setSelectedConsultant] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         fetchPerformance();
@@ -21,7 +22,6 @@ const PerformanceDashboard = () => {
         try {
             setLoading(true);
             const response = await api.get('/performance');
-            // Sort by total activity for leaderboard
             const sortedData = response.data.sort((a, b) => {
                 const scoreA = a.stats.active_sale + a.stats.active_rent + (a.stats.interactions_monthly * 0.5);
                 const scoreB = b.stats.active_sale + b.stats.active_rent + (b.stats.interactions_monthly * 0.5);
@@ -31,196 +31,166 @@ const PerformanceDashboard = () => {
             setLoading(false);
         } catch (err) {
             console.error('Error fetching performance:', err);
-            setError('Performans verileri yüklenirken bir hata oluştu.');
+            setError('Veri yüklenemedi.');
             setLoading(false);
         }
     };
 
-    if (loading) return <div className="flex justify-center p-12 text-gray-500">Yükleniyor...</div>;
-    if (error) return <div className="p-6 text-red-500 bg-red-50 rounded-xl border border-red-100">{error}</div>;
+    if (loading) return <div className="flex justify-center p-8 text-slate-400 text-sm">Yükleniyor...</div>;
+    if (error) return <div className="p-4 text-red-500 bg-red-50 rounded-lg text-sm border border-red-100">{error}</div>;
 
-    const topConsultant = performanceData[0];
+    const filteredData = performanceData.filter(c =>
+        c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        c.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const totalPortfolio = performanceData.reduce((acc, curr) => acc + curr.stats.active_sale + curr.stats.active_rent, 0);
+    const totalInteractions = performanceData.reduce((acc, curr) => acc + curr.stats.interactions_monthly, 0);
+    const topPerformer = performanceData[0];
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
-            <div className="flex justify-between items-end">
-                <div>
-                    <h2 className="text-2xl font-bold text-slate-800">Danışman Performansı</h2>
-                    <p className="text-slate-500 mt-1">Ekibinizin aylık başarı ve portföy gelişimi verileri.</p>
+        <div className="space-y-6 animate-in fade-in duration-300">
+            {/* 1. Ultra-Compact Header Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+                            <Briefcase size={18} />
+                        </div>
+                        <div>
+                            <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">Toplam Portföy</p>
+                            <h3 className="text-lg font-bold text-slate-800">{totalPortfolio} <span className="text-xs font-normal text-emerald-500">+4%</span></h3>
+                        </div>
+                    </div>
                 </div>
-                <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-lg">
-                    <button className="px-3 py-1 text-sm bg-white rounded shadow-sm text-slate-700 font-medium">Bu Ay</button>
-                    <button className="px-3 py-1 text-sm text-slate-500 hover:text-slate-700">Geçen Ay</button>
-                    <button className="px-3 py-1 text-sm text-slate-500 hover:text-slate-700">Yıllık</button>
+
+                <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-purple-50 text-purple-600 rounded-lg">
+                            <PhoneCall size={18} />
+                        </div>
+                        <div>
+                            <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">Aylık Etkileşim</p>
+                            <h3 className="text-lg font-bold text-slate-800">{totalInteractions} <span className="text-xs font-normal text-slate-400">görüşme</span></h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-gradient-to-r from-slate-900 to-slate-800 p-3 rounded-xl shadow-sm flex items-center justify-between text-white relative overflow-hidden">
+                    <div className="flex items-center gap-3 z-10">
+                        <div className="p-2 bg-white/10 rounded-lg">
+                            <Award size={18} className="text-amber-400" />
+                        </div>
+                        <div>
+                            <p className="text-[10px] text-slate-300 uppercase tracking-wide font-bold">Ayın Lideri</p>
+                            <h3 className="text-sm font-bold">{topPerformer?.name || 'Belirlenmedi'}</h3>
+                        </div>
+                    </div>
+                    <Star className="absolute -right-2 -bottom-2 text-white/5 rotate-12" size={60} />
                 </div>
             </div>
 
-            {/* Quick Stats / Leaderboard */}
-            {performanceData.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div className="md:col-span-2 bg-gradient-to-br from-indigo-600 to-violet-700 rounded-2xl p-6 text-white shadow-lg shadow-indigo-100 flex items-center justify-between overflow-hidden relative border-0">
-                        <div className="relative z-10">
-                            <span className="text-indigo-100 text-[10px] font-bold uppercase tracking-widest bg-white/20 px-2 py-1 rounded-full border border-white/10">Ayın Yıldızı</span>
-                            <h3 className="text-2xl font-bold mt-2">{topConsultant.email.split('@')[0]}</h3>
-                            <p className="text-indigo-200 text-sm mt-1">{topConsultant.stats.active_sale + topConsultant.stats.active_rent} Aktif İlan | {topConsultant.stats.interactions_monthly} Etkileşim</p>
-                            <button
-                                onClick={() => setSelectedConsultant(topConsultant)}
-                                className="mt-4 bg-white text-indigo-600 text-xs font-bold px-4 py-2 rounded-xl hover:bg-slate-50 transition-colors shadow-sm"
-                            >
-                                Detayları Gör
-                            </button>
-                        </div>
-                        <Award size={120} className="text-white/10 absolute -right-6 -bottom-6 rotate-12" />
-                        <Star className="text-amber-400 absolute top-6 right-8 animate-pulse" fill="#f59e0b" size={32} />
-                    </div>
-
-                    <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center">
-                        <span className="text-slate-400 text-xs font-bold uppercase tracking-tighter">Toplam Portföy</span>
-                        <div className="text-3xl font-black text-slate-800 mt-1">
-                            {performanceData.reduce((acc, curr) => acc + curr.stats.active_sale + curr.stats.active_rent, 0)}
-                        </div>
-                        <span className="text-emerald-500 text-xs font-bold mt-2 flex items-center gap-1">
-                            <TrendingUp size={12} /> +12% artış
-                        </span>
-                    </div>
-
-                    <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center">
-                        <span className="text-slate-400 text-xs font-bold uppercase tracking-tighter">Ekip Etkileşimi</span>
-                        <div className="text-3xl font-black text-slate-800 mt-1">
-                            {performanceData.reduce((acc, curr) => acc + curr.stats.interactions_monthly, 0)}
-                        </div>
-                        <span className="text-slate-400 text-xs mt-2">Bu ayki toplam görüşme</span>
-                    </div>
+            {/* 2. Compact Toolbar */}
+            <div className="flex justify-between items-center bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
+                <div className="relative">
+                    <Search className="absolute left-3 top-2 text-slate-400" size={16} />
+                    <input
+                        type="text"
+                        placeholder="Danışman ara..."
+                        className="pl-9 pr-4 py-1.5 text-sm border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500 w-64 bg-slate-50"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
                 </div>
-            )}
-
-            <div className="grid grid-cols-1 gap-6">
-                {performanceData.map((consultant, index) => (
-                    <div key={consultant.id} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-shadow relative">
-                        {index === 0 && (
-                            <div className="absolute top-0 right-0 z-10">
-                                <div className="bg-amber-400 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-tighter shadow-sm flex items-center gap-1">
-                                    <Star size={10} fill="white" /> Lider
-                                </div>
-                            </div>
-                        )}
-                        <div className="p-6 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className={`w-12 h-12 ${index === 0 ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600'} rounded-full flex items-center justify-center font-bold text-lg shadow-inner`}>
-                                    {consultant.email.charAt(0).toUpperCase()}
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-slate-800">{consultant.email}</h3>
-                                    <span className="text-[10px] bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded font-bold uppercase tracking-widest border border-emerald-100/50">Danışman</span>
-                                </div>
-                            </div>
-                            <div className="text-right">
-                                <span className="text-[10px] text-slate-400 block uppercase tracking-tighter mb-1 font-bold">Portföy Gücü</span>
-                                <div className="h-2 w-32 bg-slate-200 rounded-full overflow-hidden shadow-inner">
-                                    <div
-                                        className="h-full bg-emerald-500 transition-all duration-1000"
-                                        style={{ width: `${Math.min((consultant.stats.active_sale + consultant.stats.active_rent) * 10, 100)}%` }}
-                                    ></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 divide-x divide-slate-100 border-b border-slate-100">
-                            <StatBox
-                                label="Satılık İlan"
-                                value={consultant.stats.active_sale}
-                                icon={<Home size={18} />}
-                                color="blue"
-                            />
-                            <StatBox
-                                label="Kiralık İlan"
-                                value={consultant.stats.active_rent}
-                                icon={<TrendingUp size={18} />}
-                                color="purple"
-                            />
-                            <StatBox
-                                label="Yeni Portföy"
-                                subLabel="(Bu Ay)"
-                                value={consultant.stats.new_portfolio_monthly}
-                                icon={<CheckCircle size={18} />}
-                                color="emerald"
-                            />
-                            <StatBox
-                                label="Aktif Müşteri"
-                                value={consultant.stats.total_clients}
-                                icon={<Users size={18} />}
-                                color="amber"
-                            />
-                            <StatBox
-                                label="İşlemler"
-                                subLabel="(Bu Ay)"
-                                value={consultant.stats.interactions_monthly}
-                                icon={<PhoneCall size={18} />}
-                                color="rose"
-                            />
-                            <StatBox
-                                label="Biten Görev"
-                                value={consultant.stats.completed_tasks_monthly}
-                                icon={<Calendar size={18} />}
-                                color="indigo"
-                            />
-                        </div>
-
-                        <div className="p-4 bg-white flex justify-end">
-                            <button
-                                onClick={() => setSelectedConsultant(consultant)}
-                                className="text-sm font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 group transition-all"
-                            >
-                                <BarChart2 size={16} className="group-hover:scale-110 transition-transform" />
-                                Detaylı Analiz
-                            </button>
-                        </div>
-                    </div>
-                ))}
+                <div className="flex gap-2">
+                    <button className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-50 border border-slate-200 rounded-md hover:bg-slate-100">
+                        <Filter size={14} /> Filtrele
+                    </button>
+                    <button className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-50 border border-slate-200 rounded-md hover:bg-slate-100">
+                        <Calendar size={14} /> Bu Ay
+                    </button>
+                </div>
             </div>
 
-            {performanceData.length === 0 && (
-                <div className="text-center p-12 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
-                    <Users className="mx-auto text-slate-300 mb-4" size={48} />
-                    <p className="text-slate-500 font-medium">Henüz performans verisi olan danışman bulunmuyor.</p>
-                </div>
-            )}
+            {/* 3. High Density Table */}
+            <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                <table className="w-full text-left border-collapse">
+                    <thead>
+                        <tr className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100">
+                            <th className="px-4 py-3 font-semibold">Danışman</th>
+                            <th className="px-4 py-3 font-semibold text-center">Rol</th>
+                            <th className="px-4 py-3 font-semibold text-center">Satılık</th>
+                            <th className="px-4 py-3 font-semibold text-center">Kiralık</th>
+                            <th className="px-4 py-3 font-semibold text-center">Etkileşim</th>
+                            <th className="px-4 py-3 font-semibold text-center">Başarı Skoru</th>
+                            <th className="px-4 py-3 font-semibold text-right">İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                        {filteredData.map((consultant, index) => (
+                            <tr key={consultant.id} className="hover:bg-slate-50/80 transition-colors group">
+                                <td className="px-4 py-2.5">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600 border border-slate-200">
+                                            {consultant.name ? consultant.name.charAt(0) : consultant.email.charAt(0).toUpperCase()}
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-semibold text-slate-800">{consultant.name || 'İsimsiz'}</p>
+                                            <p className="text-[10px] text-slate-400">{consultant.email}</p>
+                                        </div>
+                                        {index === 0 && <span className="ml-1 px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded">1.</span>}
+                                        {index === 1 && <span className="ml-1 px-1.5 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded">2.</span>}
+                                        {index === 2 && <span className="ml-1 px-1.5 py-0.5 bg-orange-50 text-orange-700 text-[10px] font-bold rounded">3.</span>}
+                                    </div>
+                                </td>
+                                <td className="px-4 py-2.5 text-center">
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-indigo-50 text-indigo-700">
+                                        Danışman
+                                    </span>
+                                </td>
+                                <td className="px-4 py-2.5 text-center">
+                                    <span className="text-sm font-bold text-slate-700">{consultant.stats.active_sale}</span>
+                                </td>
+                                <td className="px-4 py-2.5 text-center">
+                                    <span className="text-sm font-bold text-slate-700">{consultant.stats.active_rent}</span>
+                                </td>
+                                <td className="px-4 py-2.5 text-center">
+                                    <div className="flex items-center justify-center gap-1 text-slate-600">
+                                        <PhoneCall size={12} className="text-slate-400" />
+                                        <span className="text-sm font-semibold">{consultant.stats.interactions_monthly}</span>
+                                    </div>
+                                </td>
+                                <td className="px-4 py-2.5 text-center">
+                                    <div className="flex items-center justify-center gap-2">
+                                        <div className="h-1.5 w-16 bg-slate-100 rounded-full overflow-hidden">
+                                            <div
+                                                className="h-full bg-emerald-500 rounded-full"
+                                                style={{ width: `${Math.min(((consultant.stats.active_sale + consultant.stats.active_rent) * 5), 100)}%` }}
+                                            />
+                                        </div>
+                                        <span className="text-xs font-bold text-emerald-600">{Math.min(((consultant.stats.active_sale + consultant.stats.active_rent) * 5), 100)}%</span>
+                                    </div>
+                                </td>
+                                <td className="px-4 py-2.5 text-right">
+                                    <button
+                                        onClick={() => setSelectedConsultant(consultant)}
+                                        className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                                    >
+                                        <MoreHorizontal size={16} />
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
 
-            {/* Performance Detail Modal */}
             {selectedConsultant && (
                 <PerformanceDetailModal
                     consultant={selectedConsultant}
                     onClose={() => setSelectedConsultant(null)}
                 />
             )}
-
-            {/* Agency Portfolio Stats */}
-            <div className="mt-8 border-t border-slate-200 pt-8">
-                <PortfolioDashboard mode="agency" />
-            </div>
-        </div>
-    );
-};
-
-const StatBox = ({ label, subLabel, value, icon, color }) => {
-    const colors = {
-        emerald: 'bg-emerald-50 text-emerald-600 border-emerald-100',
-        blue: 'bg-blue-50 text-blue-600 border-blue-100',
-        purple: 'bg-purple-50 text-purple-600 border-purple-100',
-        amber: 'bg-amber-50 text-amber-600 border-amber-100',
-        rose: 'bg-rose-50 text-rose-600 border-rose-100',
-        indigo: 'bg-indigo-50 text-indigo-600 border-indigo-100',
-    };
-
-    return (
-        <div className="p-4 hover:bg-slate-50 transition-colors">
-            <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-3 border shadow-sm ${colors[color]}`}>
-                {icon}
-            </div>
-            <div className="text-2xl font-black text-slate-800">{value}</div>
-            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">
-                {label} {subLabel && <span className="text-[8px] opacity-70 block">{subLabel}</span>}
-            </div>
         </div>
     );
 };

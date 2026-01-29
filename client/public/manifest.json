@@ -1,0 +1,20 @@
+{
+    "short_name": "Trio App",
+    "name": "Trio Emlak Otomasyon Sistemi",
+    "icons": [
+        {
+            "src": "trio-logo.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "trio-logo.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "start_url": ".",
+    "display": "standalone",
+    "theme_color": "#2563eb",
+    "background_color": "#f8fafc"
+}

@@ -70,11 +70,27 @@ const MobileNav = ({ user, handleScrape, handleLogout, propertiesCount }) => {
 
                                 {navItem(
                                     <Users size={20} />,
-                                    user?.role === 'admin' ? 'Admin Paneli' : 'Danışman Paneli',
+                                    'Danışman Paneli',
                                     () => navigate('/consultant-panel')
                                 )}
+                                {user?.role === 'admin' && navItem(
+                                    <Settings size={20} />,
+                                    'Yönetim Paneli',
+                                    () => navigate('/admin')
+                                )}
 
-                                {navItem(<RefreshCw size={20} />, "Verileri Güncelle", handleScrape, "text-green-600")}
+                                <div className="px-4 py-2 mt-2">
+                                    <button
+                                        onClick={() => {
+                                            handleScrape();
+                                            closeMenu();
+                                        }}
+                                        className="flex items-center justify-center gap-3 w-full p-3.5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl shadow-lg shadow-blue-100 font-bold transition-all active:scale-95"
+                                    >
+                                        <RefreshCw size={18} />
+                                        <span>Verileri Güncelle</span>
+                                    </button>
+                                </div>
 
                                 {navItem(<FileText size={20} />, "Proje Raporu", () => navigate('/report'), "text-purple-600")}
 

@@ -10,49 +10,64 @@ const groupProperty = async (propertyId) => {
             where: { id: propertyId }
         });
 
-        if (!property || !property.neighborhood || !property.rooms || !property.size_m2) {
+        if (!property || !property.neighborhood) {
             return null;
         }
 
-        const size = Number(property.size_m2);
+        const size = property.size_m2 ? Number(property.size_m2) : null;
         const price = Number(property.price);
+        const isLand = ['land', 'arsa', 'tarla', 'zeytinlik'].includes(property.category?.toLowerCase());
 
         // 1. Search for potential matches in the database
-        // Criteria: Same neighborhood, same rooms, similar size (±2%), similar price (±10%)
-        const matches = await prisma.property.findMany({
+        const rawMatches = await prisma.property.findMany({
             where: {
                 id: { not: propertyId },
                 neighborhood: property.neighborhood,
-                rooms: property.rooms,
                 district: property.district,
                 listing_type: property.listing_type,
-                size_m2: {
-                    gte: size * 0.98,
-                    lte: size * 1.02
-                },
-                // Price can vary slightly between portals or over time
+                ...(!isLand && property.rooms ? { rooms: property.rooms } : {}),
+                ...(size ? {
+                    size_m2: {
+                        gte: size * 0.95, // Wider margin for cross-portal detection
+                        lte: size * 1.05
+                    }
+                } : {}),
                 price: {
-                    gte: price * 0.90,
-                    lte: price * 1.10
+                    gte: price * 0.85,
+                    lte: price * 1.15
                 }
             },
             orderBy: { created_at: 'asc' }
+        });
+
+        // 2. Fuzzy Title Matching (Jaccard Similarity)
+        const getWords = (str) => {
+            if (!str) return new Set();
+            return new Set(str.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/).filter(w => w.length > 3));
+        };
+
+        const currentWords = getWords(property.title);
+        const matches = rawMatches.filter(m => {
+            const matchWords = getWords(m.title);
+            if (currentWords.size === 0 || matchWords.size === 0) return true; // Fallback to basic criteria
+
+            const intersection = new Set([...currentWords].filter(x => matchWords.has(x)));
+            const union = new Set([...currentWords, ...matchWords]);
+            const similarity = intersection.size / union.size;
+
+            return similarity > 0.3; // Low threshold but enough to filter unrelated ones in same neighborhood/price
         });
 
         let groupId = null;
         let isPrimary = false;
 
         if (matches.length > 0) {
-            // Found a match! Use the existing group_id if it exists, otherwise create one
             const existingGroupMatch = matches.find(m => m.group_id);
             if (existingGroupMatch) {
                 groupId = existingGroupMatch.group_id;
-                isPrimary = false; // The new one is a secondary listing
+                isPrimary = false;
             } else {
-                // No group_id yet, generate a new one and update the first match too
                 groupId = crypto.randomUUID();
-
-                // Update the oldest listing as primary
                 const oldest = matches[0];
                 await prisma.property.update({
                     where: { id: oldest.id },
@@ -61,12 +76,10 @@ const groupProperty = async (propertyId) => {
                 isPrimary = false;
             }
         } else {
-            // Truly new property (no matches yet)
             groupId = crypto.randomUUID();
             isPrimary = true;
         }
 
-        // 2. Update the current property
         const updated = await prisma.property.update({
             where: { id: propertyId },
             data: {
@@ -94,6 +107,8 @@ const runInitialDeduplication = async () => {
 
     for (const p of ungrouped) {
         await groupProperty(p.id);
+        // Add a small delay to prevent DB/CPU spikes
+        await new Promise(r => setTimeout(r, 100));
     }
 
     console.log('Initial deduplication complete.');

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Activity, Users, Globe, Flame } from 'lucide-react';
+import { Activity, Users, Globe } from 'lucide-react';
 
 const MarketHealthWidget = ({ data = [], totalCount: propTotalCount }) => {
     // Basic heuristics based on scraped data
@@ -18,7 +18,7 @@ const MarketHealthWidget = ({ data = [], totalCount: propTotalCount }) => {
         : 0;
 
     const getTemp = (score) => {
-        if (score >= 7) return { label: 'Sıcak (Fırsat Bol)', color: 'text-orange-600', bg: 'bg-orange-50', icon: Flame };
+        if (score >= 7) return { label: 'Sıcak (Fırsat Bol)', color: 'text-orange-600', bg: 'bg-orange-50', icon: Activity };
         if (score >= 5) return { label: 'Normal', color: 'text-blue-600', bg: 'bg-blue-50', icon: Activity };
         return { label: 'Sakin', color: 'text-gray-600', bg: 'bg-gray-50', icon: Activity };
     };
@@ -66,14 +66,18 @@ const MarketHealthWidget = ({ data = [], totalCount: propTotalCount }) => {
                 <div className="flex-1">
                     <div className="text-xs text-gray-500 font-medium">Kaynak Dağılımı</div>
                     <div className="flex gap-1 mt-1">
-                        <div className="flex-1 h-2 bg-yellow-400 rounded-full" title={`Sahibinden: ${sahCount}`} style={{ flex: sahCount || 1 }} />
+                        <div
+                            className="flex-1 h-2 rounded-full"
+                            title={`Sahibinden: ${sahCount}`}
+                            style={{ backgroundColor: '#ffdb15', flex: sahCount || 1 }}
+                        />
                         <div className="flex-1 h-2 bg-red-500 rounded-full" title={`Hepsiemlak: ${hepCount}`} style={{ flex: hepCount || 1 }} />
                         <div className="flex-1 h-2 bg-blue-500 rounded-full" title={`Emlakjet: ${ejCount}`} style={{ flex: ejCount || 1 }} />
                     </div>
-                    <div className="flex justify-between text-[8px] font-bold text-gray-400 mt-1 uppercase tracking-tighter">
-                        <span>SAH</span>
-                        <span>HEP</span>
-                        <span>EMJ</span>
+                    <div className="flex justify-between text-[8px] font-black text-gray-500 mt-1 uppercase tracking-tighter">
+                        <span className="text-yellow-600">SAH (Yellow)</span>
+                        <span className="text-red-600">HEP (Red)</span>
+                        <span className="text-blue-600">EMJ (Blue)</span>
                     </div>
                 </div>
             </div>

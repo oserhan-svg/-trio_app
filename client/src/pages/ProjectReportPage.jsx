@@ -15,6 +15,25 @@ const ProjectReportPage = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 print:bg-white text-gray-900 font-sans">
+            {/* Print Styles */}
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                @media print {
+                    @page { margin: 0; size: auto; }
+                    body { margin: 1.6cm; background: white !important; }
+                    .no-print { display: none !important; }
+                    .print-only { display: block !important; }
+                    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    .A4-page { 
+                        box-shadow: none !important; 
+                        margin: 0 !important; 
+                        padding: 0 !important; 
+                        width: 100% !important; 
+                        max-width: none !important;
+                    }
+                }
+            `}} />
+
             {/* Action Bar (Hidden on Print) */}
             <div className="bg-white shadow-sm px-8 py-4 flex justify-between items-center print:hidden sticky top-0 z-50">
                 <div className="flex items-center gap-4">
@@ -37,7 +56,7 @@ const ProjectReportPage = () => {
             </div>
 
             {/* A4 Page Container */}
-            <div className="max-w-[210mm] mx-auto bg-white shadow-xl my-8 p-[15mm] print:shadow-none print:my-0 print:p-0 print:w-full">
+            <div className="A4-page max-w-[210mm] mx-auto bg-white shadow-xl my-8 p-[20mm] print:shadow-none print:my-0 print:p-0 print:w-full">
 
                 {/* Header */}
                 <div className="border-b-2 border-gray-900 pb-6 mb-8">

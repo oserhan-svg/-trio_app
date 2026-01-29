@@ -163,7 +163,10 @@ const OpportunityReportPage = () => {
                                 <div className="absolute top-2 right-2 bg-emerald-600 text-white text-xs font-bold px-2 py-1 rounded shadow-md">
                                     Fırsat Puanı: {p.opportunity_score}/10
                                 </div>
-                                <div className="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] font-bold px-2 py-0.5 rounded backdrop-blur-sm">
+                                <div
+                                    className="absolute bottom-2 left-2 text-black text-[10px] font-black px-2 py-0.5 rounded shadow-sm"
+                                    style={{ backgroundColor: '#ffdb15' }}
+                                >
                                     {p.seller_name || 'Sahibinden'}
                                 </div>
                             </div>

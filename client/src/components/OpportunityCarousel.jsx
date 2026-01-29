@@ -1,39 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { TrendingDown, ArrowRight, Home, ChevronRight, ChevronLeft, Calendar, Palmtree, TreeDeciduous, Building } from 'lucide-react';
-import api from '../services/api';
+import useOpportunities from '../hooks/useOpportunities';
 
-const OpportunityCarousel = ({ compact = false }) => {
-    const [opportunities, setOpportunities] = useState([]);
-    const [loading, setLoading] = useState(true);
+const OpportunityCarousel = React.memo(({ compact = false }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     const itemsPerSlide = compact ? 1 : 3;
 
-    useEffect(() => {
-        const fetchOpportunities = async () => {
-            try {
-                const response = await api.get('/properties');
-                const allProps = response.data.data || [];
-                // Filter for high-score deals AND Owner listings (from ANY portal)
-                const ops = allProps
-                    .filter(p =>
-                        p.opportunity_score >= 8 &&
-                        p.seller_type === 'owner'
-                    )
-                    .sort((a, b) => b.opportunity_score - a.opportunity_score || b.deviation - a.deviation)
-                    .slice(0, 10);
-                setOpportunities(ops);
-            } catch (error) {
-                console.error('Failed to fetch opportunities:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchOpportunities();
-    }, []);
+    // Use shared hook with owner filter
+    const { opportunities: allOpportunities, loading, filterOpportunities } = useOpportunities({
+        minScore: 8,
+        sellerType: 'owner',
+        limit: 10
+    });
 
-    const getCategory = (p) => {
+    // Memoize filtered opportunities
+    const opportunities = useMemo(() => {
+        return filterOpportunities(allOpportunities);
+    }, [allOpportunities, filterOpportunities]);
+
+    // Memoize category detection
+    const getCategory = useCallback((p) => {
         const title = (p.title || '').toLowerCase();
         const desc = (p.description || '').toLowerCase();
         const category = p.category || '';
@@ -41,10 +29,16 @@ const OpportunityCarousel = ({ compact = false }) => {
         if (title.includes('villa') || title.includes('müstakil')) return { label: 'Villa', icon: Home, color: 'text-purple-600' };
         if (category === 'land' || title.includes('arsa')) return { label: 'Arsa', icon: TreeDeciduous, color: 'text-emerald-600' };
         return { label: 'Daire', icon: Building, color: 'text-blue-600' };
-    };
+    }, []);
 
-    const nextSlide = () => setCurrentIndex((prev) => (prev + 1) % Math.ceil(opportunities.length / itemsPerSlide));
-    const prevSlide = () => setCurrentIndex((prev) => (prev - 1 + Math.ceil(opportunities.length / itemsPerSlide)) % Math.ceil(opportunities.length / itemsPerSlide));
+    // Memoize navigation handlers
+    const nextSlide = useCallback(() => {
+        setCurrentIndex((prev) => (prev + 1) % Math.ceil(opportunities.length / itemsPerSlide));
+    }, [opportunities.length, itemsPerSlide]);
+
+    const prevSlide = useCallback(() => {
+        setCurrentIndex((prev) => (prev - 1 + Math.ceil(opportunities.length / itemsPerSlide)) % Math.ceil(opportunities.length / itemsPerSlide));
+    }, [opportunities.length, itemsPerSlide]);
 
     if (loading) return null;
     if (opportunities.length === 0) return null;
@@ -114,7 +108,12 @@ const OpportunityCarousel = ({ compact = false }) => {
                                     <div className="flex justify-between items-start gap-1 mb-1">
                                         <div className="flex flex-col gap-0.5">
                                             {prop.url && prop.url.includes('sahibinden') ? (
-                                                <span className="text-[7px] bg-yellow-50 text-yellow-800 px-1 py-0.5 rounded border border-yellow-200 font-bold w-fit">SAHİBİNDEN</span>
+                                                <span
+                                                    className="text-[7px] px-1 py-0.5 rounded shadow-sm font-bold w-fit"
+                                                    style={{ backgroundColor: '#ffdb15', color: '#000' }}
+                                                >
+                                                    SAHİBİNDEN
+                                                </span>
                                             ) : (
                                                 <span className="text-[7px] bg-red-50 text-red-800 px-1 py-0.5 rounded border border-red-200 font-bold w-fit">HEPSİEMLAK</span>
                                             )}
@@ -156,6 +155,6 @@ const OpportunityCarousel = ({ compact = false }) => {
             </div>
         </div>
     );
-};
+});
 
 export default OpportunityCarousel;

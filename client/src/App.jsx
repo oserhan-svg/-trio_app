@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { ToastProvider } from './context/ToastContext';
+import { ThemeProvider } from './context/ThemeContext';
 import LoadingSpinner from './components/ui/LoadingSpinner';
 import ServerWakeupHandling from './components/ui/ServerWakeupHandling';
 
@@ -14,8 +15,10 @@ const PropertyListingPage = React.lazy(() => import('./pages/PropertyListingPage
 const PropertyListingPublic = React.lazy(() => import('./pages/PropertyListingPublic'));
 const ProjectReportPage = React.lazy(() => import('./pages/ProjectReportPage'));
 const OpportunityReportPage = React.lazy(() => import('./pages/OpportunityReportPage'));
-const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
-const AppShell = React.lazy(() => import('./components/layout/AppShell'));
+const SalesPipeline = React.lazy(() => import('./pages/SalesPipeline'));
+const AdminOverview = React.lazy(() => import('./components/admin/AdminOverview'));
+const ScraperMonitoring = React.lazy(() => import('./components/admin/ScraperMonitoring'));
+const AppShell = React.lazy(() => import('./components/layout/AppShell.jsx'));
 
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem('token');
@@ -36,6 +39,8 @@ const Agenda = React.lazy(() => import('./components/agenda/Agenda'));
 const PendingContactsTable = React.lazy(() => import('./components/crm/PendingContactsTable'));
 const AdminManagement = React.lazy(() => import('./pages/AdminManagement'));
 const PerformanceDashboard = React.lazy(() => import('./components/admin/PerformanceDashboard'));
+const AILearningDashboard = React.lazy(() => import('./components/admin/AILearningDashboard'));
+const RevenueDashboard = React.lazy(() => import('./components/admin/RevenueDashboard'));
 
 // Wrapper Components
 const ClientTrackingWrapper = () => <div className="p-6"><h1 className="text-2xl font-black text-slate-800 mb-6">Müşteri Yönetimi</h1><ClientTracking /></div>;
@@ -49,7 +54,7 @@ const PortfolioWrapper = () => {
 const MatchNewsfeedWrapper = () => <div className="p-6"><h1 className="text-2xl font-black text-slate-800 mb-6">Akıllı Eşleşmeler</h1><MatchNewsfeed /></div>;
 const MapInsightWrapper = () => <div className="p-6"><MapInsight /></div>;
 const MarketRadarWrapper = () => <div className="p-6"><MarketRadar /></div>;
-const WhatsAppWrapper = () => <div className="p-6"><WhatsAppBotDashboard /></div>;
+const WhatsAppWrapper = () => <WhatsAppBotDashboard />;
 const TrainingWrapper = () => <div className="p-6"><TrainingDashboard /></div>;
 const AgendaWrapper = () => <div className="p-6"><Agenda /></div>;
 const PendingContactsWrapper = () => <div className="p-6"><h1 className="text-2xl font-black text-slate-800 mb-6">Aday Havuzu</h1><PendingContactsTable /></div>;
@@ -60,131 +65,166 @@ const VoiceAssistant = React.lazy(() => import('./components/ai/VoiceAssistant')
 
 function App() {
   return (
-    <ToastProvider>
-      <BrowserRouter>
-        <ServerWakeupHandling />
-        <Toaster position="top-right" />
-        <Suspense fallback={<LoadingSpinner />}>
-          <VoiceAssistant />
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/listing/:token" element={<PropertyListingPublic />} />
+    <ThemeProvider>
+      <ToastProvider>
+        <BrowserRouter>
+          <ServerWakeupHandling />
+          <Toaster position="top-right" />
+          <Suspense fallback={<LoadingSpinner />}>
+            <VoiceAssistant />
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/listing/:token" element={<PropertyListingPublic />} />
 
-            {/* Dashboard (Home) */}
-            <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-            <Route path="/crm/apps" element={<PrivateRoute><AppsPage /></PrivateRoute>} />
-            <Route path="/crm/tools" element={<PrivateRoute><ToolsPage /></PrivateRoute>} />
-            <Route path="/" element={<Navigate to="/dashboard" />} />
+              {/* Dashboard (Home) */}
+              <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+              <Route path="/crm/apps" element={<PrivateRoute><AppsPage /></PrivateRoute>} />
+              <Route path="/crm/tools" element={<PrivateRoute><ToolsPage /></PrivateRoute>} />
+              <Route path="/" element={<Navigate to="/dashboard" />} />
 
-            {/* --- CRM ROUTES --- */}
-            <Route path="/crm/clients" element={
-              <React.Suspense fallback={<LoadingSpinner />}>
-                <PrivateRoute>
-                  <ClientTrackingWrapper />
-                </PrivateRoute>
-              </React.Suspense>
-            } />
-            <Route path="/clients" element={<Navigate to="/crm/clients" />} /> {/* Legacy Redirect */}
-            <Route path="/clients/:id" element={<PrivateRoute><ClientDetail /></PrivateRoute>} />
+              {/* --- CRM ROUTES --- */}
+              <Route path="/crm/clients" element={
+                <React.Suspense fallback={<LoadingSpinner />}>
+                  <PrivateRoute>
+                    <ClientTrackingWrapper />
+                  </PrivateRoute>
+                </React.Suspense>
+              } />
+              <Route path="/clients" element={<Navigate to="/crm/clients" />} /> {/* Legacy Redirect */}
+              <Route path="/clients/:id" element={<PrivateRoute><ClientDetail /></PrivateRoute>} />
+              <Route path="/crm/pipeline" element={<PrivateRoute><SalesPipeline /></PrivateRoute>} />
 
-            <Route path="/crm/matches" element={
-              <React.Suspense fallback={<LoadingSpinner />}>
-                <PrivateRoute>
-                  <MatchNewsfeedWrapper />
-                </PrivateRoute>
-              </React.Suspense>
-            } />
+              <Route path="/crm/matches" element={
+                <React.Suspense fallback={<LoadingSpinner />}>
+                  <PrivateRoute>
+                    <MatchNewsfeedWrapper />
+                  </PrivateRoute>
+                </React.Suspense>
+              } />
 
-            <Route path="/crm/agenda" element={
-              <React.Suspense fallback={<LoadingSpinner />}>
-                <PrivateRoute>
-                  <AgendaWrapper />
-                </PrivateRoute>
-              </React.Suspense>
-            } />
+              <Route path="/crm/agenda" element={
+                <React.Suspense fallback={<LoadingSpinner />}>
+                  <PrivateRoute>
+                    <AgendaWrapper />
+                  </PrivateRoute>
+                </React.Suspense>
+              } />
 
-            <Route path="/crm/pool" element={
-              <React.Suspense fallback={<LoadingSpinner />}>
-                <PrivateRoute>
-                  <PendingContactsWrapper />
-                </PrivateRoute>
-              </React.Suspense>
-            } />
+              <Route path="/crm/pool" element={
+                <React.Suspense fallback={<LoadingSpinner />}>
+                  <PrivateRoute>
+                    <PendingContactsWrapper />
+                  </PrivateRoute>
+                </React.Suspense>
+              } />
 
-            {/* --- PORTFOLIO ROUTES --- */}
-            <Route path="/portfolio" element={
-              <React.Suspense fallback={<LoadingSpinner />}>
-                <PrivateRoute>
-                  <PortfolioWrapper />
-                </PrivateRoute>
-              </React.Suspense>
-            } />
-            <Route path="/property/:id" element={<PrivateRoute><PropertyDetail /></PrivateRoute>} />
-            <Route path="/property-listing/:propertyId" element={<PrivateRoute><PropertyListingPage /></PrivateRoute>} />
+              {/* --- PORTFOLIO ROUTES --- */}
+              <Route path="/portfolio" element={
+                <React.Suspense fallback={<LoadingSpinner />}>
+                  <PrivateRoute>
+                    <PortfolioWrapper />
+                  </PrivateRoute>
+                </React.Suspense>
+              } />
+              <Route path="/property/:id" element={<PrivateRoute><PropertyDetail /></PrivateRoute>} />
+              <Route path="/property-listing/:propertyId" element={<PrivateRoute><PropertyListingPage /></PrivateRoute>} />
 
-            {/* --- INTELLIGENCE & APPS --- */}
-            <Route path="/intelligence/map" element={
-              <React.Suspense fallback={<LoadingSpinner />}>
-                <PrivateRoute>
-                  <MapInsightWrapper />
-                </PrivateRoute>
-              </React.Suspense>
-            } />
+              {/* --- INTELLIGENCE & APPS --- */}
+              <Route path="/intelligence/map" element={
+                <React.Suspense fallback={<LoadingSpinner />}>
+                  <PrivateRoute>
+                    <MapInsightWrapper />
+                  </PrivateRoute>
+                </React.Suspense>
+              } />
 
-            <Route path="/intelligence/market-radar" element={
-              <React.Suspense fallback={<LoadingSpinner />}>
-                <PrivateRoute>
-                  <MarketRadarWrapper />
-                </PrivateRoute>
-              </React.Suspense>
-            } />
+              <Route path="/intelligence/market-radar" element={
+                <React.Suspense fallback={<LoadingSpinner />}>
+                  <PrivateRoute>
+                    <MarketRadarWrapper />
+                  </PrivateRoute>
+                </React.Suspense>
+              } />
 
-            <Route path="/intelligence/whatsapp" element={
-              <React.Suspense fallback={<LoadingSpinner />}>
-                <PrivateRoute>
-                  <WhatsAppWrapper />
-                </PrivateRoute>
-              </React.Suspense>
-            } />
+              <Route path="/intelligence/whatsapp" element={
+                <React.Suspense fallback={<LoadingSpinner />}>
+                  <PrivateRoute>
+                    <WhatsAppWrapper />
+                  </PrivateRoute>
+                </React.Suspense>
+              } />
 
-            <Route path="/intelligence/training" element={
-              <React.Suspense fallback={<LoadingSpinner />}>
-                <PrivateRoute>
-                  <TrainingWrapper />
-                </PrivateRoute>
-              </React.Suspense>
-            } />
+              <Route path="/intelligence/training" element={
+                <React.Suspense fallback={<LoadingSpinner />}>
+                  <PrivateRoute>
+                    <TrainingWrapper />
+                  </PrivateRoute>
+                </React.Suspense>
+              } />
 
-            {/* --- ADMIN ONLY --- */}
-            <Route path="/admin/team" element={
-              <React.Suspense fallback={<LoadingSpinner />}>
-                <PrivateRoute>
-                  <AdminManagementWrapper />
-                </PrivateRoute>
-              </React.Suspense>
-            } />
+              {/* --- ADMIN ONLY --- */}
+              <Route path="/admin/overview" element={
+                <React.Suspense fallback={<LoadingSpinner />}>
+                  <PrivateRoute>
+                    <div className="p-6"><AdminOverview /></div>
+                  </PrivateRoute>
+                </React.Suspense>
+              } />
 
-            <Route path="/admin/performance" element={
-              <React.Suspense fallback={<LoadingSpinner />}>
-                <PrivateRoute>
-                  <PerformanceWrapper />
-                </PrivateRoute>
-              </React.Suspense>
-            } />
+              <Route path="/admin/scraper" element={
+                <React.Suspense fallback={<LoadingSpinner />}>
+                  <PrivateRoute>
+                    <div className="p-6"><ScraperMonitoring /></div>
+                  </PrivateRoute>
+                </React.Suspense>
+              } />
 
-            <Route path="/admin/settings" element={<PrivateRoute><AdminDashboard /></PrivateRoute>} /> {/* Keeping one catch-all for now or detailed settings */}
+              <Route path="/admin/team" element={
+                <React.Suspense fallback={<LoadingSpinner />}>
+                  <PrivateRoute>
+                    <AdminManagementWrapper />
+                  </PrivateRoute>
+                </React.Suspense>
+              } />
 
-            {/* Reports */}
-            <Route path="/report" element={<PrivateRoute><ProjectReportPage /></PrivateRoute>} />
-            <Route path="/reports/opportunities" element={<PrivateRoute><OpportunityReportPage /></PrivateRoute>} />
+              <Route path="/admin/performance" element={
+                <React.Suspense fallback={<LoadingSpinner />}>
+                  <PrivateRoute>
+                    <PerformanceWrapper />
+                  </PrivateRoute>
+                </React.Suspense>
+              } />
 
-            {/* Fallback */}
-            <Route path="*" element={<Navigate to="/dashboard" />} />
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
-    </ToastProvider>
+              <Route path="/admin/ai-learning" element={
+                <React.Suspense fallback={<LoadingSpinner />}>
+                  <PrivateRoute>
+                    <div className="p-6"><AILearningDashboard /></div>
+                  </PrivateRoute>
+                </React.Suspense>
+              } />
+
+              <Route path="/admin/finance" element={
+                <React.Suspense fallback={<LoadingSpinner />}>
+                  <PrivateRoute>
+                    <div className="p-6"><RevenueDashboard /></div>
+                  </PrivateRoute>
+                </React.Suspense>
+              } />
+
+              <Route path="/admin/settings" element={<Navigate to="/admin/overview" />} />
+
+              {/* Reports */}
+              <Route path="/report" element={<PrivateRoute><ProjectReportPage /></PrivateRoute>} />
+              <Route path="/reports/opportunities" element={<PrivateRoute><OpportunityReportPage /></PrivateRoute>} />
+
+              {/* Fallback */}
+              <Route path="*" element={<Navigate to="/dashboard" />} />
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </ToastProvider>
+    </ThemeProvider>
   );
 }
 

@@ -8,11 +8,12 @@ const scraperConfig = require('../config/scraperConfig');
 puppeteer.use(StealthPlugin());
 
 const USER_AGENTS = [
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0',
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15',
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 OPR/109.0.0.0'
+    // Updated for 2026 (Chrome 145+)
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/19.4 Safari/605.1.15',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0'
 ];
 
 const VIEWPORTS = [
@@ -28,16 +29,33 @@ const VIEWPORTS = [
 async function createStealthBrowser(options = {}) {
     const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER;
     const {
-        headless = isProduction ? 'new' : false, // Headless in production
+        headless = false, // ALWAYS SHOW WINDOW FOR DEBUGGING
         proxy = null,
-        userDataDir = scraperConfig.paths.userDataDir
+        userDataDir = scraperConfig.paths.userDataDir,
+        useExisting = false // FORCE FRESH: Do not connect to existing browser
     } = options;
+
+    // Try connecting to an existing debug session (Clean Mode)
+    if (useExisting) {
+        try {
+            console.log('🔌 Checking for active Clean Chrome Mode (Port 9222)...');
+            const browser = await puppeteer.connect({
+                browserURL: 'http://127.0.0.1:9222',
+                defaultViewport: null
+            });
+            console.log('✅ Connected to existing Chrome instance on port 9222.');
+            return browser;
+        } catch (e) {
+            console.log('ℹ️ No active Clean Chrome Mode found (or port 9222 busy). Launching fresh instance.');
+        }
+    }
 
     const launchArgs = [
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-infobars',
-        '--window-position=0,0',
+        '--window-position=0,0', // Visible for manual captcha solving
+        '--start-maximized',
         '--ignore-certificate-errors',
         '--ignore-certificate-errors-spki-list',
         '--disable-blink-features=AutomationControlled',
@@ -64,9 +82,25 @@ async function createStealthBrowser(options = {}) {
         '--no-default-browser-check',
         '--no-first-run',
         '--remote-debugging-port=9222',
-        '--disable-gpu', // Recommended for headless
-        '--disable-dev-shm-usage', // Recommended for Docker/Render
-        '--shm-size=1gb'
+        '--disable-gpu',
+        '--disable-dev-shm-usage',
+        '--shm-size=1gb',
+        // Suppress "Allow this site to access local network devices" prompt
+        '--disable-discovery-models',
+        '--disable-media-router',
+        '--disable-features=OptimizationGuideModelDownloading,OptimizationHintsFetching,OptimizationTargetPrediction,OptimizationHints,MediaRouter,DialMediaRouteProvider,CalculateNativeWinOcclusion,InterestFeedContentSuggestions,CertificateTransparencyComponentUpdater,AutofillServerCommunication,AndroidPayIntegrationV1,AndroidPayIntegrationV2,ChromeWhatsNewUI,PrivacySandboxSettings4,UserAgentClientHint',
+        '--no-default-browser-check',
+        '--disable-notifications',
+        '--disable-geolocation',
+        '--disable-device-discovery-notifications',
+        '--disable-session-crashed-bubble',
+        '--disable-restore-session-state',
+        // [FIX] Prevent background throttling (Detached Frame fix)
+        '--disable-background-timer-throttling',
+        '--disable-backgrounding-occluded-windows',
+        '--disable-renderer-backgrounding',
+        '--disable-ipc-flooding-protection'
+        // '--incognito' // Disabled to allow visible debugging with profile
     ];
 
     let finalProxy = proxy;
@@ -86,6 +120,20 @@ async function createStealthBrowser(options = {}) {
     if (!fs.existsSync(userDataDir)) {
         fs.mkdirSync(userDataDir, { recursive: true });
     }
+
+    // [FIX] Clean up any stale SingletonLock files that cause "Browser already running" errors
+    const lockFiles = ['SingletonLock', 'SingletonCookie', 'SingletonSocket'];
+    lockFiles.forEach(file => {
+        const lockPath = path.join(userDataDir, file);
+        if (fs.existsSync(lockPath)) {
+            try {
+                console.log(`🧹 Removing stale lock file: ${file}`);
+                fs.unlinkSync(lockPath);
+            } catch (e) {
+                console.warn(`⚠️ Could not remove lock file ${file}: ${e.message}`);
+            }
+        }
+    });
 
     // Explicitly set executablePath for Render environment
     const launchOptions = {
@@ -163,9 +211,45 @@ async function createStealthBrowser(options = {}) {
         if (!launchOptions.executablePath) {
             console.log('✗ Chrome not found. Trying Puppeteer default...');
         }
+    } else {
+        // [FIX] Local Environment Chrome Fallback
+        const commonPaths = [
+            'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+            'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+            '/usr/bin/google-chrome',
+            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+        ];
+
+        for (const p of commonPaths) {
+            if (fs.existsSync(p)) {
+                console.log(`✓ Found system Chrome at: ${p}`);
+                launchOptions.executablePath = p;
+                break;
+            }
+        }
     }
 
-    const browser = await puppeteer.launch(launchOptions);
+    let browser;
+    try {
+        console.log(`🚀 Launching browser with profile: ${launchOptions.userDataDir}`);
+        browser = await puppeteer.launch(launchOptions);
+    } catch (e) {
+        if (e.message.includes('already running') || e.message.includes('EBUSY') || e.message.includes('locked')) {
+            console.warn(`⚠️ Profile Locked! Switching to RECOVERY mode... (${e.message.split('\n')[0]})`);
+
+            // Create a unique recovery profile to bypass the lock
+            launchOptions.userDataDir += `_RECOVERY_${Date.now()}`;
+
+            if (!fs.existsSync(launchOptions.userDataDir)) {
+                fs.mkdirSync(launchOptions.userDataDir, { recursive: true });
+            }
+
+            console.log(`♻️ Retrying with RECOVERY profile: ${launchOptions.userDataDir}`);
+            browser = await puppeteer.launch(launchOptions);
+        } else {
+            throw e;
+        }
+    }
 
     return browser;
 }
@@ -180,108 +264,96 @@ async function configureStealthPage(page) {
 
     // 2. Randomize Viewport
     const randomViewport = VIEWPORTS[Math.floor(Math.random() * VIEWPORTS.length)];
-    await page.setViewport(randomViewport);
+    await page.setViewport(randomViewport); // Standard Viewport
 
-    // 3. Mask WebDriver (Redundant with StealthPlugin but good backup)
+    // 3. Basic WebDriver Masking (Lightweight)
     await page.evaluateOnNewDocument(() => {
         Object.defineProperty(navigator, 'webdriver', { get: () => false });
     });
 
-    // 4. Randomize Hardware Concurrency, Memory & Touch
-    await page.evaluateOnNewDocument(() => {
-        const cores = [2, 4, 8, 12, 16];
-        const memories = [4, 8, 16, 32];
-        const touchPoints = [0, 5, 10]; // 0 for most desktops, 5/10 for touch screens
+    // 4. Load Cookies (Self-Healing)
+    const cookiePath = scraperConfig.paths.cookies;
+    const backupPath = `${cookiePath}.bak`;
 
-        const selectedCores = cores[Math.floor(Math.random() * cores.length)];
-        const selectedMemory = memories[Math.floor(Math.random() * memories.length)];
-        const selectedTouch = touchPoints[Math.floor(Math.random() * touchPoints.length)];
-
-        Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => selectedCores });
-        Object.defineProperty(navigator, 'deviceMemory', { get: () => selectedMemory });
-        Object.defineProperty(navigator, 'maxTouchPoints', { get: () => selectedTouch });
-
-        // Randomize Screen Color Depth
-        Object.defineProperty(screen, 'colorDepth', { get: () => 24 });
-        Object.defineProperty(screen, 'pixelDepth', { get: () => 24 });
-    });
-
-    // 4.1 Screen Orientation Simulation
-    await page.evaluateOnNewDocument(() => {
-        if (window.screen && window.screen.orientation) {
-            const types = ['landscape-primary', 'landscape-secondary'];
-            const type = types[Math.floor(Math.random() * types.length)];
-            Object.defineProperty(window.screen.orientation, 'type', { get: () => type });
-            Object.defineProperty(window.screen.orientation, 'angle', { get: () => 0 });
-        }
-    });
-
-    // 5. Add Advanced Client Hints (Anti-Bot evasion for Chrome)
-    const isMobile = randomUA.includes('Mobile');
-    const platform = randomUA.includes('Windows') ? 'Windows' :
-        randomUA.includes('Macintosh') ? 'macOS' :
-            randomUA.includes('Linux') ? 'Linux' : 'Chrome OS';
-
-    await page.setExtraHTTPHeaders({
-        'Accept-Language': 'tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7',
-        'Sec-Ch-Ua': '"Google Chrome";v="124", "Chromium";v="124", "Not-A.Brand";v="24"',
-        'Sec-Ch-Ua-Mobile': isMobile ? '?1' : '?0',
-        'Sec-Ch-Ua-Platform': `"${platform}"`,
-        'Referer': 'https://www.google.com/'
-    });
-
-    // 6. Mask Canvas & WebGL (Anti-Fingerprinting)
-    await page.evaluateOnNewDocument(() => {
-        // Canvas Masking
-        const originalToDataURL = HTMLCanvasElement.prototype.toDataURL;
-        HTMLCanvasElement.prototype.toDataURL = function (type) {
-            const context = this.getContext('2d');
-            if (context) {
-                // Add tiny invisible noise
-                const originalFillStyle = context.fillStyle;
-                context.fillStyle = 'rgba(255, 255, 255, 0.01)';
-                context.fillRect(0, 0, 1, 1);
-                context.fillStyle = originalFillStyle;
-            }
-            return originalToDataURL.apply(this, arguments);
-        };
-
-        // WebGL Masking (Small buffer noise)
-        const originalGetParameter = WebGLRenderingContext.prototype.getParameter;
-        WebGLRenderingContext.prototype.getParameter = function (parameter) {
-            const value = originalGetParameter.apply(this, arguments);
-            // Slightly modify unmaskable params if they match specific IDs (e.g. renderer)
-            if (parameter === 37446) return value + ' (Optimized)'; // UNMASKED_RENDERER_WEBGL
-            return value;
-        };
-    });
-
-    // 7. Load Cookies if available
-    if (fs.existsSync(scraperConfig.paths.cookies)) {
+    const loadCookies = async (path) => {
         try {
-            const cookiesString = fs.readFileSync(scraperConfig.paths.cookies);
-            const cookies = JSON.parse(cookiesString);
-            await page.setCookie(...cookies);
+            if (fs.existsSync(path)) {
+                const cookiesString = fs.readFileSync(path);
+                const cookies = JSON.parse(cookiesString);
+                if (cookies.length > 0) {
+                    await page.setCookie(...cookies);
+                    console.log(`🍪 Restored session from ${path.includes('.bak') ? 'BACKUP' : 'Main'} (${cookies.length} cookies)`);
+                    return true;
+                }
+            }
         } catch (e) {
-            console.error('⚠️ Failed to load cookies:', e.message);
+            console.error(`⚠️ Cookie load error:`, e.message);
         }
+        return false;
+    };
+
+    // Try Main -> If fail, Try Backup
+    let loaded = await loadCookies(cookiePath);
+    if (!loaded) {
+        // console.warn('⚠️ Main cookie file failed/empty. Attempting backup...');
+        await loadCookies(backupPath);
     }
+
+    console.log('✅ Page Configured (Lightweight Stealth Mode)');
 }
 
 /**
  * Save browser state (cookies)
  */
+/**
+ * Save browser state (cookies) with Atomic Write & Backup
+ * Prevents file corruption if process crashes during write.
+ */
 async function saveBrowserState(page) {
     try {
         const cookies = await page.cookies();
-        const cookieDir = path.dirname(scraperConfig.paths.cookies);
+
+        // Don't save empty if we have existing cookies (prevent wiping)
+        if (cookies.length === 0) {
+            // Check if we effectively lost session?
+            // Maybe logging is enough. Don't overwrite good cookies with empty unless we mean to.
+            // console.warn('⚠️ Warning: Attempted to save 0 cookies. Skipping to preserve state.');
+            // return;
+        }
+
+        const cookiePath = scraperConfig.paths.cookies;
+        const cookieDir = path.dirname(cookiePath);
+
         if (!fs.existsSync(cookieDir)) {
             fs.mkdirSync(cookieDir, { recursive: true });
         }
-        fs.writeFileSync(scraperConfig.paths.cookies, JSON.stringify(cookies, null, 2));
-        // console.log('💾 Saved ' + cookies.length + ' cookies.');
+
+        const tempPath = `${cookiePath}.tmp`;
+        const backupPath = `${cookiePath}.bak`;
+        const data = JSON.stringify(cookies, null, 2);
+
+        // 1. Atomic Write Strategy: Write to .tmp first
+        fs.writeFileSync(tempPath, data);
+
+        // 2. Create Backup of current valid file before overwriting
+        if (fs.existsSync(cookiePath)) {
+            try {
+                fs.copyFileSync(cookiePath, backupPath);
+            } catch (e) { /* Ignore backup error */ }
+        }
+
+        // 3. Rename .tmp to .json (Atomic operation on same FS)
+        try {
+            fs.renameSync(tempPath, cookiePath);
+            // console.log('💾 Cookies secured (Atomic Save).');
+        } catch (e) {
+            // Fallback for systems where renameSync might fail across partitions (rare)
+            fs.copyFileSync(tempPath, cookiePath);
+            fs.unlinkSync(tempPath);
+        }
+
     } catch (e) {
-        console.error('⚠️ Failed to save state:', e.message);
+        console.error('⚠️ Failed to save browser state:', e.message);
     }
 }
 

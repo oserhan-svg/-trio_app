@@ -1,8 +1,16 @@
 const { createStealthBrowser, saveBrowserState, humanizePage } = require('./browserFactory');
+const path = require('path');
 const scraperConfig = require('../config/scraperConfig');
+const { getSessionManager } = require('./sessionManager');
+const { generatePropertyTitle } = require('../scripts/fix_nameless_titles');
 
 /**
  * Checks for known blocking pages/titles
+ */
+const { handleCloudflareChallenge } = require('./cloudflareBypass');
+
+/**
+ * Checks for known blocking pages/titles and auto-solves them
  */
 async function checkBlock(page) {
     try {
@@ -14,19 +22,28 @@ async function checkBlock(page) {
         );
 
         if (isBlocked) {
-            console.log('🛑 DETECTED BLOCK! Waiting for manual intervention...');
-            process.stdout.write('\x07'); // Bell sound
+            console.log('🛑 DETECTED BLOCK! Initiating Smart Bypass...');
+            const sessionMgr = getSessionManager();
+            sessionMgr.addEvent('Sahibinden: Blok tespiti! Otomatik çözüm deneniyor...', 'warning', 'sahibinden');
 
-            // Wait until block clears
-            await page.waitForFunction((indicators) => {
-                const t = document.title;
-                const b = document.body.innerText;
-                return !indicators.some(i => t.includes(i) || b.includes(i));
-            }, { timeout: 0, polling: 2000 }, scraperConfig.selectors.blockIndicators);
+            // Attempt Auto-Solve using our enhanced module
+            const result = await handleCloudflareChallenge(page, {
+                maxAutoWait: 60000,
+                enableManualFallback: true // Allow manual if auto fails
+            });
 
-            console.log('✅ Block cleared! Resuming...');
-            await saveBrowserState(page); // Save trust after solving
-            await new Promise(r => setTimeout(r, 2000));
+            if (result.success) {
+                console.log('✅ Block cleared via ' + result.method + '! Resuming...');
+                sessionMgr.addEvent('Sahibinden: Engel aşıldı (' + result.method + '), devam ediliyor.', 'success', 'sahibinden');
+
+                // CRITICAL: Save the new "trusted" state immediately
+                await saveBrowserState(page);
+                await new Promise(r => setTimeout(r, 2000));
+
+            } else {
+                console.error('❌ Bypass failed. Manual intervention required.');
+                // The handleCloudflareChallenge function already did the waiting/logging
+            }
         }
     } catch (e) {
         // Ignore errors during block check (e.g. navigation)
@@ -47,6 +64,8 @@ async function performSideQuest(page) {
     console.log(`🧭 Performing Side-Quest: ${target}`);
 
     try {
+        const sessionManager = getSessionManager();
+        sessionManager.addEvent(`Yan aktivite yapılıyor: ${target}`, 'info');
         await page.goto(target, { waitUntil: 'domcontentloaded', timeout: 30000 });
         await page.randomWait(3000, 7000);
         await page.randomScroll();
@@ -103,9 +122,14 @@ async function organicWarmup(page) {
     }
 }
 
-async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 'residential', targetPages = [1, 2], injectedPage = null) {
+async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 'residential', targetPages = [1, 2], injectedPage = null, listingType = 'sale') {
     const { saveListings } = require('./scraperService');
-    console.log(`🕵️ Stealth Scraper Starting for: ${url} [Pages: ${targetPages.join(', ')}]`);
+    const sessionManager = getSessionManager();
+
+    // Performance tracking
+    const perfStart = Date.now();
+    console.log(`🕵️ Stealth Scraper Starting for: ${url} [Type: ${listingType}, Category: ${category}, Pages: ${targetPages.join(', ')}]`);
+    sessionManager.addEvent(`Sahibinden: Tarama başlatıldı [${listingType} - ${category}]`, 'info', 'sahibinden');
 
     let browser;
     try {
@@ -140,15 +164,22 @@ async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 
 
         for (const pageNum1Based of targetPages) {
             const pageNum = pageNum1Based - 1; // 0-based for offset
-            const offset = pageNum * 20;
-            const pageUrl = url.includes('?') ? `${url}&pagingOffset=${offset}` : `${url}?pagingOffset=${offset}`;
-            console.log(`📍 Page ${pageNum1Based}: Visiting ${pageUrl}`);
+            const pageSize = scraperConfig.pagination?.sahibinden || 20;
+            const offset = pageNum * pageSize;
+            const pageUrl = url.includes('?')
+                ? `${url}&pagingOffset=${offset}&pagingSize=${pageSize}`
+                : `${url}?pagingOffset=${offset}&pagingSize=${pageSize}`;
+            console.log(`📍 Page ${pageNum1Based}: Visiting ${pageUrl} (Offset: ${offset}, Size: ${pageSize})`);
+            sessionManager.addEvent(`Sahibinden: Sayfa ${pageNum1Based} ziyaret ediliyor (Size: ${pageSize})...`, 'info', 'sahibinden');
 
             // Navigate with random delay
             if (page.url() !== pageUrl) {
                 // Before navigating, move mouse randomly
                 await page.mouseMoveOrganic('body');
                 await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: scraperConfig.timeouts.pageLoad });
+
+                // Wait after navigation completes (more human-like)
+                await page.randomWait(scraperConfig.timeouts.afterNavigationDelay || 3000, (scraperConfig.timeouts.afterNavigationDelay || 3000) + 2000);
             }
 
             // Enhanced block checking
@@ -164,12 +195,27 @@ async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 
                 if (blockErr.message === '403_BLOCK_REBOOT') throw blockErr;
             }
 
-            // Occasionally perform side-quest to stay "human"
-            if (pageNum > 0 && pageNum % 2 === 0) {
+            // Occasionally perform side-quest to stay "human" (optimized frequency)
+            const sideQuestFreq = scraperConfig.timeouts.sideQuestFrequency || 5;
+            if (pageNum > 0 && pageNum % sideQuestFreq === 0) {
                 await performSideQuest(page);
                 // Return to original target
                 console.log('🏡 Returning to target page...');
                 await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: scraperConfig.timeouts.pageLoad });
+
+                // Check for blocks after side-quest return
+                try {
+                    const title = await page.title();
+                    if (title.includes('Access Denied') || title.includes('Olağandışı')) {
+                        console.log('🛑 Forbidden detected after Side Quest!');
+                        await rebootProfile();
+                        throw new Error('403_BLOCK_REBOOT');
+                    }
+                    await checkBlock(page);
+                } catch (e) {
+                    if (e.message === '403_BLOCK_REBOOT') throw e;
+                }
+
                 await page.randomWait(2000, 4000);
             }
 
@@ -181,19 +227,48 @@ async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 
 
             const selector = scraperConfig.selectors.listingRow || '.searchResultsItem';
 
-            // Wait for table or list items
-            try {
-                await page.waitForFunction(() =>
-                    document.querySelectorAll('.searchResultsItem').length > 0 ||
-                    document.querySelectorAll('.classified:not(.header)').length > 0
-                    , { timeout: scraperConfig.timeouts.element });
-            } catch (e) {
-                console.log('❌ Listings not found (Timeout). End of results?');
-                break;
+            // Wait for table or list items with retry logic
+            let listingsFound = false;
+            for (let attempt = 0; attempt <= (scraperConfig.retry?.maxPageRetries || 0); attempt++) {
+                try {
+                    if (attempt > 0) {
+                        console.log(`🔄 Retry attempt ${attempt}/${scraperConfig.retry?.maxPageRetries || 0} for page ${pageNum1Based}...`);
+                        sessionManager.addEvent(`Sayfa ${pageNum1Based} tekrar deneniyor (${attempt}/${scraperConfig.retry?.maxPageRetries || 0})`, 'warning', 'sahibinden');
+                        // Exponential backoff: 3s, 6s, 12s, etc.
+                        const baseDelay = scraperConfig.timeouts.retryDelay || 3000;
+                        const backoffDelay = scraperConfig.retry?.useExponentialBackoff
+                            ? baseDelay * Math.pow(2, attempt - 1)
+                            : baseDelay;
+                        await page.randomWait(backoffDelay, backoffDelay + 2000);
+                        // Try reloading the page
+                        await page.reload({ waitUntil: 'domcontentloaded', timeout: scraperConfig.timeouts.pageLoad });
+                    }
+
+                    await page.waitForFunction(() =>
+                        document.querySelectorAll('.searchResultsItem').length > 0 ||
+                        document.querySelectorAll('.classified:not(.header)').length > 0
+                        , { timeout: scraperConfig.timeouts.element });
+
+                    listingsFound = true;
+                    break;
+                } catch (e) {
+                    if (attempt >= (scraperConfig.retry?.maxPageRetries || 0)) {
+                        console.log(`❌ Listings not found on page ${pageNum1Based} after ${attempt} retries. ${scraperConfig.retry?.continueOnPageFailure ? 'Skipping to next page...' : 'Ending pagination.'}`);
+                        sessionManager.addEvent(`Sayfa ${pageNum1Based} başarısız oldu, ${scraperConfig.retry?.continueOnPageFailure ? 'devam ediliyor' : 'sonlandırılıyor'}.`, 'error', 'sahibinden');
+                    }
+                }
+            }
+
+            if (!listingsFound) {
+                if (scraperConfig.retry?.continueOnPageFailure) {
+                    continue; // Skip to next page
+                } else {
+                    break; // End pagination
+                }
             }
 
             // Extract Data
-            const pageListings = await page.evaluate((forcedType, selector) => {
+            const pageListings = await page.evaluate((forcedType, selector, lType) => {
                 // Check if we are in Store Mode (div.classified)
                 const storeItems = document.querySelectorAll('.classified:not(.header)');
                 if (storeItems.length > 0) {
@@ -228,7 +303,31 @@ async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 
                         // If empty, it might be the store owner (Admin) which we handle later via fallback.
                         // But let's leave it empty to trigger "Bilinmiyor" or fallback logic.
 
-                        data.push({ external_id: id, title, price, url: fullUrl, location, district: '', neighborhood: '', seller_type: 'office', seller_name, rooms: '', size_m2: 0 });
+                        // Store mode: listing date extraction
+                        let listing_date = null;
+                        const dateEl = row.querySelector('.date') || row.querySelector('.classified-date') || row.querySelector('[class*="date"]');
+                        if (dateEl) {
+                            listing_date = dateEl.innerText.trim();
+                        }
+
+                        // Determine listing type from URL or fallback to passed lType
+                        const typeFromUrl = fullUrl.includes('kiralik') ? 'rent' : (fullUrl.includes('satilik') ? 'sale' : lType);
+
+                        data.push({
+                            external_id: id,
+                            title,
+                            price,
+                            url: fullUrl,
+                            location,
+                            district: '',
+                            neighborhood: '',
+                            seller_type: 'office',
+                            seller_name,
+                            rooms: '',
+                            size_m2: 0,
+                            listing_date,
+                            listing_type: typeFromUrl
+                        });
                     });
                     return data;
                 }
@@ -254,7 +353,15 @@ async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 
 
                     const locationEl = row.querySelector('.searchResultsLocationValue');
                     let location = locationEl ? locationEl.innerText.replace(/\n/g, ' ').trim() : '';
-                    // Debugging removed
+
+                    // STRICT GEOGRAPHY FILTER: Ensure we only get Ayvalık listings
+                    // This prevents "Similar Listings" from other cities (e.g. Afyon) or Search mishaps
+                    const isAyvalik = location && (location.toLocaleLowerCase('tr-TR').includes('ayvalık') || location.toLowerCase().includes('ayvalik'));
+
+                    if (!isAyvalik) {
+                        return;
+                    }
+
                     let district = '';
                     let neighborhood = '';
 
@@ -294,9 +401,14 @@ async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 
                     if (forcedType === 'owner') {
                         seller_name = 'Sahibinden';
                         seller_type = 'owner';
-                    } else if (lowerText.includes('sahibinden') || lowerText.includes('bireysel') || row.querySelector('.searchResultsTitleValue .text-glow')) {
+                    } else if (lowerText.includes('sahibinden') ||
+                        lowerText.includes('bireysel') ||
+                        lowerText.includes('kişisel') ||
+                        lowerText.includes('owner') ||
+                        row.querySelector('.searchResultsTitleValue .text-glow') ||
+                        row.querySelector('a[href*="/sahibinden"]')) {
                         seller_type = 'owner';
-                        seller_name = 'Sahibinden';
+                        seller_name = 'Sahibinden (Bireysel)';
                     } else if (lowerText.includes('banka')) {
                         seller_type = 'bank';
                         seller_name = 'Banka';
@@ -312,20 +424,107 @@ async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 
                         }
                     }
 
-                    data.push({ external_id: id, title, price, url: fullUrl, location, district, neighborhood, seller_type, seller_name, rooms, size_m2 });
+                    // Listing Date Extraction with multiple fallback selectors
+                    let listing_date = null;
+                    const dateEl = row.querySelector('.searchResultsDateValue') ||
+                        row.querySelector('.classified-info-date') ||
+                        row.querySelector('[class*="Date"]') ||
+                        row.querySelector('.date-info');
+
+                    if (dateEl) {
+                        const rawDate = dateEl.innerText.trim();
+                        // Parse Turkish relative dates
+                        const now = new Date();
+                        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+                        const monthMap = {
+                            'ocak': '01', 'şubat': '02', 'mart': '03', 'nisan': '04',
+                            'mayıs': '05', 'haziran': '06', 'temmuz': '07', 'ağustos': '08',
+                            'eylül': '09', 'ekim': '10', 'kasım': '11', 'aralık': '12'
+                        };
+
+                        if (rawDate.toLowerCase().includes('bugün') || rawDate.toLowerCase().includes('today')) {
+                            listing_date = today.toISOString().split('T')[0];
+                        } else if (rawDate.toLowerCase().includes('dün') || rawDate.toLowerCase().includes('yesterday')) {
+                            const yesterday = new Date(today);
+                            yesterday.setDate(yesterday.getDate() - 1);
+                            listing_date = yesterday.toISOString().split('T')[0];
+                        } else if (rawDate.match(/(\d+)\s*(saat|hour)/i)) {
+                            listing_date = today.toISOString().split('T')[0];
+                        } else if (rawDate.match(/(\d+)\s*(gün|day)/i)) {
+                            const match = rawDate.match(/(\d+)\s*(gün|day)/i);
+                            const daysAgo = parseInt(match[1]);
+                            const date = new Date(today);
+                            date.setDate(date.getDate() - daysAgo);
+                            listing_date = date.toISOString().split('T')[0];
+                        } else if (rawDate.match(/\d{2}\.\d{2}\.\d{4}/)) {
+                            const parts = rawDate.match(/(\d{2})\.(\d{2})\.(\d{4})/);
+                            if (parts) listing_date = `${parts[3]}-${parts[2]}-${parts[1]}`;
+                        } else {
+                            // Handle "25 Ocak 2026" or "25 Ocak"
+                            const parts = rawDate.split(/\s+/);
+                            if (parts.length >= 2) {
+                                const day = parts[0].padStart(2, '0');
+                                const monthName = parts[1].toLocaleLowerCase('tr-TR');
+                                const month = monthMap[monthName];
+                                const year = parts[2] || now.getFullYear();
+
+                                if (day && month && year) {
+                                    listing_date = `${year}-${month}-${day}`;
+                                }
+                            }
+                        }
+
+                        // Final safety: ensure it's a valid date string or null
+                        if (listing_date && isNaN(new Date(listing_date).getTime())) {
+                            console.log(`⚠️ Invalid date parsed: [${rawDate}] -> ${listing_date}. Nullifying.`);
+                            listing_date = null;
+                        }
+                    }
+
+                    // Determine listing type from URL or fallback to passed lType
+                    const typeFromUrl = fullUrl.includes('kiralik') ? 'rent' : (fullUrl.includes('satilik') ? 'sale' : lType);
+
+                    data.push({
+                        external_id: id,
+                        title,
+                        price,
+                        url: fullUrl,
+                        location,
+                        district,
+                        neighborhood,
+                        seller_type,
+                        seller_name,
+                        rooms,
+                        size_m2,
+                        listing_date,
+                        listing_type: typeFromUrl
+                    });
                 });
                 return data;
-            }, forcedSellerType, selector);
+            }, forcedSellerType, selector, listingType);
 
             console.log(`🎉 Page ${pageNum + 1} extracted ${pageListings.length} listings.`);
 
             if (pageListings.length === 0) {
-                hasNextPage = false;
+                console.log(`ℹ️ Page ${pageNum + 1} returned no listings. Ending pagination.`);
+                break;
             } else {
                 console.log(`🎉 Page ${pageNum + 1} extracted ${pageListings.length} listings. Saving progress...`);
 
                 // Enrich and Save progressively
-                const enriched = pageListings.map(l => ({ ...l, category }));
+                const enriched = pageListings.map(l => {
+                    const item = { ...l, category };
+                    if (!item.title || item.title === 'No Title' || item.title === 'İsimsiz İlan') {
+                        item.title = generatePropertyTitle(item);
+                    }
+                    return item;
+                });
+                const { getSessionManager } = require('./sessionManager');
+                const sessionManager = getSessionManager();
+                sessionManager.trackRequest(true, 'sahibinden');
+                sessionManager.trackListings('sahibinden', pageListings.length);
+                sessionManager.addEvent(`Sahibinden: Sayfa ${pageNum1Based} tarandı, ${pageListings.length} ilan alındı.`, 'info', 'sahibinden');
                 await saveListings(enriched);
 
                 allListings = [...allListings, ...pageListings];
@@ -338,6 +537,19 @@ async function scrapeSahibindenStealth(url, forcedSellerType = null, category = 
                 }
             }
         }
+
+        // Performance summary
+        const perfEnd = Date.now();
+        const totalSeconds = (perfEnd - perfStart) / 1000;
+        const lpm = totalSeconds > 0 ? (allListings.length / totalSeconds * 60).toFixed(2) : 0;
+        console.log(`\n${'='.repeat(70)}`);
+        console.log(`📊 SCRAPING PERFORMANCE SUMMARY [${category}]`);
+        console.log(`   Duration: ${totalSeconds.toFixed(1)}s (${(totalSeconds / 60).toFixed(2)} minutes)`);
+        console.log(`   Pages Scraped: ${targetPages.length}`);
+        console.log(`   Listings Found: ${allListings.length}`);
+        console.log(`   Listings/Minute (LPM): ${lpm}`);
+        console.log(`${'='.repeat(70)}\n`);
+        sessionManager.addEvent(`Sahibinden: Tarama tamamlandı. ${allListings.length} ilan, ${totalSeconds.toFixed(1)}s`, 'success', 'sahibinden');
 
         return allListings;
 
@@ -496,9 +708,39 @@ async function scrapeSahibindenDetails(url, existingPage = null) {
             });
 
             // Seller Info
-            const seller_name = document.querySelector('.username-info-area h5')?.innerText.trim() ||
-                document.querySelector('.user-info-module .u-name')?.innerText.trim() ||
-                'Dosya Sahibi';
+            // Seller Info - Robust Extraction for Consultant
+            let seller_name = 'Dosya Sahibi';
+
+            // 1. Try Specific Consultant Selectors
+            const consultantEl = document.querySelector('.user-info-agent h3') || // Verified with debug
+                document.querySelector('.sticky-header-name') || // Sticky header fallback
+                document.querySelector('.user-info-agent .name') ||
+                document.querySelector('.consultant-name') ||
+                document.querySelector('.real-estate-consultant');
+
+            if (consultantEl) {
+                seller_name = consultantEl.innerText.trim();
+            } else {
+                // 2. Fallback to generic user info, but filtered
+                const genericEl = document.querySelector('.username-info-area h5') ||
+                    document.querySelector('.user-info-module .u-name');
+
+                if (genericEl) {
+                    const text = genericEl.innerText.trim();
+                    // If it looks like an agency name, try to find a sub-name
+                    if (text.toLowerCase().includes('emlak') || text.toLowerCase().includes('gayrimenkul')) {
+                        // Look for a secondary name below it
+                        const subName = document.querySelector('.username-info-area .title')?.innerText.trim();
+                        if (subName && subName.length > 2) {
+                            seller_name = subName;
+                        } else {
+                            seller_name = text; // Default to agency if no person found
+                        }
+                    } else {
+                        seller_name = text;
+                    }
+                }
+            }
 
             const seller_phone = document.querySelector('.pretty-phone-part')?.innerText.trim() || '';
 
@@ -534,6 +776,10 @@ async function scrapeSahibindenDetails(url, existingPage = null) {
 
     } catch (error) {
         if (error.message === '403_BLOCK_REBOOT') {
+            if (existingPage) {
+                console.log('🛑 Forbidden detected in Shared Browser Mode. Skipping reboot/retry to preserve session.');
+                throw new Error('BLOCKED_IN_SHARED_MODE');
+            }
             console.log('🔄 Restarting detail scrape after profile reboot...');
             return await scrapeSahibindenDetails(url);
         }
@@ -606,4 +852,68 @@ async function scrapeSahibindenTeam(url, existingPage = null) {
     }
 }
 
-module.exports = { scrapeSahibindenStealth, getOrLaunchBrowser, scrapeSahibindenDetails, scrapeSahibindenTeam };
+async function findComparableListings(criteria) {
+    console.log('🕵️ Finding comparables for:', criteria);
+    // criteria: { district, price_min, price_max, rooms }
+
+    // Construct Search URL dynamically (Reverse-engineered Sahibinden URL structure)
+    // Base: https://www.sahibinden.com/satilik-daire/balikesir-ayvalik-{district}?price_min={min}&price_max={max}
+
+    let districtSlug = criteria.district ? criteria.district.toLowerCase().replace(/ /g, '-').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ü/g, 'u').replace(/ş/g, 's').replace(/ç/g, 'c').replace(/ğ/g, 'g') : '';
+    if (districtSlug && !districtSlug.includes('mah')) districtSlug += '-mahallesi';
+
+    let searchUrl = `https://www.sahibinden.com/satilik/balikesir-ayvalik${districtSlug ? '-' + districtSlug : ''}?`;
+
+    if (criteria.price_min) searchUrl += `&price_min=${criteria.price_min}`;
+    if (criteria.price_max) searchUrl += `&price_max=${criteria.price_max}`;
+    if (criteria.rooms) {
+        // Simple mapping for demonstration. Real mapping requires exact query params.
+        // For now, we search broad and filter in memory if strict.
+    }
+
+    searchUrl += '&sorting=price_asc'; // Find cheapest for arbitrage
+
+    console.log('🔎 Generated Search URL:', searchUrl);
+
+    try {
+        const listings = await scrapeSahibindenStealth(searchUrl, null, 'residential', [1]);
+        return listings;
+    } catch (e) {
+        console.error('Comparable search failed:', e);
+        return [];
+    }
+}
+
+function detectArbitrage(targetProperty, comparables) {
+    if (!comparables || comparables.length === 0) return null;
+
+    // Filter outliers (very cheap or very expensive)
+    const validComps = comparables.filter(c => c.price > 0 && c.price !== targetProperty.price);
+
+    if (validComps.length === 0) return null;
+
+    // Calculate Average Market Price
+    const total = validComps.reduce((sum, c) => sum + c.price, 0);
+    const averagePrice = total / validComps.length;
+
+    const diff = targetProperty.price - averagePrice;
+    const percentageDiff = (diff / averagePrice) * 100;
+
+    // Arbitrage Logic
+    // If our property is 10% cheaper than average -> Opportunity
+    // If our property is 10% more expensive -> Overpriced
+    let status = 'Fair Market Value';
+    if (percentageDiff < -10) status = 'Under Market Value (Opportunity)';
+    if (percentageDiff > 10) status = 'Overpriced';
+
+    return {
+        targetPrice: targetProperty.price,
+        marketAverage: averagePrice,
+        percentageDiff: percentageDiff.toFixed(2),
+        status,
+        comparableCount: validComps.length,
+        cheapestComp: validComps.sort((a, b) => a.price - b.price)[0]
+    };
+}
+
+module.exports = { scrapeSahibindenStealth, getOrLaunchBrowser, scrapeSahibindenDetails, scrapeSahibindenTeam, findComparableListings, detectArbitrage };

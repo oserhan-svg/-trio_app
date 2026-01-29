@@ -1,3 +1,5 @@
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 const puppeteer = require('puppeteer-extra');
 const { scrapeProperties } = require('../services/scraperService');
 

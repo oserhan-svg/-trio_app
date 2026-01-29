@@ -6,6 +6,8 @@ const { authenticateToken } = require('../middleware/authMiddleware');
 const validate = require('../middleware/validate');
 const { clientSchema, demandSchema } = require('../utils/schemas');
 
+router.post('/public/lead', clientController.createPublicLead);
+
 // Protect all CRM routes
 router.use(authenticateToken);
 
@@ -38,7 +40,12 @@ router.post('/pending/bulk-approve', pendingController.bulkApprove);
 router.post('/pending/bulk-delete', pendingController.bulkDelete);
 
 // Client-specific routes with sub-paths (MUST come before /:id)
+router.post('/:id/ai-digest', clientController.generateAIDigest);
+router.post('/:id/ai-digest/send', clientController.sendAIDigest);
+router.post('/:id/analyze', clientController.analyzeClient);
 router.get('/:id/matches', clientController.getClientMatches);
+router.get('/:id/strategy', clientController.getClientStrategy);
+router.get('/:id/health', clientController.getClientHealth);
 router.get('/:id/interactions', interactionController.getInteractions);
 router.post('/:id/interactions', interactionController.createInteraction);
 router.get('/:id/properties', clientPropertyController.getClientProperties);

@@ -4,7 +4,7 @@ import PriceDistributionChart from './PriceDistributionChart';
 import NeighborhoodChart from './NeighborhoodChart';
 import RentalRateWidget from './dashboard/RentalRateWidget';
 
-const DashboardStatsHeader = ({ properties, stats }) => {
+const DashboardStatsHeader = React.memo(({ properties, stats }) => {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 relative z-10">
             {/* 1. Rental Rate Widget */}
@@ -28,6 +28,6 @@ const DashboardStatsHeader = ({ properties, stats }) => {
             </div>
         </div>
     );
-};
+});
 
 export default DashboardStatsHeader;

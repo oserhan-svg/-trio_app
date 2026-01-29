@@ -1,0 +1,195 @@
+{
+    "intents": {
+        "buy": [
+            "almak",
+            "alıyorum",
+            "satın almak",
+            "ev arıyorum",
+            "daire arıyorum",
+            "arıyorum",
+            "arayışım",
+            "bulmak istiyorum",
+            "bakıyorum",
+            "ilgileniyorum",
+            "düşünüyorum",
+            "bakmaktayım",
+            "ihtiyacım",
+            "ihtiyaç"
+        ],
+        "sell": [
+            "satmak",
+            "satıyorum",
+            "satılık",
+            "elden çıkarmak",
+            "değerlendirme",
+            "fiyat öğrenmek",
+            "satış"
+        ],
+        "rent_in": [
+            "kiralamak",
+            "kiralıyorum",
+            "kiralık ev",
+            "kiralık daire",
+            "kirada oturmak",
+            "tutmak"
+        ],
+        "rent_out": [
+            "kiraya vermek",
+            "kiraya vereceğim",
+            "kiracı arıyorum",
+            "kira geliri"
+        ],
+        "info": [
+            "bilgi",
+            "detay",
+            "öğrenmek istiyorum",
+            "sormak istiyorum",
+            "danışmak",
+            "sorum var",
+            "randevu",
+            "görüşmek",
+            "yer görme",
+            "sunum"
+        ]
+    },
+    "propertyTypes": {
+        "residential": [
+            "daire",
+            "ev",
+            "konut",
+            "rezidans",
+            "villa",
+            "müstakil",
+            "yalı",
+            "yazlık",
+            "köy evi",
+            "bağ evi"
+        ],
+        "commercial": [
+            "ofis",
+            "dükkan",
+            "işyeri",
+            "mağaza",
+            "ticari",
+            "plaza",
+            "büro",
+            "devren",
+            "cafe",
+            "restoran",
+            "fabrika",
+            "depo"
+        ],
+        "land": [
+            "arsa",
+            "tarla",
+            "bahçe",
+            "arazi",
+            "parsel",
+            "imarlı"
+        ]
+    },
+    "urgency": {
+        "high": [
+            "acil",
+            "hemen",
+            "bu hafta",
+            "bugün",
+            "yarın",
+            "bir an önce",
+            "çok acele",
+            "hızlı",
+            "acilen"
+        ],
+        "medium": [
+            "2 hafta",
+            "bu ay",
+            "yakında",
+            "en kısa sürede",
+            "önümüzdeki ay"
+        ]
+    },
+    "locations": {
+        "ayvalik": [
+            "ayvalık",
+            "cunda",
+            "sarımsaklı",
+            "altınova",
+            "küçükköy",
+            "hayrettinpaşa",
+            "ali çetinkaya",
+            "sefa",
+            "çamlık",
+            "lale adası"
+        ],
+        "istanbul": [
+            "kadıköy",
+            "beşiktaş",
+            "şişli",
+            "üsküdar",
+            "ataşehir",
+            "maltepe",
+            "pendik",
+            "kartal",
+            "çekmeköy",
+            "sancaktepe",
+            "beykoz",
+            "ümraniye",
+            "sarıyer",
+            "bakırköy",
+            "bahçelievler",
+            "beylikdüzü",
+            "esenyurt",
+            "başakşehir",
+            "küçükçekmece",
+            "büyükçekmece",
+            "kağıthane"
+        ],
+        "general": [
+            "lokasyon",
+            "bölge",
+            "mahalle",
+            "cadde",
+            "sokak",
+            "yakın",
+            "merkez",
+            "civarı",
+            "tarafı"
+        ]
+    },
+    "details": [
+        "bütçe",
+        "tl",
+        "₺",
+        "oda",
+        "m2",
+        "metrekare",
+        "kat",
+        "banyo",
+        "balkon",
+        "teras",
+        "kredi",
+        "peşin",
+        "tapu",
+        "masraf",
+        "takas",
+        "fiyat",
+        "devren",
+        "stopaj",
+        "aidat"
+    ],
+    "positiveEngagement": [
+        "teşekkür",
+        "sağolun",
+        "memnun oldum",
+        "güzel",
+        "harika",
+        "tamam"
+    ],
+    "negative": [
+        "hayır",
+        "gerek yok",
+        "ilgilenmiyorum",
+        "spam",
+        "rahatsız etme"
+    ]
+}

@@ -1,0 +1,52 @@
+
+[2026-01-21T16:30:46.773Z] Query: {"portfolio":"agency","status":"active","limit":"500"}
+
+[2026-01-21T16:30:46.789Z] Query: {"portfolio":"agency","status":"active","limit":"500"}
+
+[2026-01-21T16:31:20.324Z] Query: {"portfolio":"agency","status":"active","limit":"500"}
+
+[2026-01-21T16:31:20.344Z] Query: {"portfolio":"agency","status":"active","limit":"500"}
+
+[2026-01-21T16:36:19.751Z] Query: {"portfolio":"agency","status":"active","limit":"500"}
+
+[2026-01-21T16:36:19.769Z] Query: {"portfolio":"agency","status":"active","limit":"500"}
+
+[2026-01-21T16:37:07.816Z] Query: {}
+
+[2026-01-21T16:37:07.825Z] Query: {"page":"1","limit":"50","sort":"newest"}
+
+[2026-01-21T16:37:07.864Z] Query: {}
+
+[2026-01-21T16:37:07.868Z] Query: {"page":"1","limit":"50","sort":"newest"}
+
+[2026-01-21T16:37:11.024Z] Query: {}
+
+[2026-01-21T16:37:11.034Z] Query: {"page":"1","limit":"50","sort":"newest"}
+
+[2026-01-21T16:37:11.069Z] Query: {"page":"1","limit":"50","sort":"newest"}
+
+[2026-01-21T16:37:11.073Z] Query: {}
+
+[2026-01-21T16:37:59.894Z] Query: {"portfolio":"agency","status":"active","limit":"500"}
+
+[2026-01-21T16:37:59.909Z] Query: {"portfolio":"agency","status":"active","limit":"500"}
+
+[2026-01-21T16:38:15.529Z] Query: {"portfolio":"agency","status":"removed","limit":"500"}
+
+[2026-01-21T16:38:16.946Z] Query: {"portfolio":"agency","status":"active","limit":"500"}
+
+[2026-01-21T16:40:26.805Z] Query: {}
+
+[2026-01-21T16:40:26.812Z] Query: {"page":"1","limit":"50","sort":"newest"}
+
+[2026-01-21T16:40:26.844Z] Query: {}
+
+[2026-01-21T16:40:26.851Z] Query: {"page":"1","limit":"50","sort":"newest"}
+
+[2026-01-21T16:40:30.167Z] Query: {}
+
+[2026-01-21T16:40:30.172Z] Query: {"page":"1","limit":"50","sort":"newest"}
+
+[2026-01-21T16:40:30.209Z] Query: {}
+
+[2026-01-21T16:40:30.213Z] Query: {"page":"1","limit":"50","sort":"newest"}

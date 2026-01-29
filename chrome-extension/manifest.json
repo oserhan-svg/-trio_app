@@ -1,0 +1,78 @@
+{
+    "manifest_version": 3,
+    "name": "Trio Assistant (Auto-Pilot)",
+    "version": "1.0",
+    "description": "Automated Scraper for Sahibinden, Hepsiemlak & WhatsApp",
+    "permissions": [
+        "activeTab",
+        "scripting",
+        "storage",
+        "alarms",
+        "tabs",
+        "declarativeNetRequest"
+    ],
+    "host_permissions": [
+        "https://sahibinden.com/*",
+        "https://*.sahibinden.com/*",
+        "https://hepsiemlak.com/*",
+        "https://*.hepsiemlak.com/*",
+        "https://hemlak.com/*",
+        "https://*.hemlak.com/*",
+        "https://emlakjet.com/*",
+        "https://*.emlakjet.com/*",
+        "https://web.whatsapp.com/*",
+        "http://127.0.0.1:5005/*"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "declarative_net_request": {
+        "rule_resources": [
+            {
+                "id": "ruleset_1",
+                "enabled": true,
+                "path": "rules.json"
+            }
+        ]
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://web.whatsapp.com/*"
+            ],
+            "js": [
+                "mask.js"
+            ],
+            "run_at": "document_start",
+            "world": "MAIN",
+            "all_frames": true
+        },
+        {
+            "matches": [
+                "https://*.sahibinden.com/*",
+                "https://*.hepsiemlak.com/*",
+                "https://*.hemlak.com/*",
+                "https://*.emlakjet.com/*",
+                "https://web.whatsapp.com/*"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "run_at": "document_start",
+            "all_frames": true
+        }
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "icon16.png",
+            "48": "icon48.png",
+            "128": "icon128.png"
+        }
+    },
+    "icons": {
+        "16": "icon16.png",
+        "48": "icon48.png",
+        "128": "icon128.png"
+    }
+}

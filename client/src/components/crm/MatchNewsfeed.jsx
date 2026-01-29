@@ -1,18 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { Sparkles, User, Home, ArrowRight, Clock, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { Sparkles, Filter, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
+import MatchCard from './MatchCard';
 
 const MatchNewsfeed = () => {
     const [matches, setMatches] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [filter, setFilter] = useState('all'); // 'all', 'high_score'
+    const [refreshing, setRefreshing] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
         fetchRecentMatches();
     }, []);
 
-    const fetchRecentMatches = async () => {
+    // OPTIMIZATION: useCallback to prevent unnecessary re-creation
+    const fetchRecentMatches = useCallback(async () => {
         try {
             setLoading(true);
             const response = await api.get('/clients/recent-matches');
@@ -22,20 +26,35 @@ const MatchNewsfeed = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    // OPTIMIZATION: Debounced refresh to prevent spam clicks
+    const handleRefresh = useCallback(() => {
+        if (refreshing) return;
+        setRefreshing(true);
+        fetchRecentMatches().finally(() => {
+            setTimeout(() => setRefreshing(false), 1000);
+        });
+    }, [refreshing, fetchRecentMatches]);
+
+    // OPTIMIZATION: Memoize filtered results to prevent recalculation on every render
+    const filteredMatches = useMemo(() => {
+        return matches.filter(m => {
+            if (m.property?.status === 'removed') return false;
+            if (filter === 'high_score') return (m.score || 0) >= 90;
+            return true;
+        });
+    }, [matches, filter]);
 
     if (loading) return (
-        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm animate-pulse">
-            <div className="h-4 bg-gray-100 rounded w-1/3 mb-6"></div>
+        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm animate-pulse h-[600px]">
+            <div className="flex justify-between mb-6">
+                <div className="h-4 bg-gray-100 rounded w-1/3"></div>
+                <div className="h-4 bg-gray-100 rounded w-16"></div>
+            </div>
             <div className="space-y-4">
                 {[1, 2, 3].map(i => (
-                    <div key={i} className="flex gap-4">
-                        <div className="w-12 h-12 bg-gray-50 rounded-lg"></div>
-                        <div className="flex-1 space-y-2">
-                            <div className="h-3 bg-gray-50 rounded w-3/4"></div>
-                            <div className="h-2 bg-gray-50 rounded w-1/2"></div>
-                        </div>
-                    </div>
+                    <div key={i} className="h-32 bg-gray-50 rounded-xl"></div>
                 ))}
             </div>
         </div>
@@ -44,74 +63,74 @@ const MatchNewsfeed = () => {
     if (matches.length === 0) return null;
 
     return (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col h-[600px]">
-            <div className="px-3 py-2 bg-gradient-to-r from-emerald-50 to-white border-b border-emerald-100 flex justify-between items-center">
-                <h3 className="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
-                    <Sparkles size={14} className="text-emerald-600" />
-                    Taze Eşleşmeler
-                </h3>
-                <span className="text-[10px] font-bold bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full border border-emerald-200">
-                    {matches.length} Yeni
-                </span>
-            </div>
-
-            <div className="flex-1 overflow-y-auto divide-y divide-gray-50 custom-scrollbar">
-                {matches.filter(m => m.property?.status !== 'removed').map((m) => (
-                    <div
-                        key={m.id}
-                        className="px-3 py-2.5 hover:bg-gray-50 transition-colors cursor-pointer group relative"
-                        onClick={() => navigate(`/clients/${m.client_id}`)}
-                    >
-                        <div className="flex gap-2.5 items-start">
-                            {/* Avatar */}
-                            <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 flex-shrink-0 mt-0.5 border border-blue-100">
-                                <User size={14} />
-                            </div>
-
-                            {/* Content */}
-                            <div className="flex-1 min-w-0">
-                                {/* Header: Name & Time */}
-                                <div className="flex justify-between items-center mb-1">
-                                    <h4 className="font-bold text-gray-900 text-xs truncate pr-2">{m.client.name}</h4>
-                                    <span className="text-[9px] text-gray-400 flex items-center gap-0.5 whitespace-nowrap">
-                                        {new Date(m.added_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
-                                    </span>
-                                </div>
-
-                                {/* Property Snippet */}
-                                <div className="bg-white rounded border border-gray-100 p-1.5 group-hover:border-emerald-300 group-hover:shadow-sm transition-all">
-                                    <div className="flex justify-between items-center mb-0.5">
-                                        <span className="text-[10px] text-gray-500 flex items-center gap-1 truncate max-w-[60%]">
-                                            <Home size={8} /> {m.property.district} / {m.property.neighborhood}
-                                        </span>
-                                        <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1 rounded">
-                                            {parseInt(m.property.price).toLocaleString()} ₺
-                                        </span>
-                                    </div>
-                                    <p className="text-[10px] text-gray-700 truncate font-medium">{m.property.title?.split('#')[0].trim()}</p>
-                                </div>
-                            </div>
-
-                            {/* Hover Action Indicator */}
-                            <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <div className="bg-white rounded-full p-1 shadow border border-gray-200 text-emerald-600">
-                                    <ChevronRight size={14} />
-                                </div>
-                            </div>
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[700px]">
+            {/* Header */}
+            <div className="px-5 py-4 bg-white border-b border-slate-100 flex justify-between items-center sticky top-0 z-20 backdrop-blur-md bg-white/90">
+                <div>
+                    <h3 className="text-base font-black text-slate-800 flex items-center gap-2">
+                        <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl">
+                            <Sparkles size={18} />
                         </div>
-                    </div>
-                ))}
+                        Eşleşme Akışı
+                    </h3>
+                    <p className="text-xs text-slate-500 font-medium mt-1 ml-11">
+                        Son 24 saatteki potansiyel fırsatlar
+                    </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => setFilter('all')}
+                        className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors ${filter === 'all' ? 'bg-slate-100 text-slate-900' : 'text-slate-400 hover:bg-slate-50'}`}
+                    >
+                        Tümü
+                    </button>
+                    <button
+                        onClick={() => setFilter('high_score')}
+                        className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 ${filter === 'high_score' ? 'bg-emerald-50 text-emerald-700' : 'text-slate-400 hover:bg-slate-50'}`}
+                    >
+                        <Sparkles size={12} />
+                        %90+
+                    </button>
+                    <button
+                        onClick={handleRefresh}
+                        disabled={refreshing}
+                        className={`p-2 rounded-lg transition-all ${refreshing
+                                ? 'text-slate-300 cursor-not-allowed'
+                                : 'text-slate-400 hover:text-blue-600 hover:bg-blue-50 active:scale-95'
+                            }`}
+                        title="Yenile"
+                    >
+                        <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
+                    </button>
+                </div>
             </div>
 
-            <button
-                onClick={() => navigate('/clients')}
-                className="py-2 text-[10px] font-bold text-gray-500 hover:text-emerald-700 border-t border-gray-100 text-center flex items-center justify-center gap-1 hover:bg-gray-50 transition-all bg-gray-50/50"
-            >
-                Tümünü Gör
-                <ArrowRight size={10} />
-            </button>
+            {/* Feed Content */}
+            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar bg-slate-50/50">
+                <div className="grid grid-cols-1 gap-4">
+                    {filteredMatches.length > 0 ? (
+                        filteredMatches.map(match => (
+                            <MatchCard key={match.id} match={match} />
+                        ))
+                    ) : (
+                        <div className="text-center py-12 text-slate-400">
+                            <Filter size={32} className="mx-auto mb-2 opacity-50" />
+                            <p className="text-sm font-medium">Bu kriterde eşleşme yok.</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Footer Status */}
+            <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 text-center">
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                    Toplam {filteredMatches.length} Fırsat Gösteriliyor
+                </p>
+            </div>
         </div>
     );
 };
 
-export default MatchNewsfeed;
+// OPTIMIZATION: React.memo to prevent unnecessary re-renders
+export default React.memo(MatchNewsfeed);
