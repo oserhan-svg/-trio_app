@@ -20,33 +20,21 @@ const PORT = process.env.PORT || 5005; // Force 5005 to avoid localhost:5000 con
 app.set('trust proxy', 1);
 
 // 🔍 GLOBAL NETWORK LOGGER (First Middleware)
+// GLOBAL MIDDLEWARE
 app.use((req, res, next) => {
-    const origin = req.headers.origin || 'none';
-    const isPNA = req.headers['access-control-request-private-network'] === 'true';
-
+    // Basic network logging
     if (req.method === 'OPTIONS' || req.url.includes('scraper')) {
-        console.log(`[NETWORK] ${req.method} ${req.url} | Origin: ${origin} | PNA-Req: ${isPNA}`);
+        const origin = req.headers.origin || 'none';
+        console.log(`[NETWORK] ${req.method} ${req.url} | Origin: ${origin}`);
     }
-
-    // Auto-handle PNA/CORS Preflights (Chrome Extension connectivity)
-    if (req.method === 'OPTIONS') {
-        res.setHeader('Access-Control-Allow-Origin', origin === 'none' ? '*' : origin);
-        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-requested-with');
-        res.setHeader('Access-Control-Allow-Private-Network', 'true');
-        res.setHeader('Access-Control-Allow-Credentials', 'true'); // Critical for frontend auth
-        res.setHeader('Access-Control-Max-Age', '86400'); // Cache preflight for 24h
-        return res.status(204).send();
-    }
-
-    // Always include PNA header for actual requests too
-    res.setHeader('Access-Control-Allow-Private-Network', 'true');
     next();
 });
 
 app.use(cors({
     origin: (origin, callback) => {
-        // Explicitly allow requests from the new frontend and established sources
+        // If no origin (apps, curl), allow
+        if (!origin) return callback(null, true);
+
         const allowedOrigins = [
             'https://trio-app.pages.dev',
             'https://trio-client.pages.dev',
@@ -54,18 +42,20 @@ app.use(cors({
             'http://localhost:3000'
         ];
 
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
-
-        if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('localhost') || origin.includes('chrome-extension')) {
+        // Flexible checking for dev/extensions
+        if (allowedOrigins.includes(origin) ||
+            origin.includes('localhost') ||
+            origin.startsWith('chrome-extension://')) {
             callback(null, true);
         } else {
-            // Soft allow for other domains during dev/testing, but log it
-            console.log('[CORS] Allowing unknown origin:', origin);
+            console.log('[CORS] New origin detected (allowing softly):', origin);
             callback(null, true);
         }
     },
-    credentials: true
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-requested-with'],
+    credentials: true,
+    optionsSuccessStatus: 200
 }));
 app.use(helmet({
     contentSecurityPolicy: false,

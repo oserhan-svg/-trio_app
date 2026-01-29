@@ -8,9 +8,11 @@ class SocketService {
     initialize(server) {
         this.io = socketIo(server, {
             cors: {
-                origin: "*", // allow all for dev
-                methods: ["GET", "POST"]
-            }
+                origin: (origin, callback) => callback(null, true), // Allow all for socket
+                methods: ["GET", "POST"],
+                credentials: true
+            },
+            transports: ['websocket', 'polling']
         });
 
         this.io.on('connection', (socket) => {
