@@ -23,6 +23,7 @@ server/scripts/*.json
 # Puppeteer & Browser Profiles
 .cache/
 .wwebjs_auth/
+.wwebjs_auth_debug/
 .wwebjs_cache/
 chrome-stealth-profile*/
 server/chrome-stealth-profile*/

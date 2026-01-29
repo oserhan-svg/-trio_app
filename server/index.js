@@ -34,6 +34,7 @@ app.use((req, res, next) => {
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-requested-with');
         res.setHeader('Access-Control-Allow-Private-Network', 'true');
+        res.setHeader('Access-Control-Allow-Credentials', 'true'); // Critical for frontend auth
         res.setHeader('Access-Control-Max-Age', '86400'); // Cache preflight for 24h
         return res.status(204).send();
     }
@@ -45,8 +46,24 @@ app.use((req, res, next) => {
 
 app.use(cors({
     origin: (origin, callback) => {
-        // Allow all origins for the local scraper API
-        callback(null, true);
+        // Explicitly allow requests from the new frontend and established sources
+        const allowedOrigins = [
+            'https://trio-app.pages.dev',
+            'https://trio-client.pages.dev',
+            'http://localhost:5173',
+            'http://localhost:3000'
+        ];
+
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('localhost') || origin.includes('chrome-extension')) {
+            callback(null, true);
+        } else {
+            // Soft allow for other domains during dev/testing, but log it
+            console.log('[CORS] Allowing unknown origin:', origin);
+            callback(null, true);
+        }
     },
     credentials: true
 }));
