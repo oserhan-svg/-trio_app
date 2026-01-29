@@ -60,8 +60,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-// Explicitly handle preflight for all routes to be safe
-app.options('*', cors(corsOptions));
+// Validated: app.use(cors) handles preflight automatically. Redundant handler removed.
 
 app.use(helmet({
     contentSecurityPolicy: false,
