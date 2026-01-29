@@ -30,7 +30,8 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(cors({
+// Configure CORS options
+const corsOptions = {
     origin: (origin, callback) => {
         // If no origin (apps, curl), allow
         if (!origin) return callback(null, true);
@@ -56,7 +57,12 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization', 'x-requested-with'],
     credentials: true,
     optionsSuccessStatus: 200
-}));
+};
+
+app.use(cors(corsOptions));
+// Explicitly handle preflight for all routes to be safe
+app.options('*', cors(corsOptions));
+
 app.use(helmet({
     contentSecurityPolicy: false,
     crossOriginResourcePolicy: { policy: "cross-origin" }
@@ -86,7 +92,7 @@ const dealRoutes = require('./routes/dealRoutes');
 // Health Check
 app.get('/api/health', (req, res) => {
     console.log(`[HEALTH CHECK] Responding from Port ${PORT}`);
-    res.json({ status: 'OK', version: '1.20', port: PORT });
+    res.json({ status: 'OK', version: '1.22', port: PORT });
 });
 
 // Lightweight Ping for Keep-Alive (Zero Overhead)
@@ -167,7 +173,7 @@ app.use(errorHandler);
 const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 SERVER ACTIVE ON PORT ${PORT} - READY FOR SYNC`);
     console.log('*************************************************');
-    console.log('*  CRASH FIX LOADED - VERSION: 1.17             *');
+    console.log('*  CRASH FIX LOADED - VERSION: 1.22             *');
     console.log('*  PORT 5005 ENFORCED FOR EXTENSION             *');
     console.log('*************************************************');
 
