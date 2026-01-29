@@ -9,7 +9,6 @@
     "start": "node index.js",
     "dev-server": "nodemon index.js",
     "login": "node scripts/login_mode.js",
-    "postinstall": "npx puppeteer browsers install chrome",
     "dev": "concurrently \"npm run dev-server\" \"cd ../client && npm run dev\""
   },
   "keywords": [],

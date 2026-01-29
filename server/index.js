@@ -97,6 +97,11 @@ app.get('/api/health', (req, res) => {
 // Lightweight Ping for Keep-Alive (Zero Overhead)
 app.get('/api/ping', (req, res) => res.send('pong'));
 
+// Root Route for basic verification
+app.get('/', (req, res) => {
+    res.send('Trio App Server v1.22 is running. <br>Go to /api/health for status.');
+});
+
 // REST OF API ROUTES
 app.use('/api/auth', authRoutes);
 app.use('/api/properties', propertyRoutes);
