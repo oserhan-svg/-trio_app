@@ -1,3 +1,0 @@
-$J(function () {
-  SIHANG?.openKeysMainModal();
-});

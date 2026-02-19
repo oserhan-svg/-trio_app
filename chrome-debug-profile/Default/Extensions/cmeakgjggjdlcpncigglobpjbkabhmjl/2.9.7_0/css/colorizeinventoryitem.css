@@ -1,9 +1,0 @@
-.colorized-background {
-  &.colorized-background__full {
-    background-color: var(--dynamic-color) !important;
-  }
-
-  &.colorized-background__backlight img {
-    filter: drop-shadow(0px 0px 10px var(--dynamic-color));
-  }
-}
