@@ -1,0 +1,3 @@
+## 2025-02-19 - Concurrent Heavy Queries from Frontend
+**Learning:** Found a specific codebase anti-pattern: the frontend `Dashboard.jsx` fires both `/properties` and `/analytics` on load simultaneously. Both endpoints depend on the same heavy backend calculation (`getNeighborhoodStatsMap`), leading to a "cache stampede" that hits the database multiple times concurrently before the cache is populated.
+**Action:** Implemented Promise memoization in the `AnalyticsService` singleton so concurrent identical requests await the same promise instead of triggering duplicate `groupBy` queries. Look for this pattern when dealing with multiple dashboard widgets fetching data on load.
