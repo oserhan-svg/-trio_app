@@ -1,0 +1,4 @@
+## 2024-05-18 - [CRITICAL] Unauthenticated Database Migration Route
+**Vulnerability:** A route `/internal/migrate` mapped to `dealController.runInternalMigration` existed without authentication or authorization middleware. This allowed anyone to hit the endpoint and trigger a database migration script via `child_process.exec`.
+**Learning:** Database management commands like Prisma migrations should never be mapped directly to HTTP endpoints without strict access control (admin-only). Exposing such functionality over HTTP is an inherent risk of command injection or malicious database manipulation.
+**Prevention:** Ensure all `/internal` or administrative routes are explicitly secured with `authenticateToken` and role checks (like `authorizeRole('admin')`). Consider avoiding executing shell commands from web controllers whenever possible.
