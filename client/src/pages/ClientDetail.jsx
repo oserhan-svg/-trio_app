@@ -282,7 +282,7 @@ const ClientDetail = () => {
                     <div className="lg:col-span-12 animate-in slide-in-from-top duration-300">
                         <div className="bg-slate-50 border-2 border-slate-200 rounded-2xl p-6 relative overflow-hidden group">
                             <div className="absolute top-0 right-0 p-4">
-                                <button onClick={() => setShowAnalysis(false)} className="text-slate-400 hover:text-slate-600"><X size={20} /></button>
+                                <button aria-label="Analizi kapat" onClick={() => setShowAnalysis(false)} className="text-slate-400 hover:text-slate-600"><X size={20} /></button>
                             </div>
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="p-2 bg-slate-900 rounded-xl text-blue-400">
@@ -403,8 +403,8 @@ const ClientDetail = () => {
                                             placeholder="Not..."
                                         />
                                         <div className="flex justify-end gap-1">
-                                            <button onClick={() => setIsEditingInfo(false)} className="p-1 hover:bg-gray-100 rounded"><X size={14} /></button>
-                                            <button onClick={handleSaveInfo} className="p-1 text-green-600 hover:bg-green-50 rounded"><CheckCircle size={14} /></button>
+                                            <button aria-label="Düzenlemeyi iptal et" onClick={() => setIsEditingInfo(false)} className="p-1 hover:bg-gray-100 rounded"><X size={14} /></button>
+                                            <button aria-label="Bilgileri kaydet" onClick={handleSaveInfo} className="p-1 text-green-600 hover:bg-green-50 rounded"><CheckCircle size={14} /></button>
                                         </div>
                                     </div>
                                 ) : (
@@ -673,8 +673,8 @@ const ClientDetail = () => {
                                                                             onChange={e => setTempPropertyNote(e.target.value)}
                                                                             autoFocus
                                                                         />
-                                                                        <button onClick={() => handleSavePropertyNote(p.id, prop.id)} className="text-green-600"><CheckCircle size={14} /></button>
-                                                                        <button onClick={() => setEditingPropertyNote(null)} className="text-gray-400"><X size={14} /></button>
+                                                                        <button aria-label="Notu kaydet" onClick={() => handleSavePropertyNote(p.id, prop.id)} className="text-green-600"><CheckCircle size={14} /></button>
+                                                                        <button aria-label="Not düzenlemeyi iptal et" onClick={() => setEditingPropertyNote(null)} className="text-gray-400"><X size={14} /></button>
                                                                     </div>
                                                                 ) : (
                                                                     <button
@@ -687,8 +687,8 @@ const ClientDetail = () => {
                                                             </div>
 
                                                             <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                <button onClick={() => window.open(`/property/${prop.id}`, '_blank')} className="p-1.5 text-gray-500 hover:bg-gray-200 rounded" title="Detay"><FileText size={14} /></button>
-                                                                <button onClick={() => handleRemoveProperty(prop.id)} className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded" title="Kaldır"><Trash2 size={14} /></button>
+                                                                <button aria-label="Mülk detayını gör" onClick={() => window.open(`/property/${prop.id}`, '_blank')} className="p-1.5 text-gray-500 hover:bg-gray-200 rounded" title="Detay"><FileText size={14} /></button>
+                                                                <button aria-label="Mülkü kaldır" onClick={() => handleRemoveProperty(prop.id)} className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded" title="Kaldır"><Trash2 size={14} /></button>
                                                             </div>
                                                         </div>
                                                     </div>
