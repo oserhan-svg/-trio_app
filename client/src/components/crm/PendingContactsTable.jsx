@@ -333,6 +333,7 @@ const PendingContactsTable = ({ onImportClick }) => {
                                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                                 disabled={currentPage === 1}
                                 className="p-1 hover:bg-gray-100 disabled:opacity-50 disabled:hover:bg-white border-r border-gray-200"
+                                aria-label="Önceki Sayfa"
                             >
                                 <ChevronLeft size={14} />
                             </button>
@@ -343,6 +344,7 @@ const PendingContactsTable = ({ onImportClick }) => {
                                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                                 disabled={currentPage === totalPages || totalPages === 0}
                                 className="p-1 hover:bg-gray-100 disabled:opacity-50 disabled:hover:bg-white border-l border-gray-200"
+                                aria-label="Sonraki Sayfa"
                             >
                                 <ChevronRight size={14} />
                             </button>
