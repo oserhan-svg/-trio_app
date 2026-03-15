@@ -235,9 +235,15 @@ const getProperties = async (req, res) => {
             const sliceIds = slice.map(p => p.id);
 
             // PASS 2: Detailed fetch for active slice only
+            // [OPTIMIZATION] Limit history to last 2 entries for scoring to reduce payload size
             const detailedProperties = await prisma.property.findMany({
                 where: { id: { in: sliceIds } },
-                include: { history: { orderBy: { changed_at: 'asc' } } }
+                include: {
+                    history: {
+                        orderBy: { changed_at: 'desc' },
+                        take: 2
+                    }
+                }
             });
 
             // Re-map analysis back to detailed objects
@@ -247,6 +253,9 @@ const getProperties = async (req, res) => {
                 return {
                     ...p,
                     images: upgradeImages(p.images),
+                    // Ensure history is in ascending order for any downstream consumers if needed,
+                    // though scoring was already done in Pass 1.
+                    history: (p.history || []).reverse(),
                     opportunity_score: analysis.score,
                     opportunity_label: analysis.label,
                     deviation: analysis.deviation,
@@ -263,16 +272,41 @@ const getProperties = async (req, res) => {
 
         } else {
             // Standard path
+            // [OPTIMIZATION] Limit history to last 2 entries for scoring to reduce payload size
             [total, properties] = await Promise.all([
                 prisma.property.count({ where }),
-                prisma.property.findMany({ where, orderBy: { created_at: 'desc' }, include: { history: { orderBy: { changed_at: 'asc' } } }, skip, take: limit })
+                prisma.property.findMany({
+                    where,
+                    orderBy: { created_at: 'desc' },
+                    include: {
+                        history: {
+                            orderBy: { changed_at: 'desc' },
+                            take: 2
+                        }
+                    },
+                    skip,
+                    take: limit
+                })
             ]);
 
             const statsMap = await statsMapTask;
             processed = properties.map(p => {
                 try {
-                    const analysis = analyticsService.scoreProperty(p, statsMap, p.history);
-                    return { ...p, images: upgradeImages(p.images), opportunity_score: analysis.score, opportunity_label: analysis.label, deviation: analysis.deviation, roi: analysis.roi, comparison_basis: analysis.comparisonBasis, comparison_price: analysis.comparisonPrice, has_recent_price_drop: analysis.hasRecentPriceDrop };
+                    // Reverse history to ascending for scoring logic
+                    const sortedHistory = (p.history || []).reverse();
+                    const analysis = analyticsService.scoreProperty(p, statsMap, sortedHistory);
+                    return {
+                        ...p,
+                        history: sortedHistory,
+                        images: upgradeImages(p.images),
+                        opportunity_score: analysis.score,
+                        opportunity_label: analysis.label,
+                        deviation: analysis.deviation,
+                        roi: analysis.roi,
+                        comparison_basis: analysis.comparisonBasis,
+                        comparison_price: analysis.comparisonPrice,
+                        has_recent_price_drop: analysis.hasRecentPriceDrop
+                    };
                 } catch (err) {
                     return { ...p, images: upgradeImages(p.images) };
                 }
