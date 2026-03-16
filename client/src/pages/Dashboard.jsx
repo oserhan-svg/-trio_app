@@ -22,7 +22,6 @@ import AIOpportunitiesFeed from '../components/dashboard/AIOpportunitiesFeed';
 const Dashboard = () => {
     const navigate = useNavigate();
     const [properties, setProperties] = useState([]);
-    const [stats, setStats] = useState([]);
     const [viewMode, setViewMode] = useState('list');
     const [loading, setLoading] = useState(true);
     const [errorMsg, setErrorMsg] = useState(null);
@@ -84,8 +83,6 @@ const Dashboard = () => {
             if (currentFilters.floor_location) params.append('floor_location', currentFilters.floor_location);
 
             const requests = [api.get(`/properties?${params.toString()}`)];
-            if (!append && pageParam === 1) requests.push(api.get('/analytics'));
-
             const results = await Promise.allSettled(requests);
 
             const propResult = results[0];
@@ -109,12 +106,6 @@ const Dashboard = () => {
                 throw propResult.reason;
             }
 
-            if (!append && pageParam === 1 && results[1]) {
-                const analyticsResult = results[1];
-                if (analyticsResult.status === 'fulfilled') {
-                    setStats(analyticsResult.value.data.marketStats || []);
-                }
-            }
 
         } catch (error) {
             console.error('Error fetching data:', error);
