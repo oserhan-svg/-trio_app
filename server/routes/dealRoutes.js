@@ -7,6 +7,7 @@ router.get('/', authenticateToken, dealController.getDeals);
 router.post('/', authenticateToken, dealController.createDeal);
 router.get('/stats', authenticateToken, dealController.getFinancialStats);
 router.get('/stats/summary/:id', authenticateToken, dealController.getDealSummaryLetter);
-router.get('/internal/migrate', dealController.runInternalMigration);
+// Security: Protect internal administrative endpoints that execute shell commands
+router.get('/internal/migrate', authenticateToken, authorizeRole('admin'), dealController.runInternalMigration);
 
 module.exports = router;

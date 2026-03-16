@@ -187,6 +187,8 @@ const getDealSummaryLetter = async (req, res) => {
     }
 };
 
+// Security Note: Exposing exec() over HTTP is a critical risk.
+// This endpoint MUST be protected with strong authentication and authorization (e.g., admin-only).
 const runInternalMigration = async (req, res) => {
     const { exec } = require('child_process');
     const path = require('path');
