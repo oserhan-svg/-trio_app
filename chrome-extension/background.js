@@ -27,6 +27,10 @@ async function reliableSendMessage(tabId, message, retries = 5) {
 // Internal state to prevent storage race conditions
 let activeTabRegistry = {};
 
+// Extension API Key for Server Auth
+// TODO: Load this from a secure configuration or build-time environment variable
+const EXTENSION_API_KEY = 'REPLACE_WITH_YOUR_EXTENSION_API_KEY';
+
 // Restore registry from storage on startup
 chrome.storage.local.get(['active_tab_ids'], (result) => {
     activeTabRegistry = result.active_tab_ids || {};
@@ -133,7 +137,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 if (source !== 'whatsapp') {
                     fetch('http://127.0.0.1:5005/api/scraper/finished', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-api-key': EXTENSION_API_KEY
+                        },
                         body: JSON.stringify({ provider: source || 'unknown', reason: reason || 'Page end' })
                     }).catch(() => { });
                 }
@@ -147,7 +154,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         fetch('http://127.0.0.1:5005/api/whatsapp/extension-sync', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': EXTENSION_API_KEY
+            },
             body: JSON.stringify({ partnerName, profilePicUrl, messages })
         }).catch(err => console.error('❌ WhatsApp Sync Error:', err));
 
@@ -167,7 +177,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             try {
                 const response = await fetch(url, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': EXTENSION_API_KEY
+                    },
                     body: JSON.stringify({ listings, provider: source })
                 });
 

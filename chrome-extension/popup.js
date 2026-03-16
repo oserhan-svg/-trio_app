@@ -88,6 +88,7 @@ document.getElementById('stopBtn').addEventListener('click', () => {
 
 document.getElementById('testBtn').addEventListener('click', () => {
     document.getElementById('status').innerText = "Bağlantı test ediliyor...";
+    // Note: api/health doesn't require extensionAuth yet, but good for generic testing
     fetch('http://127.0.0.1:5005/api/health')
         .then(r => r.json())
         .then(data => {
