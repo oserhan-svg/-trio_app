@@ -378,6 +378,9 @@ const syncChat = async (req, res) => {
             });
             const existingIdsSet = new Set(existingMessages.map(m => m.whatsapp_id));
 
+            // ⚡ Bolt: Accumulate new messages to avoid N+1 database queries
+            const newMessagesData = [];
+
             for (const msg of messages) {
                 if (!['chat', 'image', 'video', 'audio', 'document', 'ptt'].includes(msg.type)) continue;
                 if (existingIdsSet.has(msg.id._serialized)) continue;
@@ -390,24 +393,30 @@ const syncChat = async (req, res) => {
                 const authorId = isGroup ? (msg.author || msg.from).split('@')[0] : phoneNumber;
                 const authorResolution = await messageHandlerService.resolveSenderName(authorId, null, null);
 
-                await prisma.whatsAppMessage.create({
-                    data: {
-                        whatsapp_id: msg.id._serialized,
-                        from: msg.fromMe ? 'system' : fullChatId,
-                        to: msg.fromMe ? fullChatId : 'system',
-                        content: msg.body,
-                        sender_name: msg.fromMe ? 'Trio Emlak' : (isGroup ? (msg._data?.notifyName || authorResolution.name) : (resolvedName || phoneNumber)),
-                        timestamp: new Date(msg.timestamp * 1000),
-                        client_id: client?.id,
-                        media_url: mediaData?.url,
-                        media_type: mediaData?.type,
-                        mime_type: mediaData?.mimetype,
-                        metadata: {
-                            is_consultant: authorResolution.isConsultant,
-                            author: authorId,
-                            is_group: isGroup
-                        }
+                newMessagesData.push({
+                    whatsapp_id: msg.id._serialized,
+                    from: msg.fromMe ? 'system' : fullChatId,
+                    to: msg.fromMe ? fullChatId : 'system',
+                    content: msg.body,
+                    sender_name: msg.fromMe ? 'Trio Emlak' : (isGroup ? (msg._data?.notifyName || authorResolution.name) : (resolvedName || phoneNumber)),
+                    timestamp: new Date(msg.timestamp * 1000),
+                    client_id: client?.id,
+                    media_url: mediaData?.url,
+                    media_type: mediaData?.type,
+                    mime_type: mediaData?.mimetype,
+                    metadata: {
+                        is_consultant: authorResolution.isConsultant,
+                        author: authorId,
+                        is_group: isGroup
                     }
+                });
+            }
+
+            if (newMessagesData.length > 0) {
+                // ⚡ Bolt: Bulk insert new messages in a single query
+                await prisma.whatsAppMessage.createMany({
+                    data: newMessagesData,
+                    skipDuplicates: true // Extra safety
                 });
             }
         }
