@@ -27,7 +27,11 @@ const AddClientModal = ({ isOpen, onClose, onSave }) => {
             <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl scale-100 opacity-100">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-bold text-gray-900">Yeni Müşteri Ekle</h2>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition">
+                    <button
+                        onClick={onClose}
+                        className="text-gray-400 hover:text-gray-600 transition"
+                        aria-label="Kapat"
+                    >
                         <X size={24} />
                     </button>
                 </div>
@@ -35,6 +39,7 @@ const AddClientModal = ({ isOpen, onClose, onSave }) => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <Input
                         label="Ad Soyad"
+                        id="client-name"
                         placeholder="Örn: Ahmet Yılmaz"
                         value={formData.name}
                         onChange={e => setFormData({ ...formData, name: e.target.value })}
@@ -42,12 +47,14 @@ const AddClientModal = ({ isOpen, onClose, onSave }) => {
                     />
                     <Input
                         label="Telefon"
+                        id="client-phone"
                         placeholder="Örn: 0555 123 45 67"
                         value={formData.phone}
                         onChange={e => setFormData({ ...formData, phone: e.target.value })}
                     />
                     <Input
                         label="E-posta"
+                        id="client-email"
                         type="email"
                         placeholder="ahmet@ornek.com"
                         value={formData.email}
@@ -82,8 +89,9 @@ const AddClientModal = ({ isOpen, onClose, onSave }) => {
                         </div>
                     </div>
                     <div className="flex flex-col gap-1.5">
-                        <label className="text-sm font-medium text-gray-700">Notlar</label>
+                        <label htmlFor="client-notes" className="text-sm font-medium text-gray-700">Notlar</label>
                         <textarea
+                            id="client-notes"
                             className="px-3 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:outline-none min-h-[100px]"
                             placeholder="Müşteri hakkında notlar..."
                             value={formData.notes}
@@ -93,8 +101,8 @@ const AddClientModal = ({ isOpen, onClose, onSave }) => {
 
                     <div className="flex justify-end gap-3 mt-6">
                         <Button type="button" variant="secondary" onClick={onClose}>İptal</Button>
-                        <Button type="submit" disabled={loading}>
-                            {loading ? 'Kaydediliyor...' : 'Kaydet'}
+                        <Button type="submit" isLoading={loading}>
+                            Kaydet
                         </Button>
                     </div>
                 </form>
