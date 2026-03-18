@@ -1,0 +1,3 @@
+## 2024-05-24 - Parallelize Independent Database Counts
+**Learning:** In the `adminController.js` and `analyticsController.js`, multiple independent `prisma.property.count()` queries were being executed sequentially. Since these counts do not depend on each other, executing them one after another causes unnecessary latency, effectively acting like an N+1 bottleneck for dashboard statistics.
+**Action:** When calculating dashboard metrics or aggregating multiple independent statistics, always use `Promise.all()` to run the database queries concurrently. This reduces the total time to the duration of the single longest query rather than the sum of all query times.
