@@ -66,6 +66,18 @@ const getChats = async (req, res) => {
             Prisma.sql`WHERE (c.consultant_id = ${req.user.id} OR c.consultant_id IS NULL OR c.id IS NULL)` :
             Prisma.sql`WHERE 1=1`;
 
+        let searchCondition = Prisma.empty;
+        if (searchTerm) {
+            const term = `%${searchTerm}%`;
+            searchCondition = Prisma.sql`AND (
+                lm.partner ILIKE ${term} OR
+                c.name ILIKE ${term} OR
+                lm.content ILIKE ${term} OR
+                lm.sender_name ILIKE ${term}
+            )`;
+        }
+
+        // BOLT: Optimized query with JOINed unread counts and SQL-level filtering
         const chatSummaries = await prisma.$queryRaw`
             WITH LatestMessages AS (
                 SELECT DISTINCT ON (partner)
@@ -73,22 +85,29 @@ const getChats = async (req, res) => {
                     id, content, timestamp, "from", "to", is_viewed, media_type, client_id, sender_name
                 FROM whatsapp_messages
                 ORDER BY partner, timestamp DESC
+            ),
+            UnreadCounts AS (
+                SELECT "from" as partner, COUNT(*)::int as count
+                FROM whatsapp_messages
+                WHERE "to" = 'system' AND is_viewed = false
+                GROUP BY "from"
             )
             SELECT 
                 lm.*,
                 c.id as "clientId", c.name as "clientName", c.profile_pic_url as "profilePicUrl",
                 c.ai_delegated, c.ai_summary, c.priority_score, c.last_intent_tag,
                 c.last_sentiment, c.next_best_action, c.is_stale,
-                (SELECT COUNT(*)::int FROM whatsapp_messages 
-                 WHERE "from" = lm.partner AND "to" = 'system' AND is_viewed = false) as "unreadCount"
+                COALESCE(uc.count, 0) as "unreadCount"
             FROM LatestMessages lm
             LEFT JOIN clients c ON (c.phone = lm.partner OR c.phone = split_part(lm.partner, '@', 1))
+            LEFT JOIN UnreadCounts uc ON uc.partner = lm.partner
             ${baseCondition}
+            ${searchCondition}
             ORDER BY lm.timestamp DESC
             LIMIT 100
         `;
 
-        let result = chatSummaries.map(c => {
+        const result = chatSummaries.map(c => {
             let displayName = c.clientName;
             const isGroup = c.partner.endsWith('@g.us');
             if (!displayName || displayName === 'WhatsApp Grup' || displayName === c.partner || /^\d+$/.test(String(displayName).replace(/\D/g, ''))) {
@@ -120,16 +139,7 @@ const getChats = async (req, res) => {
             };
         });
 
-        if (searchTerm) {
-            const term = searchTerm.toLowerCase();
-            result = result.filter(c =>
-                c.phone.includes(term) ||
-                (c.name && c.name.toLowerCase().includes(term)) ||
-                (c.lastMessage.content && c.lastMessage.content.toLowerCase().includes(term))
-            );
-        }
-
-        result.sort((a, b) => (new Date(b.lastMessage.timestamp).getTime() || 0) - (new Date(a.lastMessage.timestamp).getTime() || 0));
+        // BOLT: Removed manual JS filtering and sorting - handled by SQL for better performance
         res.json(result);
     } catch (error) {
         console.error('Fetch chats error:', error);
