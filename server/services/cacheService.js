@@ -3,6 +3,7 @@ class CacheService {
     constructor(maxSize = 1000) {
         this.cache = new Map();
         this.timers = new Map();
+        this.pending = new Map(); // Track in-flight promises to prevent thundering herd
         this.maxSize = maxSize; // Maximum number of keys to prevent memory bloat
         this.stats = {
             hits: 0,
@@ -87,15 +88,34 @@ class CacheService {
     }
 
     /**
-     * Singleton Wrapper: Get or set pattern
+     * Singleton Wrapper: Get or set pattern with Promise Coalescing
+     * Prevents multiple concurrent calls for the same key (thundering herd)
      */
     async getOrSet(key, fetcher, ttlSeconds = 300, namespace = 'global') {
+        const fullKey = `${namespace}:${key}`;
+
+        // 1. Check existing cache
         const cached = this.get(key, namespace);
         if (cached !== undefined) return cached;
 
-        const value = await fetcher();
-        this.set(key, value, ttlSeconds, namespace);
-        return value;
+        // 2. Check for in-flight promise (coalescing)
+        if (this.pending.has(fullKey)) {
+            return this.pending.get(fullKey);
+        }
+
+        // 3. Create new promise, store it, and execute fetcher
+        const promise = (async () => {
+            try {
+                const value = await fetcher();
+                this.set(key, value, ttlSeconds, namespace);
+                return value;
+            } finally {
+                this.pending.delete(fullKey);
+            }
+        })();
+
+        this.pending.set(fullKey, promise);
+        return promise;
     }
 
     getStats() {
