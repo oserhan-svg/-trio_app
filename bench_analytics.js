@@ -1,11 +1,12 @@
+const analyticsService = require('./server/services/analyticsService');
 const prisma = require('./server/db');
-const { getNeighborhoodStatsMap } = require('./server/services/analyticsService');
 
 async function benchmark() {
     try {
         console.log('--- Benchmarking Analytics ---');
         const start = Date.now();
-        const stats = await getNeighborhoodStatsMap();
+        // The service is exported as an instance
+        const stats = await analyticsService.getNeighborhoodStatsMap();
         const end = Date.now();
         console.log('Time taken:', (end - start), 'ms');
         console.log('Neighborhood Count:', Object.keys(stats).length);
