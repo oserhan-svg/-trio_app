@@ -1,0 +1,4 @@
+## 2025-03-18 - Unauthenticated Command Execution Endpoint
+**Vulnerability:** Found an exposed `/internal/migrate` endpoint that executes a database migration command (`prisma migrate dev`) using `exec()` without any authentication or authorization checks.
+**Learning:** Internal or "developer" tools, especially those that trigger shell commands or system-level changes, must not be left exposed in production environments without proper authentication. Even if intended for internal use only, they represent a significant risk if discovered by external attackers.
+**Prevention:** Always wrap internal or administrative endpoints with robust authentication (`authenticateToken`) and strict role-based authorization (`authorizeRole('admin')`). Avoid using `exec()` for database migrations in production application code; instead, handle migrations via CI/CD pipelines or dedicated administrative scripts outside the main web application context.
