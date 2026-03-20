@@ -12,6 +12,7 @@ class AnalyticsService {
             lastFetch: 0,
             ttl: 5 * 60 * 1000 // 5 minutes
         };
+        this.statsMapPromise = null;
     }
 
     /**
@@ -108,24 +109,26 @@ class AnalyticsService {
     }
 
     async getConsultantEfficiency() {
-        const users = await prisma.user.findMany({
-            where: { role: 'consultant' },
-            include: {
-                _count: {
-                    select: { deals: true, clients: true }
-                }
-            }
-        });
-
         // Get last 30 days leads count
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-        const recentLeads = await prisma.client.groupBy({
-            by: ['consultant_id'],
-            where: { created_at: { gte: thirtyDaysAgo } },
-            _count: { id: true }
-        });
+        // ⚡ Bolt: Parallelize independent database queries
+        const [users, recentLeads] = await Promise.all([
+            prisma.user.findMany({
+                where: { role: 'consultant' },
+                include: {
+                    _count: {
+                        select: { deals: true, clients: true }
+                    }
+                }
+            }),
+            prisma.client.groupBy({
+                by: ['consultant_id'],
+                where: { created_at: { gte: thirtyDaysAgo } },
+                _count: { id: true }
+            })
+        ]);
 
         const recentLeadsMap = {};
         recentLeads.forEach(r => { if (r.consultant_id) recentLeadsMap[r.consultant_id] = r._count.id; });
@@ -227,8 +230,13 @@ class AnalyticsService {
             return this.cache.statsMap;
         }
 
-        console.log('🏘️ Calculating Neighborhood Intelligence...');
-        const rawStats = await prisma.property.groupBy({
+        // ⚡ Bolt: Promise coalescing (Thundering Herd protection)
+        if (this.statsMapPromise) return this.statsMapPromise;
+
+        this.statsMapPromise = (async () => {
+            try {
+                console.log('🏘️ Calculating Neighborhood Intelligence...');
+                const rawStats = await prisma.property.groupBy({
             by: ['district', 'neighborhood'],
             where: { status: 'active', price: { gt: 0 } },
             _avg: { price: true },
@@ -259,9 +267,15 @@ class AnalyticsService {
             });
         });
 
-        this.cache.statsMap = statsMap;
-        this.cache.lastFetch = now;
-        return statsMap;
+                this.cache.statsMap = statsMap;
+                this.cache.lastFetch = now;
+                return statsMap;
+            } finally {
+                this.statsMapPromise = null;
+            }
+        })();
+
+        return this.statsMapPromise;
     }
 
     /**
