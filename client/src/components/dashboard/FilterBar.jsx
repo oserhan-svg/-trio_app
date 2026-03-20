@@ -387,7 +387,7 @@ const FilterBar = ({ filters, metadata, properties = [], onChange, onClearAll, t
                                             savedSearches.map(s => (
                                                 <div key={s.id} onClick={() => loadSavedSearch(s.filters)} className="group flex items-center justify-between p-3 rounded-2xl hover:bg-blue-600 dark:hover:bg-blue-500 cursor-pointer transition-all border border-transparent hover:shadow-lg hover:shadow-blue-500/20">
                                                     <span className="text-xs font-bold text-slate-700 dark:text-slate-200 group-hover:text-white truncate pr-2">{s.name}</span>
-                                                    <button onClick={(e) => { e.stopPropagation(); deleteSavedSearch(e, s.id); }} className="p-1.5 text-slate-400 dark:text-slate-500 group-hover:text-white/50 hover:text-white! transition-colors">
+                                                    <button onClick={(e) => { e.stopPropagation(); deleteSavedSearch(e, s.id); }} className="p-1.5 text-slate-400 dark:text-slate-500 group-hover:text-white/50 hover:text-white! transition-colors" aria-label="Kaydı Sil">
                                                         <X size={14} />
                                                     </button>
                                                 </div>
@@ -447,6 +447,7 @@ const FilterBar = ({ filters, metadata, properties = [], onChange, onClearAll, t
                                 <button
                                     onClick={() => removeFilter(key)}
                                     className="p-1 px-1.5 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-500 transition-all active:scale-75"
+                                    aria-label="Filtreyi Kaldır"
                                 >
                                     <X size={12} strokeWidth={3} />
                                 </button>
