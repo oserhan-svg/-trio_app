@@ -1,0 +1,3 @@
+## 2024-03-20 - N+1 Latency in Independent Prisma Queries
+**Learning:** Multiple dashboard and analytics controllers in this codebase execute independent Prisma aggregation queries (like `.count()`) sequentially. Because Node.js awaits each database roundtrip before starting the next, this creates a waterfall effect that linearly increases response times.
+**Action:** When calculating metrics or aggregating multiple independent statistics using Prisma in backend controllers, always use `Promise.all()` to run the database queries concurrently rather than sequentially to avoid N+1-like latency bottlenecks.
