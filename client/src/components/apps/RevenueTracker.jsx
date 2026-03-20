@@ -76,7 +76,7 @@ const RevenueTracker = ({ onBack }) => {
         <div className="space-y-6">
             <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-4">
-                    <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-full text-gray-500 transition-colors">
+                    <button onClick={onBack} aria-label="Geri Dön" className="p-2 hover:bg-gray-100 rounded-full text-gray-500 transition-colors focus:ring-2 focus:ring-indigo-500 outline-none">
                         <ArrowLeft size={20} />
                     </button>
                     <div>
@@ -186,7 +186,7 @@ const RevenueTracker = ({ onBack }) => {
                     <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
                         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-indigo-600">
                             <h3 className="text-white font-bold text-lg">Yeni Satış Kaydı</h3>
-                            <button onClick={() => setShowAddModal(false)} className="text-white/80 hover:text-white"><X size={20} /></button>
+                            <button onClick={() => setShowAddModal(false)} aria-label="Kapat" className="text-white/80 hover:text-white focus:ring-2 focus:ring-white outline-none rounded"><X size={20} /></button>
                         </div>
                         <form onSubmit={handleSubmit} className="p-6 space-y-4">
                             <div className="grid grid-cols-2 gap-4">
