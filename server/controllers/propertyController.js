@@ -162,6 +162,7 @@ const getProperties = async (req, res) => {
             console.log(`[RADAR] Incoming request - filter: ${opportunity_filter}, category: ${radar_category}`);
 
             // PASS 1: Lightweight fetch for filtering and scoring
+            // ⚡ Bolt: Reuse existing statsMapTask promise instead of redundant call
             const [rawProps, statsMap] = await Promise.all([
                 prisma.property.findMany({
                     where,
@@ -175,7 +176,7 @@ const getProperties = async (req, res) => {
                         }
                     }
                 }),
-                analyticsService.getNeighborhoodStatsMap()
+                statsMapTask
             ]);
 
             console.log(`[RADAR] Found ${rawProps.length} active properties in DB matching "where".`);
