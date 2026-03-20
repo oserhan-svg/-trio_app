@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import { LogIn } from 'lucide-react';
-import api from '../services/api'; // Changed from axios
+import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
@@ -17,7 +17,6 @@ const Login = () => {
         setLoading(true);
 
         try {
-            // Using api instance handles base URL
             const response = await api.post('/auth/login', {
                 email,
                 password
@@ -28,7 +27,6 @@ const Login = () => {
 
             toast.success('Giriş başarılı! Yönlendiriliyorsunuz...');
 
-            // Navigate to dashboard
             setTimeout(() => {
                 navigate('/dashboard');
             }, 1000);
@@ -48,7 +46,7 @@ const Login = () => {
                 <div className="p-8">
                     <div className="flex flex-col items-center mb-8">
                         <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-4 text-emerald-600">
-                            <LogIn size={24} />
+                            <LogIn size={24} aria-hidden="true" />
                         </div>
                         <h1 className="text-2xl font-bold text-gray-900">Hoş Geldiniz</h1>
                         <p className="text-gray-500 text-sm mt-1">Trio App'e giriş yapın</p>
@@ -75,10 +73,12 @@ const Login = () => {
                             required
                         />
 
-
-
-                        <Button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2">
-                            <LogIn size={18} />
+                        <Button
+                            type="submit"
+                            isLoading={loading}
+                            className="w-full"
+                        >
+                            {!loading && <LogIn size={18} aria-hidden="true" />}
                             {loading ? 'Giriş Yapılıyor...' : 'Giriş Yap'}
                         </Button>
                     </form>
