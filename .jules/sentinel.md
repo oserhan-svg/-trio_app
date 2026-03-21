@@ -1,0 +1,4 @@
+## 2024-05-24 - Unauthenticated Internal Migration Endpoint
+**Vulnerability:** The GET `/api/deals/internal/migrate` endpoint was exposed without any authentication or authorization checks. The endpoint directly executed a shell command (`exec`) running a Prisma database migration (`prisma migrate dev`).
+**Learning:** Internal or "hidden" endpoints intended for administrative use or development are often pushed to production without proper security scaffolding. Any user (or even unauthenticated visitor) could trigger destructive database operations or potential denial-of-service.
+**Prevention:** Ensure that all internal/admin routes explicitly include both `authenticateToken` and `authorizeRole('admin')` middleware. Avoid executing raw shell commands (`exec()`) from API endpoints whenever possible.
