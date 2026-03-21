@@ -12,32 +12,38 @@ const getStats = async (req, res) => {
         console.log(`✅ statsMap calculated in ${Date.now() - start}ms`);
 
         const sStart = Date.now();
-        const supplyDemand = await analyticsService.getSupplyDemandStats();
-        console.log(`✅ supplyDemand calculated in ${Date.now() - sStart}ms`);
 
-        const totalProperties = await prisma.property.count();
+        // Optimizes performance by running all independent property counts and supply/demand queries concurrently
+        const [
+            supplyDemand,
+            totalProperties,
+            sahibindenCount,
+            hepsiemlakCount,
+            emlakjetCount,
+            assignedCount
+        ] = await Promise.all([
+            analyticsService.getSupplyDemandStats(),
+            prisma.property.count(),
+            prisma.property.count({
+                where: { url: { contains: 'sahibinden.com' } }
+            }),
+            prisma.property.count({
+                where: {
+                    OR: [
+                        { url: { contains: 'hepsiemlak.com' } },
+                        { url: { contains: 'hemlak.com' } }
+                    ]
+                }
+            }),
+            prisma.property.count({
+                where: { url: { contains: 'emlakjet.com' } }
+            }),
+            prisma.property.count({
+                where: { assigned_user_id: { not: null } }
+            })
+        ]);
 
-        // Admin-specific counts
-        const sahibindenCount = await prisma.property.count({
-            where: { url: { contains: 'sahibinden.com' } }
-        });
-
-        const hepsiemlakCount = await prisma.property.count({
-            where: {
-                OR: [
-                    { url: { contains: 'hepsiemlak.com' } },
-                    { url: { contains: 'hemlak.com' } }
-                ]
-            }
-        });
-
-        const emlakjetCount = await prisma.property.count({
-            where: { url: { contains: 'emlakjet.com' } }
-        });
-
-        const assignedCount = await prisma.property.count({
-            where: { assigned_user_id: { not: null } }
-        });
+        console.log(`✅ supplyDemand and admin stats calculated concurrently in ${Date.now() - sStart}ms`);
 
         const responseData = {
             totalProperties,
