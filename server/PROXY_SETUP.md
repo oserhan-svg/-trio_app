@@ -32,7 +32,7 @@ proxyManager: {
 3. **Add to environment**:
 ```bash
 # .env file
-WEBSHARE_API_KEY=e32sqcvxnvfs8jw83zuw0ra1d0gy8hkmfoxgr1im
+WEBSHARE_API_KEY=your_api_key_here
 ```
 
 4. **Enable in config**:

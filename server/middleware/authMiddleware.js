@@ -38,4 +38,41 @@ const isAdmin = (req, res, next) => {
     });
 };
 
-module.exports = { authenticateToken, authorizeRole, isAdmin };
+/**
+ * Secure middleware for Chrome Extension endpoints.
+ * Uses SHA-256 for constant-time comparison against EXTENSION_API_KEY.
+ */
+const extensionAuth = (req, res, next) => {
+    const apiKey = req.headers['x-api-key'];
+    const serverApiKey = process.env.EXTENSION_API_KEY;
+
+    if (!serverApiKey) {
+        console.error('❌ EXTENSION_API_KEY is not set in environment variables');
+        return res.status(500).json({ error: 'Server configuration error' });
+    }
+
+    if (!apiKey) {
+        return res.status(401).json({ error: 'API Key required' });
+    }
+
+    try {
+        const crypto = require('crypto');
+
+        // Use SHA-256 to hash both keys to fixed length
+        // This mitigates length-based timing leaks and handles different input lengths safely
+        const hash = (key) => crypto.createHash('sha256').update(key).digest();
+        const clientHash = hash(apiKey);
+        const serverHash = hash(serverApiKey);
+
+        if (crypto.timingSafeEqual(clientHash, serverHash)) {
+            return next();
+        }
+
+        return res.status(401).json({ error: 'Invalid API Key' });
+    } catch (error) {
+        console.error('Extension Auth Error:', error);
+        return res.status(500).json({ error: 'Authentication processing error' });
+    }
+};
+
+module.exports = { authenticateToken, authorizeRole, isAdmin, extensionAuth };
