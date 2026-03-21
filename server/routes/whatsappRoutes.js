@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const whatsappController = require('../controllers/whatsappController');
-const { authenticateToken } = require('../middleware/authMiddleware');
+const { authenticateToken, extensionAuth } = require('../middleware/authMiddleware');
 const { aiRateLimiter, heavyAiRateLimiter } = require('../middleware/rateLimitMiddleware');
 
 /**
@@ -29,7 +29,7 @@ router.post('/send', authenticateToken, whatsappController.sendMessage);
 
 // Sync Operations
 router.post('/sync', authenticateToken, whatsappController.sync);
-router.post('/extension-sync', whatsappController.syncExtension); // Often used by extension with different auth or none? Keeping consistent with old file (no auth middleware visible in old snippet but controller checks are safe)
+router.post('/extension-sync', extensionAuth, whatsappController.syncExtension); // Protected by extensionAuth for Trio Assistant
 // Actually, looking at old file, likely used body data. If auth is needed, extension sends token?
 // Assuming controller handles it or it's open for the extension scenario. 
 // Re-adding authenticateToken to be safe if that was the case, but most likely extension endpoints use API keys or similar.
