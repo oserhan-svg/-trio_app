@@ -1,0 +1,3 @@
+## 2026-03-23 - Analytics Pipeline Optimization
+**Learning:** Sequential database queries in analytics controllers can lead to a "death by a thousand cuts" performance profile. Parallelizing 7+ independent queries using `Promise.all` reduced response time to the duration of the single slowest query. Additionally, implementing promise coalescing in the centralized `CacheService` prevents the "thundering herd" problem where concurrent requests for the same expired key trigger redundant expensive operations.
+**Action:** Always look for independent `await` calls in controllers to parallelize. Use the centralized `CacheService` with `getOrSet` to benefit from built-in thundering herd protection.
