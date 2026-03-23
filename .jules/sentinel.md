@@ -1,0 +1,4 @@
+## 2025-05-14 - Secure Extension API Authentication
+**Vulnerability:** Several sensitive endpoints intended for the Chrome extension (`/api/scraper/import`, `/api/scraper/finished`, and `/api/whatsapp/extension-sync`) were completely unprotected, allowing unauthorized data injection and potential DOS. Additionally, a `WEBSHARE_API_KEY` was hardcoded in documentation.
+**Learning:** Legacy or third-party integration points (like extensions) often bypass standard JWT auth flows and can be overlooked during security audits. Hardcoded keys in documentation are just as dangerous as those in code.
+**Prevention:** Implement a dedicated, lightweight API key middleware (`extensionAuth`) using `crypto.timingSafeEqual` and SHA-256 hashing for these integration points. Always scrub documentation for secrets during security reviews.
