@@ -92,9 +92,9 @@ const AddClientModal = ({ isOpen, onClose, onSave }) => {
                     </div>
 
                     <div className="flex justify-end gap-3 mt-6">
-                        <Button type="button" variant="secondary" onClick={onClose}>İptal</Button>
-                        <Button type="submit" disabled={loading}>
-                            {loading ? 'Kaydediliyor...' : 'Kaydet'}
+                        <Button type="button" variant="secondary" onClick={onClose} disabled={loading}>İptal</Button>
+                        <Button type="submit" isLoading={loading}>
+                            Kaydet
                         </Button>
                     </div>
                 </form>
