@@ -38,6 +38,7 @@ const Login = () => {
             const msg = err.response?.data?.error || err.message || 'Giriş yapılamadı.';
             toast.error(msg);
         } finally {
+            // Reset loading state for scenarios where navigation is delayed or fails
             setLoading(false);
         }
     };
@@ -77,8 +78,8 @@ const Login = () => {
 
 
 
-                        <Button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2">
-                            <LogIn size={18} />
+                        <Button type="submit" isLoading={loading} className="w-full">
+                            {!loading && <LogIn size={18} />}
                             {loading ? 'Giriş Yapılıyor...' : 'Giriş Yap'}
                         </Button>
                     </form>
