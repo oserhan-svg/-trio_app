@@ -3,6 +3,7 @@ class CacheService {
     constructor(maxSize = 1000) {
         this.cache = new Map();
         this.timers = new Map();
+        this.promises = new Map(); // Track ongoing async fetches (Promise Coalescing)
         this.maxSize = maxSize; // Maximum number of keys to prevent memory bloat
         this.stats = {
             hits: 0,
@@ -87,15 +88,34 @@ class CacheService {
     }
 
     /**
-     * Singleton Wrapper: Get or set pattern
+     * Singleton Wrapper: Get or set pattern (with Promise Coalescing)
      */
     async getOrSet(key, fetcher, ttlSeconds = 300, namespace = 'global') {
+        const fullKey = `${namespace}:${key}`;
+
+        // 1. Check direct cache
         const cached = this.get(key, namespace);
         if (cached !== undefined) return cached;
 
-        const value = await fetcher();
-        this.set(key, value, ttlSeconds, namespace);
-        return value;
+        // 2. BOLT OPTIMIZATION: Check for ongoing promise (Thundering Herd Protection)
+        if (this.promises.has(fullKey)) {
+            return this.promises.get(fullKey);
+        }
+
+        // 3. Initiate new fetch and track it
+        const fetchPromise = (async () => {
+            try {
+                const value = await fetcher();
+                this.set(key, value, ttlSeconds, namespace);
+                return value;
+            } finally {
+                // Always clean up the promise map
+                this.promises.delete(fullKey);
+            }
+        })();
+
+        this.promises.set(fullKey, fetchPromise);
+        return fetchPromise;
     }
 
     getStats() {
