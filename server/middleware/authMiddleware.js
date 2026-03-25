@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 require('dotenv').config();
 
 const authenticateToken = (req, res, next) => {
@@ -38,4 +39,29 @@ const isAdmin = (req, res, next) => {
     });
 };
 
-module.exports = { authenticateToken, authorizeRole, isAdmin };
+const extensionAuth = (req, res, next) => {
+    const apiKey = req.headers['x-api-key'];
+    const serverKey = process.env.EXTENSION_API_KEY;
+
+    if (!serverKey) {
+        console.error('CRITICAL SECURITY ALERT: EXTENSION_API_KEY is not set');
+        return res.status(500).json({ error: 'Secure communication failed' });
+    }
+
+    if (!apiKey) {
+        return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    // Use constant-time comparison via hashing to prevent timing attacks
+    const clientKeyHash = crypto.createHash('sha256').update(apiKey).digest();
+    const serverKeyHash = crypto.createHash('sha256').update(serverKey).digest();
+
+    if (!crypto.timingSafeEqual(clientKeyHash, serverKeyHash)) {
+        console.warn(`[SECURITY] Invalid extension API key attempt from IP: ${req.ip}`);
+        return res.status(401).json({ error: 'Invalid API Key' });
+    }
+
+    next();
+};
+
+module.exports = { authenticateToken, authorizeRole, isAdmin, extensionAuth };
