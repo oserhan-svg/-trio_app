@@ -377,6 +377,7 @@ class WhatsAppService {
             }
         }
 
+        const consultantName = consultantCache?.get(cleanPhone);
         if (consultantName) return { name: consultantName, isConsultant: true, source: 'consultant' };
 
         // 1b. Check Short-lived resolution cache
