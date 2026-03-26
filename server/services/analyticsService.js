@@ -142,29 +142,11 @@ class AnalyticsService {
      */
     async calculateResponseTimes() {
         try {
-            // Fetch recent messages
-            const messages = await prisma.whatsAppMessage.findMany({
-                take: 1000,
-                orderBy: { timestamp: 'asc' },
-                select: { from: true, to: true, timestamp: true, fromMe: false } // Assuming 'fromMe' logic needs deduction or we use length
-            });
+            // [PERFORMANCE] Removed expensive 1000-message fetch that was unused.
+            // TODO: Implement actual response time calculation logic using a more efficient
+            // SQL aggregation or by tracking response times in a dedicated table.
 
-            // Since we don't have is_from_me field in schema (based on what I saw earlier), 
-            // we rely on 'from' length. 
-            // Usually 'from' with @c.us is external if it matches a client phone, 
-            // but for simplicity let's assume if it has a 'sender_name' it might be inbound?
-            // Actually schema has 'from' and 'to'.
-            // Simple heuristic: 
-            // If message A (from X) is followed by message B (to X), that is a reply.
-
-            // Allow override if 'fromMe' is not directly available, we infer from checking if 'from' is our system number.
-            // But we don't know our system number easily here.
-            // Let's assume we group by chat (interaction pair).
-
-            // Better approach with existing schema:
-            // Use Client Interactions if available or just timestamp diffs on threaded chats.
-
-            // For now, returning a mock based on real data existence to avoid complex logic without proper 'is_from_me' flag
+            // For now, returning a consistent mock to avoid performance degradation.
             return {
                 averageMinutes: 15,
                 grade: 'A'
