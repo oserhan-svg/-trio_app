@@ -166,6 +166,7 @@ const FilterBar = ({ filters, metadata, properties = [], onChange, onClearAll, t
                                     <button
                                         key={i}
                                         onClick={() => setSearchTerm(h)}
+                                        aria-label={`Geçmiş arama: ${h}`}
                                         className="text-[11px] font-black text-slate-500 dark:text-slate-400 bg-white/50 dark:bg-slate-700/50 px-3 py-1 rounded-full hover:bg-blue-600 dark:hover:bg-blue-500 hover:text-white transition-all shadow-sm active:scale-95"
                                     >
                                         {h}
@@ -359,6 +360,7 @@ const FilterBar = ({ filters, metadata, properties = [], onChange, onClearAll, t
                     <div className="col-span-8 flex items-end justify-end gap-3">
                         <button
                             onClick={onClearAll}
+                            aria-label="Filtreleri Sıfırla"
                             className="h-12 w-12 flex items-center justify-center bg-rose-50 text-rose-500 rounded-2xl hover:bg-rose-500 hover:text-white transition-all active:scale-95 shadow-sm border border-rose-100/50"
                             title="Filtreleri Sıfırla"
                         >
@@ -387,7 +389,7 @@ const FilterBar = ({ filters, metadata, properties = [], onChange, onClearAll, t
                                             savedSearches.map(s => (
                                                 <div key={s.id} onClick={() => loadSavedSearch(s.filters)} className="group flex items-center justify-between p-3 rounded-2xl hover:bg-blue-600 dark:hover:bg-blue-500 cursor-pointer transition-all border border-transparent hover:shadow-lg hover:shadow-blue-500/20">
                                                     <span className="text-xs font-bold text-slate-700 dark:text-slate-200 group-hover:text-white truncate pr-2">{s.name}</span>
-                                                    <button onClick={(e) => { e.stopPropagation(); deleteSavedSearch(e, s.id); }} className="p-1.5 text-slate-400 dark:text-slate-500 group-hover:text-white/50 hover:text-white! transition-colors">
+                                                    <button aria-label="Kayıtlı aramayı sil" onClick={(e) => { e.stopPropagation(); deleteSavedSearch(e, s.id); }} className="p-1.5 text-slate-400 dark:text-slate-500 group-hover:text-white/50 hover:text-white! transition-colors">
                                                         <X size={14} />
                                                     </button>
                                                 </div>
@@ -446,6 +448,7 @@ const FilterBar = ({ filters, metadata, properties = [], onChange, onClearAll, t
                                 <span className="text-blue-600 dark:text-blue-400 truncate max-w-[150px]">{getFilterLabel(key, value)}</span>
                                 <button
                                     onClick={() => removeFilter(key)}
+                                    aria-label="Filtreyi kaldır"
                                     className="p-1 px-1.5 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-500 transition-all active:scale-75"
                                 >
                                     <X size={12} strokeWidth={3} />
