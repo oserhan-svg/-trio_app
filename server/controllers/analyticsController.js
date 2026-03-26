@@ -8,36 +8,31 @@ const getStats = async (req, res) => {
         console.log('📊 Starting Analytics Calculation...');
         const start = Date.now();
 
-        const statsMap = await analyticsService.getNeighborhoodStatsMap();
-        console.log(`✅ statsMap calculated in ${Date.now() - start}ms`);
+        // [PERFORMANCE] Parallelize independent data fetching
+        const [statsMap, supplyDemand, countsData] = await Promise.all([
+            analyticsService.getNeighborhoodStatsMap(),
+            analyticsService.getSupplyDemandStats(),
+            // [PERFORMANCE] Consolidated all property counts into a single raw SQL query.
+            // Uses SUM(CASE WHEN...) for better portability across different SQL dialects.
+            prisma.$queryRaw`
+                SELECT
+                    COUNT(*) as "total",
+                    SUM(CASE WHEN assigned_user_id IS NOT NULL THEN 1 ELSE 0 END) as "assigned",
+                    SUM(CASE WHEN url LIKE '%sahibinden.com%' THEN 1 ELSE 0 END) as "sahibinden",
+                    SUM(CASE WHEN url LIKE '%hepsiemlak.com%' OR url LIKE '%hemlak.com%' THEN 1 ELSE 0 END) as "hepsiemlak",
+                    SUM(CASE WHEN url LIKE '%emlakjet.com%' THEN 1 ELSE 0 END) as "emlakjet"
+                FROM properties
+            `
+        ]);
 
-        const sStart = Date.now();
-        const supplyDemand = await analyticsService.getSupplyDemandStats();
-        console.log(`✅ supplyDemand calculated in ${Date.now() - sStart}ms`);
+        const counts = countsData[0];
+        const totalProperties = Number(counts.total || 0);
+        const assignedCount = Number(counts.assigned || 0);
+        const sahibindenCount = Number(counts.sahibinden || 0);
+        const hepsiemlakCount = Number(counts.hepsiemlak || 0);
+        const emlakjetCount = Number(counts.emlakjet || 0);
 
-        const totalProperties = await prisma.property.count();
-
-        // Admin-specific counts
-        const sahibindenCount = await prisma.property.count({
-            where: { url: { contains: 'sahibinden.com' } }
-        });
-
-        const hepsiemlakCount = await prisma.property.count({
-            where: {
-                OR: [
-                    { url: { contains: 'hepsiemlak.com' } },
-                    { url: { contains: 'hemlak.com' } }
-                ]
-            }
-        });
-
-        const emlakjetCount = await prisma.property.count({
-            where: { url: { contains: 'emlakjet.com' } }
-        });
-
-        const assignedCount = await prisma.property.count({
-            where: { assigned_user_id: { not: null } }
-        });
+        console.log(`✅ Analytics calculated in ${Date.now() - start}ms`);
 
         const responseData = {
             totalProperties,
