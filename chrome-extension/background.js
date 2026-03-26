@@ -1,6 +1,35 @@
 // TRIO ASSISTANT - Background Worker (Phase 4 Optimized)
 
 /**
+ * Secure fetch with API Key authentication
+ */
+async function authenticatedFetch(url, options = {}) {
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get(['extension_api_key'], async (data) => {
+            const apiKey = data.extension_api_key;
+            if (!apiKey) {
+                console.warn('⚠️ No API Key found in storage. Request might fail.');
+            }
+
+            const secureOptions = {
+                ...options,
+                headers: {
+                    ...(options.headers || {}),
+                    'x-api-key': apiKey || ''
+                }
+            };
+
+            try {
+                const response = await fetch(url, secureOptions);
+                resolve(response);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    });
+}
+
+/**
  * Reliable message sender with exponential backoff and tab existence check
  */
 async function reliableSendMessage(tabId, message, retries = 5) {
@@ -131,7 +160,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 });
 
                 if (source !== 'whatsapp') {
-                    fetch('http://127.0.0.1:5005/api/scraper/finished', {
+                    authenticatedFetch('http://127.0.0.1:5005/api/scraper/finished', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ provider: source || 'unknown', reason: reason || 'Page end' })
@@ -145,7 +174,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const { partnerName, profilePicUrl, messages } = request;
         console.log(`📥 Received ${messages.length} WhatsApp messages from ${partnerName} (Pic: ${!!profilePicUrl})`);
 
-        fetch('http://127.0.0.1:5005/api/whatsapp/extension-sync', {
+        authenticatedFetch('http://127.0.0.1:5005/api/whatsapp/extension-sync', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ partnerName, profilePicUrl, messages })
@@ -165,7 +194,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
             const url = 'http://127.0.0.1:5005/api/scraper/import';
             try {
-                const response = await fetch(url, {
+                const response = await authenticatedFetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ listings, provider: source })
