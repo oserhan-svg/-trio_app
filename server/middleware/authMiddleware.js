@@ -1,5 +1,36 @@
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 require('dotenv').config();
+
+const extensionAuth = (req, res, next) => {
+    const apiKey = req.headers['x-api-key'];
+    const serverKey = process.env.EXTENSION_API_KEY;
+
+    if (!serverKey) {
+        console.error('CRITICAL: EXTENSION_API_KEY is not set in environment variables');
+        return res.status(500).json({ error: 'Server configuration error' });
+    }
+
+    if (!apiKey) {
+        return res.status(401).json({ error: 'API Key required' });
+    }
+
+    try {
+        // Use timingSafeEqual to prevent timing attacks
+        const apiBuffer = Buffer.from(crypto.createHash('sha256').update(apiKey).digest('hex'));
+        const serverBuffer = Buffer.from(crypto.createHash('sha256').update(serverKey).digest('hex'));
+
+        if (apiBuffer.length === serverBuffer.length && crypto.timingSafeEqual(apiBuffer, serverBuffer)) {
+            next();
+        } else {
+            console.warn(`Unauthorized extension access attempt from ${req.ip}`);
+            res.status(401).json({ error: 'Invalid API Key' });
+        }
+    } catch (err) {
+        console.error('Extension Auth Error:', err);
+        res.status(500).json({ error: 'Authentication processing error' });
+    }
+};
 
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -38,4 +69,4 @@ const isAdmin = (req, res, next) => {
     });
 };
 
-module.exports = { authenticateToken, authorizeRole, isAdmin };
+module.exports = { authenticateToken, authorizeRole, isAdmin, extensionAuth };
