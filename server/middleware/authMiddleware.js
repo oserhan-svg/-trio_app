@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 require('dotenv').config();
 
 const authenticateToken = (req, res, next) => {
@@ -38,4 +39,15 @@ const isAdmin = (req, res, next) => {
     });
 };
 
-module.exports = { authenticateToken, authorizeRole, isAdmin };
+const extensionAuth = (req, res, next) => {
+    const apiKey = req.headers['x-api-key'], serverKey = process.env.EXTENSION_API_KEY;
+    if (!serverKey) return res.status(500).json({ error: 'Server configuration error' });
+    if (!apiKey) return res.status(401).json({ error: 'API Key required' });
+    const h = k => crypto.createHash('sha256').update(k).digest();
+    try {
+        if (crypto.timingSafeEqual(h(apiKey), h(serverKey))) return next();
+    } catch (e) {}
+    res.status(401).json({ error: 'Invalid API Key' });
+};
+
+module.exports = { authenticateToken, authorizeRole, isAdmin, extensionAuth };

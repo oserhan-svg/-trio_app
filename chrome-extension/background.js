@@ -1,6 +1,26 @@
 // TRIO ASSISTANT - Background Worker (Phase 4 Optimized)
 
 /**
+ * Authenticated fetch helper for server requests
+ */
+async function authenticatedFetch(url, options = {}) {
+    const data = await chrome.storage.local.get(['extension_api_key']);
+    const apiKey = data.extension_api_key;
+
+    if (!apiKey) {
+        console.warn('⚠️ No extension API key found in storage. Request might fail.');
+    }
+
+    const headers = {
+        ...options.headers,
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey || ''
+    };
+
+    return fetch(url, { ...options, headers });
+}
+
+/**
  * Reliable message sender with exponential backoff and tab existence check
  */
 async function reliableSendMessage(tabId, message, retries = 5) {
@@ -131,9 +151,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 });
 
                 if (source !== 'whatsapp') {
-                    fetch('http://127.0.0.1:5005/api/scraper/finished', {
+                    authenticatedFetch('http://127.0.0.1:5005/api/scraper/finished', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ provider: source || 'unknown', reason: reason || 'Page end' })
                     }).catch(() => { });
                 }
@@ -145,9 +164,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const { partnerName, profilePicUrl, messages } = request;
         console.log(`📥 Received ${messages.length} WhatsApp messages from ${partnerName} (Pic: ${!!profilePicUrl})`);
 
-        fetch('http://127.0.0.1:5005/api/whatsapp/extension-sync', {
+        authenticatedFetch('http://127.0.0.1:5005/api/whatsapp/extension-sync', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ partnerName, profilePicUrl, messages })
         }).catch(err => console.error('❌ WhatsApp Sync Error:', err));
 
@@ -165,9 +183,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
             const url = 'http://127.0.0.1:5005/api/scraper/import';
             try {
-                const response = await fetch(url, {
+                const response = await authenticatedFetch(url, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ listings, provider: source })
                 });
 
