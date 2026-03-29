@@ -98,5 +98,14 @@ document.getElementById('testBtn').addEventListener('click', () => {
         });
 });
 
+document.getElementById('configBtn')?.addEventListener('click', () => {
+    const key = prompt("Lütfen Extension API Anahtarını Girin:");
+    if (key !== null) {
+        chrome.storage.local.set({ extension_api_key: key }, () => {
+            alert("API Anahtarı kaydedildi.");
+        });
+    }
+});
+
 setInterval(updateUI, 1000);
 updateUI();
