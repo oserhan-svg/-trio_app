@@ -1,0 +1,3 @@
+## 2026-03-29 - [Component Standardization & Accessibility]
+**Learning:** Standardizing core UI components (like `Button`) to handle common states (loading, disabled) and accessibility (ARIA) internally ensures a more consistent UX and reduces repetitive implementation errors across the app. In Turkish-language interfaces, matching `aria-label` to `title` for action buttons ensures linguistic consistency for screen readers.
+**Action:** Always check core UI components for missing standardized props before implementing manual state handling in pages. Ensure all icon-only buttons have explicit `aria-label` attributes.
