@@ -1,0 +1,3 @@
+## 2026-05-15 - Standardizing Loading States in Core UI Components
+**Learning:** Standardizing core UI components (like `Button`) to handle common states like `isLoading` and `isDisabled` internally ensures a consistent user experience across the application and reduces implementation errors at call sites. Centralizing ARIA attributes (e.g., `aria-busy`, `aria-hidden`) within these components guarantees a baseline level of accessibility.
+**Action:** Always favor extending base UI components with standard props (`isLoading`, `icon`, etc.) rather than manually implementing these states in individual pages or features.
