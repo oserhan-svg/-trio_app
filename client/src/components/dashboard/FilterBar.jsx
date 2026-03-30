@@ -359,7 +359,8 @@ const FilterBar = ({ filters, metadata, properties = [], onChange, onClearAll, t
                     <div className="col-span-8 flex items-end justify-end gap-3">
                         <button
                             onClick={onClearAll}
-                            className="h-12 w-12 flex items-center justify-center bg-rose-50 text-rose-500 rounded-2xl hover:bg-rose-500 hover:text-white transition-all active:scale-95 shadow-sm border border-rose-100/50"
+                            className="h-12 w-12 flex items-center justify-center bg-rose-50 text-rose-500 rounded-2xl hover:bg-rose-500 hover:text-white transition-all active:scale-95 shadow-sm border border-rose-100/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
+                            aria-label="Filtreleri Sıfırla"
                             title="Filtreleri Sıfırla"
                         >
                             <Trash2 size={20} />
