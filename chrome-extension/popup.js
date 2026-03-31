@@ -86,6 +86,18 @@ document.getElementById('stopBtn').addEventListener('click', () => {
     document.getElementById('status').innerText = "⏹ Durduruldu";
 });
 
+document.getElementById('configBtn')?.addEventListener('click', () => {
+    chrome.storage.local.get(['extension_api_key'], (data) => {
+        const currentKey = data.extension_api_key || '';
+        const newKey = prompt("Extension API Key (Mevcut: " + (currentKey ? '******' : 'Yok') + "):", currentKey);
+        if (newKey !== null) {
+            chrome.storage.local.set({ extension_api_key: newKey.trim() }, () => {
+                document.getElementById('status').innerText = "🔑 API Key Kaydedildi";
+            });
+        }
+    });
+});
+
 document.getElementById('testBtn').addEventListener('click', () => {
     document.getElementById('status').innerText = "Bağlantı test ediliyor...";
     fetch('http://127.0.0.1:5005/api/health')
