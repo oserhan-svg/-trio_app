@@ -54,6 +54,7 @@ const AuthEditModal = ({ property, onClose, onSuccess }) => {
                     <h3 className="font-bold text-gray-800">Yetki Belgesi Yönetimi</h3>
                     <button
                         onClick={onClose}
+                        aria-label="Kapat"
                         className="text-gray-400 hover:text-gray-600 text-xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors"
                     >
                         &times;
