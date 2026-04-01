@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { authenticateToken } = require('../middleware/authMiddleware');
+const { authenticateToken, extensionAuth } = require('../middleware/authMiddleware');
 const { scrapeProperties, syncPortfolio } = require('../services/scraperService');
 const { getSessionManager } = require('../services/sessionManager');
 const { getProxyStats } = require('../services/proxyIntegration');
@@ -25,7 +25,7 @@ router.post('/trigger', authenticateToken, async (req, res) => {
  * POST /api/scraper/import
  * Import listings from Chrome Extension (Trio Assistant)
  */
-router.post('/import', async (req, res) => {
+router.post('/import', extensionAuth, async (req, res) => {
     try {
         let { listings, provider } = req.body;
 
@@ -89,7 +89,7 @@ router.post('/sync-portfolio', authenticateToken, async (req, res) => {
  * POST /api/scraper/finished
  * Portal reports it has finished its run
  */
-router.post('/finished', async (req, res) => {
+router.post('/finished', extensionAuth, async (req, res) => {
     const { provider, reason } = req.body;
     const sessionManager = getSessionManager();
     console.log(`🏁 [SCRAPER] Portal ${provider} finished. Reason: ${reason || 'End of pages'}`);
