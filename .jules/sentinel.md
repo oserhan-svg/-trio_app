@@ -1,0 +1,4 @@
+## 2024-04-01 - Unauthenticated Command Execution via Migration Route
+**Vulnerability:** The `/internal/migrate` route in `server/routes/dealRoutes.js` invoked `child_process.exec()` to run database migrations, but the endpoint lacked authentication (`authenticateToken`) and authorization (`authorizeRole('admin')`) middleware.
+**Learning:** Internal or testing routes that execute shell commands or sensitive operations are sometimes left exposed in production builds if they are not strictly protected by application-level middleware.
+**Prevention:** Ensure all administrative or internal Express routes are protected by both `authenticateToken` and `authorizeRole('admin')` middleware to prevent RCE or Command Injection vulnerabilities, and explicitly review uses of `child_process.exec()` for missing access controls.
