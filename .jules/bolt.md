@@ -1,0 +1,3 @@
+## 2024-05-24 - Resolve Database Performance Bottlenecks from Sequential N+1 Queries
+**Learning:** Sequential Prisma calls (like multiple `count()` operations on a dashboard) introduce significant latency bottlenecks, as each query waits for the database network roundtrip of the previous one before executing. This acts as a severe N+1 anti-pattern, particularly impactful within mapped loops or high-throughput analytics controllers.
+**Action:** Always wrap independent concurrent database read operations inside a `Promise.all()` structure (e.g. `const [countA, countB] = await Promise.all([prisma.a.count(), prisma.b.count()])`), especially inside loops, to execute them concurrently against the connection pool and reduce overall roundtrip latency.
