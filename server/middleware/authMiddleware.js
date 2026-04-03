@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 require('dotenv').config();
 
 const authenticateToken = (req, res, next) => {
@@ -38,4 +39,38 @@ const isAdmin = (req, res, next) => {
     });
 };
 
-module.exports = { authenticateToken, authorizeRole, isAdmin };
+/**
+ * 🛡️ Sentinel: Secure Authentication for Chrome Extension
+ * Uses constant-time comparison and SHA-256 hashing to prevent timing attacks.
+ */
+const extensionAuth = (req, res, next) => {
+    const apiKey = req.headers['x-extension-api-key'];
+    const serverKey = process.env.EXTENSION_API_KEY;
+
+    if (!serverKey) {
+        console.error('❌ [SECURITY] EXTENSION_API_KEY is not defined in environment variables.');
+        return res.status(500).json({ error: 'Server configuration error' });
+    }
+
+    if (!apiKey) {
+        return res.status(401).json({ error: 'Extension API key required' });
+    }
+
+    try {
+        // Hash both keys to ensure fixed length for timingSafeEqual
+        const hashedApiKey = crypto.createHash('sha256').update(apiKey).digest();
+        const hashedServerKey = crypto.createHash('sha256').update(serverKey).digest();
+
+        if (crypto.timingSafeEqual(hashedApiKey, hashedServerKey)) {
+            next();
+        } else {
+            console.warn(`⚠️ [SECURITY] Unauthorized extension access attempt from ${req.ip}`);
+            res.status(403).json({ error: 'Invalid Extension API key' });
+        }
+    } catch (error) {
+        console.error('❌ [SECURITY] Extension auth error:', error.message);
+        res.status(500).json({ error: 'Internal security error' });
+    }
+};
+
+module.exports = { authenticateToken, authorizeRole, isAdmin, extensionAuth };
