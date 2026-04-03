@@ -8,36 +8,34 @@ const getStats = async (req, res) => {
         console.log('📊 Starting Analytics Calculation...');
         const start = Date.now();
 
-        const statsMap = await analyticsService.getNeighborhoodStatsMap();
-        console.log(`✅ statsMap calculated in ${Date.now() - start}ms`);
+        // [BOLT OPTIMIZATION] Parallelize independent data fetching tasks
+        // This reduces total latency by overlapping I/O-bound operations.
+        const [statsMap, supplyDemand, countsResult] = await Promise.all([
+            analyticsService.getNeighborhoodStatsMap(),
+            analyticsService.getSupplyDemandStats(),
+            // [BOLT OPTIMIZATION] Consolidate multiple counts into a single raw SQL query.
+            // Using PostgreSQL's FILTER clause allows us to perform multiple conditional counts in a single table scan,
+            // which is significantly more efficient than multiple individual count queries.
+            // We use double quotes for "properties" to match Prisma's mapped table name and ::int to avoid BigInt serialization issues.
+            prisma.$queryRaw`
+                SELECT
+                    COUNT(*)::int as "total",
+                    COUNT(*) FILTER (WHERE url LIKE '%sahibinden.com%')::int as "sahibinden",
+                    COUNT(*) FILTER (WHERE url LIKE '%hepsiemlak.com%' OR url LIKE '%hemlak.com%')::int as "hepsiemlak",
+                    COUNT(*) FILTER (WHERE url LIKE '%emlakjet.com%')::int as "emlakjet",
+                    COUNT(*) FILTER (WHERE assigned_user_id IS NOT NULL)::int as "assigned"
+                FROM "properties"
+            `
+        ]);
 
-        const sStart = Date.now();
-        const supplyDemand = await analyticsService.getSupplyDemandStats();
-        console.log(`✅ supplyDemand calculated in ${Date.now() - sStart}ms`);
+        const counts = countsResult[0];
+        const totalProperties = counts.total;
+        const sahibindenCount = counts.sahibinden;
+        const hepsiemlakCount = counts.hepsiemlak;
+        const emlakjetCount = counts.emlakjet;
+        const assignedCount = counts.assigned;
 
-        const totalProperties = await prisma.property.count();
-
-        // Admin-specific counts
-        const sahibindenCount = await prisma.property.count({
-            where: { url: { contains: 'sahibinden.com' } }
-        });
-
-        const hepsiemlakCount = await prisma.property.count({
-            where: {
-                OR: [
-                    { url: { contains: 'hepsiemlak.com' } },
-                    { url: { contains: 'hemlak.com' } }
-                ]
-            }
-        });
-
-        const emlakjetCount = await prisma.property.count({
-            where: { url: { contains: 'emlakjet.com' } }
-        });
-
-        const assignedCount = await prisma.property.count({
-            where: { assigned_user_id: { not: null } }
-        });
+        console.log(`✅ Analytics calculated in ${Date.now() - start}ms`);
 
         const responseData = {
             totalProperties,
