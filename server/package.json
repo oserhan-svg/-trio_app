@@ -24,7 +24,7 @@
     "cheerio": "^1.1.2",
     "concurrently": "^9.2.1",
     "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
+    "dotenv": "^17.4.0",
     "exceljs": "^4.4.0",
     "express": "^5.2.1",
     "express-rate-limit": "^8.2.1",
