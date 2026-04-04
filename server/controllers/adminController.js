@@ -2,38 +2,24 @@ const prisma = require('../db');
 
 exports.getDashboardStats = async (req, res) => {
     try {
-        // 1. Total Properties
-        const totalProperties = await prisma.property.count();
+        // ⚡ Bolt Optimization: Use a single raw SQL query with FILTER to consolidate multiple counts.
+        // This reduces database round-trips from 5 down to 1.
+        const counts = await prisma.$queryRaw`
+            SELECT
+                COUNT(*)::int as total,
+                COUNT(*) FILTER (WHERE "assigned_user_id" IS NOT NULL)::int as assigned,
+                COUNT(*) FILTER (WHERE "url" LIKE '%sahibinden.com%')::int as sahibinden,
+                COUNT(*) FILTER (WHERE "url" LIKE '%hepsiemlak.com%' OR "url" LIKE '%hemlak.com%')::int as hepsiemlak,
+                COUNT(*) FILTER (WHERE "url" LIKE '%emlakjet.com%')::int as emlakjet
+            FROM "properties"
+        `;
 
-        // 2. By Source
-        const sahibindenCount = await prisma.property.count({
-            where: { url: { contains: 'sahibinden.com' } }
-        });
-
-        const hepsiemlakCount = await prisma.property.count({
-            where: {
-                OR: [
-                    { url: { contains: 'hepsiemlak.com' } },
-                    { url: { contains: 'hemlak.com' } }
-                ]
-            }
-        });
-
-        const emlakjetCount = await prisma.property.count({
-            where: { url: { contains: 'emlakjet.com' } }
-        });
-
-        // 3. Assignment Stats
-        const assignedCount = await prisma.property.count({
-            where: { assigned_user_id: { not: null } }
-        });
-
-        // 4. Duplicate / similar (Approximation for 'Mükerrer')
-        // Ideally we check for same external_id or similar title+price
-        // For now, let's just count properties sharing an external_id if strictly unique,
-        // but since external_id is unique in schema, maybe we count properties with same group_id > 1?
-        // Let's use simplified logic: Properties scraped today vs total? 
-        // Or simply "Pending Assignments"
+        const statsRow = counts[0] || { total: 0, assigned: 0, sahibinden: 0, hepsiemlak: 0, emlakjet: 0 };
+        const totalProperties = statsRow.total;
+        const assignedCount = statsRow.assigned;
+        const sahibindenCount = statsRow.sahibinden;
+        const hepsiemlakCount = statsRow.hepsiemlak;
+        const emlakjetCount = statsRow.emlakjet;
         const pendingCount = totalProperties - assignedCount;
 
         res.json({
