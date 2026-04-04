@@ -1,0 +1,4 @@
+## 2025-02-14 - Unprotected Internal DB Migration Route
+**Vulnerability:** Found an unprotected internal route (`/api/deals/internal/migrate`) that triggers database migrations using `child_process.exec`.
+**Learning:** Internal or testing routes that execute database migrations via `child_process.exec` are highly critical and can lead to RCE/Command Injection if exposed or left without authorization in production. They must be explicitly protected with both `authenticateToken` and `authorizeRole('admin')`.
+**Prevention:** Always wrap any internal-only debug or admin operational endpoints with strict role-based access control checking (`authorizeRole('admin')`), or ensure they are completely excluded from production builds.
