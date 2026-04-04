@@ -91,11 +91,20 @@ document.getElementById('testBtn').addEventListener('click', () => {
     fetch('http://127.0.0.1:5005/api/health')
         .then(r => r.json())
         .then(data => {
-            document.getElementById('status').innerText = `✅ Bağlantı Başarılı (v${data.debugVersion || '?'})`;
+            document.getElementById('status').innerText = `✅ Bağlantı Başarılı (v${data.version || '?'})`;
         })
         .catch(err => {
             document.getElementById('status').innerText = `❌ Sunucuya Bağlanılamadı`;
         });
+});
+
+document.getElementById('configBtn')?.addEventListener('click', () => {
+    const key = prompt("Lütfen Extension API Key giriniz:");
+    if (key !== null) {
+        chrome.storage.local.set({ extension_api_key: key }, () => {
+            alert("API Key kaydedildi.");
+        });
+    }
 });
 
 setInterval(updateUI, 1000);
