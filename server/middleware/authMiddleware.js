@@ -38,4 +38,25 @@ const isAdmin = (req, res, next) => {
     });
 };
 
-module.exports = { authenticateToken, authorizeRole, isAdmin };
+/**
+ * Middleware for Chrome Extension authentication using API Key
+ * Fail-secure: returns 500 if server key is not configured
+ */
+const extensionAuth = (req, res, next) => {
+    const serverKey = process.env.EXTENSION_API_KEY;
+    const clientKey = req.headers['x-extension-api-key'];
+
+    if (!serverKey) {
+        console.error('🛡️ [SECURITY] CRITICAL: EXTENSION_API_KEY is not defined in environment variables.');
+        return res.status(500).json({ error: 'Extension access is currently disabled on the server.' });
+    }
+
+    if (!clientKey || clientKey !== serverKey) {
+        console.warn(`🛡️ [SECURITY] Unauthorized Extension Access Attempt from IP: ${req.ip}`);
+        return res.status(401).json({ error: 'Invalid or missing Extension API Key' });
+    }
+
+    next();
+};
+
+module.exports = { authenticateToken, authorizeRole, isAdmin, extensionAuth };
