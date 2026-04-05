@@ -186,7 +186,7 @@ const RevenueTracker = ({ onBack }) => {
                     <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
                         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-indigo-600">
                             <h3 className="text-white font-bold text-lg">Yeni Satış Kaydı</h3>
-                            <button onClick={() => setShowAddModal(false)} className="text-white/80 hover:text-white"><X size={20} /></button>
+                            <button aria-label="Kapat" onClick={() => setShowAddModal(false)} className="text-white/80 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded"><X size={20} /></button>
                         </div>
                         <form onSubmit={handleSubmit} className="p-6 space-y-4">
                             <div className="grid grid-cols-2 gap-4">

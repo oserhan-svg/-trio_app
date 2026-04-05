@@ -143,7 +143,7 @@ const SalesPipeline = () => {
                                 <h3 className="font-black text-slate-700 uppercase tracking-widest text-xs">{column.status}</h3>
                                 <span className="text-[10px] font-black bg-slate-200 text-slate-500 px-2 py-0.5 rounded-full">{column.count}</span>
                             </div>
-                            <button className="text-slate-400 hover:text-slate-600"><MoreHorizontal size={18} /></button>
+                            <button aria-label="Daha fazla seçenek" className="text-slate-400 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded"><MoreHorizontal size={18} /></button>
                         </div>
 
                         {/* Column Content */}
