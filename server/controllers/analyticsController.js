@@ -8,50 +8,38 @@ const getStats = async (req, res) => {
         console.log('📊 Starting Analytics Calculation...');
         const start = Date.now();
 
-        const statsMap = await analyticsService.getNeighborhoodStatsMap();
-        console.log(`✅ statsMap calculated in ${Date.now() - start}ms`);
+        // [OPTIMIZATION] Parallelize independent data fetching tasks and consolidate counts
+        // Reduces database round-trips from 7+ to 3 (statsMap, supplyDemand, and all counts in one SQL)
+        const [statsMap, supplyDemand, counts] = await Promise.all([
+            analyticsService.getNeighborhoodStatsMap(),
+            analyticsService.getSupplyDemandStats(),
+            prisma.$queryRaw`
+                SELECT
+                    COUNT(*)::int as total,
+                    COUNT(*) FILTER (WHERE url LIKE '%sahibinden.com%')::int as sahibinden,
+                    COUNT(*) FILTER (WHERE url LIKE '%hepsiemlak.com%' OR url LIKE '%hemlak.com%')::int as hepsiemlak,
+                    COUNT(*) FILTER (WHERE url LIKE '%emlakjet.com%')::int as emlakjet,
+                    COUNT(*) FILTER (WHERE "assigned_user_id" IS NOT NULL)::int as assigned
+                FROM "properties"
+            `
+        ]);
 
-        const sStart = Date.now();
-        const supplyDemand = await analyticsService.getSupplyDemandStats();
-        console.log(`✅ supplyDemand calculated in ${Date.now() - sStart}ms`);
-
-        const totalProperties = await prisma.property.count();
-
-        // Admin-specific counts
-        const sahibindenCount = await prisma.property.count({
-            where: { url: { contains: 'sahibinden.com' } }
-        });
-
-        const hepsiemlakCount = await prisma.property.count({
-            where: {
-                OR: [
-                    { url: { contains: 'hepsiemlak.com' } },
-                    { url: { contains: 'hemlak.com' } }
-                ]
-            }
-        });
-
-        const emlakjetCount = await prisma.property.count({
-            where: { url: { contains: 'emlakjet.com' } }
-        });
-
-        const assignedCount = await prisma.property.count({
-            where: { assigned_user_id: { not: null } }
-        });
+        const { total, sahibinden, hepsiemlak, emlakjet, assigned } = counts[0];
+        console.log(`✅ Analytics calculated in ${Date.now() - start}ms`);
 
         const responseData = {
-            totalProperties,
+            totalProperties: total,
             marketStats: statsMap._heatmapData,
             supplyDemand,
             adminStats: {
-                totalProperties,
-                assignedCount,
-                pendingCount: totalProperties - assignedCount,
+                totalProperties: total,
+                assignedCount: assigned,
+                pendingCount: total - assigned,
                 sources: [
-                    { name: 'Sahibinden', count: sahibindenCount, color: 'text-yellow-600', bg: 'bg-yellow-50' },
-                    { name: 'Hepsiemlak', count: hepsiemlakCount, color: 'text-red-600', bg: 'bg-red-50' },
-                    { name: 'Emlakjet', count: emlakjetCount, color: 'text-green-600', bg: 'bg-green-50' },
-                    { name: 'Diğer', count: totalProperties - (sahibindenCount + hepsiemlakCount + emlakjetCount), color: 'text-gray-600', bg: 'bg-gray-50' }
+                    { name: 'Sahibinden', count: sahibinden, color: 'text-yellow-600', bg: 'bg-yellow-50' },
+                    { name: 'Hepsiemlak', count: hepsiemlak, color: 'text-red-600', bg: 'bg-red-50' },
+                    { name: 'Emlakjet', count: emlakjet, color: 'text-green-600', bg: 'bg-green-50' },
+                    { name: 'Diğer', count: total - (sahibinden + hepsiemlak + emlakjet), color: 'text-gray-600', bg: 'bg-gray-50' }
                 ]
             }
         };
