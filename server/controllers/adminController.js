@@ -2,51 +2,31 @@ const prisma = require('../db');
 
 exports.getDashboardStats = async (req, res) => {
     try {
-        // 1. Total Properties
-        const totalProperties = await prisma.property.count();
+        // [OPTIMIZATION] Consolidate multiple counts into a single raw SQL query.
+        // Reduces database round-trips from 5 to 1.
+        const counts = await prisma.$queryRaw`
+            SELECT
+                COUNT(*)::int as total,
+                COUNT(*) FILTER (WHERE url LIKE '%sahibinden.com%')::int as sahibinden,
+                COUNT(*) FILTER (WHERE url LIKE '%hepsiemlak.com%' OR url LIKE '%hemlak.com%')::int as hepsiemlak,
+                COUNT(*) FILTER (WHERE url LIKE '%emlakjet.com%')::int as emlakjet,
+                COUNT(*) FILTER (WHERE "assigned_user_id" IS NOT NULL)::int as assigned
+            FROM "properties"
+        `;
 
-        // 2. By Source
-        const sahibindenCount = await prisma.property.count({
-            where: { url: { contains: 'sahibinden.com' } }
-        });
-
-        const hepsiemlakCount = await prisma.property.count({
-            where: {
-                OR: [
-                    { url: { contains: 'hepsiemlak.com' } },
-                    { url: { contains: 'hemlak.com' } }
-                ]
-            }
-        });
-
-        const emlakjetCount = await prisma.property.count({
-            where: { url: { contains: 'emlakjet.com' } }
-        });
-
-        // 3. Assignment Stats
-        const assignedCount = await prisma.property.count({
-            where: { assigned_user_id: { not: null } }
-        });
-
-        // 4. Duplicate / similar (Approximation for 'Mükerrer')
-        // Ideally we check for same external_id or similar title+price
-        // For now, let's just count properties sharing an external_id if strictly unique,
-        // but since external_id is unique in schema, maybe we count properties with same group_id > 1?
-        // Let's use simplified logic: Properties scraped today vs total? 
-        // Or simply "Pending Assignments"
-        const pendingCount = totalProperties - assignedCount;
+        const { total, sahibinden, hepsiemlak, emlakjet, assigned } = counts[0];
 
         res.json({
             stats: {
-                totalProperties,
+                totalProperties: total,
                 sources: [
-                    { name: 'Sahibinden', count: sahibindenCount, color: 'text-yellow-600', bg: 'bg-yellow-50' },
-                    { name: 'Hepsiemlak', count: hepsiemlakCount, color: 'text-red-600', bg: 'bg-red-50' },
-                    { name: 'Emlakjet', count: emlakjetCount, color: 'text-green-600', bg: 'bg-green-50' },
-                    { name: 'Diğer', count: totalProperties - (sahibindenCount + hepsiemlakCount + emlakjetCount), color: 'text-gray-600', bg: 'bg-gray-50' }
+                    { name: 'Sahibinden', count: sahibinden, color: 'text-yellow-600', bg: 'bg-yellow-50' },
+                    { name: 'Hepsiemlak', count: hepsiemlak, color: 'text-red-600', bg: 'bg-red-50' },
+                    { name: 'Emlakjet', count: emlakjet, color: 'text-green-600', bg: 'bg-green-50' },
+                    { name: 'Diğer', count: total - (sahibinden + hepsiemlak + emlakjet), color: 'text-gray-600', bg: 'bg-gray-50' }
                 ],
-                assignedCount,
-                pendingCount
+                assignedCount: assigned,
+                pendingCount: total - assigned
             }
         });
 
