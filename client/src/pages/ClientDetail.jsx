@@ -282,7 +282,7 @@ const ClientDetail = () => {
                     <div className="lg:col-span-12 animate-in slide-in-from-top duration-300">
                         <div className="bg-slate-50 border-2 border-slate-200 rounded-2xl p-6 relative overflow-hidden group">
                             <div className="absolute top-0 right-0 p-4">
-                                <button onClick={() => setShowAnalysis(false)} className="text-slate-400 hover:text-slate-600"><X size={20} /></button>
+                                <button aria-label="Kapat" onClick={() => setShowAnalysis(false)} className="text-slate-400 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded"><X size={20} /></button>
                             </div>
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="p-2 bg-slate-900 rounded-xl text-blue-400">
@@ -403,7 +403,7 @@ const ClientDetail = () => {
                                             placeholder="Not..."
                                         />
                                         <div className="flex justify-end gap-1">
-                                            <button onClick={() => setIsEditingInfo(false)} className="p-1 hover:bg-gray-100 rounded"><X size={14} /></button>
+                                            <button aria-label="Kapat" onClick={() => setIsEditingInfo(false)} className="p-1 hover:bg-gray-100 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"><X size={14} /></button>
                                             <button onClick={handleSaveInfo} className="p-1 text-green-600 hover:bg-green-50 rounded"><CheckCircle size={14} /></button>
                                         </div>
                                     </div>
@@ -674,7 +674,7 @@ const ClientDetail = () => {
                                                                             autoFocus
                                                                         />
                                                                         <button onClick={() => handleSavePropertyNote(p.id, prop.id)} className="text-green-600"><CheckCircle size={14} /></button>
-                                                                        <button onClick={() => setEditingPropertyNote(null)} className="text-gray-400"><X size={14} /></button>
+                                                                        <button aria-label="Kapat" onClick={() => setEditingPropertyNote(null)} className="text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded"><X size={14} /></button>
                                                                     </div>
                                                                 ) : (
                                                                     <button
