@@ -1,0 +1,3 @@
+## 2025-05-14 - Optimized Consultant Performance Queries
+**Learning:** The `getConsultantPerformance` and `getConsultantDetail` endpoints suffered from classic N+1 query patterns. `getConsultantPerformance` executed $1 + 5N$ queries for $N$ consultants, which grows linearly and impacts performance as the team scales. Bulk aggregation using Prisma's `groupBy` and `$queryRaw` can consolidate these into a constant number of queries ($O(1)$ scaling).
+**Action:** Always look for loops containing database queries (counts, finds) and replace them with bulk operations (`groupBy`, `in` clauses, or raw SQL joins/aggregations) to maintain performance at scale.
