@@ -131,11 +131,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 });
 
                 if (source !== 'whatsapp') {
-                    fetch('http://127.0.0.1:5005/api/scraper/finished', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ provider: source || 'unknown', reason: reason || 'Page end' })
-                    }).catch(() => { });
+                    chrome.storage.local.get(['extension_api_key'], (apiKeyData) => {
+                        fetch('http://127.0.0.1:5005/api/scraper/finished', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Extension-API-Key': apiKeyData.extension_api_key || ''
+                            },
+                            body: JSON.stringify({ provider: source || 'unknown', reason: reason || 'Page end' })
+                        }).catch(() => { });
+                    });
                 }
             });
         }
@@ -145,11 +150,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const { partnerName, profilePicUrl, messages } = request;
         console.log(`📥 Received ${messages.length} WhatsApp messages from ${partnerName} (Pic: ${!!profilePicUrl})`);
 
-        fetch('http://127.0.0.1:5005/api/whatsapp/extension-sync', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ partnerName, profilePicUrl, messages })
-        }).catch(err => console.error('❌ WhatsApp Sync Error:', err));
+        chrome.storage.local.get(['extension_api_key'], (apiKeyData) => {
+            fetch('http://127.0.0.1:5005/api/whatsapp/extension-sync', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Extension-API-Key': apiKeyData.extension_api_key || ''
+                },
+                body: JSON.stringify({ partnerName, profilePicUrl, messages })
+            }).catch(err => console.error('❌ WhatsApp Sync Error:', err));
+        });
 
         return true;
     }
@@ -160,14 +170,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         if (typeof updatePortalHeartbeat === 'function') updatePortalHeartbeat(tabId);
 
-        chrome.storage.local.get(['scraped_count', 'page_count', 'is_running', 'active_tab_ids'], async (data) => {
+        chrome.storage.local.get(['scraped_count', 'page_count', 'is_running', 'active_tab_ids', 'extension_api_key'], async (data) => {
             if (!data.is_running) return;
 
             const url = 'http://127.0.0.1:5005/api/scraper/import';
             try {
                 const response = await fetch(url, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Extension-API-Key': data.extension_api_key || ''
+                    },
                     body: JSON.stringify({ listings, provider: source })
                 });
 
