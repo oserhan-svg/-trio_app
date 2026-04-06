@@ -88,14 +88,27 @@ document.getElementById('stopBtn').addEventListener('click', () => {
 
 document.getElementById('testBtn').addEventListener('click', () => {
     document.getElementById('status').innerText = "Bağlantı test ediliyor...";
-    fetch('http://127.0.0.1:5005/api/health')
-        .then(r => r.json())
-        .then(data => {
-            document.getElementById('status').innerText = `✅ Bağlantı Başarılı (v${data.debugVersion || '?'})`;
+    chrome.storage.local.get(['extension_api_key'], (data) => {
+        fetch('http://127.0.0.1:5005/api/health', {
+            headers: { 'X-Extension-API-Key': data.extension_api_key || '' }
         })
-        .catch(err => {
-            document.getElementById('status').innerText = `❌ Sunucuya Bağlanılamadı`;
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('status').innerText = `✅ Bağlantı Başarılı (v${data.debugVersion || '?'})`;
+            })
+            .catch(err => {
+                document.getElementById('status').innerText = `❌ Sunucuya Bağlanılamadı`;
+            });
+    });
+});
+
+document.getElementById('configBtn')?.addEventListener('click', () => {
+    const currentKey = prompt("Lütfen Extension API Key giriniz:");
+    if (currentKey !== null) {
+        chrome.storage.local.set({ extension_api_key: currentKey }, () => {
+            alert("API Key kaydedildi.");
         });
+    }
 });
 
 setInterval(updateUI, 1000);

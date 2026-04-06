@@ -38,4 +38,21 @@ const isAdmin = (req, res, next) => {
     });
 };
 
-module.exports = { authenticateToken, authorizeRole, isAdmin };
+const extensionAuth = (req, res, next) => {
+    const extensionKey = req.headers['x-extension-api-key'];
+    const serverKey = process.env.EXTENSION_API_KEY;
+
+    if (!serverKey) {
+        console.error('❌ EXTENSION_API_KEY is not defined in the environment!');
+        return res.status(500).json({ error: 'Extension API Key is not configured on the server.' });
+    }
+
+    if (!extensionKey || extensionKey !== serverKey) {
+        console.warn(`[SECURITY] Unauthorized extension access attempt from ${req.ip}`);
+        return res.status(401).json({ error: 'Unauthorized: Invalid Extension API Key' });
+    }
+
+    next();
+};
+
+module.exports = { authenticateToken, authorizeRole, isAdmin, extensionAuth };
