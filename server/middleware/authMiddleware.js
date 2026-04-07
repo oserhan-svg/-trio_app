@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 require('dotenv').config();
 
 const authenticateToken = (req, res, next) => {
@@ -38,4 +39,32 @@ const isAdmin = (req, res, next) => {
     });
 };
 
-module.exports = { authenticateToken, authorizeRole, isAdmin };
+const extensionAuth = (req, res, next) => {
+    const apiKey = req.headers['x-extension-api-key'];
+    const serverKey = process.env.EXTENSION_API_KEY;
+
+    if (!serverKey) {
+        console.error('❌ EXTENSION_API_KEY is not configured on the server');
+        return res.status(500).json({ error: 'Server security configuration missing' });
+    }
+
+    if (!apiKey) {
+        return res.status(401).json({ error: 'Unauthorized: Extension API Key missing' });
+    }
+
+    // Secure comparison to prevent timing attacks
+    try {
+        const apiKeyBuf = Buffer.from(apiKey);
+        const serverKeyBuf = Buffer.from(serverKey);
+
+        if (apiKeyBuf.length !== serverKeyBuf.length || !crypto.timingSafeEqual(apiKeyBuf, serverKeyBuf)) {
+            return res.status(401).json({ error: 'Unauthorized: Invalid Extension API Key' });
+        }
+    } catch (error) {
+        return res.status(401).json({ error: 'Unauthorized: Invalid Extension API Key' });
+    }
+
+    next();
+};
+
+module.exports = { authenticateToken, authorizeRole, isAdmin, extensionAuth };
