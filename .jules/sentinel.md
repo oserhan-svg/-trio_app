@@ -1,0 +1,4 @@
+## 2024-04-07 - Unauthenticated Remote Command Execution Vulnerability via Migration Endpoint
+**Vulnerability:** An unauthenticated endpoint (`/internal/migrate`) mapped to `dealController.runInternalMigration` exposed an execution vector where `child_process.exec` was called without authorization headers.
+**Learning:** This existed because the migration route was created outside the established security wrapper logic (`authenticateToken` / `authorizeRole`), missing simple yet vital checks needed for administrative operations and exposing a severe RCE risk.
+**Prevention:** All administrative, internal, or maintenance routes must be wrapped with `authenticateToken` and `authorizeRole('admin')` middleware. Database execution using Node APIs like `child_process.exec` should not be publicly accessible.
