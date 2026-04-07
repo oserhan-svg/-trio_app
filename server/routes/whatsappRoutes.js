@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const whatsappController = require('../controllers/whatsappController');
-const { authenticateToken } = require('../middleware/authMiddleware');
+const { authenticateToken, extensionAuth } = require('../middleware/authMiddleware');
 const { aiRateLimiter, heavyAiRateLimiter } = require('../middleware/rateLimitMiddleware');
 
 /**
@@ -29,13 +29,7 @@ router.post('/send', authenticateToken, whatsappController.sendMessage);
 
 // Sync Operations
 router.post('/sync', authenticateToken, whatsappController.sync);
-router.post('/extension-sync', whatsappController.syncExtension); // Often used by extension with different auth or none? Keeping consistent with old file (no auth middleware visible in old snippet but controller checks are safe)
-// Actually, looking at old file, likely used body data. If auth is needed, extension sends token?
-// Assuming controller handles it or it's open for the extension scenario. 
-// Re-adding authenticateToken to be safe if that was the case, but most likely extension endpoints use API keys or similar.
-// I will omit authenticateToken for extension-sync based on common patterns, or better, keep it if extension sends it.
-// To be safe, I'll match the previous file's likely pattern. I didn't see explicit auth middleware on the extension route in the view, so I'll leave it open BUT verify controller logic.
-// Controller syncExtension doesn't use req.user. OK.
+router.post('/extension-sync', extensionAuth, whatsappController.syncExtension); // Secured with extension API key authentication
 
 // Maintenance
 router.post('/repair-names', authenticateToken, whatsappController.repairNames);
