@@ -50,7 +50,7 @@ class AnalyticsService {
      */
     async calculatePipelineVelocity() {
         try {
-            const interactions = await prisma.clientInteraction.findMany({
+            const interactions = await prisma.interaction.findMany({
                 where: { type: 'Status Change' },
                 orderBy: { date: 'asc' },
                 include: { client: { select: { created_at: true } } }
@@ -352,6 +352,27 @@ class AnalyticsService {
         } catch (error) {
             console.error('Heatmap Data Error:', error);
             return [];
+        }
+    }
+
+    /**
+     * Optimized: Get consolidated property counts in a single DB round-trip
+     */
+    async getGlobalCounts() {
+        try {
+            const result = await prisma.$queryRaw`
+                SELECT
+                    COUNT(*)::int as total,
+                    COUNT(*) FILTER (WHERE url LIKE '%sahibinden.com%')::int as sahibinden,
+                    COUNT(*) FILTER (WHERE url LIKE '%hepsiemlak.com%' OR url LIKE '%hemlak.com%')::int as hepsiemlak,
+                    COUNT(*) FILTER (WHERE url LIKE '%emlakjet.com%')::int as emlakjet,
+                    COUNT(*) FILTER (WHERE assigned_user_id IS NOT NULL)::int as assigned
+                FROM properties
+            `;
+            return result[0] || { total: 0, sahibinden: 0, hepsiemlak: 0, emlakjet: 0, assigned: 0 };
+        } catch (error) {
+            console.error('Global Counts Error:', error);
+            return { total: 0, sahibinden: 0, hepsiemlak: 0, emlakjet: 0, assigned: 0 };
         }
     }
 }
