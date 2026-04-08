@@ -1,0 +1,3 @@
+## 2025-02-18 - Promise.all for Concurrent Queries
+**Learning:** Sequential Prisma queries and data processing functions (like analytics and metric calculations) in backend controllers significantly increase execution time, introducing performance bottlenecks especially on dashboard routes.
+**Action:** Consistently combine independent Prisma queries and independent async data service calls using `Promise.all` inside controllers to execute them concurrently, reducing total query latency to the latency of the slowest individual query.
