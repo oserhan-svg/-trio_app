@@ -1,0 +1,3 @@
+## 2024-06-25 - Using Promise.all for independent Prisma queries
+**Learning:** Sequential Prisma queries or independent service calls within backend controllers significantly slow down request latency. In an Express/Prisma setup, iterating over collections with `.map` and sequentially doing `await prisma...` creates an N+1 latency bottleneck.
+**Action:** When aggregating multiple independent statistics or querying Prisma independently in backend controllers, always group them using `Promise.all()` to execute them concurrently. When iterating over collections (e.g. using `.map()`), wrap the inner grouped `Promise.all` inside the outer `Promise.all` for maximum concurrency.
