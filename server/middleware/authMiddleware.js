@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 require('dotenv').config();
 
 const authenticateToken = (req, res, next) => {
@@ -38,4 +39,32 @@ const isAdmin = (req, res, next) => {
     });
 };
 
-module.exports = { authenticateToken, authorizeRole, isAdmin };
+/**
+ * Authentication for Chrome Extension using a shared API Key
+ */
+const extensionAuth = (req, res, next) => {
+    const apiKey = req.headers['x-extension-api-key'];
+    const serverKey = process.env.EXTENSION_API_KEY;
+
+    if (!serverKey) {
+        console.error('CRITICAL: EXTENSION_API_KEY is not defined in environment variables.');
+        return res.status(500).json({ error: 'Extension access is currently disabled' });
+    }
+
+    if (!apiKey) {
+        return res.status(401).json({ error: 'Extension API key required' });
+    }
+
+    // Use timingSafeEqual to prevent timing attacks
+    // We hash both keys to ensure they have the same length for timingSafeEqual
+    const apiKeyHash = crypto.createHash('sha256').update(apiKey).digest();
+    const serverKeyHash = crypto.createHash('sha256').update(serverKey).digest();
+
+    if (apiKeyHash.length === serverKeyHash.length && crypto.timingSafeEqual(apiKeyHash, serverKeyHash)) {
+        return next();
+    }
+
+    res.status(401).json({ error: 'Invalid Extension API key' });
+};
+
+module.exports = { authenticateToken, authorizeRole, isAdmin, extensionAuth };
