@@ -1,0 +1,3 @@
+## 2024-05-24 - Fix sequential Prisma queries in Analytics endpoints
+**Learning:** Found multiple independent database count queries and external service lookups executed sequentially via separate `await` statements in `server/controllers/analyticsController.js`. This creates an N+1 latency bottleneck where the total response time is the sum of all individual query latencies, slowing down the dashboard view.
+**Action:** When aggregating multiple independent statistics (like counts or cached metric maps) in Express controllers, always use `Promise.all()` to execute them concurrently, bringing the theoretical time complexity closer to O(max(N)) instead of O(sum(N)).
