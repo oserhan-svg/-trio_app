@@ -1,0 +1,3 @@
+## 2025-05-14 - Optimized Analytics and Cache Promise Coalescing
+**Learning:** Consolidating multiple `COUNT` queries into a single SQL statement using PostgreSQL `FILTER` clauses significantly reduces database round-trip latency. Additionally, implementing Promise Coalescing in the `CacheService` prevents "thundering herd" issues where concurrent requests for the same expired key would otherwise trigger multiple redundant database operations.
+**Action:** Use `COUNT(*) FILTER (WHERE ...)` for dashboard-style counters and ensure `CacheService.getOrSet` handles in-flight promises to collapse redundant requests.
