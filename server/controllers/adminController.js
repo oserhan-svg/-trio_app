@@ -1,52 +1,22 @@
 const prisma = require('../db');
+const analyticsService = require('../services/analyticsService');
 
 exports.getDashboardStats = async (req, res) => {
     try {
-        // 1. Total Properties
-        const totalProperties = await prisma.property.count();
-
-        // 2. By Source
-        const sahibindenCount = await prisma.property.count({
-            where: { url: { contains: 'sahibinden.com' } }
-        });
-
-        const hepsiemlakCount = await prisma.property.count({
-            where: {
-                OR: [
-                    { url: { contains: 'hepsiemlak.com' } },
-                    { url: { contains: 'hemlak.com' } }
-                ]
-            }
-        });
-
-        const emlakjetCount = await prisma.property.count({
-            where: { url: { contains: 'emlakjet.com' } }
-        });
-
-        // 3. Assignment Stats
-        const assignedCount = await prisma.property.count({
-            where: { assigned_user_id: { not: null } }
-        });
-
-        // 4. Duplicate / similar (Approximation for 'Mükerrer')
-        // Ideally we check for same external_id or similar title+price
-        // For now, let's just count properties sharing an external_id if strictly unique,
-        // but since external_id is unique in schema, maybe we count properties with same group_id > 1?
-        // Let's use simplified logic: Properties scraped today vs total? 
-        // Or simply "Pending Assignments"
-        const pendingCount = totalProperties - assignedCount;
+        // Optimized: Fetch all counts in a single DB round-trip via AnalyticsService
+        const counts = await analyticsService.getGlobalCounts();
 
         res.json({
             stats: {
-                totalProperties,
+                totalProperties: counts.total,
                 sources: [
-                    { name: 'Sahibinden', count: sahibindenCount, color: 'text-yellow-600', bg: 'bg-yellow-50' },
-                    { name: 'Hepsiemlak', count: hepsiemlakCount, color: 'text-red-600', bg: 'bg-red-50' },
-                    { name: 'Emlakjet', count: emlakjetCount, color: 'text-green-600', bg: 'bg-green-50' },
-                    { name: 'Diğer', count: totalProperties - (sahibindenCount + hepsiemlakCount + emlakjetCount), color: 'text-gray-600', bg: 'bg-gray-50' }
+                    { name: 'Sahibinden', count: counts.sahibinden, color: 'text-yellow-600', bg: 'bg-yellow-50' },
+                    { name: 'Hepsiemlak', count: counts.hepsiemlak, color: 'text-red-600', bg: 'bg-red-50' },
+                    { name: 'Emlakjet', count: counts.emlakjet, color: 'text-green-600', bg: 'bg-green-50' },
+                    { name: 'Diğer', count: counts.total - (counts.sahibinden + counts.hepsiemlak + counts.emlakjet), color: 'text-gray-600', bg: 'bg-gray-50' }
                 ],
-                assignedCount,
-                pendingCount
+                assignedCount: counts.assigned,
+                pendingCount: counts.total - counts.assigned
             }
         });
 

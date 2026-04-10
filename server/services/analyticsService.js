@@ -1,48 +1,33 @@
 const prisma = require('../db');
+const { Prisma } = require('@prisma/client');
+const cacheService = require('./cacheService');
 
 class AnalyticsService {
-    constructor() {
-        this.cache = {
-            statsMap: null,
-            lastFetch: 0,
-            ttl: 30 * 60 * 1000 // 30 minutes
-        };
-        this.biCache = {
-            data: null,
-            lastFetch: 0,
-            ttl: 5 * 60 * 1000 // 5 minutes
-        };
-    }
+    constructor() {}
 
     /**
-     * Get predictive revenue and pipeline metrics (WITH CACHING)
+     * Get predictive revenue and pipeline metrics (WITH CACHING via CacheService)
      */
     async getBIDashboard() {
-        const now = Date.now();
-        if (this.biCache.data && (now - this.biCache.lastFetch < this.biCache.ttl)) {
-            return this.biCache.data;
-        }
+        return await cacheService.getOrSet('bi_dashboard', async () => {
+            console.log('📈 Generating BI Predictive Dashboard...');
+            const [velocity, projection, efficiency, responseTime, funnel] = await Promise.all([
+                this.calculatePipelineVelocity(),
+                this.getRevenueProjection(),
+                this.getConsultantEfficiency(),
+                this.calculateResponseTimes(),
+                this.getConversionFunnel()
+            ]);
 
-        console.log('📈 Generating BI Predictive Dashboard...');
-        const [velocity, projection, efficiency, responseTime, funnel] = await Promise.all([
-            this.calculatePipelineVelocity(),
-            this.getRevenueProjection(),
-            this.getConsultantEfficiency(),
-            this.calculateResponseTimes(),
-            this.getConversionFunnel()
-        ]);
-
-        this.biCache.data = {
-            velocity,
-            projection,
-            efficiency,
-            responseTime,
-            funnel,
-            generatedAt: new Date()
-        };
-        this.biCache.lastFetch = now;
-
-        return this.biCache.data;
+            return {
+                velocity,
+                projection,
+                efficiency,
+                responseTime,
+                funnel,
+                generatedAt: new Date()
+            };
+        }, 300, 'analytics'); // 5 minute TTL
     }
 
     /**
@@ -219,49 +204,43 @@ class AnalyticsService {
     }
 
     /**
-     * CORE: Analyzes every neighborhood to find price averages and trends
+     * CORE: Analyzes every neighborhood to find price averages and trends (WITH CACHING)
      */
     async getNeighborhoodStatsMap() {
-        const now = Date.now();
-        if (this.cache.statsMap && (now - this.cache.lastFetch < this.cache.ttl)) {
-            return this.cache.statsMap;
-        }
-
-        console.log('🏘️ Calculating Neighborhood Intelligence...');
-        const rawStats = await prisma.property.groupBy({
-            by: ['district', 'neighborhood'],
-            where: { status: 'active', price: { gt: 0 } },
-            _avg: { price: true },
-            _count: { id: true },
-            _min: { price: true },
-            _max: { price: true }
-        });
-
-        const statsMap = { _heatmapData: [] };
-        rawStats.forEach(s => {
-            const district = s.district || 'Bilinmiyor';
-            const neighborhood = s.neighborhood || 'Bilinmiyor';
-            const key = `${district}-${neighborhood}`.toLowerCase();
-            const avg = Number(s._avg.price) || 0;
-
-            statsMap[key] = {
-                avg,
-                count: s._count.id,
-                min: Number(s._min.price),
-                max: Number(s._max.price)
-            };
-
-            statsMap._heatmapData.push({
-                district,
-                neighborhood,
-                avgPrice: avg,
-                count: s._count.id
+        return await cacheService.getOrSet('neighborhood_stats', async () => {
+            console.log('🏘️ Calculating Neighborhood Intelligence...');
+            const rawStats = await prisma.property.groupBy({
+                by: ['district', 'neighborhood'],
+                where: { status: 'active', price: { gt: 0 } },
+                _avg: { price: true },
+                _count: { id: true },
+                _min: { price: true },
+                _max: { price: true }
             });
-        });
 
-        this.cache.statsMap = statsMap;
-        this.cache.lastFetch = now;
-        return statsMap;
+            const statsMap = { _heatmapData: [] };
+            rawStats.forEach(s => {
+                const district = s.district || 'Bilinmiyor';
+                const neighborhood = s.neighborhood || 'Bilinmiyor';
+                const key = `${district}-${neighborhood}`.toLowerCase();
+                const avg = Number(s._avg.price) || 0;
+
+                statsMap[key] = {
+                    avg,
+                    count: s._count.id,
+                    min: Number(s._min.price),
+                    max: Number(s._max.price)
+                };
+
+                statsMap._heatmapData.push({
+                    district,
+                    neighborhood,
+                    avgPrice: avg,
+                    count: s._count.id
+                });
+            });
+            return statsMap;
+        }, 1800, 'analytics'); // 30 minute TTL
     }
 
     /**
@@ -325,15 +304,36 @@ class AnalyticsService {
     }
 
     async getSupplyDemandStats() {
-        try {
-            const [supply, demand] = await Promise.all([
-                prisma.property.count({ where: { status: 'active' } }),
-                prisma.client.count({ where: { type: { not: 'consultant' } } })
-            ]);
-            return { supply, demand, trend: 'up' };
-        } catch (e) {
-            return { supply: 0, demand: 0, trend: 'stable' };
-        }
+        return await cacheService.getOrSet('supply_demand', async () => {
+            try {
+                const [supply, demand] = await Promise.all([
+                    prisma.property.count({ where: { status: 'active' } }),
+                    prisma.client.count({ where: { type: { not: 'consultant' } } })
+                ]);
+                return { supply, demand, trend: 'up' };
+            } catch (e) {
+                return { supply: 0, demand: 0, trend: 'stable' };
+            }
+        }, 300, 'analytics');
+    }
+
+    /**
+     * Optimized Global Counts using PostgreSQL FILTER clauses
+     * Reduces 5-6 separate count queries to ONE single database round-trip
+     */
+    async getGlobalCounts() {
+        return await cacheService.getOrSet('global_counts', async () => {
+            const counts = await prisma.$queryRaw`
+                SELECT
+                    COUNT(*)::int as total,
+                    COUNT(*) FILTER (WHERE url LIKE '%sahibinden.com%')::int as sahibinden,
+                    COUNT(*) FILTER (WHERE url LIKE '%hepsiemlak.com%' OR url LIKE '%hemlak.com%')::int as hepsiemlak,
+                    COUNT(*) FILTER (WHERE url LIKE '%emlakjet.com%')::int as emlakjet,
+                    COUNT(*) FILTER (WHERE assigned_user_id IS NOT NULL)::int as assigned
+                FROM "properties"
+            `;
+            return counts[0] || { total: 0, sahibinden: 0, hepsiemlak: 0, emlakjet: 0, assigned: 0 };
+        }, 60, 'analytics'); // 1 minute TTL
     }
 
     async getDemandHeatmapData() {
