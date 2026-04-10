@@ -1,0 +1,4 @@
+## 2025-04-09 - [CRITICAL] Unauthenticated Admin/Migration Endpoint
+**Vulnerability:** The `/internal/migrate` endpoint in `server/routes/dealRoutes.js` executed system commands (`child_process.exec`) without any authentication or authorization checks.
+**Learning:** Internal or testing routes that execute shell commands or sensitive database migrations must be secured, otherwise they pose a severe Remote Code Execution (RCE) and/or Denial of Service (DoS) risk, even if they are only meant for development or internal use.
+**Prevention:** Always verify that all routes in Express routers, especially those interacting with the system shell or executing raw queries, explicitly include `authenticateToken` and `authorizeRole('admin')` middleware unless intentionally public. Ideally, remove test endpoints from production builds entirely.
