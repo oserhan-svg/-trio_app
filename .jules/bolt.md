@@ -1,0 +1,3 @@
+## 2024-04-10 - Concurrent DB Queries in Performance Controller
+**Learning:** Sequential `await` calls on Prisma database operations that don't depend on each other (like counting various stats) cause significant N+1 style latency bottlenecks. In this codebase, the performance controller was executing 5 queries sequentially per consultant loop and 2 queries sequentially per month loop.
+**Action:** When calculating metrics or aggregating multiple independent statistics using Prisma in backend controllers, always group them using `Promise.all()` arrays. When iterating over collections using `.map()`, it's safe to wrap inner `Promise.all` sets for maximum concurrency.
