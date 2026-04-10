@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { FileText } from 'lucide-react';
+import { FileText, X } from 'lucide-react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
+import Button from '../ui/Button';
 
 const AuthEditModal = ({ property, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -10,6 +11,7 @@ const AuthEditModal = ({ property, onClose, onSuccess }) => {
         auth_end_date: property.auth_end_date ? property.auth_end_date.split('T')[0] : ''
     });
     const [uploading, setUploading] = useState(false);
+    const [saving, setSaving] = useState(false);
 
     const handleFileUpload = async (e) => {
         const file = e.target.files[0];
@@ -37,6 +39,7 @@ const AuthEditModal = ({ property, onClose, onSuccess }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const saveToast = toast.loading('Kaydediliyor...');
+        setSaving(true);
         try {
             await api.put(`/properties/${property.id}`, formData);
             toast.success('Yetki belgesi güncellendi', { id: saveToast });
@@ -44,6 +47,8 @@ const AuthEditModal = ({ property, onClose, onSuccess }) => {
         } catch (error) {
             console.error(error);
             toast.error('Güncelleme başarısız oldu', { id: saveToast });
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -54,9 +59,10 @@ const AuthEditModal = ({ property, onClose, onSuccess }) => {
                     <h3 className="font-bold text-gray-800">Yetki Belgesi Yönetimi</h3>
                     <button
                         onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600 text-xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors"
+                        className="text-gray-400 hover:text-gray-600 transition p-1 hover:bg-gray-200 rounded-full"
+                        aria-label="Kapat"
                     >
-                        &times;
+                        <X size={20} />
                     </button>
                 </div>
                 <form onSubmit={handleSubmit} className="p-5 space-y-4">
@@ -100,8 +106,8 @@ const AuthEditModal = ({ property, onClose, onSuccess }) => {
                     </div>
 
                     <div className="flex justify-end gap-2 pt-4 border-t border-gray-100 mt-2">
-                        <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg font-medium transition-colors">İptal</button>
-                        <button type="submit" disabled={uploading} className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-sm shadow-blue-200 transition-all active:scale-95 disabled:opacity-70 disabled:active:scale-100">Kaydet</button>
+                        <Button type="button" variant="secondary" onClick={onClose} className="text-sm px-4 py-2">İptal</Button>
+                        <Button type="submit" isLoading={saving || uploading} loadingText={uploading ? "Yükleniyor..." : "Kaydediliyor..."} className="text-sm px-4 py-2 bg-blue-600 hover:bg-blue-700 shadow-blue-200">Kaydet</Button>
                     </div>
                 </form>
             </div>
