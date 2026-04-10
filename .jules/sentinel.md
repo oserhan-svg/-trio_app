@@ -1,0 +1,4 @@
+## 2026-04-10 - Unauthenticated internal migration route
+**Vulnerability:** Command Injection via unauthenticated internal migration route (`/internal/migrate`).
+**Learning:** Internal routes that execute system commands (like `child_process.exec`) should never be accessible without authentication, particularly if they are not meant for general users. They can be exploited for RCE or unintended actions.
+**Prevention:** Ensure all routes that execute system commands or access sensitive backend operations are heavily protected, using both `authenticateToken` and `authorizeRole('admin')` middleware. Alternatively, remove these routes entirely from production environments if they are only for local development.
