@@ -1,0 +1,3 @@
+## 2024-05-24 - Added aria-labels and keyboard focus to Opportunity Carousel
+**Learning:** Icon-only buttons (like the left/right navigation arrows in the `OpportunityCarousel` component) often lack visible text, making them inaccessible to screen readers, and sometimes lack visible focus outlines, making them hard to use with keyboard navigation.
+**Action:** Always verify that icon-only interactive elements contain localized `aria-label`s (e.g., `aria-label="Önceki fırsat"`) and use Tailwind `focus-visible:` utilities (e.g., `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500`) to ensure they are fully accessible without adding custom CSS.
