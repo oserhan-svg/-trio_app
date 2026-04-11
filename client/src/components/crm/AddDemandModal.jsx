@@ -54,7 +54,7 @@ const AddDemandModal = ({ isOpen, onClose, onSave, clientName, initialData = nul
                     <h2 className="text-xl font-bold text-gray-900">
                         {initialData ? 'Talebi Düzenle' : 'Talep Ekle'}
                     </h2>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition">
+                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition" aria-label="Kapat">
                         <X size={24} />
                     </button>
                 </div>
@@ -130,8 +130,8 @@ const AddDemandModal = ({ isOpen, onClose, onSave, clientName, initialData = nul
 
                     <div className="flex justify-end gap-3 mt-6">
                         <Button type="button" variant="secondary" onClick={onClose}>İptal</Button>
-                        <Button type="submit" disabled={loading}>
-                            {loading ? 'Kaydediliyor...' : (initialData ? 'Güncelle' : 'Ekle')}
+                        <Button type="submit" isLoading={loading} loadingText="Kaydediliyor...">
+                            {initialData ? 'Güncelle' : 'Ekle'}
                         </Button>
                     </div>
                 </form>
