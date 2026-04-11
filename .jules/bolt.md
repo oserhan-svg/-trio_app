@@ -1,0 +1,3 @@
+## 2024-05-18 - [Optimization of N+1 Queries in Performance Controllers]
+**Learning:** Prisma does not support grouping by related fields (e.g., grouping `Interactions` by `Client.consultant_id`) directly in `groupBy`. Using `$queryRaw` with an explicit `JOIN` is significantly more efficient than fetching all records and grouping in-memory or making N+1 queries. Additionally, range-based queries with in-memory filtering for historical data (e.g., 6 months of stats) are often faster than 12+ separate database roundtrips.
+**Action:** Use `$queryRaw` for complex aggregations involving relations and prioritize range queries over multiple single-point count queries for time-series data.
