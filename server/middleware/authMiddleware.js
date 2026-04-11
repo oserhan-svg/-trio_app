@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 require('dotenv').config();
 
 const authenticateToken = (req, res, next) => {
@@ -38,4 +39,30 @@ const isAdmin = (req, res, next) => {
     });
 };
 
-module.exports = { authenticateToken, authorizeRole, isAdmin };
+const extensionAuth = (req, res, next) => {
+    const apiKey = req.headers['x-extension-api-key'];
+    const expectedKey = process.env.EXTENSION_API_KEY;
+
+    if (!apiKey) {
+        return res.status(401).json({ error: 'Extension API key required' });
+    }
+
+    if (!expectedKey) {
+        console.error('EXTENSION_API_KEY is not set in environment');
+        return res.status(500).json({ error: 'Server configuration error' });
+    }
+
+    // Use timing-safe comparison by hashing both keys
+    const apiKeyHash = crypto.createHash('sha256').update(apiKey).digest();
+    const expectedKeyHash = crypto.createHash('sha256').update(expectedKey).digest();
+
+    if (apiKeyHash.length === expectedKeyHash.length &&
+        crypto.timingSafeEqual(apiKeyHash, expectedKeyHash)) {
+        return next();
+    }
+
+    console.warn(`Unauthorized extension access attempt from IP: ${req.ip}`);
+    return res.status(403).json({ error: 'Invalid Extension API key' });
+};
+
+module.exports = { authenticateToken, authorizeRole, isAdmin, extensionAuth };
