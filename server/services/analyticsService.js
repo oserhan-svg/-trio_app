@@ -324,6 +324,42 @@ class AnalyticsService {
         }
     }
 
+    /**
+     * Get global property counts in a single query for dashboard performance
+     */
+    async getGlobalCounts() {
+        try {
+            const result = await prisma.$queryRaw`
+                SELECT
+                    COUNT(*)::int as "totalProperties",
+                    COUNT(*) FILTER (WHERE url LIKE '%sahibinden.com%')::int as "sahibindenCount",
+                    COUNT(*) FILTER (WHERE url LIKE '%hepsiemlak.com%' OR url LIKE '%hemlak.com%')::int as "hepsiemlakCount",
+                    COUNT(*) FILTER (WHERE url LIKE '%emlakjet.com%')::int as "emlakjetCount",
+                    COUNT(*) FILTER (WHERE assigned_user_id IS NOT NULL)::int as "assignedCount"
+                FROM properties
+            `;
+            return result[0];
+        } catch (error) {
+            console.error('Error in getGlobalCounts:', error);
+            // Fallback to individual counts if raw query fails
+            const [totalProperties, sahibindenCount, hepsiemlakCount, emlakjetCount, assignedCount] = await Promise.all([
+                prisma.property.count(),
+                prisma.property.count({ where: { url: { contains: 'sahibinden.com' } } }),
+                prisma.property.count({
+                    where: {
+                        OR: [
+                            { url: { contains: 'hepsiemlak.com' } },
+                            { url: { contains: 'hemlak.com' } }
+                        ]
+                    }
+                }),
+                prisma.property.count({ where: { url: { contains: 'emlakjet.com' } } }),
+                prisma.property.count({ where: { assigned_user_id: { not: null } } })
+            ]);
+            return { totalProperties, sahibindenCount, hepsiemlakCount, emlakjetCount, assignedCount };
+        }
+    }
+
     async getSupplyDemandStats() {
         try {
             const [supply, demand] = await Promise.all([

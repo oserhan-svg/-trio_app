@@ -8,36 +8,15 @@ const getStats = async (req, res) => {
         console.log('📊 Starting Analytics Calculation...');
         const start = Date.now();
 
-        const statsMap = await analyticsService.getNeighborhoodStatsMap();
-        console.log(`✅ statsMap calculated in ${Date.now() - start}ms`);
+        // [OPTIMIZATION] Execute independent analytics tasks in parallel
+        // [OPTIMIZATION] Using getGlobalCounts to reduce 5 count queries to 1
+        const [statsMap, supplyDemand, counts] = await Promise.all([
+            analyticsService.getNeighborhoodStatsMap(),
+            analyticsService.getSupplyDemandStats(),
+            analyticsService.getGlobalCounts()
+        ]);
 
-        const sStart = Date.now();
-        const supplyDemand = await analyticsService.getSupplyDemandStats();
-        console.log(`✅ supplyDemand calculated in ${Date.now() - sStart}ms`);
-
-        const totalProperties = await prisma.property.count();
-
-        // Admin-specific counts
-        const sahibindenCount = await prisma.property.count({
-            where: { url: { contains: 'sahibinden.com' } }
-        });
-
-        const hepsiemlakCount = await prisma.property.count({
-            where: {
-                OR: [
-                    { url: { contains: 'hepsiemlak.com' } },
-                    { url: { contains: 'hemlak.com' } }
-                ]
-            }
-        });
-
-        const emlakjetCount = await prisma.property.count({
-            where: { url: { contains: 'emlakjet.com' } }
-        });
-
-        const assignedCount = await prisma.property.count({
-            where: { assigned_user_id: { not: null } }
-        });
+        const { totalProperties, assignedCount, sahibindenCount, hepsiemlakCount, emlakjetCount } = counts;
 
         const responseData = {
             totalProperties,
