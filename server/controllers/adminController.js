@@ -1,39 +1,11 @@
 const prisma = require('../db');
+const analyticsService = require('../services/analyticsService');
 
 exports.getDashboardStats = async (req, res) => {
     try {
-        // 1. Total Properties
-        const totalProperties = await prisma.property.count();
+        // [OPTIMIZATION] Using getGlobalCounts to reduce 5 count queries to 1
+        const { totalProperties, assignedCount, sahibindenCount, hepsiemlakCount, emlakjetCount } = await analyticsService.getGlobalCounts();
 
-        // 2. By Source
-        const sahibindenCount = await prisma.property.count({
-            where: { url: { contains: 'sahibinden.com' } }
-        });
-
-        const hepsiemlakCount = await prisma.property.count({
-            where: {
-                OR: [
-                    { url: { contains: 'hepsiemlak.com' } },
-                    { url: { contains: 'hemlak.com' } }
-                ]
-            }
-        });
-
-        const emlakjetCount = await prisma.property.count({
-            where: { url: { contains: 'emlakjet.com' } }
-        });
-
-        // 3. Assignment Stats
-        const assignedCount = await prisma.property.count({
-            where: { assigned_user_id: { not: null } }
-        });
-
-        // 4. Duplicate / similar (Approximation for 'Mükerrer')
-        // Ideally we check for same external_id or similar title+price
-        // For now, let's just count properties sharing an external_id if strictly unique,
-        // but since external_id is unique in schema, maybe we count properties with same group_id > 1?
-        // Let's use simplified logic: Properties scraped today vs total? 
-        // Or simply "Pending Assignments"
         const pendingCount = totalProperties - assignedCount;
 
         res.json({
