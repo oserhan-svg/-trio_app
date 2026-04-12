@@ -1,0 +1,3 @@
+## 2024-04-13 - Systematic Missing ARIA Labels on Icon-Only Navigation
+**Learning:** The application heavily utilizes `lucide-react` icons inside `<button>` elements across main architectural components (like `AppShell` and carousels) without providing accessible names (`aria-label`) or keyboard focus indicators, rendering core navigation inaccessible to screen readers and keyboard users.
+**Action:** When introducing new icon-only buttons using `lucide-react`, always accompany them with a localized Turkish `aria-label` and Tailwind's `focus-visible` ring utilities to ensure brand-consistent visual focus and screen reader accessibility.
