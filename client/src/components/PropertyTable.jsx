@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ExternalLink, FileSpreadsheet, Instagram, Eye, ChevronLeft, ChevronRight, FileText, TrendingDown, Home, ChevronUp, ChevronDown, X, Sparkles, Activity, Layers, Search, Flame } from 'lucide-react';
 import api from '../services/api';
@@ -23,6 +23,46 @@ const PropertySkeleton = () => (
         ))}
     </>
 );
+
+const SortHeader = ({ label, sortKeyBase, currentSort, onSortChange }) => {
+    const isCurrent = currentSort === `${sortKeyBase}_asc` || currentSort === `${sortKeyBase}_desc` || (sortKeyBase === 'date' && currentSort === 'newest');
+    const isDesc = currentSort === `${sortKeyBase}_desc` || (sortKeyBase === 'date' && currentSort === 'newest');
+
+    const handleClick = () => {
+        if (!onSortChange) return;
+        if (sortKeyBase === 'date') {
+            onSortChange(currentSort === 'newest' ? 'date_asc' : 'newest');
+        } else {
+            onSortChange(isDesc ? `${sortKeyBase}_asc` : `${sortKeyBase}_desc`);
+        }
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleClick();
+        }
+    };
+
+    return (
+        <th
+            className={`px-6 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em] cursor-pointer transition-all relative group/th ${isCurrent ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'}`}
+            onClick={handleClick}
+            onKeyDown={handleKeyDown}
+            tabIndex={0}
+            role="button"
+            aria-label={`${label} ile sırala`}
+        >
+            <div className="flex items-center gap-2">
+                {label}
+                <div className={`transition-all duration-300 ${isCurrent ? 'opacity-100 scale-100' : 'opacity-0 scale-50 group-hover/th:opacity-50 group-hover/th:scale-100'}`}>
+                    {isDesc ? <ChevronDown size={14} strokeWidth={3} /> : <ChevronUp size={14} strokeWidth={3} />}
+                </div>
+            </div>
+            {isCurrent && <div className="absolute bottom-0 left-6 right-6 h-0.5 bg-blue-600 dark:bg-blue-500 rounded-full animate-in fade-in duration-500" />}
+        </th>
+    );
+};
 
 const PropertyRow = React.memo(({ prop, isSelected, onToggleSelect, onGenerateStory, lastElementRef }) => {
     const navigate = useNavigate();
@@ -200,6 +240,7 @@ const PropertyRow = React.memo(({ prop, isSelected, onToggleSelect, onGenerateSt
                         onClick={() => navigate(`/property/${prop.id}`)}
                         className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white dark:hover:text-white hover:border-blue-600 dark:hover:border-blue-600 transition-all active:scale-90"
                         title="Derinlemesine Analiz"
+                        aria-label="Derinlemesine Analiz"
                     >
                         <Eye size={18} strokeWidth={2.5} />
                     </button>
@@ -207,6 +248,7 @@ const PropertyRow = React.memo(({ prop, isSelected, onToggleSelect, onGenerateSt
                         onClick={() => navigate(`/property-listing/${prop.id}`)}
                         className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white dark:hover:text-white hover:border-indigo-600 dark:hover:border-indigo-600 transition-all active:scale-90"
                         title="Müşteri Sunumu Hazırla"
+                        aria-label="Müşteri Sunumu Hazırla"
                     >
                         <FileText size={18} strokeWidth={2.5} />
                     </button>
@@ -214,6 +256,7 @@ const PropertyRow = React.memo(({ prop, isSelected, onToggleSelect, onGenerateSt
                         onClick={() => onGenerateStory(prop.id)}
                         className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-rose-600 dark:hover:bg-rose-600 hover:text-white dark:hover:text-white hover:border-rose-600 dark:hover:border-rose-600 transition-all active:scale-90"
                         title="Hızlı Reklam (Story)"
+                        aria-label="Hızlı Reklam (Story)"
                     >
                         <Instagram size={18} strokeWidth={2.5} />
                     </button>
@@ -223,6 +266,7 @@ const PropertyRow = React.memo(({ prop, isSelected, onToggleSelect, onGenerateSt
                         rel="noopener noreferrer"
                         className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-slate-900 dark:hover:bg-slate-100 hover:text-white dark:hover:text-slate-900 hover:border-slate-900 dark:hover:border-slate-100 transition-all active:scale-90"
                         title="Kaynağı Görüntüle"
+                        aria-label="Kaynağı Görüntüle"
                     >
                         <ExternalLink size={18} strokeWidth={2.5} />
                     </a>
@@ -233,7 +277,6 @@ const PropertyRow = React.memo(({ prop, isSelected, onToggleSelect, onGenerateSt
 });
 
 const PropertyTable = ({ properties, currentSort, onSortChange, hasMore, onLoadMore, isLoadingMore }) => {
-    const navigate = useNavigate();
     const [selectedIds, setSelectedIds] = useState([]);
     const observer = useRef();
 
@@ -311,35 +354,6 @@ const PropertyTable = ({ properties, currentSort, onSortChange, hasMore, onLoadM
             console.error('Image generation failed:', error);
             toast.error('Görsel oluşturulamadı.');
         }
-    };
-
-    const SortHeader = ({ label, sortKeyBase, currentSort, onSortChange }) => {
-        const isCurrent = currentSort === `${sortKeyBase}_asc` || currentSort === `${sortKeyBase}_desc` || (sortKeyBase === 'date' && currentSort === 'newest');
-        const isDesc = currentSort === `${sortKeyBase}_desc` || (sortKeyBase === 'date' && currentSort === 'newest');
-
-        const handleClick = () => {
-            if (!onSortChange) return;
-            if (sortKeyBase === 'date') {
-                onSortChange(currentSort === 'newest' ? 'date_asc' : 'newest');
-            } else {
-                onSortChange(isDesc ? `${sortKeyBase}_asc` : `${sortKeyBase}_desc`);
-            }
-        };
-
-        return (
-            <th
-                className={`px-6 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em] cursor-pointer transition-all relative group/th ${isCurrent ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'}`}
-                onClick={handleClick}
-            >
-                <div className="flex items-center gap-2">
-                    {label}
-                    <div className={`transition-all duration-300 ${isCurrent ? 'opacity-100 scale-100' : 'opacity-0 scale-50 group-hover/th:opacity-50 group-hover/th:scale-100'}`}>
-                        {isDesc ? <ChevronDown size={14} strokeWidth={3} /> : <ChevronUp size={14} strokeWidth={3} />}
-                    </div>
-                </div>
-                {isCurrent && <div className="absolute bottom-0 left-6 right-6 h-0.5 bg-blue-600 dark:bg-blue-500 rounded-full animate-in fade-in duration-500" />}
-            </th>
-        );
     };
 
     return (
