@@ -1,0 +1,3 @@
+## 2025-04-13 - Standardizing Loading States and Table Accessibility
+**Learning:** Interactive table headers (like those used for sorting) are often overlooked in accessibility audits. They require `role="button"`, `tabIndex={0}`, and keyboard event listeners (Enter/Space) to be fully usable by keyboard-only users. Additionally, centralizing loading logic in a base `Button` component ensures consistent visual feedback (spinners, disabled states) and ARIA attributes (`aria-busy`) across the entire application.
+**Action:** Always check interactive `<th>` elements for keyboard accessibility and prefer a centralized `Button` component with built-in loading states over manual conditional rendering of spinners in forms.
