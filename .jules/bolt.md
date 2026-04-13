@@ -1,0 +1,3 @@
+## 2025-05-15 - N+1 Query Elimination in Performance Metrics
+**Learning:** The `performanceController` was suffering from an N+1 query bottleneck where it executed 5 separate `count` queries for every consultant. Additionally, Prisma's `groupBy` does not support grouping by fields on a related model (e.g., grouping `Interactions` by `Client.consultant_id`).
+**Action:** Use `prisma.property.groupBy` and `prisma.agendaItem.groupBy` for direct field aggregations, and `prisma.$queryRaw` with an explicit `JOIN` for relation-based grouping to consolidate multiple queries into a single database call. For time-series data like monthly stats, fetch the entire range in one query and group in memory to avoid multiple round-trips.
