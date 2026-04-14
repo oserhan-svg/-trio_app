@@ -12,10 +12,12 @@ class AnalyticsService {
             lastFetch: 0,
             ttl: 5 * 60 * 1000 // 5 minutes
         };
+        this.statsMapPromise = null;
+        this.biDashboardPromise = null;
     }
 
     /**
-     * Get predictive revenue and pipeline metrics (WITH CACHING)
+     * Get predictive revenue and pipeline metrics (WITH CACHING & COALESCING)
      */
     async getBIDashboard() {
         const now = Date.now();
@@ -23,26 +25,38 @@ class AnalyticsService {
             return this.biCache.data;
         }
 
+        if (this.biDashboardPromise) {
+            return this.biDashboardPromise;
+        }
+
         console.log('📈 Generating BI Predictive Dashboard...');
-        const [velocity, projection, efficiency, responseTime, funnel] = await Promise.all([
-            this.calculatePipelineVelocity(),
-            this.getRevenueProjection(),
-            this.getConsultantEfficiency(),
-            this.calculateResponseTimes(),
-            this.getConversionFunnel()
-        ]);
+        this.biDashboardPromise = (async () => {
+            try {
+                const [velocity, projection, efficiency, responseTime, funnel] = await Promise.all([
+                    this.calculatePipelineVelocity(),
+                    this.getRevenueProjection(),
+                    this.getConsultantEfficiency(),
+                    this.calculateResponseTimes(),
+                    this.getConversionFunnel()
+                ]);
 
-        this.biCache.data = {
-            velocity,
-            projection,
-            efficiency,
-            responseTime,
-            funnel,
-            generatedAt: new Date()
-        };
-        this.biCache.lastFetch = now;
+                this.biCache.data = {
+                    velocity,
+                    projection,
+                    efficiency,
+                    responseTime,
+                    funnel,
+                    generatedAt: new Date()
+                };
+                this.biCache.lastFetch = Date.now();
 
-        return this.biCache.data;
+                return this.biCache.data;
+            } finally {
+                this.biDashboardPromise = null;
+            }
+        })();
+
+        return this.biDashboardPromise;
     }
 
     /**
@@ -50,7 +64,7 @@ class AnalyticsService {
      */
     async calculatePipelineVelocity() {
         try {
-            const interactions = await prisma.clientInteraction.findMany({
+            const interactions = await prisma.interaction.findMany({
                 where: { type: 'Status Change' },
                 orderBy: { date: 'asc' },
                 include: { client: { select: { created_at: true } } }
@@ -220,6 +234,7 @@ class AnalyticsService {
 
     /**
      * CORE: Analyzes every neighborhood to find price averages and trends
+     * Optimized with Promise Coalescing to prevent concurrent DB hits on cold cache
      */
     async getNeighborhoodStatsMap() {
         const now = Date.now();
@@ -227,41 +242,55 @@ class AnalyticsService {
             return this.cache.statsMap;
         }
 
+        // Return in-flight promise if another request is already fetching
+        if (this.statsMapPromise) {
+            return this.statsMapPromise;
+        }
+
         console.log('🏘️ Calculating Neighborhood Intelligence...');
-        const rawStats = await prisma.property.groupBy({
-            by: ['district', 'neighborhood'],
-            where: { status: 'active', price: { gt: 0 } },
-            _avg: { price: true },
-            _count: { id: true },
-            _min: { price: true },
-            _max: { price: true }
-        });
+        this.statsMapPromise = (async () => {
+            try {
+                const rawStats = await prisma.property.groupBy({
+                    by: ['district', 'neighborhood'],
+                    where: { status: 'active', price: { gt: 0 } },
+                    _avg: { price: true },
+                    _count: { id: true },
+                    _min: { price: true },
+                    _max: { price: true }
+                });
 
-        const statsMap = { _heatmapData: [] };
-        rawStats.forEach(s => {
-            const district = s.district || 'Bilinmiyor';
-            const neighborhood = s.neighborhood || 'Bilinmiyor';
-            const key = `${district}-${neighborhood}`.toLowerCase();
-            const avg = Number(s._avg.price) || 0;
+                const statsMap = { _heatmapData: [] };
+                rawStats.forEach(s => {
+                    const district = s.district || 'Bilinmiyor';
+                    const neighborhood = s.neighborhood || 'Bilinmiyor';
+                    const key = `${district}-${neighborhood}`.toLowerCase();
+                    const avg = Number(s._avg.price) || 0;
 
-            statsMap[key] = {
-                avg,
-                count: s._count.id,
-                min: Number(s._min.price),
-                max: Number(s._max.price)
-            };
+                    statsMap[key] = {
+                        avg,
+                        count: s._count.id,
+                        min: Number(s._min.price),
+                        max: Number(s._max.price)
+                    };
 
-            statsMap._heatmapData.push({
-                district,
-                neighborhood,
-                avgPrice: avg,
-                count: s._count.id
-            });
-        });
+                    statsMap._heatmapData.push({
+                        district,
+                        neighborhood,
+                        avgPrice: avg,
+                        count: s._count.id
+                    });
+                });
 
-        this.cache.statsMap = statsMap;
-        this.cache.lastFetch = now;
-        return statsMap;
+                this.cache.statsMap = statsMap;
+                this.cache.lastFetch = Date.now();
+                return statsMap;
+            } finally {
+                // Clear the promise when done (success or failure)
+                this.statsMapPromise = null;
+            }
+        })();
+
+        return this.statsMapPromise;
     }
 
     /**
