@@ -175,7 +175,7 @@ const getProperties = async (req, res) => {
                         }
                     }
                 }),
-                analyticsService.getNeighborhoodStatsMap()
+                statsMapTask // Reuse the already initiated task
             ]);
 
             console.log(`[RADAR] Found ${rawProps.length} active properties in DB matching "where".`);
