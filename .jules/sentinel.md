@@ -1,0 +1,4 @@
+## 2024-04-14 - Unauthenticated Migration Endpoint
+**Vulnerability:** The `/internal/migrate` endpoint in `server/routes/dealRoutes.js` runs a `child_process.exec` command but lacked `authenticateToken` and `authorizeRole('admin')` middleware.
+**Learning:** Internal or testing routes that execute shell commands or migrations must always be strictly protected or removed in production to prevent unauthorized execution or potential RCE.
+**Prevention:** Always apply `authenticateToken` and `authorizeRole('admin')` to administrative or internal endpoints, and verify route definitions during security reviews.
