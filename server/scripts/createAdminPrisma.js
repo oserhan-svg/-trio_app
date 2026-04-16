@@ -10,7 +10,8 @@ async function createAdmin() {
         const user = await prisma.user.upsert({
             where: { email: email },
             update: {
-                password_hash: hashedPassword,
+                // SECURITY: Do not update password_hash here to avoid resetting
+                // it to the default '1234' on every server restart.
                 role: 'admin'
             },
             create: {
