@@ -361,6 +361,7 @@ const FilterBar = ({ filters, metadata, properties = [], onChange, onClearAll, t
                             onClick={onClearAll}
                             className="h-12 w-12 flex items-center justify-center bg-rose-50 text-rose-500 rounded-2xl hover:bg-rose-500 hover:text-white transition-all active:scale-95 shadow-sm border border-rose-100/50"
                             title="Filtreleri Sıfırla"
+                            aria-label="Filtreleri Sıfırla"
                         >
                             <Trash2 size={20} />
                         </button>
@@ -387,7 +388,7 @@ const FilterBar = ({ filters, metadata, properties = [], onChange, onClearAll, t
                                             savedSearches.map(s => (
                                                 <div key={s.id} onClick={() => loadSavedSearch(s.filters)} className="group flex items-center justify-between p-3 rounded-2xl hover:bg-blue-600 dark:hover:bg-blue-500 cursor-pointer transition-all border border-transparent hover:shadow-lg hover:shadow-blue-500/20">
                                                     <span className="text-xs font-bold text-slate-700 dark:text-slate-200 group-hover:text-white truncate pr-2">{s.name}</span>
-                                                    <button onClick={(e) => { e.stopPropagation(); deleteSavedSearch(e, s.id); }} className="p-1.5 text-slate-400 dark:text-slate-500 group-hover:text-white/50 hover:text-white! transition-colors">
+                                                    <button aria-label="Kaydı Sil" onClick={(e) => { e.stopPropagation(); deleteSavedSearch(e, s.id); }} className="p-1.5 text-slate-400 dark:text-slate-500 group-hover:text-white/50 hover:text-white! transition-colors">
                                                         <X size={14} />
                                                     </button>
                                                 </div>
@@ -447,6 +448,7 @@ const FilterBar = ({ filters, metadata, properties = [], onChange, onClearAll, t
                                 <button
                                     onClick={() => removeFilter(key)}
                                     className="p-1 px-1.5 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-500 transition-all active:scale-75"
+                                    aria-label="Filtreyi Kaldır"
                                 >
                                     <X size={12} strokeWidth={3} />
                                 </button>
