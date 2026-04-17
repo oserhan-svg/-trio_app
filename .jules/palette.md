@@ -1,0 +1,3 @@
+## 2024-04-18 - Global Header Icon Accessibility
+**Learning:** Global topbar icon-only controls (Menu, Theme, Notifications) lacked proper ARIA labels and visual keyboard focus states, creating a site-wide navigation barrier for screen reader and keyboard users.
+**Action:** Always include localized `aria-label` attributes and Tailwind `focus-visible:` styles for all icon-only interactive elements in structural components.
