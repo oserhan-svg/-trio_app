@@ -15,29 +15,34 @@ const getStats = async (req, res) => {
         const supplyDemand = await analyticsService.getSupplyDemandStats();
         console.log(`✅ supplyDemand calculated in ${Date.now() - sStart}ms`);
 
-        const totalProperties = await prisma.property.count();
-
-        // Admin-specific counts
-        const sahibindenCount = await prisma.property.count({
-            where: { url: { contains: 'sahibinden.com' } }
-        });
-
-        const hepsiemlakCount = await prisma.property.count({
-            where: {
-                OR: [
-                    { url: { contains: 'hepsiemlak.com' } },
-                    { url: { contains: 'hemlak.com' } }
-                ]
-            }
-        });
-
-        const emlakjetCount = await prisma.property.count({
-            where: { url: { contains: 'emlakjet.com' } }
-        });
-
-        const assignedCount = await prisma.property.count({
-            where: { assigned_user_id: { not: null } }
-        });
+        // Performance: Run independent count queries concurrently via Promise.all
+        const [
+            totalProperties,
+            sahibindenCount,
+            hepsiemlakCount,
+            emlakjetCount,
+            assignedCount
+        ] = await Promise.all([
+            prisma.property.count(),
+            // Admin-specific counts
+            prisma.property.count({
+                where: { url: { contains: 'sahibinden.com' } }
+            }),
+            prisma.property.count({
+                where: {
+                    OR: [
+                        { url: { contains: 'hepsiemlak.com' } },
+                        { url: { contains: 'hemlak.com' } }
+                    ]
+                }
+            }),
+            prisma.property.count({
+                where: { url: { contains: 'emlakjet.com' } }
+            }),
+            prisma.property.count({
+                where: { assigned_user_id: { not: null } }
+            })
+        ]);
 
         const responseData = {
             totalProperties,
