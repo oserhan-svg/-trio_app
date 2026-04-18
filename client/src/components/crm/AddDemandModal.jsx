@@ -54,7 +54,11 @@ const AddDemandModal = ({ isOpen, onClose, onSave, clientName, initialData = nul
                     <h2 className="text-xl font-bold text-gray-900">
                         {initialData ? 'Talebi Düzenle' : 'Talep Ekle'}
                     </h2>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition">
+                    <button
+                        onClick={onClose}
+                        className="text-gray-400 hover:text-gray-600 transition"
+                        aria-label="Kapat"
+                    >
                         <X size={24} />
                     </button>
                 </div>
@@ -143,7 +147,6 @@ const AddDemandModal = ({ isOpen, onClose, onSave, clientName, initialData = nul
 // Internal Multi-Select Component for Neighborhoods
 const NeighborhoodMultiSelect = ({ value, onChange }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [selected, setSelected] = useState([]);
 
     const neighborhoods = [
         "150 Evler", "Ali Çetinkaya", "Altınova", "Cunda (Namık Kemal)",
@@ -153,13 +156,7 @@ const NeighborhoodMultiSelect = ({ value, onChange }) => {
         "Yeni", "Zekibey"
     ];
 
-    useEffect(() => {
-        if (value) {
-            setSelected(value.split(',').map(s => s.trim()).filter(Boolean));
-        } else {
-            setSelected([]);
-        }
-    }, [value]);
+    const selected = value ? value.split(',').map(s => s.trim()).filter(Boolean) : [];
 
     const toggleSelection = (item) => {
         let newSelection;
@@ -168,7 +165,6 @@ const NeighborhoodMultiSelect = ({ value, onChange }) => {
         } else {
             newSelection = [...selected, item];
         }
-        setSelected(newSelection);
         onChange(newSelection.join(','));
     };
 
