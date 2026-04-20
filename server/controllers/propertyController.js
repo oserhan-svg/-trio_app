@@ -162,6 +162,7 @@ const getProperties = async (req, res) => {
             console.log(`[RADAR] Incoming request - filter: ${opportunity_filter}, category: ${radar_category}`);
 
             // PASS 1: Lightweight fetch for filtering and scoring
+            // Optimized: reusing statsMapTask promise instead of initiating a new call
             const [rawProps, statsMap] = await Promise.all([
                 prisma.property.findMany({
                     where,
@@ -175,7 +176,7 @@ const getProperties = async (req, res) => {
                         }
                     }
                 }),
-                analyticsService.getNeighborhoodStatsMap()
+                statsMapTask
             ]);
 
             console.log(`[RADAR] Found ${rawProps.length} active properties in DB matching "where".`);
@@ -308,6 +309,7 @@ const getPortfolioStats = async (req, res) => {
         let sahibindenCount = 0;
         let hepsiemlakCount = 0;
         let sample = [];
+        let statsMapTask = analyticsService.getNeighborhoodStatsMap();
 
         if (opportunity_filter) {
             // Memory intensive path for scored filters - optimized to fetch only necessary fields
@@ -324,7 +326,7 @@ const getPortfolioStats = async (req, res) => {
                         }
                     }
                 }),
-                analyticsService.getNeighborhoodStatsMap()
+                statsMapTask
             ]);
 
             const filtered = properties.filter(p => {
