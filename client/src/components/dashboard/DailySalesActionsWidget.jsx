@@ -88,12 +88,16 @@ const DailySalesActionsWidget = () => {
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => handleSend(action.clientPhone, action.pitch)}
-                                    className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black py-2.5 rounded-lg flex items-center justify-center gap-2 shadow-lg shadow-indigo-100 transition"
+                                    className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black py-2.5 rounded-lg flex items-center justify-center gap-2 shadow-lg shadow-indigo-100 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1"
                                 >
                                     <Send size={14} />
                                     WhatsApp ile Gönder
                                 </button>
-                                <button className="px-3 bg-white border border-gray-200 text-gray-400 hover:text-indigo-600 rounded-lg transition">
+                                <button
+                                    aria-label="Takvime Ekle"
+                                    title="Takvime Ekle"
+                                    className="px-3 bg-white border border-gray-200 text-gray-400 hover:text-indigo-600 rounded-lg transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1"
+                                >
                                     <Calendar size={16} />
                                 </button>
                             </div>
@@ -109,7 +113,10 @@ const DailySalesActionsWidget = () => {
             </div>
 
             <div className="bg-gray-50 p-4 text-center border-t border-gray-100">
-                <button onClick={fetchActions} className="text-xs text-gray-500 font-bold hover:text-indigo-600 transition flex items-center gap-1 mx-auto">
+                <button
+                    onClick={fetchActions}
+                    className="text-xs text-gray-500 font-bold hover:text-indigo-600 transition flex items-center gap-1 mx-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded px-2 py-1"
+                >
                     <RefreshCw size={12} /> Listeyi Güncelle
                 </button>
             </div>
