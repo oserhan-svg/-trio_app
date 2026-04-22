@@ -27,6 +27,24 @@ async function reliableSendMessage(tabId, message, retries = 5) {
 // Internal state to prevent storage race conditions
 let activeTabRegistry = {};
 
+/**
+ * Shared fetch helper for backend API calls with authentication
+ */
+async function secureFetch(url, options = {}) {
+    const defaultHeaders = {
+        'Content-Type': 'application/json',
+        'x-extension-key': 'your_extension_key_here' // Should be configured via extension options in production
+    };
+
+    return fetch(url, {
+        ...options,
+        headers: {
+            ...defaultHeaders,
+            ...options.headers
+        }
+    });
+}
+
 // Restore registry from storage on startup
 chrome.storage.local.get(['active_tab_ids'], (result) => {
     activeTabRegistry = result.active_tab_ids || {};
@@ -131,9 +149,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 });
 
                 if (source !== 'whatsapp') {
-                    fetch('http://127.0.0.1:5005/api/scraper/finished', {
+                    secureFetch('http://127.0.0.1:5005/api/scraper/finished', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ provider: source || 'unknown', reason: reason || 'Page end' })
                     }).catch(() => { });
                 }
@@ -145,9 +162,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const { partnerName, profilePicUrl, messages } = request;
         console.log(`📥 Received ${messages.length} WhatsApp messages from ${partnerName} (Pic: ${!!profilePicUrl})`);
 
-        fetch('http://127.0.0.1:5005/api/whatsapp/extension-sync', {
+        secureFetch('http://127.0.0.1:5005/api/whatsapp/extension-sync', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ partnerName, profilePicUrl, messages })
         }).catch(err => console.error('❌ WhatsApp Sync Error:', err));
 
@@ -165,9 +181,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
             const url = 'http://127.0.0.1:5005/api/scraper/import';
             try {
-                const response = await fetch(url, {
+                const response = await secureFetch(url, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ listings, provider: source })
                 });
 
