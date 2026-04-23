@@ -1,0 +1,3 @@
+## 2025-05-15 - [Bolt: N+1 Optimization for Analytics Dashboards]
+**Learning:** The `performanceController` was suffering from severe N+1 query patterns in both consultant overview and detail views. `getConsultantPerformance` scaled linearly with the number of consultants (1+5N queries), and `getConsultantDetail` executed 12 queries for a 6-month view.
+**Action:** Use Prisma's `groupBy` for simple aggregations and `$queryRaw` with `date_trunc` for time-series data or complex joins (like interactions-to-consultant). Always cast raw SQL counts to `::int` to avoid BigInt serialization issues. Use `Object.fromEntries` for O(1) in-memory mapping of results.
