@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { FileText } from 'lucide-react';
+import { FileText, X } from 'lucide-react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
+import Button from '../ui/Button';
 
 const AuthEditModal = ({ property, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -10,6 +11,7 @@ const AuthEditModal = ({ property, onClose, onSuccess }) => {
         auth_end_date: property.auth_end_date ? property.auth_end_date.split('T')[0] : ''
     });
     const [uploading, setUploading] = useState(false);
+    const [saving, setSaving] = useState(false);
 
     const handleFileUpload = async (e) => {
         const file = e.target.files[0];
@@ -36,72 +38,77 @@ const AuthEditModal = ({ property, onClose, onSuccess }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const saveToast = toast.loading('Kaydediliyor...');
+        setSaving(true);
         try {
             await api.put(`/properties/${property.id}`, formData);
-            toast.success('Yetki belgesi güncellendi', { id: saveToast });
+            toast.success('Yetki belgesi güncellendi');
             onSuccess();
         } catch (error) {
             console.error(error);
-            toast.error('Güncelleme başarısız oldu', { id: saveToast });
+            toast.error('Güncelleme başarısız oldu');
+        } finally {
+            setSaving(false);
         }
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
-                <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+                <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                     <h3 className="font-bold text-gray-800">Yetki Belgesi Yönetimi</h3>
                     <button
                         onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600 text-xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors"
+                        aria-label="Kapat"
+                        className="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
                     >
-                        &times;
+                        <X size={20} />
                     </button>
                 </div>
-                <form onSubmit={handleSubmit} className="p-5 space-y-4">
+                <form onSubmit={handleSubmit} className="p-6 space-y-4">
                     <div>
-                        <label className="block text-xs font-bold text-gray-700 mb-1">Yetki Belgesi</label>
+                        <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wider">Yetki Belgesi</label>
                         <div className="flex gap-2 items-center">
-                            <label className={`flex-1 cursor-pointer bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 border-dashed rounded-lg p-3 text-center transition-colors ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                                <span className="text-sm font-medium">{uploading ? 'Yükleniyor...' : 'Dosya Seç & Yükle (PDF/Resim)'}</span>
+                            <label className={`flex-1 cursor-pointer bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 border-dashed rounded-xl p-4 text-center transition-all ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                                <span className="text-sm font-semibold">{uploading ? 'Yükleniyor...' : 'Dosya Seç & Yükle (PDF/Resim)'}</span>
                                 <input type="file" className="hidden" onChange={handleFileUpload} accept=".pdf,.jpg,.jpeg,.png" disabled={uploading} />
                             </label>
                         </div>
                         {formData.auth_doc_url && (
-                            <div className="mt-2 text-xs text-emerald-600 flex items-center gap-1 bg-emerald-50 p-2 rounded border border-emerald-100">
-                                <FileText size={12} />
-                                <span className="truncate flex-1">Dosya yüklü: ...{formData.auth_doc_url.slice(-20)}</span>
+                            <div className="mt-3 text-xs text-emerald-600 flex items-center gap-2 bg-emerald-50/50 p-3 rounded-xl border border-emerald-100">
+                                <FileText size={14} />
+                                <span className="truncate flex-1 font-medium">Dosya yüklü: ...{formData.auth_doc_url.slice(-20)}</span>
                             </div>
                         )}
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 mb-1">Başlangıç</label>
+                    <div className="grid grid-cols-2 gap-4 pt-2">
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Başlangıç</label>
                             <input
                                 type="date"
                                 required
-                                className="w-full text-sm border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                                className="w-full text-sm border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm px-3 py-2 transition-all"
                                 value={formData.auth_start_date}
                                 onChange={e => setFormData({ ...formData, auth_start_date: e.target.value })}
                             />
                         </div>
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 mb-1">Bitiş</label>
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Bitiş</label>
                             <input
                                 type="date"
                                 required
-                                className="w-full text-sm border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                                className="w-full text-sm border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm px-3 py-2 transition-all"
                                 value={formData.auth_end_date}
                                 onChange={e => setFormData({ ...formData, auth_end_date: e.target.value })}
                             />
                         </div>
                     </div>
 
-                    <div className="flex justify-end gap-2 pt-4 border-t border-gray-100 mt-2">
-                        <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg font-medium transition-colors">İptal</button>
-                        <button type="submit" disabled={uploading} className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-sm shadow-blue-200 transition-all active:scale-95 disabled:opacity-70 disabled:active:scale-100">Kaydet</button>
+                    <div className="flex justify-end gap-3 pt-6 border-t border-gray-50 mt-4">
+                        <Button type="button" variant="secondary" onClick={onClose} disabled={saving || uploading}>İptal</Button>
+                        <Button type="submit" isLoading={saving} loadingText="Kaydediliyor..." disabled={uploading}>
+                            Kaydet
+                        </Button>
                     </div>
                 </form>
             </div>
