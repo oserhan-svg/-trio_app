@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const GroqService = require('../services/GroqService');
-const CacheService = require('../services/CacheService');
+const CacheService = require('../services/cacheService');
 const prisma = require('../db');
 const { authenticateToken, authorizeRole } = require('../middleware/authMiddleware');
 

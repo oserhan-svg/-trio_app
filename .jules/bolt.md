@@ -1,0 +1,3 @@
+## 2025-05-15 - N+1 Query Elimination in Performance Dashboards
+**Learning:** Performance dashboards often suffer from N+1 query patterns when calculating stats per entity (e.g., consultant) or per time-slice (e.g., month) in a loop. In Prisma, replacing iterative `.count()` calls with bulk `.groupBy()` or `$queryRaw` aggregations significantly reduces database roundtrips from O(N) to O(1), leading to massive latency improvements as the dataset or entity count grows.
+**Action:** Always prefer bulk aggregations for dashboard metrics. Use `Map` objects in memory for O(1) correlation of results back to the original entities. Use PostgreSQL's `date_trunc` and `TO_CHAR` for efficient time-series grouping in raw queries.
