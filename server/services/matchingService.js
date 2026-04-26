@@ -20,23 +20,53 @@ const getPropertyPool = async () => {
     }
 
     const start = performance.now();
-    propertyPool = await prisma.property.findMany({
+    const rawPool = await prisma.property.findMany({
         where: {
             status: { not: 'removed' }
         },
         select: {
             id: true,
             title: true,
+            description: true,
             price: true,
             rooms: true,
             neighborhood: true,
             district: true,
             listing_type: true,
             size_m2: true,
-            images: true, // Needed for quality scoring
+            images: true,
+            category: true,
             created_at: true
         }
     });
+
+    // BOLT: Pre-normalize properties to avoid O(N*M) redundant processing
+    propertyPool = rawPool.map(p => {
+        const titleLower = (p.title || '').toLocaleLowerCase('tr');
+        const descLower = (p.description || '').toLocaleLowerCase('tr');
+        const neighborhoodLower = (p.neighborhood || '').toLocaleLowerCase('tr');
+        const districtLower = (p.district || '').toLocaleLowerCase('tr');
+        const roomsLower = (p.rooms || '').toLocaleLowerCase('tr');
+        const roomsClean = (p.rooms || '').replace(/\s/g, '');
+        const listingTypeLower = (p.listing_type || 'sale').toLocaleLowerCase('tr');
+
+        const tokens = [titleLower, neighborhoodLower, districtLower].join(' ').split(/\s+/).filter(Boolean);
+
+        return {
+            ...p,
+            _normalized: {
+                titleLower,
+                descLower,
+                neighborhoodLower,
+                districtLower,
+                roomsLower,
+                roomsClean,
+                listingTypeLower,
+                tokenSet: new Set(tokens)
+            }
+        };
+    });
+
     lastPoolFetch = now;
     console.log(`[PROFILE] Property Pool Refreshed: ${(performance.now() - start).toFixed(2)}ms (${propertyPool.length} properties)`);
     return propertyPool;
@@ -48,13 +78,14 @@ const getPropertyPool = async () => {
 /**
  * Calculate Jaccard Similarity between two sets of tokens.
  * @param {string[]} arr1 - Request keywords
- * @param {string[]} arr2 - Property keywords
+ * @param {string[]|Set} arr2OrSet - Property keywords or pre-calculated Set
  */
-const calculateSemanticSimilarity = (arr1, arr2) => {
-    if (!arr1 || !arr1.length || !arr2 || !arr2.length) return 0;
+const calculateSemanticSimilarity = (arr1, arr2OrSet) => {
+    if (!arr1 || !arr1.length || !arr2OrSet) return 0;
 
-    // Set 2 for O(1) lookups
-    const set2 = new Set(arr2);
+    // BOLT: Accept pre-calculated Set to avoid O(N) construction per call
+    const set2 = arr2OrSet instanceof Set ? arr2OrSet : new Set(arr2OrSet);
+    if (set2.size === 0) return 0;
 
     let matches = 0;
     for (const k of arr1) {
@@ -86,13 +117,15 @@ const calculateMatchScore = (property, demand, aiSummary = null) => {
     let score = 0;
     const reasons = [];
 
-    // 0. STRICT FILTER: Listing Type (Sale vs Rent) - CRITICAL FIX
-    // If demand has a listing_type, it MUST match the property's listing_type.
-    // Default legacy demands to 'sale' if undefined.
-    const demandType = demand.listing_type || 'sale';
-    const propertyType = property.listing_type || 'sale';
+    // BOLT: Use pre-normalized values if available (from getPropertyPool and findMatchesForClient)
+    const pNorm = property._normalized || {};
+    const dNorm = demand._normalized || {};
 
-    if (demandType.toLocaleLowerCase('tr') !== propertyType.toLocaleLowerCase('tr')) {
+    // 0. STRICT FILTER: Listing Type (Sale vs Rent) - CRITICAL FIX
+    const demandTypeLower = dNorm.listingTypeLower || (demand.listing_type || 'sale').toLocaleLowerCase('tr');
+    const propertyTypeLower = pNorm.listingTypeLower || (property.listing_type || 'sale').toLocaleLowerCase('tr');
+
+    if (demandTypeLower !== propertyTypeLower) {
         return { score: 0, isViable: false, reasons: ['İlan Tipi Uyumsuz'] };
     }
 
@@ -131,17 +164,19 @@ const calculateMatchScore = (property, demand, aiSummary = null) => {
     if (!demand.neighborhood) {
         score += 25;
     } else {
-        const targetNeighborhoods = demand.neighborhood.split(',').map(n => n.trim().toLocaleLowerCase('tr'));
-        const propNeighborhood = (property.neighborhood || '').toLocaleLowerCase('tr');
+        const targetNeighborhoods = dNorm.neighborhoodsLower || (demand.neighborhood || '').split(',').map(n => n.trim().toLocaleLowerCase('tr'));
+        const propNeighborhoodLower = pNorm.neighborhoodLower || (property.neighborhood || '').toLocaleLowerCase('tr');
 
         // Exact or Partial match
-        const isMatch = targetNeighborhoods.some(target => propNeighborhood.includes(target));
+        const isMatch = targetNeighborhoods.some(target => propNeighborhoodLower.includes(target));
 
         if (isMatch) score += 25;
         else {
             // Check district fallback
-            if (demand.district && property.district &&
-                property.district.toLocaleLowerCase('tr').includes(demand.district.toLocaleLowerCase('tr'))) {
+            const dDistrictLower = dNorm.districtLower || (demand.district || '').toLocaleLowerCase('tr');
+            const pDistrictLower = pNorm.districtLower || (property.district || '').toLocaleLowerCase('tr');
+
+            if (dDistrictLower && pDistrictLower && pDistrictLower.includes(dDistrictLower)) {
                 score += 5; // Partial credit for correct district
                 reasons.push('Mahalle farklı, İlçe uyumlu');
             } else {
@@ -155,10 +190,13 @@ const calculateMatchScore = (property, demand, aiSummary = null) => {
         score += 15;
     } else if (demand.rooms === 'Villa') {
         // STRICT VILLA FILTER
+        const pTitleLower = pNorm.titleLower || (property.title || '').toLocaleLowerCase('tr');
+        const pRoomsLower = pNorm.roomsLower || (property.rooms || '').toLocaleLowerCase('tr');
+
         const isVillaProp =
             (property.category === 'villa' || property.category === 'müstakil') ||
-            (property.rooms && property.rooms.toLocaleLowerCase('tr').includes('villa')) ||
-            (property.title && /villa|müstakil|malikane|köşk|yal[ıi]/i.test(property.title.toLocaleLowerCase('tr')));
+            (pRoomsLower.includes('villa')) ||
+            (pTitleLower && /villa|müstakil|malikane|köşk|yal[ıi]/i.test(pTitleLower));
 
         if (isVillaProp) {
             score += 15;
@@ -169,8 +207,8 @@ const calculateMatchScore = (property, demand, aiSummary = null) => {
             reasons.push('Daire/Konut Tipi Uyumsuz (Villa Talebi)');
         }
     } else {
-        const cleanPropRooms = (property.rooms || '').replace(/\s/g, '');
-        const cleanDemandRooms = demand.rooms.replace(/\s/g, '');
+        const cleanPropRooms = pNorm.roomsClean || (property.rooms || '').replace(/\s/g, '');
+        const cleanDemandRooms = dNorm.roomsClean || (demand.rooms || '').replace(/\s/g, '');
 
         if (cleanPropRooms === cleanDemandRooms) {
             score += 15;
@@ -191,7 +229,9 @@ const calculateMatchScore = (property, demand, aiSummary = null) => {
                     reasons.push('Oda sayısı yetersiz');
                 }
             } else {
-                if (property.rooms && property.rooms.includes(demand.rooms)) score += 15;
+                const pRoomsLower = pNorm.roomsLower || (property.rooms || '').toLocaleLowerCase('tr');
+                const dRoomsLower = (demand.rooms || '').toLocaleLowerCase('tr');
+                if (pRoomsLower && pRoomsLower.includes(dRoomsLower)) score += 15;
                 else reasons.push('Oda tipi farklı');
             }
         }
@@ -199,13 +239,14 @@ const calculateMatchScore = (property, demand, aiSummary = null) => {
 
     // 4. Semantic / AI Score (Max 25 pts)
     if (demand.embedding && Array.isArray(demand.embedding)) {
-        const propTokens = [
+        // BOLT: Use pre-calculated tokenSet
+        const tokensOrSet = pNorm.tokenSet || [
             property.title,
             property.neighborhood || '',
             property.district || ''
-        ].join(' ').toLocaleLowerCase('tr').split(/\s+/);
+        ].join(' ').toLocaleLowerCase('tr').split(/\s+/).filter(Boolean);
 
-        const semanticScore = calculateSemanticSimilarity(demand.embedding, propTokens);
+        const semanticScore = calculateSemanticSimilarity(demand.embedding, tokensOrSet);
         const weightedSemantic = (semanticScore / 100) * 25;
 
         if (weightedSemantic > 2) {
@@ -213,22 +254,24 @@ const calculateMatchScore = (property, demand, aiSummary = null) => {
             reasons.push(`AI Profil Uyumu: %${Math.round(semanticScore)}`);
         }
     } else if (aiSummary) {
-        const summaryText = JSON.stringify(aiSummary).toLocaleLowerCase('tr');
+        // BOLT: Use pre-serialized summaryText
+        const summaryText = typeof aiSummary === 'string' ? aiSummary : JSON.stringify(aiSummary).toLocaleLowerCase('tr');
         // Simple keyword boosts
-        if (summaryText.includes('yatırım') && property.title.toLocaleLowerCase('tr').includes('fırsat')) {
+        const propTitleLower = pNorm.titleLower || (property.title || '').toLocaleLowerCase('tr');
+        if (summaryText.includes('yatırım') && propTitleLower.includes('fırsat')) {
             score += 10;
         }
-        if (summaryText.includes('deniz') && property.title.toLocaleLowerCase('tr').includes('deniz')) {
+        if (summaryText.includes('deniz') && propTitleLower.includes('deniz')) {
             score += 10;
         }
     }
 
     // 4b. Category Specific Logic (e.g. Land / Arsa)
-    const isLand = property.category === 'land' || property.title.toLocaleLowerCase('tr').includes('arsa') || property.title.toLocaleLowerCase('tr').includes('tarla');
+    const pTitleLower = pNorm.titleLower || (property.title || '').toLocaleLowerCase('tr');
+    const isLand = property.category === 'land' || pTitleLower.includes('arsa') || pTitleLower.includes('tarla');
     if (isLand) {
         const landKeywords = ['imar', 'parsel', 'ada', 'müstakil'];
-        const propTitleLower = property.title.toLocaleLowerCase('tr');
-        const demandNotesLower = (demand.notes || '').toLocaleLowerCase('tr');
+        const demandNotesLower = dNorm.notesLower || (demand.notes || '').toLocaleLowerCase('tr');
 
         landKeywords.forEach(kw => {
             if (propTitleLower.includes(kw) && demandNotesLower.includes(kw)) {
@@ -242,8 +285,8 @@ const calculateMatchScore = (property, demand, aiSummary = null) => {
     // Scan description for keywords if notes demand it
     if (demand.notes || aiSummary) {
         const keywords = ['deniz', 'havuz', 'site', 'asansör', 'teras', 'bahçe'];
-        const notesLower = (demand.notes || JSON.stringify(aiSummary || {})).toLocaleLowerCase('tr');
-        const descLower = (property.description || '').toLocaleLowerCase('tr');
+        const notesLower = dNorm.notesLower || (demand.notes || (typeof aiSummary === 'string' ? aiSummary : JSON.stringify(aiSummary || {}))).toLocaleLowerCase('tr');
+        const descLower = pNorm.descLower || (property.description || '').toLocaleLowerCase('tr');
 
         let keywordMatches = 0;
         keywords.forEach(kw => {
@@ -311,11 +354,26 @@ const findMatchesForClient = async (clientId) => {
     const pool = await getPropertyPool();
     const allMatches = new Map();
 
+    // BOLT: Pre-normalize Client Context once
+    const normalizedAI = client.ai_summary ? JSON.stringify(client.ai_summary).toLocaleLowerCase('tr') : null;
+
     // 3. In-Memory Batch Scoring
     const startScoring = performance.now();
     for (const demand of client.demands) {
+        // BOLT: Pre-normalize Demand once per demand
+        const normDemand = {
+            ...demand,
+            _normalized: {
+                listingTypeLower: (demand.listing_type || 'sale').toLocaleLowerCase('tr'),
+                neighborhoodsLower: (demand.neighborhood || '').split(',').map(n => n.trim().toLocaleLowerCase('tr')),
+                districtLower: (demand.district || '').toLocaleLowerCase('tr'),
+                roomsClean: (demand.rooms || '').replace(/\s/g, ''),
+                notesLower: (demand.notes || '').toLocaleLowerCase('tr')
+            }
+        };
+
         pool.forEach(prop => {
-            const { score, isViable, reasons } = calculateMatchScore(prop, demand, client.ai_summary);
+            const { score, isViable, reasons } = calculateMatchScore(prop, normDemand, normalizedAI);
             if (isViable) {
                 const existing = allMatches.get(prop.id);
                 if (!existing || score > existing.match_quality) {
