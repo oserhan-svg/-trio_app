@@ -1,0 +1,3 @@
+## 2024-05-22 - Eliminating N+1 Queries in Performance Dashboards
+**Learning:** Dashboard and reporting endpoints frequently suffer from N+1 query patterns when developers loop over a list (e.g., consultants or months) to perform individual counts or aggregations. These can be efficiently collapsed into bulk operations using Prisma's `groupBy` for simple relational counts, or `$queryRaw` with PostgreSQL's `date_trunc` and `TO_CHAR` for time-series data.
+**Action:** Always prefer bulk aggregations and JavaScript `Map` objects for O(1) post-fetch lookups over iterative database calls within loops. Use `$queryRaw` when Prisma's high-level API doesn't support advanced aggregations like date-based grouping.
