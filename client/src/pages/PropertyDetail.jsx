@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { MapPin, Calendar, Home, Ruler, ExternalLink, ArrowLeft, RefreshCw, Image as ImageIcon, MessageCircle, FileText } from 'lucide-react';
+import { MapPin, Calendar, Home, Ruler, ExternalLink, ArrowLeft, RefreshCw, Image as ImageIcon, MessageCircle, FileText, ChevronRight, ChevronLeft } from 'lucide-react';
 import api from '../services/api';
 import MarketingCenter from '../components/marketing/MarketingCenter';
 import PropertyBenchmarkCard from '../components/apps/PropertyBenchmarkCard';
@@ -142,9 +142,10 @@ const PropertyDetail = () => {
                                             const nextIdx = (currIdx + 1) % images.length;
                                             setSelectedImage(images[nextIdx]);
                                         }}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition hover:bg-black/70"
+                                        aria-label="Sonraki görsel"
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition hover:bg-black/70 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
                                     >
-                                        👉
+                                        <ChevronRight size={24} />
                                     </button>
                                     <button
                                         onClick={() => {
@@ -152,9 +153,10 @@ const PropertyDetail = () => {
                                             const prevIdx = (currIdx - 1 + images.length) % images.length;
                                             setSelectedImage(images[prevIdx]);
                                         }}
-                                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition hover:bg-black/70"
+                                        aria-label="Önceki görsel"
+                                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition hover:bg-black/70 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
                                     >
-                                        👈
+                                        <ChevronLeft size={24} />
                                     </button>
                                 </div>
                                 <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
