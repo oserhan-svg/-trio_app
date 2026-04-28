@@ -5,12 +5,14 @@ class AnalyticsService {
         this.cache = {
             statsMap: null,
             lastFetch: 0,
-            ttl: 30 * 60 * 1000 // 30 minutes
+            ttl: 30 * 60 * 1000, // 30 minutes
+            pendingPromise: null
         };
         this.biCache = {
             data: null,
             lastFetch: 0,
-            ttl: 5 * 60 * 1000 // 5 minutes
+            ttl: 5 * 60 * 1000, // 5 minutes
+            pendingPromise: null
         };
     }
 
@@ -23,26 +25,37 @@ class AnalyticsService {
             return this.biCache.data;
         }
 
-        console.log('📈 Generating BI Predictive Dashboard...');
-        const [velocity, projection, efficiency, responseTime, funnel] = await Promise.all([
-            this.calculatePipelineVelocity(),
-            this.getRevenueProjection(),
-            this.getConsultantEfficiency(),
-            this.calculateResponseTimes(),
-            this.getConversionFunnel()
-        ]);
+        if (this.biCache.pendingPromise) {
+            return this.biCache.pendingPromise;
+        }
 
-        this.biCache.data = {
-            velocity,
-            projection,
-            efficiency,
-            responseTime,
-            funnel,
-            generatedAt: new Date()
-        };
-        this.biCache.lastFetch = now;
+        this.biCache.pendingPromise = (async () => {
+            try {
+                console.log('📈 Generating BI Predictive Dashboard...');
+                const [velocity, projection, efficiency, responseTime, funnel] = await Promise.all([
+                    this.calculatePipelineVelocity(),
+                    this.getRevenueProjection(),
+                    this.getConsultantEfficiency(),
+                    this.calculateResponseTimes(),
+                    this.getConversionFunnel()
+                ]);
 
-        return this.biCache.data;
+                this.biCache.data = {
+                    velocity,
+                    projection,
+                    efficiency,
+                    responseTime,
+                    funnel,
+                    generatedAt: new Date()
+                };
+                this.biCache.lastFetch = Date.now();
+                return this.biCache.data;
+            } finally {
+                this.biCache.pendingPromise = null;
+            }
+        })();
+
+        return this.biCache.pendingPromise;
     }
 
     /**
@@ -227,41 +240,53 @@ class AnalyticsService {
             return this.cache.statsMap;
         }
 
-        console.log('🏘️ Calculating Neighborhood Intelligence...');
-        const rawStats = await prisma.property.groupBy({
-            by: ['district', 'neighborhood'],
-            where: { status: 'active', price: { gt: 0 } },
-            _avg: { price: true },
-            _count: { id: true },
-            _min: { price: true },
-            _max: { price: true }
-        });
+        if (this.cache.pendingPromise) {
+            return this.cache.pendingPromise;
+        }
 
-        const statsMap = { _heatmapData: [] };
-        rawStats.forEach(s => {
-            const district = s.district || 'Bilinmiyor';
-            const neighborhood = s.neighborhood || 'Bilinmiyor';
-            const key = `${district}-${neighborhood}`.toLowerCase();
-            const avg = Number(s._avg.price) || 0;
+        this.cache.pendingPromise = (async () => {
+            try {
+                console.log('🏘️ Calculating Neighborhood Intelligence...');
+                const rawStats = await prisma.property.groupBy({
+                    by: ['district', 'neighborhood'],
+                    where: { status: 'active', price: { gt: 0 } },
+                    _avg: { price: true },
+                    _count: { id: true },
+                    _min: { price: true },
+                    _max: { price: true }
+                });
 
-            statsMap[key] = {
-                avg,
-                count: s._count.id,
-                min: Number(s._min.price),
-                max: Number(s._max.price)
-            };
+                const statsMap = { _heatmapData: [] };
+                rawStats.forEach(s => {
+                    const district = s.district || 'Bilinmiyor';
+                    const neighborhood = s.neighborhood || 'Bilinmiyor';
+                    const key = `${district}-${neighborhood}`.toLowerCase();
+                    const avg = Number(s._avg.price) || 0;
 
-            statsMap._heatmapData.push({
-                district,
-                neighborhood,
-                avgPrice: avg,
-                count: s._count.id
-            });
-        });
+                    statsMap[key] = {
+                        avg,
+                        count: s._count.id,
+                        min: Number(s._min.price),
+                        max: Number(s._max.price)
+                    };
 
-        this.cache.statsMap = statsMap;
-        this.cache.lastFetch = now;
-        return statsMap;
+                    statsMap._heatmapData.push({
+                        district,
+                        neighborhood,
+                        avgPrice: avg,
+                        count: s._count.id
+                    });
+                });
+
+                this.cache.statsMap = statsMap;
+                this.cache.lastFetch = Date.now();
+                return statsMap;
+            } finally {
+                this.cache.pendingPromise = null;
+            }
+        })();
+
+        return this.cache.pendingPromise;
     }
 
     /**
