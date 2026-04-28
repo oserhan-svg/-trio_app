@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FileText } from 'lucide-react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
+import Button from '../ui/Button';
 
 const AuthEditModal = ({ property, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -10,6 +11,7 @@ const AuthEditModal = ({ property, onClose, onSuccess }) => {
         auth_end_date: property.auth_end_date ? property.auth_end_date.split('T')[0] : ''
     });
     const [uploading, setUploading] = useState(false);
+    const [saving, setSaving] = useState(false);
 
     const handleFileUpload = async (e) => {
         const file = e.target.files[0];
@@ -37,6 +39,7 @@ const AuthEditModal = ({ property, onClose, onSuccess }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const saveToast = toast.loading('Kaydediliyor...');
+        setSaving(true);
         try {
             await api.put(`/properties/${property.id}`, formData);
             toast.success('Yetki belgesi güncellendi', { id: saveToast });
@@ -44,6 +47,8 @@ const AuthEditModal = ({ property, onClose, onSuccess }) => {
         } catch (error) {
             console.error(error);
             toast.error('Güncelleme başarısız oldu', { id: saveToast });
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -55,6 +60,7 @@ const AuthEditModal = ({ property, onClose, onSuccess }) => {
                     <button
                         onClick={onClose}
                         className="text-gray-400 hover:text-gray-600 text-xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors"
+                        aria-label="Kapat"
                     >
                         &times;
                     </button>
@@ -82,7 +88,7 @@ const AuthEditModal = ({ property, onClose, onSuccess }) => {
                             <input
                                 type="date"
                                 required
-                                className="w-full text-sm border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                                className="w-full text-sm border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
                                 value={formData.auth_start_date}
                                 onChange={e => setFormData({ ...formData, auth_start_date: e.target.value })}
                             />
@@ -92,7 +98,7 @@ const AuthEditModal = ({ property, onClose, onSuccess }) => {
                             <input
                                 type="date"
                                 required
-                                className="w-full text-sm border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                                className="w-full text-sm border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
                                 value={formData.auth_end_date}
                                 onChange={e => setFormData({ ...formData, auth_end_date: e.target.value })}
                             />
@@ -100,8 +106,10 @@ const AuthEditModal = ({ property, onClose, onSuccess }) => {
                     </div>
 
                     <div className="flex justify-end gap-2 pt-4 border-t border-gray-100 mt-2">
-                        <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg font-medium transition-colors">İptal</button>
-                        <button type="submit" disabled={uploading} className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-sm shadow-blue-200 transition-all active:scale-95 disabled:opacity-70 disabled:active:scale-100">Kaydet</button>
+                        <Button type="button" variant="secondary" onClick={onClose}>İptal</Button>
+                        <Button type="submit" isLoading={saving || uploading} loadingText="Kaydediliyor...">
+                            Kaydet
+                        </Button>
                     </div>
                 </form>
             </div>
