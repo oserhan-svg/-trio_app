@@ -34,6 +34,7 @@ const AddClientModal = ({ isOpen, onClose, onSave }) => {
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <Input
+                        id="name"
                         label="Ad Soyad"
                         placeholder="Örn: Ahmet Yılmaz"
                         value={formData.name}
@@ -41,12 +42,14 @@ const AddClientModal = ({ isOpen, onClose, onSave }) => {
                         required
                     />
                     <Input
+                        id="phone"
                         label="Telefon"
                         placeholder="Örn: 0555 123 45 67"
                         value={formData.phone}
                         onChange={e => setFormData({ ...formData, phone: e.target.value })}
                     />
                     <Input
+                        id="email"
                         label="E-posta"
                         type="email"
                         placeholder="ahmet@ornek.com"
@@ -93,8 +96,8 @@ const AddClientModal = ({ isOpen, onClose, onSave }) => {
 
                     <div className="flex justify-end gap-3 mt-6">
                         <Button type="button" variant="secondary" onClick={onClose}>İptal</Button>
-                        <Button type="submit" disabled={loading}>
-                            {loading ? 'Kaydediliyor...' : 'Kaydet'}
+                        <Button type="submit" isLoading={loading} loadingText="Kaydediliyor...">
+                            Kaydet
                         </Button>
                     </div>
                 </form>
