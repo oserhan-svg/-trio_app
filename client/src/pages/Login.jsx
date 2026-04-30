@@ -75,11 +75,14 @@ const Login = () => {
                             required
                         />
 
-
-
-                        <Button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2">
+                        <Button
+                            type="submit"
+                            isLoading={loading}
+                            loadingText="Giriş Yapılıyor..."
+                            className="w-full"
+                        >
                             <LogIn size={18} />
-                            {loading ? 'Giriş Yapılıyor...' : 'Giriş Yap'}
+                            Giriş Yap
                         </Button>
                     </form>
                 </div>
