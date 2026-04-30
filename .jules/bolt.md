@@ -1,0 +1,3 @@
+## 2025-05-15 - Optimizing Performance Metrics with Bulk Aggregations
+**Learning:** Iterative database queries (N+1 patterns) in analytics dashboards lead to linear latency growth as data or team size increases. Prisma's `groupBy` and `$queryRaw` can be used to fetch all required counts and sums in a single pass.
+**Action:** Always prefer bulk aggregations (groupBy) over looping with `.count()` or `.findMany()`. When using `DATE_TRUNC` in SQL, use robust key mapping (e.g., `YYYY-MM` string keys) to reliably link database results with JavaScript date objects and avoid timezone/offset discrepancies.
