@@ -1,7 +1,8 @@
 import React from 'react';
+import { Loader2 } from 'lucide-react';
 
-const Button = ({ children, variant = 'primary', className = '', ...props }) => {
-    const baseStyles = 'px-4 py-2 rounded-xl transition-all duration-200 font-medium focus:outline-none focus:ring-2 focus:ring-offset-2';
+const Button = ({ children, variant = 'primary', className = '', isLoading = false, loadingText = '', disabled, ...props }) => {
+    const baseStyles = 'px-4 py-2 rounded-xl transition-all duration-200 font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center justify-center gap-2';
 
     const variants = {
         primary: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-200 focus:ring-emerald-500',
@@ -10,12 +11,17 @@ const Button = ({ children, variant = 'primary', className = '', ...props }) => 
         ghost: 'bg-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900',
     };
 
+    const isButtonDisabled = isLoading || disabled;
+
     return (
         <button
-            className={`${baseStyles} ${variants[variant]} ${className}`}
+            className={`${baseStyles} ${variants[variant]} ${isButtonDisabled ? 'opacity-70 cursor-not-allowed' : ''} ${className}`}
+            disabled={isButtonDisabled}
+            aria-busy={isLoading}
             {...props}
         >
-            {children}
+            {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+            {isLoading && loadingText ? loadingText : children}
         </button>
     );
 };
