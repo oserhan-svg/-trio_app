@@ -1,0 +1,3 @@
+## 2025-05-24 - Optimized Consultant Performance Metrics
+**Learning:** Found an N+1 query bottleneck in `getConsultantPerformance` and `getConsultantDetail`. Fetching statistics in a loop for each consultant (or each month) leads to poor performance as the number of consultants or the time range grows. Prisma's `groupBy` and `$queryRaw` with `JOIN` and `TO_CHAR` are significantly more efficient.
+**Action:** Use bulk aggregations (`groupBy`) and raw SQL for cross-relation counts (`$queryRaw` with `JOIN`) instead of iterative `.count()` calls in loops. Always guard bulk operations with empty-array checks and use Prisma's tagged templates for safe array expansion in `IN` clauses.
