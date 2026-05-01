@@ -1,0 +1,3 @@
+## 2024-05-24 - Sequential Prisma Aggregate Queries Bottleneck
+**Learning:** The codebase has a widespread anti-pattern of executing multiple independent `prisma.count()` and aggregation queries sequentially within controller actions (e.g., in `performanceController.js`), which causes significant latency bottlenecks due to compounded query execution times, especially when run inside loops (like `consultants.map`).
+**Action:** When calculating metrics or aggregating multiple independent statistics using Prisma or independent async data service calls, always use `Promise.all()` to execute them concurrently. When iterating over collections, wrap the inner grouped `Promise.all` inside another outer `Promise.all` for maximum concurrency.
