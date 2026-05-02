@@ -4,13 +4,12 @@ const bcrypt = require('bcryptjs');
 async function createAdmin() {
     try {
         const email = 'admin@emlak22.com';
-        const password = '1234';
+        const password = process.env.ADMIN_PASSWORD || '1234_SET_ME_IN_ENV';
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const user = await prisma.user.upsert({
             where: { email: email },
             update: {
-                password_hash: hashedPassword,
                 role: 'admin'
             },
             create: {
