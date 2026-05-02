@@ -130,8 +130,12 @@ const AddDemandModal = ({ isOpen, onClose, onSave, clientName, initialData = nul
 
                     <div className="flex justify-end gap-3 mt-6">
                         <Button type="button" variant="secondary" onClick={onClose}>İptal</Button>
-                        <Button type="submit" disabled={loading}>
-                            {loading ? 'Kaydediliyor...' : (initialData ? 'Güncelle' : 'Ekle')}
+                        <Button
+                            type="submit"
+                            isLoading={loading}
+                            loadingText="Kaydediliyor..."
+                        >
+                            {initialData ? 'Güncelle' : 'Ekle'}
                         </Button>
                     </div>
                 </form>
