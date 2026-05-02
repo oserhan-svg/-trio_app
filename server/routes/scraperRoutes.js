@@ -26,6 +26,12 @@ router.post('/trigger', authenticateToken, async (req, res) => {
  * Import listings from Chrome Extension (Trio Assistant)
  */
 router.post('/import', async (req, res) => {
+    const extensionKey = req.headers['x-extension-key'];
+    if (!process.env.EXTENSION_KEY || extensionKey !== process.env.EXTENSION_KEY) {
+        console.warn(`⚠️ Unauthorized extension import attempt from IP: ${req.ip}`);
+        return res.status(401).json({ error: 'Unauthorized: Invalid extension key' });
+    }
+
     try {
         let { listings, provider } = req.body;
 
@@ -90,6 +96,11 @@ router.post('/sync-portfolio', authenticateToken, async (req, res) => {
  * Portal reports it has finished its run
  */
 router.post('/finished', async (req, res) => {
+    const extensionKey = req.headers['x-extension-key'];
+    if (!process.env.EXTENSION_KEY || extensionKey !== process.env.EXTENSION_KEY) {
+        return res.status(401).json({ error: 'Unauthorized: Invalid extension key' });
+    }
+
     const { provider, reason } = req.body;
     const sessionManager = getSessionManager();
     console.log(`🏁 [SCRAPER] Portal ${provider} finished. Reason: ${reason || 'End of pages'}`);
