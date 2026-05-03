@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { FileText, Calendar, Link as LinkIcon, AlertCircle, CheckCircle, Clock } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import api from '../../services/api';
+import AuthEditModal from '../modals/AuthEditModal';
 
 const MyListings = ({ userId }) => {
     const [listings, setListings] = useState([]);
@@ -9,13 +10,7 @@ const MyListings = ({ userId }) => {
     const [selectedProperty, setSelectedProperty] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    useEffect(() => {
-        if (userId) {
-            fetchListings();
-        }
-    }, [userId]);
-
-    const fetchListings = async () => {
+    const fetchListings = useCallback(async () => {
         try {
             setLoading(true);
             const response = await api.get(`/properties?assigned_user_id=${userId}&limit=100`);
@@ -31,7 +26,13 @@ const MyListings = ({ userId }) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [userId]);
+
+    useEffect(() => {
+        if (userId) {
+            fetchListings();
+        }
+    }, [userId, fetchListings]);
 
     const handleEditClick = (property) => {
         setSelectedProperty(property);
@@ -147,93 +148,6 @@ const MyListings = ({ userId }) => {
                     onSuccess={handleUpdateSuccess}
                 />
             )}
-        </div>
-    );
-};
-
-const AuthEditModal = ({ property, onClose, onSuccess }) => {
-    const [formData, setFormData] = useState({
-        auth_doc_url: property.auth_doc_url || '',
-        auth_start_date: property.auth_start_date ? property.auth_start_date.split('T')[0] : '',
-        auth_end_date: property.auth_end_date ? property.auth_end_date.split('T')[0] : ''
-    });
-    const [saving, setSaving] = useState(false);
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setSaving(true);
-        try {
-            await api.put(`/properties/${property.id}`, {
-                auth_doc_url: formData.auth_doc_url,
-                auth_start_date: formData.auth_start_date || null,
-                auth_end_date: formData.auth_end_date || null
-            });
-
-            toast.success('Yetki bilgileri güncellendi');
-            onSuccess();
-        } catch (error) {
-            console.error(error);
-            toast.error('Hata: ' + (error.response?.data?.error || error.message));
-        } finally {
-            setSaving(false);
-        }
-    };
-
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                    <h3 className="font-semibold text-gray-800">Yetki Belgesi Düzenle</h3>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600">&times;</button>
-                </div>
-                <form onSubmit={handleSubmit} className="p-4 space-y-4">
-                    <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">Belge Linki (Drive/Dropbox vb.)</label>
-                        <input
-                            type="url"
-                            className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-red focus:ring-brand-red text-sm p-2 border"
-                            placeholder="https://..."
-                            value={formData.auth_doc_url}
-                            onChange={e => setFormData({ ...formData, auth_doc_url: e.target.value })}
-                        />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Başlangıç Tarihi</label>
-                            <input
-                                type="date"
-                                className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-red focus:ring-brand-red text-sm p-2 border"
-                                value={formData.auth_start_date}
-                                onChange={e => setFormData({ ...formData, auth_start_date: e.target.value })}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Bitiş Tarihi</label>
-                            <input
-                                type="date"
-                                className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-red focus:ring-brand-red text-sm p-2 border"
-                                value={formData.auth_end_date}
-                                onChange={e => setFormData({ ...formData, auth_end_date: e.target.value })}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="bg-blue-50 p-3 rounded text-xs text-blue-700">
-                        <p>Yetki belgesi süresi dolduğunda size bildirim gönderilecektir.</p>
-                    </div>
-
-                    <div className="flex justify-end gap-2 pt-2">
-                        <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">İptal</button>
-                        <button
-                            type="submit"
-                            disabled={saving}
-                            className="px-4 py-2 text-sm bg-brand-red text-white rounded hover:bg-red-700 disabled:opacity-50"
-                        >
-                            {saving ? 'Kaydediliyor...' : 'Kaydet'}
-                        </button>
-                    </div>
-                </form>
-            </div>
         </div>
     );
 };

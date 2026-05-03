@@ -1,0 +1,3 @@
+## 2025-05-14 - Standardizing Micro-Interactions and Modal Accessibility
+**Learning:** Found duplicate implementations of critical UI components (AuthEditModal) that resulted in inconsistent UX and accessibility gaps (missing ARIA labels and loading states). Centralizing these into a shared UI system with built-in accessibility (aria-busy, aria-label) and interaction logic (isLoading) ensures a cohesive "Emerald" brand experience.
+**Action:** Before implementing UX fixes, search for component duplicates and unify them under the `client/src/components/ui` system to ensure accessibility and brand rules are applied globally.
