@@ -259,6 +259,7 @@ const AppShell = ({ children }) => {
                         <button
                             onClick={() => setSidebarOpen(!sidebarOpen)}
                             className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-500 hover:text-blue-600 hover:shadow-md transition-all active:scale-90"
+                            aria-label="Menüyü aç/kapat"
                         >
                             <Menu size={20} />
                         </button>
@@ -285,7 +286,10 @@ const AppShell = ({ children }) => {
                             {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
                         </button>
 
-                        <button className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-400 hover:text-rose-500 hover:shadow-md transition-all relative group">
+                        <button
+                            className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-400 hover:text-rose-500 hover:shadow-md transition-all relative group"
+                            aria-label="Bildirimler"
+                        >
                             <Bell size={20} className="group-hover:animate-bounce" />
                             <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-rose-500 border-2 border-white dark:border-slate-800 rounded-full"></span>
                         </button>
@@ -295,6 +299,7 @@ const AppShell = ({ children }) => {
                         <button
                             className="bg-slate-900 dark:bg-blue-600 text-white h-10 px-4 rounded-xl flex items-center gap-2 shadow-lg hover:shadow-blue-500/20 hover:-translate-y-0.5 transition-all text-xs font-black uppercase tracking-widest active:translate-y-0"
                             onClick={handleLogout}
+                            aria-label="Çıkış Yap"
                         >
                             <LogOut size={16} />
                             <span className="hidden lg:inline">Çıkış</span>
@@ -346,12 +351,13 @@ const AppShell = ({ children }) => {
 const BottomNavItem = ({ icon: Icon, label, active, onClick }) => (
     <button
         onClick={onClick}
-        className={`flex flex-col items-center justify-center gap-1 w-16 transition-all duration-300 ${active ? 'text-blue-600' : 'text-slate-400'}`}
+        className={`group flex flex-col items-center justify-center gap-1 w-16 transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:rounded-xl ${active ? 'text-blue-600' : 'text-slate-400'}`}
+        aria-label={label}
     >
         <div className={`p-2 rounded-xl transition-all duration-300 ${active ? 'bg-blue-50 dark:bg-blue-900/30' : ''}`}>
             <Icon size={24} className={active ? 'animate-pulse' : ''} />
         </div>
-        <span className={`text-[10px] font-black uppercase tracking-tighter ${active ? 'opacity-100' : 'opacity-0'}`}>{label}</span>
+        <span className={`text-[10px] font-black uppercase tracking-tighter transition-opacity duration-300 group-focus-visible:opacity-100 ${active ? 'opacity-100' : 'opacity-0'}`}>{label}</span>
     </button>
 );
 
