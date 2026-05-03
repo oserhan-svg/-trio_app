@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ExternalLink, FileSpreadsheet, Instagram, Eye, ChevronLeft, ChevronRight, FileText, TrendingDown, Home, ChevronUp, ChevronDown, X, Sparkles, Activity, Layers, Search, Flame } from 'lucide-react';
 import api from '../services/api';
@@ -232,8 +232,36 @@ const PropertyRow = React.memo(({ prop, isSelected, onToggleSelect, onGenerateSt
     );
 });
 
+const SortHeader = React.memo(({ label, sortKeyBase, currentSort, onSortChange }) => {
+    const isCurrent = currentSort === `${sortKeyBase}_asc` || currentSort === `${sortKeyBase}_desc` || (sortKeyBase === 'date' && currentSort === 'newest');
+    const isDesc = currentSort === `${sortKeyBase}_desc` || (sortKeyBase === 'date' && currentSort === 'newest');
+
+    const handleClick = () => {
+        if (!onSortChange) return;
+        if (sortKeyBase === 'date') {
+            onSortChange(currentSort === 'newest' ? 'date_asc' : 'newest');
+        } else {
+            onSortChange(isDesc ? `${sortKeyBase}_asc` : `${sortKeyBase}_desc`);
+        }
+    };
+
+    return (
+        <th
+            className={`px-6 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em] cursor-pointer transition-all relative group/th ${isCurrent ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'}`}
+            onClick={handleClick}
+        >
+            <div className="flex items-center gap-2">
+                {label}
+                <div className={`transition-all duration-300 ${isCurrent ? 'opacity-100 scale-100' : 'opacity-0 scale-50 group-hover/th:opacity-50 group-hover/th:scale-100'}`}>
+                    {isDesc ? <ChevronDown size={14} strokeWidth={3} /> : <ChevronUp size={14} strokeWidth={3} />}
+                </div>
+            </div>
+            {isCurrent && <div className="absolute bottom-0 left-6 right-6 h-0.5 bg-blue-600 dark:bg-blue-500 rounded-full animate-in fade-in duration-500" />}
+        </th>
+    );
+});
+
 const PropertyTable = ({ properties, currentSort, onSortChange, hasMore, onLoadMore, isLoadingMore }) => {
-    const navigate = useNavigate();
     const [selectedIds, setSelectedIds] = useState([]);
     const observer = useRef();
 
@@ -248,21 +276,21 @@ const PropertyTable = ({ properties, currentSort, onSortChange, hasMore, onLoadM
         if (node) observer.current.observe(node);
     }, [isLoadingMore, hasMore, onLoadMore]);
 
-    const toggleSelectAll = () => {
+    const toggleSelectAll = useCallback(() => {
         if (selectedIds.length === properties.length) {
             setSelectedIds([]);
         } else {
             setSelectedIds(properties.map(p => p.id));
         }
-    };
+    }, [selectedIds.length, properties]);
 
-    const toggleSelectOne = (id) => {
+    const toggleSelectOne = useCallback((id) => {
         setSelectedIds(prev =>
             prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
         );
-    };
+    }, []);
 
-    const handleExport = async () => {
+    const handleExport = useCallback(async () => {
         const loadingToast = toast.loading('Excel hazırlanıyor...');
         try {
             const response = await api.get('/properties/export', { responseType: 'blob' });
@@ -277,9 +305,9 @@ const PropertyTable = ({ properties, currentSort, onSortChange, hasMore, onLoadM
             console.error('Export failed:', error);
             toast.error('Excel indirilemedi.', { id: loadingToast });
         }
-    };
+    }, []);
 
-    const handleBulkExport = async (ids) => {
+    const handleBulkExport = useCallback(async (ids) => {
         const loadingToast = toast.loading(`${ids.length} ilan paketleniyor...`);
         try {
             const response = await api.get(`/properties/export?ids=${ids.join(',')}`, { responseType: 'blob' });
@@ -294,9 +322,9 @@ const PropertyTable = ({ properties, currentSort, onSortChange, hasMore, onLoadM
             console.error('Bulk export failed:', error);
             toast.error('Seçilenler indirilemedi.', { id: loadingToast });
         }
-    };
+    }, []);
 
-    const handleGenerateStory = async (id) => {
+    const handleGenerateStory = useCallback(async (id) => {
         try {
             toast.loading('Görsel oluşturuluyor...');
             const response = await api.get(`/images/story/${id}`, { responseType: 'blob' });
@@ -311,36 +339,7 @@ const PropertyTable = ({ properties, currentSort, onSortChange, hasMore, onLoadM
             console.error('Image generation failed:', error);
             toast.error('Görsel oluşturulamadı.');
         }
-    };
-
-    const SortHeader = ({ label, sortKeyBase, currentSort, onSortChange }) => {
-        const isCurrent = currentSort === `${sortKeyBase}_asc` || currentSort === `${sortKeyBase}_desc` || (sortKeyBase === 'date' && currentSort === 'newest');
-        const isDesc = currentSort === `${sortKeyBase}_desc` || (sortKeyBase === 'date' && currentSort === 'newest');
-
-        const handleClick = () => {
-            if (!onSortChange) return;
-            if (sortKeyBase === 'date') {
-                onSortChange(currentSort === 'newest' ? 'date_asc' : 'newest');
-            } else {
-                onSortChange(isDesc ? `${sortKeyBase}_asc` : `${sortKeyBase}_desc`);
-            }
-        };
-
-        return (
-            <th
-                className={`px-6 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em] cursor-pointer transition-all relative group/th ${isCurrent ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'}`}
-                onClick={handleClick}
-            >
-                <div className="flex items-center gap-2">
-                    {label}
-                    <div className={`transition-all duration-300 ${isCurrent ? 'opacity-100 scale-100' : 'opacity-0 scale-50 group-hover/th:opacity-50 group-hover/th:scale-100'}`}>
-                        {isDesc ? <ChevronDown size={14} strokeWidth={3} /> : <ChevronUp size={14} strokeWidth={3} />}
-                    </div>
-                </div>
-                {isCurrent && <div className="absolute bottom-0 left-6 right-6 h-0.5 bg-blue-600 dark:bg-blue-500 rounded-full animate-in fade-in duration-500" />}
-            </th>
-        );
-    };
+    }, []);
 
     return (
         <div className="flex flex-col h-full space-y-4">
