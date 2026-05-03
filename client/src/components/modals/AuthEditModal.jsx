@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { FileText } from 'lucide-react';
+import { FileText, X } from 'lucide-react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
+import Button from '../ui/Button';
 
 const AuthEditModal = ({ property, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -10,12 +11,12 @@ const AuthEditModal = ({ property, onClose, onSuccess }) => {
         auth_end_date: property.auth_end_date ? property.auth_end_date.split('T')[0] : ''
     });
     const [uploading, setUploading] = useState(false);
+    const [saving, setSaving] = useState(false);
 
     const handleFileUpload = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
-        const uploadToast = toast.loading('Dosya yükleniyor...');
         setUploading(true);
         const data = new FormData();
         data.append('file', file);
@@ -25,10 +26,10 @@ const AuthEditModal = ({ property, onClose, onSuccess }) => {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             setFormData(prev => ({ ...prev, auth_doc_url: res.data.url }));
-            toast.success('Dosya başarıyla yüklendi', { id: uploadToast });
+            toast.success('Dosya başarıyla yüklendi');
         } catch (err) {
             console.error(err);
-            toast.error('Dosya yüklenemedi', { id: uploadToast });
+            toast.error('Dosya yüklenemedi');
         } finally {
             setUploading(false);
         }
@@ -36,14 +37,16 @@ const AuthEditModal = ({ property, onClose, onSuccess }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const saveToast = toast.loading('Kaydediliyor...');
+        setSaving(true);
         try {
             await api.put(`/properties/${property.id}`, formData);
-            toast.success('Yetki belgesi güncellendi', { id: saveToast });
+            toast.success('Yetki belgesi güncellendi');
             onSuccess();
         } catch (error) {
             console.error(error);
-            toast.error('Güncelleme başarısız oldu', { id: saveToast });
+            toast.error('Güncelleme başarısız oldu');
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -54,16 +57,17 @@ const AuthEditModal = ({ property, onClose, onSuccess }) => {
                     <h3 className="font-bold text-gray-800">Yetki Belgesi Yönetimi</h3>
                     <button
                         onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600 text-xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors"
+                        aria-label="Kapat"
+                        className="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-200 rounded-full"
                     >
-                        &times;
+                        <X size={20} />
                     </button>
                 </div>
                 <form onSubmit={handleSubmit} className="p-5 space-y-4">
                     <div>
                         <label className="block text-xs font-bold text-gray-700 mb-1">Yetki Belgesi</label>
                         <div className="flex gap-2 items-center">
-                            <label className={`flex-1 cursor-pointer bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 border-dashed rounded-lg p-3 text-center transition-colors ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                            <label className={`flex-1 cursor-pointer bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-200 border-dashed rounded-lg p-3 text-center transition-colors ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                                 <span className="text-sm font-medium">{uploading ? 'Yükleniyor...' : 'Dosya Seç & Yükle (PDF/Resim)'}</span>
                                 <input type="file" className="hidden" onChange={handleFileUpload} accept=".pdf,.jpg,.jpeg,.png" disabled={uploading} />
                             </label>
@@ -82,7 +86,7 @@ const AuthEditModal = ({ property, onClose, onSuccess }) => {
                             <input
                                 type="date"
                                 required
-                                className="w-full text-sm border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                                className="w-full text-sm border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
                                 value={formData.auth_start_date}
                                 onChange={e => setFormData({ ...formData, auth_start_date: e.target.value })}
                             />
@@ -92,7 +96,7 @@ const AuthEditModal = ({ property, onClose, onSuccess }) => {
                             <input
                                 type="date"
                                 required
-                                className="w-full text-sm border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                                className="w-full text-sm border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
                                 value={formData.auth_end_date}
                                 onChange={e => setFormData({ ...formData, auth_end_date: e.target.value })}
                             />
@@ -100,8 +104,15 @@ const AuthEditModal = ({ property, onClose, onSuccess }) => {
                     </div>
 
                     <div className="flex justify-end gap-2 pt-4 border-t border-gray-100 mt-2">
-                        <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg font-medium transition-colors">İptal</button>
-                        <button type="submit" disabled={uploading} className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-sm shadow-blue-200 transition-all active:scale-95 disabled:opacity-70 disabled:active:scale-100">Kaydet</button>
+                        <Button type="button" variant="secondary" onClick={onClose}>İptal</Button>
+                        <Button
+                            type="submit"
+                            isLoading={saving}
+                            loadingText="Kaydediliyor..."
+                            disabled={uploading}
+                        >
+                            Kaydet
+                        </Button>
                     </div>
                 </form>
             </div>
