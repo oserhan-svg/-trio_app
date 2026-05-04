@@ -95,19 +95,21 @@ const PropertyTable = ({ properties, onViewDetail }) => {
                                     <td className="px-6 py-4 flex justify-center gap-2">
                                         <button
                                             onClick={() => onViewDetail(prop)}
-                                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1"
                                             title="Detay"
+                                            aria-label="İlan detayını görüntüle"
                                         >
-                                            <Eye size={18} />
+                                            <Eye size={18} aria-hidden="true" />
                                         </button>
                                         <a
                                             href={prop.url}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                                            className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-1"
                                             title="İlanı Aç"
+                                            aria-label="İlan sayfasına yeni sekmede git"
                                         >
-                                            <ExternalLink size={18} />
+                                            <ExternalLink size={18} aria-hidden="true" />
                                         </a>
                                     </td>
                                 </tr>
