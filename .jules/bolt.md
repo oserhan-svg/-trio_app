@@ -1,0 +1,3 @@
+## 2025-05-15 - Prevented Cache Stampedes in AnalyticsService
+**Learning:** The `AnalyticsService` uses an internal 30-minute cache for expensive neighborhood statistics and BI dashboards. Under concurrent load, multiple requests for an expired cache entry would trigger redundant, heavy Prisma `groupBy` operations simultaneously, leading to a "cache stampede".
+**Action:** Use a "pending requests" Map to store in-flight promises. When a request is made for data that is currently being fetched, return the existing promise instead of starting a new database operation. Always use `finally` to clean up the pending map to ensure subsequent retries are possible if an operation fails.
