@@ -1,0 +1,4 @@
+## 2024-05-06 - Remote Code Execution (RCE) via Unprotected Internal Migration Endpoint
+**Vulnerability:** Found `router.get('/internal/migrate', dealController.runInternalMigration)` in `server/routes/dealRoutes.js` completely unprotected, allowing any unauthenticated user to trigger `child_process.exec` running Prisma migrations, which is a major command injection/RCE risk, especially since it's reachable from the internet.
+**Learning:** Internal or debugging routes that execute shell commands or perform critical system changes should never be left unauthenticated or accessible in production. It existed probably as a quick hack for a developer to run migrations without SSH access.
+**Prevention:** Never use `child_process.exec` with unguarded routes. If absolutely necessary, always strictly protect internal routes with `authenticateToken` AND `authorizeRole('admin')`, and prefer using a proper CI/CD pipeline or migration script for database changes.
