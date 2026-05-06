@@ -1,0 +1,3 @@
+## 2026-05-19 - Standardized Loading States and Accessibility
+**Learning:** Adding a standardized `isLoading` prop to core button components improves UI consistency and reduces repetitive ternary logic in pages. Providing `aria-busy` and `disabled` states automatically in the button component ensures accessible feedback during async operations. Icon-only buttons often rely on `title`, which is insufficient for screen readers; they must always have an explicit `aria-label`.
+**Action:** Always check core components for standardized state handling (like loading/error) before implementing local logic. Ensure all icon-only interactions have clear ARIA labels.
