@@ -1,0 +1,3 @@
+## 2025-05-14 - Cache Stampede in Analytics Aggregations
+**Learning:** High-traffic dashboards that rely on expensive database aggregations (like `groupBy` on the entire `Property` table) are vulnerable to cache stampedes. When a cache expires, multiple concurrent requests will all trigger the same heavy DB query simultaneously, leading to a spike in DB load and response times.
+**Action:** Implement promise coalescing (request collapsing) for all expensive, cache-backed service methods. Use a `pending` Map to store and return the same in-flight promise to concurrent callers, ensuring the heavy work is only done once.
