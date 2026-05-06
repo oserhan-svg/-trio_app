@@ -97,6 +97,7 @@ const PropertyTable = ({ properties, onViewDetail }) => {
                                             onClick={() => onViewDetail(prop)}
                                             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                             title="Detay"
+                                            aria-label="Detayları Görüntüle"
                                         >
                                             <Eye size={18} />
                                         </button>
@@ -106,6 +107,7 @@ const PropertyTable = ({ properties, onViewDetail }) => {
                                             rel="noopener noreferrer"
                                             className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
                                             title="İlanı Aç"
+                                            aria-label="İlanı Kaynağında Aç"
                                         >
                                             <ExternalLink size={18} />
                                         </a>
