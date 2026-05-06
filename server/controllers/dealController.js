@@ -191,6 +191,15 @@ const runInternalMigration = async (req, res) => {
     const { exec } = require('child_process');
     const path = require('path');
 
+    // DEFENSE-IN-DEPTH: Required internal key to run migration
+    const internalKey = req.query.key;
+    const expectedKey = process.env.INTERNAL_MIGRATION_KEY;
+
+    if (!expectedKey || internalKey !== expectedKey) {
+        console.warn(`🚨 Unauthorized internal migration attempt from ${req.ip}`);
+        return res.status(403).json({ error: 'Unauthorized: Internal migration key required' });
+    }
+
     // Attempt multiple paths for prisma
     const prismaPath = path.join(__dirname, '../node_modules/.bin/prisma');
     const command = `"${prismaPath}" migrate dev --name add_deals_model --skip-generate`;
