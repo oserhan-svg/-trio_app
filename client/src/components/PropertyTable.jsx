@@ -24,8 +24,36 @@ const PropertySkeleton = () => (
     </>
 );
 
-const PropertyRow = React.memo(({ prop, isSelected, onToggleSelect, onGenerateStory, lastElementRef }) => {
-    const navigate = useNavigate();
+const SortHeader = React.memo(({ label, sortKeyBase, currentSort, onSortChange }) => {
+    const isCurrent = currentSort === `${sortKeyBase}_asc` || currentSort === `${sortKeyBase}_desc` || (sortKeyBase === 'date' && currentSort === 'newest');
+    const isDesc = currentSort === `${sortKeyBase}_desc` || (sortKeyBase === 'date' && currentSort === 'newest');
+
+    const handleClick = () => {
+        if (!onSortChange) return;
+        if (sortKeyBase === 'date') {
+            onSortChange(currentSort === 'newest' ? 'date_asc' : 'newest');
+        } else {
+            onSortChange(isDesc ? `${sortKeyBase}_asc` : `${sortKeyBase}_desc`);
+        }
+    };
+
+    return (
+        <th
+            className={`px-6 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em] cursor-pointer transition-all relative group/th ${isCurrent ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'}`}
+            onClick={handleClick}
+        >
+            <div className="flex items-center gap-2">
+                {label}
+                <div className={`transition-all duration-300 ${isCurrent ? 'opacity-100 scale-100' : 'opacity-0 scale-50 group-hover/th:opacity-50 group-hover/th:scale-100'}`}>
+                    {isDesc ? <ChevronDown size={14} strokeWidth={3} /> : <ChevronUp size={14} strokeWidth={3} />}
+                </div>
+            </div>
+            {isCurrent && <div className="absolute bottom-0 left-6 right-6 h-0.5 bg-blue-600 dark:bg-blue-500 rounded-full animate-in fade-in duration-500" />}
+        </th>
+    );
+});
+
+const PropertyRow = React.memo(({ prop, isSelected, onToggleSelect, onGenerateStory, lastElementRef, navigate }) => {
     return (
         <tr
             ref={lastElementRef}
@@ -313,35 +341,6 @@ const PropertyTable = ({ properties, currentSort, onSortChange, hasMore, onLoadM
         }
     };
 
-    const SortHeader = ({ label, sortKeyBase, currentSort, onSortChange }) => {
-        const isCurrent = currentSort === `${sortKeyBase}_asc` || currentSort === `${sortKeyBase}_desc` || (sortKeyBase === 'date' && currentSort === 'newest');
-        const isDesc = currentSort === `${sortKeyBase}_desc` || (sortKeyBase === 'date' && currentSort === 'newest');
-
-        const handleClick = () => {
-            if (!onSortChange) return;
-            if (sortKeyBase === 'date') {
-                onSortChange(currentSort === 'newest' ? 'date_asc' : 'newest');
-            } else {
-                onSortChange(isDesc ? `${sortKeyBase}_asc` : `${sortKeyBase}_desc`);
-            }
-        };
-
-        return (
-            <th
-                className={`px-6 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em] cursor-pointer transition-all relative group/th ${isCurrent ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'}`}
-                onClick={handleClick}
-            >
-                <div className="flex items-center gap-2">
-                    {label}
-                    <div className={`transition-all duration-300 ${isCurrent ? 'opacity-100 scale-100' : 'opacity-0 scale-50 group-hover/th:opacity-50 group-hover/th:scale-100'}`}>
-                        {isDesc ? <ChevronDown size={14} strokeWidth={3} /> : <ChevronUp size={14} strokeWidth={3} />}
-                    </div>
-                </div>
-                {isCurrent && <div className="absolute bottom-0 left-6 right-6 h-0.5 bg-blue-600 dark:bg-blue-500 rounded-full animate-in fade-in duration-500" />}
-            </th>
-        );
-    };
-
     return (
         <div className="flex flex-col h-full space-y-4">
             {/* Table Header Controls */}
@@ -414,6 +413,7 @@ const PropertyTable = ({ properties, currentSort, onSortChange, hasMore, onLoadM
                                     onToggleSelect={toggleSelectOne}
                                     onGenerateStory={handleGenerateStory}
                                     lastElementRef={index === properties.length - 1 ? lastElementRef : null}
+                                    navigate={navigate}
                                 />
                             ))
                         ) : isLoadingMore ? (
