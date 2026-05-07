@@ -188,6 +188,16 @@ const getDealSummaryLetter = async (req, res) => {
 };
 
 const runInternalMigration = async (req, res) => {
+    // Defense-in-depth: Verify internal key even if middleware passes
+    // Using header instead of query parameter for better security (not logged)
+    const migrationKey = req.headers['x-internal-migration-key'];
+    const expectedKey = process.env.INTERNAL_MIGRATION_KEY;
+
+    if (!expectedKey || migrationKey !== expectedKey) {
+        console.warn(`🚨 Unauthorized migration attempt from ${req.ip}`);
+        return res.status(403).json({ error: 'Invalid migration key' });
+    }
+
     const { exec } = require('child_process');
     const path = require('path');
 
