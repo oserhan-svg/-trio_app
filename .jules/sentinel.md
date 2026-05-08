@@ -1,0 +1,4 @@
+## 2025-05-14 - Unprotected Internal Migration Endpoint
+**Vulnerability:** The `/api/deals/internal/migrate` endpoint was accessible via a GET request without any authentication or authorization. It executed a shell command (`prisma migrate dev`) using `child_process.exec`, which could lead to Remote Code Execution (RCE) if any part of the command was influenced by user input, or at the very least, unauthorized database schema modifications and Denial of Service.
+**Learning:** System-level operations like database migrations are sometimes left exposed during development or "internal" tooling phases without proper security middleware.
+**Prevention:** Always convert high-risk endpoints to POST, wrap them with `authenticateToken` and `authorizeRole('admin')` middleware, and implement secondary defense-in-depth measures like mandatory header keys (`x-internal-migration-key`) for sensitive operations.
