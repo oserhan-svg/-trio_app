@@ -188,6 +188,13 @@ const getDealSummaryLetter = async (req, res) => {
 };
 
 const runInternalMigration = async (req, res) => {
+    // Defense-in-depth: Secondary header key validation
+    const migrationKey = req.headers['x-internal-migration-key'];
+    if (!migrationKey || migrationKey !== process.env.INTERNAL_MIGRATION_KEY) {
+        console.warn(`🚨 Unauthorized internal migration attempt from ${req.ip}`);
+        return res.status(403).json({ error: 'Unauthorized system operation' });
+    }
+
     const { exec } = require('child_process');
     const path = require('path');
 
