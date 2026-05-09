@@ -1,0 +1,4 @@
+## 2025-05-09 - Missing Authorization on Internal Migration Endpoint
+**Vulnerability:** The `/internal/migrate` endpoint in `server/routes/dealRoutes.js` lacks `authenticateToken` and `authorizeRole('admin')` middleware. This endpoint directly executes shell commands using `child_process.exec()`, which is a significant security risk if left exposed.
+**Learning:** Internal tool endpoints often get missed during authorization setup because they are meant for "developer use", but they pose the same remote execution risks. Furthermore, executing shell commands via routes is inherently dangerous.
+**Prevention:** Ensure all endpoints, especially internal maintenance or migration scripts, have both authentication and authorization middleware. When migrating or interacting with databases, use programmatic APIs if possible, rather than shell commands, and never expose command execution endpoints in production applications.
