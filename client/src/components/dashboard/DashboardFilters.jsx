@@ -64,7 +64,7 @@ const DashboardFilters = ({ filters, setFilters, onFilter }) => {
                         <option value="Dubleks">Dubleks</option>
                     </select>
                 </div>
-                <Button onClick={onFilter} className="flex justify-center items-center gap-2">
+                <Button onClick={onFilter}>
                     <Search size={18} /> Filtrele
                 </Button>
             </div>
