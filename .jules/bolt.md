@@ -1,0 +1,3 @@
+## 2025-05-12 - N+1 Query Elimination in Performance Dashboard
+**Learning:** Controller methods `getConsultantPerformance` and `getConsultantDetail` were executing multiple database queries inside loops (once per consultant and once per month), leading to O(N) database round-trips.
+**Action:** Used Prisma `groupBy` and `$queryRaw` with PostgreSQL `TO_CHAR` to aggregate statistics in bulk. This reduced query counts to O(1) and significantly improved response times for large teams. Use mocking of Prisma calls (as seen in `tests/bolt_performance_check.js`) to verify such optimizations when live DB environments are restricted.
