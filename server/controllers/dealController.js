@@ -191,6 +191,13 @@ const runInternalMigration = async (req, res) => {
     const { exec } = require('child_process');
     const path = require('path');
 
+    // Defense-in-depth: Secondary header key check
+    const migrationKey = req.headers['x-internal-migration-key'];
+    if (!migrationKey || migrationKey !== process.env.INTERNAL_MIGRATION_KEY) {
+        console.error(`❌ Unauthorized migration attempt from ${req.ip}`);
+        return res.status(403).json({ error: 'Invalid migration key' });
+    }
+
     // Attempt multiple paths for prisma
     const prismaPath = path.join(__dirname, '../node_modules/.bin/prisma');
     const command = `"${prismaPath}" migrate dev --name add_deals_model --skip-generate`;
