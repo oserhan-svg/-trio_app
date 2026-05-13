@@ -1,0 +1,3 @@
+## 2026-05-22 - [Standardizing Button Loading States and A11y]
+**Learning:** Icon-only buttons in the dashboard (e.g., `PropertyTable.jsx` actions or `MobileNav.jsx` toggles) often had `title` attributes but lacked descriptive `aria-label` attributes, which are necessary for screen reader parity. Additionally, manual implementation of loading states in buttons led to inconsistent UX and accessibility.
+**Action:** Centralized loading logic into the core `Button` component with `isLoading`, `aria-busy`, and `aria-live` attributes. Audited and added Turkish `aria-label` values to all critical icon-only actions to match the UI context.
