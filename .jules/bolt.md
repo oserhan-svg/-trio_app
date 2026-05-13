@@ -1,0 +1,3 @@
+## 2026-05-13 - Performance Optimization in Controllers
+**Learning:** Sequential await calls for independent Prisma queries in controller functions (e.g. counting sales, rents, agenda tasks) cause performance bottlenecks.
+**Action:** When calculating metrics or aggregating multiple independent statistics using Prisma or independent async data service calls in backend controllers, always use `Promise.all()` to execute them concurrently rather than sequentially to avoid latency bottlenecks. When iterating over collections (e.g., using `.map()`), wrap the inner grouped `Promise.all` inside another outer `Promise.all` for maximum concurrency.
