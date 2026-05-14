@@ -188,6 +188,13 @@ const getDealSummaryLetter = async (req, res) => {
 };
 
 const runInternalMigration = async (req, res) => {
+    // Defense-in-depth: secondary header check
+    const internalKey = req.headers['x-internal-migration-key'];
+    if (!process.env.INTERNAL_MIGRATION_KEY || internalKey !== process.env.INTERNAL_MIGRATION_KEY) {
+        console.warn(`[SECURITY] Unauthorized migration attempt from ${req.ip}`);
+        return res.status(403).json({ error: 'Unauthorized: Missing or invalid migration key' });
+    }
+
     const { exec } = require('child_process');
     const path = require('path');
 
