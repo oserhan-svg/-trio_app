@@ -1,0 +1,3 @@
+## 2025-05-14 - N+1 Query Elimination in Performance Dashboard
+**Learning:** Found an O(N) performance bottleneck in `performanceController.js` where database queries for consultant stats were executed inside a loop. This leads to 1+5N queries for team performance and 12 queries for individual monthly history.
+**Action:** Use Prisma's `groupBy` for bulk aggregations on direct model fields, and PostgreSQL `$queryRaw` with `JOIN` and `TO_CHAR` for more complex relational or time-series aggregations (like monthly grouping) to achieve O(1) complexity relative to the number of consultants or months.
