@@ -18,9 +18,15 @@ const Input = ({ label, id, error, className = '', ...props }) => {
           transition-all duration-200
           ${error ? 'border-red-500 focus:ring-red-200' : ''}
         `}
+                aria-invalid={!!error}
+                aria-describedby={error ? `${id}-error` : undefined}
                 {...props}
             />
-            {error && <span className="text-xs text-red-500">{error}</span>}
+            {error && (
+                <span id={`${id}-error`} className="text-xs text-red-500" aria-live="polite">
+                    {error}
+                </span>
+            )}
         </div>
     );
 };
