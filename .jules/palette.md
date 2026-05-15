@@ -1,0 +1,3 @@
+## 2024-05-15 - Improve Button Focus Styles and ARIA Semantic Structure
+**Learning:** Adding ARIA-labels to icon-only buttons (`aria-label="Menüyü aç/kapat"`) and `aria-current="page"` to active custom navigation buttons significantly improves screen-reader compatibility. Custom nested elements hiding labels (`opacity-0`) need the `group` and `group-focus-visible` Tailwind classes to ensure they become visible when focused via keyboard.
+**Action:** Use `group-focus-visible` to reveal nested elements and always apply explicit focus states (`focus-visible:ring-2`) instead of relying on default browser outlines that may have low contrast.
