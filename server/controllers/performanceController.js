@@ -18,65 +18,77 @@ exports.getConsultantPerformance = async (req, res) => {
             }
         });
 
+        const consultantIds = consultants.map(c => c.id);
+        if (consultantIds.length === 0) return res.json([]);
+
         // Current month date range
         const now = new Date();
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-        const performanceData = await Promise.all(consultants.map(async (c) => {
-            // Count Sale listings
-            const saleCount = await prisma.property.count({
-                where: {
-                    assigned_user_id: c.id,
-                    listing_type: 'sale'
-                }
-            });
+        // 1. Bulk fetch Property stats
+        const propertyStats = await prisma.property.groupBy({
+            by: ['assigned_user_id', 'listing_type'],
+            where: { assigned_user_id: { in: consultantIds } },
+            _count: { id: true }
+        });
 
-            // Count Rent listings
-            const rentCount = await prisma.property.count({
-                where: {
-                    assigned_user_id: c.id,
-                    listing_type: 'rent'
-                }
-            });
+        // 2. Bulk fetch New Portfolios this month
+        const newPortfolioStats = await prisma.property.groupBy({
+            by: ['assigned_user_id'],
+            where: {
+                assigned_user_id: { in: consultantIds },
+                created_at: { gte: startOfMonth }
+            },
+            _count: { id: true }
+        });
 
-            // New portfolios (Properties assigned this month)
-            const newPortfolioCount = await prisma.property.count({
-                where: {
-                    assigned_user_id: c.id,
-                    created_at: { gte: startOfMonth }
-                }
-            });
+        // 3. Bulk fetch Interaction counts (requires join)
+        // Using Prisma $queryRaw with template literal
+        const interactionStats = await prisma.$queryRaw`
+            SELECT c.consultant_id, COUNT(i.id)::int as count
+            FROM interactions i
+            JOIN clients c ON i.client_id = c.id
+            WHERE c.consultant_id IN (${consultantIds})
+              AND i.date >= ${startOfMonth}
+            GROUP BY c.consultant_id
+        `;
 
-            // Interactions made (via clients assigned to them)
-            const interactionCount = await prisma.interaction.count({
-                where: {
-                    client: { consultant_id: c.id },
-                    date: { gte: startOfMonth }
-                }
-            });
+        // 4. Bulk fetch Completed Agenda tasks
+        const agendaStats = await prisma.agendaItem.groupBy({
+            by: ['user_id'],
+            where: {
+                user_id: { in: consultantIds },
+                status: 'completed',
+                start_at: { gte: startOfMonth }
+            },
+            _count: { id: true }
+        });
 
-            // Completed Agenda tasks
-            const completedTasks = await prisma.agendaItem.count({
-                where: {
-                    user_id: c.id,
-                    status: 'completed',
-                    start_at: { gte: startOfMonth }
-                }
-            });
+        // Helper maps for O(1) lookup
+        const propMap = {};
+        propertyStats.forEach(s => {
+            const uid = s.assigned_user_id;
+            if (!propMap[uid]) propMap[uid] = { sale: 0, rent: 0 };
+            if (s.listing_type === 'sale') propMap[uid].sale = s._count.id;
+            if (s.listing_type === 'rent') propMap[uid].rent = s._count.id;
+        });
 
-            return {
-                id: c.id,
-                email: c.email,
-                name: c.name,
-                stats: {
-                    total_clients: c._count.clients,
-                    active_sale: saleCount,
-                    active_rent: rentCount,
-                    new_portfolio_monthly: newPortfolioCount,
-                    interactions_monthly: interactionCount,
-                    completed_tasks_monthly: completedTasks
-                }
-            };
+        const newPortfolioMap = Object.fromEntries(newPortfolioStats.map(s => [s.assigned_user_id, s._count.id]));
+        const interactionMap = Object.fromEntries(interactionStats.map(s => [s.consultant_id, s.count]));
+        const agendaMap = Object.fromEntries(agendaStats.map(s => [s.user_id, s._count.id]));
+
+        const performanceData = consultants.map(c => ({
+            id: c.id,
+            email: c.email,
+            name: c.name,
+            stats: {
+                total_clients: c._count.clients,
+                active_sale: propMap[c.id]?.sale || 0,
+                active_rent: propMap[c.id]?.rent || 0,
+                new_portfolio_monthly: newPortfolioMap[c.id] || 0,
+                interactions_monthly: interactionMap[c.id] || 0,
+                completed_tasks_monthly: agendaMap[c.id] || 0
+            }
         }));
 
         res.json(performanceData);
@@ -97,33 +109,41 @@ exports.getConsultantDetail = async (req, res) => {
             const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
             months.push({
                 name: d.toLocaleString('tr-TR', { month: 'long' }),
-                month: d.getMonth(),
-                year: d.getFullYear(),
                 start: new Date(d.getFullYear(), d.getMonth(), 1),
                 end: new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59)
             });
         }
 
-        const monthlyStats = await Promise.all(months.map(async (m) => {
-            const propertiesCount = await prisma.property.count({
-                where: {
-                    assigned_user_id: consultantId,
-                    created_at: { gte: m.start, lte: m.end }
-                }
-            });
+        const sixMonthsAgo = months[months.length - 1].start;
 
-            const interactionsCount = await prisma.interaction.count({
-                where: {
-                    client: { consultant_id: consultantId },
-                    date: { gte: m.start, lte: m.end }
-                }
-            });
+        // Optimized monthly aggregation using $queryRaw
+        const [propertyStats, interactionStats] = await Promise.all([
+            prisma.$queryRaw`
+                SELECT TO_CHAR(created_at, 'Month') as month_name, COUNT(*)::int as count
+                FROM properties
+                WHERE assigned_user_id = ${consultantId}
+                  AND created_at >= ${sixMonthsAgo}
+                GROUP BY TO_CHAR(created_at, 'Month'), DATE_TRUNC('month', created_at)
+                ORDER BY DATE_TRUNC('month', created_at)
+            `,
+            prisma.$queryRaw`
+                SELECT TO_CHAR(i.date, 'Month') as month_name, COUNT(i.id)::int as count
+                FROM interactions i
+                JOIN clients c ON i.client_id = c.id
+                WHERE c.consultant_id = ${consultantId}
+                  AND i.date >= ${sixMonthsAgo}
+                GROUP BY TO_CHAR(i.date, 'Month'), DATE_TRUNC('month', i.date)
+                ORDER BY DATE_TRUNC('month', i.date)
+            `
+        ]);
 
-            return {
-                name: m.name,
-                portföy: propertiesCount,
-                etkileşim: interactionsCount
-            };
+        const propMap = Object.fromEntries(propertyStats.map(s => [s.month_name.trim(), s.count]));
+        const intMap = Object.fromEntries(interactionStats.map(s => [s.month_name.trim(), s.count]));
+
+        const monthlyStats = months.map(m => ({
+            name: m.name,
+            portföy: propMap[m.name] || 0,
+            etkileşim: intMap[m.name] || 0
         }));
 
         // Client distribution

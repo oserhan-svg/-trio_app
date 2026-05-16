@@ -1,0 +1,3 @@
+## 2026-05-16 - Elimination of N+1 Queries in Performance Controller
+**Learning:** Sequential database queries inside loops (N+1 pattern) significantly degrade API response times as the dataset grows (e.g., more consultants or longer history). PostgreSQL's bulk aggregation features like `groupBy` and `TO_CHAR` allow collapsing multiple related queries into single database round-trips.
+**Action:** Always prefer bulk fetching using `In` clauses and grouping in the database over application-side loops with `await` calls. Use `$queryRaw` for complex joins or time-series aggregations that Prisma's standard API doesn't support efficiently.
