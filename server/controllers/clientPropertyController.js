@@ -27,13 +27,6 @@ const updateClientPropertyStatus = async (req, res) => {
     // We check both clientId and id for safety, though id is the correct one from route
     const clientId = req.params.clientId || req.params.id;
 
-    // Debug logging to absolute path
-    const fs = require('fs');
-    const path = require('path');
-    const logPath = path.join(__dirname, '../debug_params_absolute.txt');
-    try {
-        fs.appendFileSync(logPath, `Time: ${new Date().toISOString()}\nParams: ${JSON.stringify(req.params)}\nBody: ${JSON.stringify(req.body)}\nURL: ${req.originalUrl}\n\n`);
-    } catch (e) { console.error('Log write failed', e); }
 
     const { propertyId, status, notes } = req.body;
     // status: 'suggested', 'liked', 'rejected', 'offered'
