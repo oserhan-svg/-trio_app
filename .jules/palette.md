@@ -1,0 +1,3 @@
+## 2025-02-12 - AppShell Accessibility Enhancements
+**Learning:** Visual active and hover states in custom navigation components (like `AppShell` and `BottomNavItem`) are completely invisible to screen readers without ARIA properties like `aria-current="page"`. Moreover, relying on default focus rings in complex absolute positioned or flex layouts often fails, necessitating custom `focus-visible` utilities.
+**Action:** Always complement visual active state toggles in custom navigation menus with `aria-current="page"`. When building interactive layout containers, systematically add `focus-visible:outline-none focus-visible:ring-2` to ensure keyboard navigability.
