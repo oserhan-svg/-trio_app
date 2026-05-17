@@ -1,0 +1,4 @@
+## 2025-05-15 - Unprotected RCE-prone Endpoint
+**Vulnerability:** The `/api/deals/internal/migrate` endpoint was completely unprotected and executed a shell command (`prisma migrate dev`) using `exec()`. This could allow an unauthenticated attacker to trigger database migrations or potentially achieve Remote Code Execution (RCE) if they could influence the command (though currently paths are hardcoded).
+**Learning:** Internal utility routes added during development or "one-off" migrations often bypass standard authentication middleware if not explicitly included in the route definition.
+**Prevention:** Always apply `authenticateToken` and `authorizeRole('admin')` to any route that performs system-level operations or executes shell commands. Use automated scanning to detect routes missing middleware.
