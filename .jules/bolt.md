@@ -1,0 +1,3 @@
+## 2024-05-18 - Optimize Independent Async Tasks with Concurrency
+**Learning:** Sequential `await` calls inside array iterations (like `.map`) and sequential database queries for independent data create unnecessary latency bottlenecks in the controller layer.
+**Action:** When calculating metrics or aggregating multiple independent statistics using Prisma in backend controllers, always group independent queries in a single `Promise.all()` to execute them concurrently rather than sequentially. When iterating over collections, wrap the inner grouped `Promise.all` inside another outer `Promise.all` for maximum concurrency.
