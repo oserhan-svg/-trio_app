@@ -3,8 +3,8 @@ const bcrypt = require('bcryptjs');
 
 async function createAdmin() {
     try {
-        const email = 'admin@emlak22.com';
-        const password = '1234';
+        const email = process.env.ADMIN_EMAIL || 'admin@emlak22.com';
+        const password = process.env.ADMIN_PASSWORD || '1234';
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const user = await prisma.user.upsert({
