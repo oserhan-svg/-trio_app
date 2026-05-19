@@ -77,8 +77,8 @@ const Login = () => {
 
 
 
-                        <Button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2">
-                            <LogIn size={18} />
+                        <Button type="submit" isLoading={loading} className="w-full flex items-center justify-center gap-2">
+                            {!loading && <LogIn size={18} />}
                             {loading ? 'Giriş Yapılıyor...' : 'Giriş Yap'}
                         </Button>
                     </form>
