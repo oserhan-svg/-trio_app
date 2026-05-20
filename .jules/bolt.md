@@ -1,0 +1,3 @@
+## 2024-12-16 - [N+1 Query Elimination in Performance Dashboard]
+**Learning:** The `performanceController.js` had multiple N+1 query patterns in `getConsultantPerformance` (looping over consultants) and `getConsultantDetail` (looping over months). Replacing these with `groupBy` and `$queryRaw` aggregations reduced query counts from $O(N)$ to $O(1)$. Specifically, `EXTRACT(MONTH FROM date)` in PostgreSQL returns 1-12, which requires a +1 adjustment when comparing against JavaScript's 0-indexed months.
+**Action:** Use bulk aggregations (`groupBy` or `$queryRaw`) whenever data needs to be collected for multiple entities or time periods. Always verify index parity (e.g., month indexing) when mixing SQL results with JS logic.
