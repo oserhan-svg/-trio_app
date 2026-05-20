@@ -55,7 +55,9 @@ const updateUser = async (req, res) => {
     const { id } = req.params;
     const { email, role, password, name } = req.body;
 
-    console.log(`[UPDATE USER] ID: ${id}, Body:`, req.body);
+    // Security: Sanitize req.body in logs to exclude sensitive fields
+    const { password: _, token: __, credit_card: ___, ...safeBody } = req.body;
+    console.log(`[UPDATE USER] ID: ${id}, Body:`, safeBody);
 
     try {
         const updateData = {};
