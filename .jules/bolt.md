@@ -1,0 +1,3 @@
+## 2024-05-22 - Optimize N+1 queries in Performance Controller
+**Learning:** Found multiple independent await statements inside a `map()` loop that are running sequentially for each consultant and month, which creates performance bottlenecks when fetching stats. Wait, they are inside `Promise.all` but they are consecutive `await` statements *inside* the map function itself, meaning they are executed sequentially per consultant/month. Using `Promise.all` inside the mapped function executes them concurrently.
+**Action:** Always wrap independent async data queries inside a `map` or similar loop in an inner `Promise.all` to fetch them concurrently, rather than awaiting them one by one.
