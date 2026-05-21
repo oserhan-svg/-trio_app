@@ -217,6 +217,7 @@ const AppShell = ({ children }) => {
                                                 ${!sidebarOpen ? 'md:justify-center px-0 !translate-x-0' : ''}
                                             `}
                                             title={!sidebarOpen ? item.label : ''}
+                                            aria-current={active ? 'page' : undefined}
                                         >
                                             <item.icon
                                                 size={20}
@@ -258,7 +259,8 @@ const AppShell = ({ children }) => {
                     <div className="flex items-center gap-4 md:gap-6">
                         <button
                             onClick={() => setSidebarOpen(!sidebarOpen)}
-                            className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-500 hover:text-blue-600 hover:shadow-md transition-all active:scale-90"
+                            aria-label="Menüyü aç/kapat"
+                            className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-500 hover:text-blue-600 hover:shadow-md transition-all active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                         >
                             <Menu size={20} />
                         </button>
@@ -279,13 +281,17 @@ const AppShell = ({ children }) => {
 
                         <button
                             onClick={toggleTheme}
-                            className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 hover:shadow-md transition-all active:scale-90"
+                            aria-label={theme === 'light' ? 'Karanlık moda geç' : 'Aydınlık moda geç'}
+                            className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 hover:shadow-md transition-all active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                             title={theme === 'light' ? 'Karanlık Mod' : 'Aydınlık Mod'}
                         >
                             {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
                         </button>
 
-                        <button className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-400 hover:text-rose-500 hover:shadow-md transition-all relative group">
+                        <button
+                            aria-label="Bildirimler"
+                            className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-400 hover:text-rose-500 hover:shadow-md transition-all relative group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
+                        >
                             <Bell size={20} className="group-hover:animate-bounce" />
                             <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-rose-500 border-2 border-white dark:border-slate-800 rounded-full"></span>
                         </button>
@@ -346,7 +352,8 @@ const AppShell = ({ children }) => {
 const BottomNavItem = ({ icon: Icon, label, active, onClick }) => (
     <button
         onClick={onClick}
-        className={`flex flex-col items-center justify-center gap-1 w-16 transition-all duration-300 ${active ? 'text-blue-600' : 'text-slate-400'}`}
+        aria-current={active ? 'page' : undefined}
+        className={`flex flex-col items-center justify-center gap-1 w-16 transition-all duration-300 ${active ? 'text-blue-600' : 'text-slate-400'} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg`}
     >
         <div className={`p-2 rounded-xl transition-all duration-300 ${active ? 'bg-blue-50 dark:bg-blue-900/30' : ''}`}>
             <Icon size={24} className={active ? 'animate-pulse' : ''} />
