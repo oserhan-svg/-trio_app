@@ -38,4 +38,38 @@ const isAdmin = (req, res, next) => {
     });
 };
 
-module.exports = { authenticateToken, authorizeRole, isAdmin };
+/**
+ * IDOR Middleware: Validates that the user has permission to access the client.
+ * Consultants can only access clients assigned to them or unassigned clients.
+ */
+const checkClientOwnership = async (req, res, next) => {
+    const prisma = require('../db');
+    const clientId = req.params.id || req.params.clientId;
+    const user = req.user;
+
+    if (!clientId) return next();
+
+    try {
+        if (user.role === 'admin') return next();
+
+        const client = await prisma.client.findUnique({
+            where: { id: parseInt(clientId) },
+            select: { consultant_id: true }
+        });
+
+        if (!client) {
+            return res.status(404).json({ error: 'Client not found' });
+        }
+
+        if (client.consultant_id && client.consultant_id !== parseInt(user.id)) {
+            return res.status(403).json({ error: 'Unauthorized: You do not have access to this client.' });
+        }
+
+        next();
+    } catch (error) {
+        console.error('Ownership Check Error:', error);
+        res.status(500).json({ error: 'Authorization error' });
+    }
+};
+
+module.exports = { authenticateToken, authorizeRole, isAdmin, checkClientOwnership };

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const clientController = require('../controllers/clientController');
 const { addDemand, deleteClient } = require('../controllers/clientController');
-const { authenticateToken } = require('../middleware/authMiddleware');
+const { authenticateToken, checkClientOwnership } = require('../middleware/authMiddleware');
 const validate = require('../middleware/validate');
 const { clientSchema, demandSchema } = require('../utils/schemas');
 
@@ -39,6 +39,9 @@ router.delete('/pending/:id', pendingController.deletePendingContact);
 router.post('/pending/bulk-approve', pendingController.bulkApprove);
 router.post('/pending/bulk-delete', pendingController.bulkDelete);
 
+// Protect all routes with /:id parameter to validate ownership
+router.use('/:id', checkClientOwnership);
+
 // Client-specific routes with sub-paths (MUST come before /:id)
 router.post('/:id/ai-digest', clientController.generateAIDigest);
 router.post('/:id/ai-digest/send', clientController.sendAIDigest);
@@ -49,9 +52,9 @@ router.get('/:id/health', clientController.getClientHealth);
 router.get('/:id/interactions', interactionController.getInteractions);
 router.post('/:id/interactions', interactionController.createInteraction);
 router.get('/:id/properties', clientPropertyController.getClientProperties);
-router.post('/:id/properties', authenticateToken, clientController.addPropertyToClient);
-router.delete('/:id/properties/:propertyId', authenticateToken, clientController.removePropertyFromClient);
-router.delete('/:id/properties', authenticateToken, clientController.removeAllProperties); // Bulk remove
+router.post('/:id/properties', clientController.addPropertyToClient);
+router.delete('/:id/properties/:propertyId', clientController.removePropertyFromClient);
+router.delete('/:id/properties', clientController.removeAllProperties); // Bulk remove
 router.post('/:id/demands', validate(demandSchema), addDemand);
 
 // Generic single-client routes (MUST come after all /:id/* routes)
