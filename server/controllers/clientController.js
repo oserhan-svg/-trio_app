@@ -403,6 +403,7 @@ const updateClient = async (req, res) => {
 // Update a demand
 const updateDemand = async (req, res) => {
     const { id } = req.params;
+    const user = req.user;
     let { min_price, max_price, rooms, district, neighborhood, listing_type, notes } = req.body;
 
     // Sanitize prices
@@ -413,6 +414,18 @@ const updateDemand = async (req, res) => {
     notes = notes ? stripHtml(notes) : null;
 
     try {
+        // IDOR Check: Ensure user has access to the client this demand belongs to
+        if (user.role !== 'admin') {
+            const demandCheck = await prisma.demand.findUnique({
+                where: { id: parseInt(id) },
+                include: { client: { select: { consultant_id: true } } }
+            });
+            if (!demandCheck) return res.status(404).json({ error: 'Demand not found' });
+            if (demandCheck.client.consultant_id && demandCheck.client.consultant_id !== parseInt(user.id)) {
+                return res.status(403).json({ error: 'Unauthorized: You do not have permission to update this demand.' });
+            }
+        }
+
         const demand = await prisma.demand.update({
             where: { id: parseInt(id) },
             data: {
@@ -439,11 +452,21 @@ const updateDemand = async (req, res) => {
 // Delete a demand
 const deleteDemand = async (req, res) => {
     const { id } = req.params;
+    const user = req.user;
     try {
         const demand = await prisma.demand.findUnique({
             where: { id: parseInt(id) },
-            select: { client_id: true }
+            include: { client: { select: { consultant_id: true } } }
         });
+
+        if (!demand) {
+            return res.status(404).json({ error: 'Demand not found' });
+        }
+
+        // IDOR Check
+        if (user.role !== 'admin' && demand.client.consultant_id && demand.client.consultant_id !== parseInt(user.id)) {
+            return res.status(403).json({ error: 'Unauthorized: You do not have permission to delete this demand.' });
+        }
 
         await prisma.demand.delete({ where: { id: parseInt(id) } });
 
