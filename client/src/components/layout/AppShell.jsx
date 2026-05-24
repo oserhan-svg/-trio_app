@@ -209,8 +209,9 @@ const AppShell = ({ children }) => {
                                         <button
                                             key={item.id}
                                             onClick={() => navigate(item.path)}
+                                            aria-current={active ? 'page' : undefined}
                                             className={`
-                                                w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl transition-all duration-300 group relative
+                                                w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl transition-all duration-300 group relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500
                                                 ${active
                                                     ? 'bg-blue-600 text-white font-bold shadow-xl shadow-blue-500/25 glow-blue translate-x-1'
                                                     : 'text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 hover:shadow-sm hover:translate-x-1'}
@@ -258,7 +259,8 @@ const AppShell = ({ children }) => {
                     <div className="flex items-center gap-4 md:gap-6">
                         <button
                             onClick={() => setSidebarOpen(!sidebarOpen)}
-                            className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-500 hover:text-blue-600 hover:shadow-md transition-all active:scale-90"
+                            aria-label="Menüyü aç/kapat"
+                            className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-500 hover:text-blue-600 hover:shadow-md transition-all active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                         >
                             <Menu size={20} />
                         </button>
@@ -272,20 +274,24 @@ const AppShell = ({ children }) => {
                     </div>
 
                     <div className="flex items-center gap-2 md:gap-4">
-                        <div className="hidden sm:flex items-center gap-2 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                        <div className="hidden sm:flex items-center gap-2 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 focus-within:ring-2 focus-within:ring-blue-500">
                             <Search size={16} className="text-slate-300" />
-                            <input type="text" placeholder="Hızlı ara..." className="bg-transparent border-none text-xs font-bold focus:ring-0 w-32 outline-none dark:text-white" />
+                            <input type="text" aria-label="Hızlı ara" placeholder="Hızlı ara..." className="bg-transparent border-none text-xs font-bold focus:ring-0 w-32 outline-none dark:text-white" />
                         </div>
 
                         <button
                             onClick={toggleTheme}
-                            className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 hover:shadow-md transition-all active:scale-90"
+                            aria-label={theme === 'light' ? 'Karanlık Mod' : 'Aydınlık Mod'}
+                            className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 hover:shadow-md transition-all active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                             title={theme === 'light' ? 'Karanlık Mod' : 'Aydınlık Mod'}
                         >
                             {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
                         </button>
 
-                        <button className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-400 hover:text-rose-500 hover:shadow-md transition-all relative group">
+                        <button
+                            aria-label="Bildirimler"
+                            className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-400 hover:text-rose-500 hover:shadow-md transition-all relative group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
+                        >
                             <Bell size={20} className="group-hover:animate-bounce" />
                             <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-rose-500 border-2 border-white dark:border-slate-800 rounded-full"></span>
                         </button>
@@ -293,7 +299,7 @@ const AppShell = ({ children }) => {
                         <div className="hidden sm:block h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
 
                         <button
-                            className="bg-slate-900 dark:bg-blue-600 text-white h-10 px-4 rounded-xl flex items-center gap-2 shadow-lg hover:shadow-blue-500/20 hover:-translate-y-0.5 transition-all text-xs font-black uppercase tracking-widest active:translate-y-0"
+                            className="bg-slate-900 dark:bg-blue-600 text-white h-10 px-4 rounded-xl flex items-center gap-2 shadow-lg hover:shadow-blue-500/20 hover:-translate-y-0.5 transition-all text-xs font-black uppercase tracking-widest active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 dark:focus-visible:ring-offset-slate-900"
                             onClick={handleLogout}
                         >
                             <LogOut size={16} />
@@ -346,7 +352,8 @@ const AppShell = ({ children }) => {
 const BottomNavItem = ({ icon: Icon, label, active, onClick }) => (
     <button
         onClick={onClick}
-        className={`flex flex-col items-center justify-center gap-1 w-16 transition-all duration-300 ${active ? 'text-blue-600' : 'text-slate-400'}`}
+        aria-current={active ? 'page' : undefined}
+        className={`flex flex-col items-center justify-center gap-1 w-16 transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl ${active ? 'text-blue-600' : 'text-slate-400'}`}
     >
         <div className={`p-2 rounded-xl transition-all duration-300 ${active ? 'bg-blue-50 dark:bg-blue-900/30' : ''}`}>
             <Icon size={24} className={active ? 'animate-pulse' : ''} />
