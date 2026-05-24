@@ -1,0 +1,4 @@
+## 2025-05-24 - Critical Remote Code Execution via Unauthenticated Internal Migration Route
+**Vulnerability:** An unauthenticated internal route (`/internal/migrate`) executed arbitrary shell commands using `child_process.exec` in the deal controller.
+**Learning:** Internal tooling routes left exposed without authentication or authorization can be easily discovered and exploited to execute arbitrary commands on the server.
+**Prevention:** Internal/testing routes executing shell commands must be completely removed from production builds or strictly protected with `authenticateToken` and `authorizeRole('admin')`.
