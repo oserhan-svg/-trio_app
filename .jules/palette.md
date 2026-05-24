@@ -1,0 +1,3 @@
+## 2026-05-24 - Interactive Elements Missing Focus-Visible Styles
+**Learning:** Found multiple interactive elements (`button`, `a`, `input`) that either rely on hover styles without focus states or use default focus rings. Some buttons are missing `aria-label` for screen readers. In `AppShell.jsx` (e.g. sidebar navigation, top bar buttons, etc), focus states are missing for keyboard navigation.
+**Action:** Add `focus-visible:` utility classes (like `focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-blue-500`) to interactive elements, starting with the main application shell buttons to improve keyboard accessibility.
