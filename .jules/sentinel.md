@@ -1,0 +1,4 @@
+## 2024-05-18 - Unprotected Migration Route and Command Injection Vulnerability
+**Vulnerability:** Found an unprotected API route `/api/deals/internal/migrate` that dynamically executes a shell command using `child_process.exec()` to run Prisma migrations.
+**Learning:** This is a critical security vulnerability. It allows any unauthenticated user to trigger arbitrary database migrations, potentially leading to denial of service, data loss, or unauthorized schema changes. It also exposes the server to command injection if the command execution pattern is copied and modified to take user input.
+**Prevention:** Never expose database migration commands via HTTP API endpoints, especially not without strict authentication and authorization (e.g., admin-only). Migrations should be run locally or within the CI/CD pipeline.
