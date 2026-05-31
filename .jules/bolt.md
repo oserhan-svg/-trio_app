@@ -1,0 +1,3 @@
+## 2024-05-31 - Optimize Prisma Count Queries with Promise.all
+**Learning:** Performing multiple independent `prisma.count()` queries sequentially within an async function creates a latency bottleneck, as each query waits for the previous one to complete.
+**Action:** Wrap independent `prisma.count()` (and other db operations) in `Promise.all()` to execute them concurrently, reducing overall execution time. When mapping over arrays, this means wrapping the internal database calls in a nested `Promise.all()`.
