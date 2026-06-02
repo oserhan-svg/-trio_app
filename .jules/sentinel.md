@@ -1,0 +1,4 @@
+## 2024-05-24 - Fix Overly Permissive CORS Configuration
+**Vulnerability:** The Express server's CORS configuration allowed requests from any origin by falling back to `callback(null, true)` for unknown origins. Combined with `credentials: true`, this allowed potential CSRF or cross-origin data exfiltration by returning `Access-Control-Allow-Origin: <Origin>` universally.
+**Learning:** This existed likely as a developer shortcut ("allowing softly") to quickly bypass CORS errors during development or extension integration, circumventing the intended allowlist.
+**Prevention:** Always explicitly deny unknown origins using `callback(new Error('Not allowed by CORS'))` and never use a permissive fallback, especially when cookies or credentials are in use.
