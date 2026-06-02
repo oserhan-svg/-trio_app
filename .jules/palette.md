@@ -1,0 +1,3 @@
+## 2024-06-02 - Enhancing Custom Navigation and Icon-Only Buttons Accessibility
+**Learning:** Custom navigation menus implemented with `<button>` elements (like those in AppShell) rely solely on visual cues for active states. Assistive technologies cannot determine the current page context without explicit `aria-current="page"` attributes. Additionally, icon-only buttons require localized `aria-label`s for screen reader support, and keyboard users require clear `focus-visible` styles to navigate effectively.
+**Action:** Always conditionally append `aria-current="page"` to the active navigation item when building custom nav elements. Ensure all interactive icon-only elements have descriptive `aria-label`s and implement `focus-visible` utilities.
