@@ -1,0 +1,3 @@
+## 2024-06-02 - Optimize Prisma Queries
+**Learning:** When calculating metrics or aggregating multiple independent statistics using Prisma or independent async data service calls in backend controllers, sequentially executing them creates latency bottlenecks.
+**Action:** Always use Promise.all() to execute them concurrently rather than sequentially to avoid latency bottlenecks. When iterating over collections (e.g., using .map()), wrap the inner grouped Promise.all inside another outer Promise.all for maximum concurrency.
