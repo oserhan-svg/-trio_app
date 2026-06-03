@@ -1,0 +1,3 @@
+## 2024-05-24 - Improve Global Navigation Accessibility
+**Learning:** Custom React navigation components (like BottomNavItem and sidebar buttons) relying entirely on visual active classes fail to convey the current page context to screen readers, and icon-only buttons in the main AppShell lack semantic labels. Furthermore, interactive components lack visible focus states for keyboard users.
+**Action:** Always apply `aria-current="page"` to active navigation `<button>` items. Add descriptive Turkish `aria-label` attributes to icon-only buttons (Menu, Notifications, Theme toggle). Introduce Tailwind `focus-visible:` classes on interactive elements to improve keyboard accessibility globally.
