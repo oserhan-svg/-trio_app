@@ -1,0 +1,4 @@
+## 2024-06-05 - Fix overly permissive CORS configuration
+**Vulnerability:** The Express server's CORS configuration allowed unknown origins with a soft fallback (`callback(null, true)`). This is a significant security risk, especially when `credentials: true` is enabled, as it allows any external origin to make authenticated cross-origin requests.
+**Learning:** The soft fallback `callback(null, true)` for unknown origins effectively bypasses CORS restrictions and should not be used in a secure application.
+**Prevention:** Always explicitly deny unknown origins by returning an error (`callback(new Error('Not allowed by CORS'))`) rather than using a permissive fallback.
