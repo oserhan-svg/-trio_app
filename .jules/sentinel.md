@@ -1,0 +1,4 @@
+## 2024-05-24 - Overly Permissive CORS with Credentials
+**Vulnerability:** The CORS configuration in `server/index.js` allowed all origins by returning `callback(null, true)` in the `else` block, while also setting `credentials: true`. This allowed any malicious site to make cross-origin requests with user credentials.
+**Learning:** The fallback allowed unknown origins softly instead of blocking them. This completely bypasses CORS protection when combined with `credentials: true`.
+**Prevention:** Always explicitly deny unknown origins in dynamic CORS configurations by returning an error (`callback(new Error('Not allowed by CORS'))`) rather than defaulting to true.
