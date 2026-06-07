@@ -209,6 +209,7 @@ const AppShell = ({ children }) => {
                                         <button
                                             key={item.id}
                                             onClick={() => navigate(item.path)}
+                                            aria-current={active ? 'page' : undefined}
                                             className={`
                                                 w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl transition-all duration-300 group relative
                                                 ${active
@@ -346,6 +347,7 @@ const AppShell = ({ children }) => {
 const BottomNavItem = ({ icon: Icon, label, active, onClick }) => (
     <button
         onClick={onClick}
+        aria-current={active ? 'page' : undefined}
         className={`flex flex-col items-center justify-center gap-1 w-16 transition-all duration-300 ${active ? 'text-blue-600' : 'text-slate-400'}`}
     >
         <div className={`p-2 rounded-xl transition-all duration-300 ${active ? 'bg-blue-50 dark:bg-blue-900/30' : ''}`}>
