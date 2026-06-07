@@ -58,10 +58,10 @@ const OpportunityCarousel = React.memo(({ compact = false }) => {
 
                 {opportunities.length > itemsPerSlide && (
                     <div className="flex gap-1">
-                        <button onClick={prevSlide} className="p-0.5 rounded border border-gray-100 bg-white hover:bg-gray-50 transition-colors shadow-sm">
+                        <button onClick={prevSlide} aria-label="Önceki fırsat" className="p-0.5 rounded border border-gray-100 bg-white hover:bg-gray-50 transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">
                             <ChevronLeft size={12} className="text-gray-600" />
                         </button>
-                        <button onClick={nextSlide} className="p-0.5 rounded border border-gray-100 bg-white hover:bg-gray-50 transition-colors shadow-sm">
+                        <button onClick={nextSlide} aria-label="Sonraki fırsat" className="p-0.5 rounded border border-gray-100 bg-white hover:bg-gray-50 transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">
                             <ChevronRight size={12} className="text-gray-600" />
                         </button>
                     </div>
