@@ -49,8 +49,8 @@ const corsOptions = {
             origin.startsWith('chrome-extension://')) {
             callback(null, true);
         } else {
-            console.log('[CORS] New origin detected (allowing softly):', origin);
-            callback(null, true);
+            console.log('[CORS] Unauthorized origin blocked:', origin);
+            callback(new Error('Not allowed by CORS'));
         }
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
