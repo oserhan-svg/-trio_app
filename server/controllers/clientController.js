@@ -122,7 +122,10 @@ const getClients = async (req, res) => {
             }
         }
 
-        const [total, clients, activeBuyers, activeSellers, newThisMonth] = await Promise.all([
+        const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+
+        // ⚡ Bolt Optimization: Merged multiple count queries into a single groupBy query
+        const [total, clients, statusTypeGroups, newThisMonth] = await Promise.all([
             prisma.client.count({ where }),
             prisma.client.findMany({
                 where,
@@ -131,37 +134,18 @@ const getClients = async (req, res) => {
                 skip,
                 take
             }),
-            prisma.client.count({
-                where: {
-                    AND: [
-                        where,
-                        { type: 'buyer' },
-                        { status: 'Active' }
-                    ]
-                }
+            prisma.client.groupBy({
+                by: ['type', 'status'],
+                where,
+                _count: { _all: true }
             }),
             prisma.client.count({
-                where: {
-                    AND: [
-                        where,
-                        { type: 'seller' },
-                        { status: 'Active' }
-                    ]
-                }
-            }),
-            prisma.client.count({
-                where: {
-                    AND: [
-                        where,
-                        {
-                            created_at: {
-                                gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
-                            }
-                        }
-                    ]
-                }
+                where: { AND: [where, { created_at: { gte: startOfMonth } }] }
             })
         ]);
+
+        const activeBuyers = statusTypeGroups.find(g => g.type === 'buyer' && g.status === 'Active')?._count?._all || 0;
+        const activeSellers = statusTypeGroups.find(g => g.type === 'seller' && g.status === 'Active')?._count?._all || 0;
 
         jsonBigInt(res, {
             data: clients,
