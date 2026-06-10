@@ -1,0 +1,3 @@
+## 2024-05-24 - Replace N+1 nested counts with grouped queries
+**Learning:** In a controller that aggregates metrics across a collection of users (like consultants), mapping over users and calling `prisma.count` per user creates an N+1 query bottleneck.
+**Action:** Replace concurrent `prisma.count` calls in mapped arrays with single `prisma.groupBy` or `prisma.findMany` queries that filter by the array of user IDs, reducing query volume from O(N) to O(1).
