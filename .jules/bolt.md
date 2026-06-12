@@ -1,0 +1,3 @@
+## 2025-06-12 - N+1 Queries in Performance Controller
+**Learning:** Found an N+1 query bottleneck in `server/controllers/performanceController.js` where counting stats per consultant happens in a `Promise.all(consultants.map(...))` loop executing 5 sequential database queries per consultant. If there are 20 consultants, this executes 100 queries. This type of overlapping counting can be optimized using Prisma's `groupBy` feature to fetch all counts in a single query per metric.
+**Action:** Replace sequential map loop counts with a single `prisma.property.groupBy` (and similar for interactions/agenda items) fetching the count grouped by `assigned_user_id` or `consultant_id` before the loop, and merge it afterwards. This converts N*5 queries into ~5 queries total.
