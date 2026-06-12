@@ -1,0 +1,4 @@
+## 2026-06-11 - Overly Permissive CORS Configuration
+**Vulnerability:** The CORS configuration in `server/index.js` was overly permissive. Specifically, the `origin` fallback soft-allowed new origins by returning `callback(null, true)`. Combined with `credentials: true`, this creates a CRITICAL security risk because it allows any unauthenticated or malicious domain to perform cross-origin requests and read authenticated data.
+**Learning:** It was using a soft fallback mechanism that explicitly allowed unlisted origins with `credentials: true`. This was incorrectly allowing full cross-origin resource sharing, which bypasses intended browser security controls for authenticated sessions.
+**Prevention:** For the Express server's CORS configuration, always explicitly deny unknown origins by returning an error (`callback(new Error('Not allowed by CORS'))`) rather than using a permissive fallback (`callback(null, true)`), especially when `credentials: true` is enabled.
