@@ -1,0 +1,3 @@
+## 2024-06-13 - Improve AppShell Navigation Accessibility
+**Learning:** Visual active states (like Tailwind color classes) are insufficient for assistive technologies to identify the current page context. Screen readers cannot interpret icon-only buttons without explicit `aria-label`s. Also, using `focus-visible:ring-2` on interactive elements is essential for keyboard navigation users.
+**Action:** Always conditionally append `aria-current="page"` to navigation buttons corresponding to the current path, provide localized `aria-label`s (e.g., 'Menüyü aç/kapat') for icon-only action buttons, and explicitly define focus indicators (e.g., `focus-visible:outline-none focus-visible:ring-2`) across the UI components.
