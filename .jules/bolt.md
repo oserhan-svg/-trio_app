@@ -1,0 +1,3 @@
+## 2024-06-14 - Optimize sequential Prisma counts with groupBy and Promise.all
+**Learning:** In the backend, there are instances (like in `performanceController.js`) where multiple sequential `prisma.*.count` calls share overlapping base conditions (e.g., `assigned_user_id`), causing compounded latency, especially within mapping loops.
+**Action:** Replace overlapping concurrent or sequential `prisma.*.count` calls with a single `prisma.*.groupBy` query using `_count: { _all: true }`, and use `Promise.all` for completely independent queries. Access the count from the grouped result using `group._count._all`.
