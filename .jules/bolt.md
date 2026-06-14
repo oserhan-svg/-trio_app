@@ -1,0 +1,3 @@
+## 2024-06-15 - Optimize Performance Controller with GroupBy
+**Learning:** Prisma's `.count()` in a loop creates significant N+1 query bottlenecks. Prisma doesn't allow `.groupBy` over relations directly, but you can achieve batched counting by grouping main fields, and fetching related field references with `findMany` using `select` to group locally for relation counts.
+**Action:** Replace looped `prisma.*.count()` calls with `Promise.all` containing `prisma.*.groupBy` and `findMany` queries mapped to lookup objects. Ensure `groupBy` counts are extracted properly using `g._count._all`.
