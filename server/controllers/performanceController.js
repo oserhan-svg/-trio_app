@@ -23,46 +23,26 @@ exports.getConsultantPerformance = async (req, res) => {
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
         const performanceData = await Promise.all(consultants.map(async (c) => {
-            // Count Sale listings
-            const saleCount = await prisma.property.count({
-                where: {
-                    assigned_user_id: c.id,
-                    listing_type: 'sale'
-                }
-            });
+            // ⚡ Bolt: Use groupBy to consolidate property counts and Promise.all to fetch remaining stats concurrently
+            const [propertyStats, newPortfolioCount, interactionCount, completedTasks] = await Promise.all([
+                prisma.property.groupBy({
+                    by: ['listing_type'],
+                    where: { assigned_user_id: c.id },
+                    _count: { _all: true }
+                }),
+                prisma.property.count({
+                    where: { assigned_user_id: c.id, created_at: { gte: startOfMonth } }
+                }),
+                prisma.interaction.count({
+                    where: { client: { consultant_id: c.id }, date: { gte: startOfMonth } }
+                }),
+                prisma.agendaItem.count({
+                    where: { user_id: c.id, status: 'completed', start_at: { gte: startOfMonth } }
+                })
+            ]);
 
-            // Count Rent listings
-            const rentCount = await prisma.property.count({
-                where: {
-                    assigned_user_id: c.id,
-                    listing_type: 'rent'
-                }
-            });
-
-            // New portfolios (Properties assigned this month)
-            const newPortfolioCount = await prisma.property.count({
-                where: {
-                    assigned_user_id: c.id,
-                    created_at: { gte: startOfMonth }
-                }
-            });
-
-            // Interactions made (via clients assigned to them)
-            const interactionCount = await prisma.interaction.count({
-                where: {
-                    client: { consultant_id: c.id },
-                    date: { gte: startOfMonth }
-                }
-            });
-
-            // Completed Agenda tasks
-            const completedTasks = await prisma.agendaItem.count({
-                where: {
-                    user_id: c.id,
-                    status: 'completed',
-                    start_at: { gte: startOfMonth }
-                }
-            });
+            const saleCount = propertyStats.find(p => p.listing_type === 'sale')?._count?._all || 0;
+            const rentCount = propertyStats.find(p => p.listing_type === 'rent')?._count?._all || 0;
 
             return {
                 id: c.id,
@@ -105,19 +85,21 @@ exports.getConsultantDetail = async (req, res) => {
         }
 
         const monthlyStats = await Promise.all(months.map(async (m) => {
-            const propertiesCount = await prisma.property.count({
-                where: {
-                    assigned_user_id: consultantId,
-                    created_at: { gte: m.start, lte: m.end }
-                }
-            });
-
-            const interactionsCount = await prisma.interaction.count({
-                where: {
-                    client: { consultant_id: consultantId },
-                    date: { gte: m.start, lte: m.end }
-                }
-            });
+            // ⚡ Bolt: Fetch month stats concurrently to avoid sequential database latency
+            const [propertiesCount, interactionsCount] = await Promise.all([
+                prisma.property.count({
+                    where: {
+                        assigned_user_id: consultantId,
+                        created_at: { gte: m.start, lte: m.end }
+                    }
+                }),
+                prisma.interaction.count({
+                    where: {
+                        client: { consultant_id: consultantId },
+                        date: { gte: m.start, lte: m.end }
+                    }
+                })
+            ]);
 
             return {
                 name: m.name,
