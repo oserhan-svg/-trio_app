@@ -1,0 +1,3 @@
+## 2025-02-12 - N+1 Client Analytics Optimization
+**Learning:** The `clientController.js` calculated `activeBuyers`, `activeSellers`, and `total` clients using multiple concurrent `prisma.client.count` calls querying identical sets with slight sub-filters. This pattern caused unnecessary multiple queries per request.
+**Action:** Replace overlapping `count` requests with a single `prisma.client.groupBy` grouped by the targeted filter fields (`type`, `status`) and sum the aggregated statistics locally in memory. Note: Ensure `_count: { _all: true }` is used instead of a boolean value for grouping fields.
