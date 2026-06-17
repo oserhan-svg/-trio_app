@@ -122,32 +122,18 @@ const getClients = async (req, res) => {
             }
         }
 
-        const [total, clients, activeBuyers, activeSellers, newThisMonth] = await Promise.all([
-            prisma.client.count({ where }),
+        const [groupedStats, clients, newThisMonth] = await Promise.all([
+            prisma.client.groupBy({
+                by: ['type', 'status'],
+                where,
+                _count: { _all: true }
+            }),
             prisma.client.findMany({
                 where,
                 include: { demands: true, consultant: { select: { email: true } } },
                 orderBy: { created_at: 'desc' },
                 skip,
                 take
-            }),
-            prisma.client.count({
-                where: {
-                    AND: [
-                        where,
-                        { type: 'buyer' },
-                        { status: 'Active' }
-                    ]
-                }
-            }),
-            prisma.client.count({
-                where: {
-                    AND: [
-                        where,
-                        { type: 'seller' },
-                        { status: 'Active' }
-                    ]
-                }
             }),
             prisma.client.count({
                 where: {
@@ -162,6 +148,19 @@ const getClients = async (req, res) => {
                 }
             })
         ]);
+
+        let total = 0;
+        let activeBuyers = 0;
+        let activeSellers = 0;
+
+        groupedStats.forEach(group => {
+            const count = group._count._all;
+            total += count;
+            if (group.status === 'Active') {
+                if (group.type === 'buyer') activeBuyers += count;
+                else if (group.type === 'seller') activeSellers += count;
+            }
+        });
 
         jsonBigInt(res, {
             data: clients,
