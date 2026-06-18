@@ -1,0 +1,3 @@
+## 2024-06-18 - AppShell Keyboard Accessibility & ARIA Support
+**Learning:** The main layout navigation (`AppShell.jsx`) relied entirely on visual states (Tailwind classes) and missing semantic aria tags for active elements (`aria-current`), menu states (`aria-expanded`), and icon-only buttons (`aria-label`). Focus states were generally disabled or ignored, failing strict keyboard accessibility criteria.
+**Action:** When creating custom button-based navigation items in this application, always enforce `aria-current="page"` when active, apply `aria-label` localized to Turkish for icon-only inputs/buttons, and explicitly map focus-states using `focus-visible:` utilities to prevent breaking mouse interactions while supporting tab navigation.
