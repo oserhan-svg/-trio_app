@@ -1,0 +1,3 @@
+## 2024-05-15 - Optimize N+1 Queries in Consultant Performance Stats
+**Learning:** The `getConsultantPerformance` function was iterating over each consultant and executing 5 separate database queries for each one, causing an N+1 query problem that degrades performance with many consultants. Prisma's `count` over relation fields directly does not work well, and standard `count` creates a bottleneck when looped.
+**Action:** Batched queries using `.groupBy` on the foreign keys of the target table, and used `findMany` to fetch records and aggregate the relation counts locally, transforming multiple N+1 queries into 4 aggregate queries.
