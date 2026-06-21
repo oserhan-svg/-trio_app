@@ -1,0 +1,4 @@
+## 2024-10-25 - Fix Permissive CORS Configuration
+**Vulnerability:** The Express app and Socket.io server used a permissive CORS configuration where they allowed all origins (by returning `callback(null, true)`) while also enabling `credentials: true`.
+**Learning:** Returning `callback(null, true)` for all origins when `credentials: true` is set effectively defeats CORS protections and allows unauthorized cross-origin requests to execute with the user's session credentials.
+**Prevention:** Always explicitly reject unknown origins using `callback(new Error('Not allowed by CORS'))` when configuring CORS dynamically, especially when credentials are permitted.
