@@ -1,0 +1,3 @@
+## 2024-05-19 - Promise.all() for sequential dashboard count queries
+**Learning:** Sequential Prisma `.count()` calls in `adminController.js` were executing synchronously, creating an N+1 like delay for dashboard statistics. The codebase handles independent aggregation queries better when batched concurrently.
+**Action:** Always wrap independent, non-dependent database queries in `Promise.all()` to execute them concurrently and reduce overall response time.

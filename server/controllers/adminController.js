@@ -2,31 +2,33 @@ const prisma = require('../db');
 
 exports.getDashboardStats = async (req, res) => {
     try {
-        // 1. Total Properties
-        const totalProperties = await prisma.property.count();
-
-        // 2. By Source
-        const sahibindenCount = await prisma.property.count({
-            where: { url: { contains: 'sahibinden.com' } }
-        });
-
-        const hepsiemlakCount = await prisma.property.count({
-            where: {
-                OR: [
-                    { url: { contains: 'hepsiemlak.com' } },
-                    { url: { contains: 'hemlak.com' } }
-                ]
-            }
-        });
-
-        const emlakjetCount = await prisma.property.count({
-            where: { url: { contains: 'emlakjet.com' } }
-        });
-
-        // 3. Assignment Stats
-        const assignedCount = await prisma.property.count({
-            where: { assigned_user_id: { not: null } }
-        });
+        // 1. Execute independent count queries concurrently
+        const [
+            totalProperties,
+            sahibindenCount,
+            hepsiemlakCount,
+            emlakjetCount,
+            assignedCount
+        ] = await Promise.all([
+            prisma.property.count(),
+            prisma.property.count({
+                where: { url: { contains: 'sahibinden.com' } }
+            }),
+            prisma.property.count({
+                where: {
+                    OR: [
+                        { url: { contains: 'hepsiemlak.com' } },
+                        { url: { contains: 'hemlak.com' } }
+                    ]
+                }
+            }),
+            prisma.property.count({
+                where: { url: { contains: 'emlakjet.com' } }
+            }),
+            prisma.property.count({
+                where: { assigned_user_id: { not: null } }
+            })
+        ]);
 
         // 4. Duplicate / similar (Approximation for 'Mükerrer')
         // Ideally we check for same external_id or similar title+price
