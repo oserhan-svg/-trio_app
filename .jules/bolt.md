@@ -1,0 +1,3 @@
+## 2025-06-25 - Fix N+1 bottlenecks on consultant performance counts
+**Learning:** The previous implementation executed multiple `prisma.*.count` calls in a map loop, which resulted in N+1 database queries. I learned that Prisma does not support `.groupBy` directly over relation fields, but we can fix N+1 bottlenecks for relation counts by batch queries using `.groupBy` on foreign keys of the target table.
+**Action:** Replaced multiple sequential `count` calls sharing a loop with a batch `prisma.*.groupBy` fetch mapped in memory. Next time, I will pre-emptively use grouped counts mapped locally when computing summary statistics for a list of items to avoid the N+1 problem.
