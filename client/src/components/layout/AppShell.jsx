@@ -258,7 +258,9 @@ const AppShell = ({ children }) => {
                     <div className="flex items-center gap-4 md:gap-6">
                         <button
                             onClick={() => setSidebarOpen(!sidebarOpen)}
-                            className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-500 hover:text-blue-600 hover:shadow-md transition-all active:scale-90"
+                            className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-500 hover:text-blue-600 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 transition-all active:scale-90"
+                            aria-label={sidebarOpen ? 'Menüyü kapat' : 'Menüyü aç'}
+                            title={sidebarOpen ? 'Menüyü kapat' : 'Menüyü aç'}
                         >
                             <Menu size={20} />
                         </button>
@@ -272,20 +274,25 @@ const AppShell = ({ children }) => {
                     </div>
 
                     <div className="flex items-center gap-2 md:gap-4">
-                        <div className="hidden sm:flex items-center gap-2 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                        <div className="hidden sm:flex items-center gap-2 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 focus-within:ring-2 focus-within:ring-blue-500">
                             <Search size={16} className="text-slate-300" />
-                            <input type="text" placeholder="Hızlı ara..." className="bg-transparent border-none text-xs font-bold focus:ring-0 w-32 outline-none dark:text-white" />
+                            <input type="text" placeholder="Hızlı ara..." aria-label="Hızlı ara" className="bg-transparent border-none text-xs font-bold focus:ring-0 w-32 outline-none dark:text-white" />
                         </div>
 
                         <button
                             onClick={toggleTheme}
-                            className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 hover:shadow-md transition-all active:scale-90"
+                            className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 transition-all active:scale-90"
                             title={theme === 'light' ? 'Karanlık Mod' : 'Aydınlık Mod'}
+                            aria-label={theme === 'light' ? 'Karanlık Moda Geç' : 'Aydınlık Moda Geç'}
                         >
                             {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
                         </button>
 
-                        <button className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-400 hover:text-rose-500 hover:shadow-md transition-all relative group">
+                        <button
+                            className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-400 hover:text-rose-500 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 transition-all relative group"
+                            aria-label="Bildirimler"
+                            title="Bildirimler"
+                        >
                             <Bell size={20} className="group-hover:animate-bounce" />
                             <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-rose-500 border-2 border-white dark:border-slate-800 rounded-full"></span>
                         </button>
