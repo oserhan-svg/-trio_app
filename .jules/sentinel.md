@@ -1,0 +1,4 @@
+## 2024-06-25 - Permissive CORS Configuration with Credentials
+**Vulnerability:** CORS was configured to reflect the request's origin and allow credentials for any origin (`callback(null, true)`), leading to potential Cross-Origin Resource Sharing vulnerabilities.
+**Learning:** Returning `callback(null, true)` for unknown origins while `credentials: true` is enabled defeats the purpose of CORS and allows any site to perform authenticated requests.
+**Prevention:** Always explicitly deny unknown origins using `callback(new Error('Not allowed by CORS'))` and never use a permissive fallback when credentials are required.
