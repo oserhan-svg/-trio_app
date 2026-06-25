@@ -1,0 +1,4 @@
+## 2025-01-20 - Fix Overly Permissive CORS with Credentials
+**Vulnerability:** CORS policies in both `server/index.js` and `server/services/socketService.js` were configured with `credentials: true` while effectively allowing all origins by either returning `callback(null, true)` for unknown origins or globally ignoring the origin check. This is a severe security risk that exposes authenticated users to Cross-Site Request Forgery (CSRF) and data theft if an attacker makes cross-origin requests from a malicious site.
+**Learning:** Returning `callback(null, true)` as a fallback for unknown origins essentially bypasses the CORS mechanism when `credentials` are enabled, defeating the purpose of the allowlist.
+**Prevention:** Always enforce strict origin allowlists and explicitly reject unknown origins with `callback(new Error('Not allowed by CORS'))` when `credentials: true` is enabled.
