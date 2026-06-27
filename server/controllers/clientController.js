@@ -122,7 +122,10 @@ const getClients = async (req, res) => {
             }
         }
 
-        const [total, clients, activeBuyers, activeSellers, newThisMonth] = await Promise.all([
+        // ⚡ Bolt Performance Optimization:
+        // Replaced multiple Prisma count queries with a single groupBy query.
+        // Impact: Reduces concurrent database calls from 5 to 4, lowering DB overhead and potentially improving endpoint latency.
+        const [total, clients, groupStats, newThisMonth] = await Promise.all([
             prisma.client.count({ where }),
             prisma.client.findMany({
                 where,
@@ -131,23 +134,10 @@ const getClients = async (req, res) => {
                 skip,
                 take
             }),
-            prisma.client.count({
-                where: {
-                    AND: [
-                        where,
-                        { type: 'buyer' },
-                        { status: 'Active' }
-                    ]
-                }
-            }),
-            prisma.client.count({
-                where: {
-                    AND: [
-                        where,
-                        { type: 'seller' },
-                        { status: 'Active' }
-                    ]
-                }
+            prisma.client.groupBy({
+                by: ['type', 'status'],
+                where,
+                _count: { _all: true }
             }),
             prisma.client.count({
                 where: {
@@ -162,6 +152,15 @@ const getClients = async (req, res) => {
                 }
             })
         ]);
+
+        let activeBuyers = 0;
+        let activeSellers = 0;
+        groupStats.forEach(g => {
+            if (g.status === 'Active') {
+                if (g.type === 'buyer') activeBuyers += g._count._all;
+                else if (g.type === 'seller') activeSellers += g._count._all;
+            }
+        });
 
         jsonBigInt(res, {
             data: clients,
