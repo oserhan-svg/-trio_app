@@ -1,0 +1,3 @@
+## 2024-06-26 - Keyboard Navigation Focus Indicators
+**Learning:** In layout components like AppShell, interactive icon-only buttons (like menu toggle, notifications, theme switch) frequently omit visible focus indicators and `aria-label`s, preventing keyboard users from discerning their active focus or purpose.
+**Action:** Always add explicit `focus-visible:ring-*` utility classes to topbar interactive elements and `focus-within:ring-*` to search wrappers, along with descriptive `aria-label`s.
