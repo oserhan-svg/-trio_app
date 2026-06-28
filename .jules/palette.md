@@ -1,0 +1,3 @@
+## 2024-06-28 - Missing Interactive Element Accessibility in Navigation Shell
+**Learning:** Core application shell components containing global interactive elements (menu toggles, themes, notifications, search bars) were missing critical keyboard focus indicators (`focus-visible:ring-2`) and `aria-label` attributes for icon-only buttons.
+**Action:** Always ensure all icon-only buttons have descriptive `aria-label`s localized to the app's language, and interactive wrapper elements have `focus-within` or `focus-visible` to support clear keyboard navigation. Added these to `AppShell.jsx`.
