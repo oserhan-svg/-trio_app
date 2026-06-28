@@ -8,7 +8,19 @@ class SocketService {
     initialize(server) {
         this.io = socketIo(server, {
             cors: {
-                origin: (origin, callback) => callback(null, true), // Allow all for socket
+                origin: (origin, callback) => {
+                    const allowedOrigins = [
+                        'https://trio-app.pages.dev',
+                        'https://trio-client.pages.dev',
+                        'http://localhost:5173',
+                        'http://localhost:3000'
+                    ];
+                    if (!origin || allowedOrigins.includes(origin) || origin.includes('localhost') || origin.startsWith('chrome-extension://')) {
+                        callback(null, true);
+                    } else {
+                        callback(new Error('Not allowed by CORS'));
+                    }
+                },
                 methods: ["GET", "POST"],
                 credentials: true
             },
