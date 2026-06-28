@@ -1,0 +1,3 @@
+## 2024-05-24 - Resolve N+1 Queries in Performance Controller
+**Learning:** `prisma.*.count` calls in an iteration block for lists (e.g. mapping over users to calculate their performance metrics) creates massive N+1 query overhead.
+**Action:** Replace looped `.count()` queries by batching with `prisma.*.groupBy()` using related IDs (e.g., grouped by user_id/assigned_user_id with `_count: { _all: true }`) or simple `.findMany` where `groupBy` is incompatible across relation fields, significantly lowering the total number of DB interactions.
