@@ -1,0 +1,3 @@
+## 2024-06-28 - Fix N+1 queries using groupBy in performanceController
+**Learning:** In Prisma, calculating related statistics per entity in a loop using `Promise.all(entities.map(e => prisma.table.count({where: {id: e.id}})))` causes N+1 query bottlenecks.
+**Action:** Replace `entities.map` loop counting with batched `.groupBy` queries referencing the foreign keys (`assigned_user_id` or `user_id`) to significantly reduce database round-trips from N queries down to just 1 batch query per related table. Since `interaction` does not directly have the `consultant_id` column, `findMany` is an acceptable performant fallback.
