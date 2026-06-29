@@ -1,0 +1,4 @@
+## 2024-06-28 - Fix Overly Permissive CORS Configurations
+**Vulnerability:** Both Express and Socket.io configurations used a permissive fallback (`callback(null, true)`) for unknown origins while `credentials: true` was enabled, exposing the application to Cross-Site Request Forgery (CSRF) and unauthorized access.
+**Learning:** The permissive fallback was applied consistently across different services (Express and Socket.io), suggesting a systemic misunderstanding of CORS policies when `credentials: true` is used.
+**Prevention:** Always explicitly deny unknown origins by returning an error (`callback(new Error('Not allowed by CORS'))`) rather than using a permissive fallback.
