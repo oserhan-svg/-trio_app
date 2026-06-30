@@ -1,0 +1,3 @@
+## 2024-06-30 - Prisma GroupBy on Relations
+**Learning:** Prisma does not support `.groupBy` directly over relation fields. When trying to resolve N+1 bottlenecks for relation counts (like counting interactions grouped by the client's consultant_id), a standard `.groupBy` fails.
+**Action:** Batch queries by using `findMany` with an `in: [...]` clause to fetch targeted minimal records (e.g., `select: { client: { select: { consultant_id: true } } }`), and aggregate the relation counts locally via iterating in-memory.
