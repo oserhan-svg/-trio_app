@@ -22,62 +22,71 @@ exports.getConsultantPerformance = async (req, res) => {
         const now = new Date();
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-        const performanceData = await Promise.all(consultants.map(async (c) => {
-            // Count Sale listings
-            const saleCount = await prisma.property.count({
-                where: {
-                    assigned_user_id: c.id,
-                    listing_type: 'sale'
-                }
-            });
+        const consultantIds = consultants.map(c => c.id);
 
-            // Count Rent listings
-            const rentCount = await prisma.property.count({
-                where: {
-                    assigned_user_id: c.id,
-                    listing_type: 'rent'
-                }
-            });
+        // ⚡ Bolt: Fix N+1 query bottleneck by batching queries with Prisma .groupBy and .findMany.
+        // Previously made 5 separate DB queries per consultant (O(N) queries). Now makes exactly 4 queries total (O(1)).
+        const [propertyStatsRaw, newPortfoliosRaw, completedTasksRaw, recentInteractionsRaw] = await Promise.all([
+            prisma.property.groupBy({
+                by: ['assigned_user_id', 'listing_type'],
+                where: { assigned_user_id: { in: consultantIds } },
+                _count: { _all: true }
+            }),
+            prisma.property.groupBy({
+                by: ['assigned_user_id'],
+                where: { assigned_user_id: { in: consultantIds }, created_at: { gte: startOfMonth } },
+                _count: { _all: true }
+            }),
+            prisma.agendaItem.groupBy({
+                by: ['user_id'],
+                where: { user_id: { in: consultantIds }, status: 'completed', start_at: { gte: startOfMonth } },
+                _count: { _all: true }
+            }),
+            prisma.interaction.findMany({
+                where: { client: { consultant_id: { in: consultantIds } }, date: { gte: startOfMonth } },
+                select: { client: { select: { consultant_id: true } } }
+            })
+        ]);
 
-            // New portfolios (Properties assigned this month)
-            const newPortfolioCount = await prisma.property.count({
-                where: {
-                    assigned_user_id: c.id,
-                    created_at: { gte: startOfMonth }
-                }
-            });
+        const saleMap = {};
+        const rentMap = {};
+        propertyStatsRaw.forEach(stat => {
+            if (!stat.assigned_user_id) return;
+            if (stat.listing_type === 'sale') saleMap[stat.assigned_user_id] = stat._count._all;
+            if (stat.listing_type === 'rent') rentMap[stat.assigned_user_id] = stat._count._all;
+        });
 
-            // Interactions made (via clients assigned to them)
-            const interactionCount = await prisma.interaction.count({
-                where: {
-                    client: { consultant_id: c.id },
-                    date: { gte: startOfMonth }
-                }
-            });
+        const newPortfolioMap = {};
+        newPortfoliosRaw.forEach(stat => {
+            if (stat.assigned_user_id) newPortfolioMap[stat.assigned_user_id] = stat._count._all;
+        });
 
-            // Completed Agenda tasks
-            const completedTasks = await prisma.agendaItem.count({
-                where: {
-                    user_id: c.id,
-                    status: 'completed',
-                    start_at: { gte: startOfMonth }
-                }
-            });
+        const completedTasksMap = {};
+        completedTasksRaw.forEach(stat => {
+            if (stat.user_id) completedTasksMap[stat.user_id] = stat._count._all;
+        });
 
+        const interactionMap = {};
+        recentInteractionsRaw.forEach(i => {
+            const cid = i.client?.consultant_id;
+            if (cid) interactionMap[cid] = (interactionMap[cid] || 0) + 1;
+        });
+
+        const performanceData = consultants.map(c => {
             return {
                 id: c.id,
                 email: c.email,
                 name: c.name,
                 stats: {
                     total_clients: c._count.clients,
-                    active_sale: saleCount,
-                    active_rent: rentCount,
-                    new_portfolio_monthly: newPortfolioCount,
-                    interactions_monthly: interactionCount,
-                    completed_tasks_monthly: completedTasks
+                    active_sale: saleMap[c.id] || 0,
+                    active_rent: rentMap[c.id] || 0,
+                    new_portfolio_monthly: newPortfolioMap[c.id] || 0,
+                    interactions_monthly: interactionMap[c.id] || 0,
+                    completed_tasks_monthly: completedTasksMap[c.id] || 0
                 }
             };
-        }));
+        });
 
         res.json(performanceData);
     } catch (error) {
