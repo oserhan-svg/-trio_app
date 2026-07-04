@@ -1,0 +1,4 @@
+## 2024-05-18 - Overly Permissive CORS Configurations
+**Vulnerability:** Express and Socket.io were configured to allow all origins while `credentials: true` was enabled. Express fallback explicitly returned `callback(null, true)` for unknown origins.
+**Learning:** Permissive fallbacks during development often make it to production. Allowing credentials with unrestricted origins exposes APIs and WebSockets to CSRF and CSWSH vulnerabilities.
+**Prevention:** Always default to denying unknown origins by returning `callback(new Error('Not allowed by CORS'))`. Enforce strict whitelists in all CORS configurations.
