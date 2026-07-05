@@ -1,0 +1,5 @@
+## 2024-05-24 - Screen reader and keyboard navigation fixes for top header
+
+**Learning:** When generating interactive Playwright verification scripts on complex React layouts (like the AppShell header containing multiple icons that toggle states or have dynamic classes), generic locators (`[aria-label="..."]`) can fail if components render conditionally or overlap. Using `nth()` or `first` with structural selectors (e.g., `header button`) proves much more resilient for forcing focus states to verify keyboard accessibility rings (`focus-visible`).
+
+**Action:** When building frontend visual verification scripts for UI components with dynamic states, rely on structural DOM queries and wait for visibility explicitly before attempting to simulate keyboard interactions, especially when bypassing complex authentication logic.
