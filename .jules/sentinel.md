@@ -1,0 +1,4 @@
+## 2025-02-23 - Overly Permissive CORS Configurations
+**Vulnerability:** The Express and Socket.IO servers used `callback(null, true)` as a fallback for the `origin` check, allowing any origin to bypass CORS restrictions while `credentials: true` was enabled.
+**Learning:** This occurred due to a misunderstanding of how the callback function works when handling origins in development or for unknown apps. While aiming for flexibility (like allowing local dev and Chrome extensions), developers inadvertently created a wildcard allowlist.
+**Prevention:** Always explicitly deny unknown origins using `callback(new Error('Not allowed by CORS'))`. If multiple dynamic origins are needed, strictly check them against regex or functional logic rather than defaulting to `true`.
