@@ -1,0 +1,4 @@
+## 2025-01-22 - Overly Permissive CORS with Credentials
+**Vulnerability:** CORS configuration returned `callback(null, true)` for all origins even when `credentials: true` was enabled, which can expose authenticated cross-origin requests to arbitrary domains.
+**Learning:** It existed as a permissive fallback in Express (`server/index.js`) and a wildcard in Socket.io (`server/services/socketService.js`) likely to bypass development friction, but it negates CORS protection entirely.
+**Prevention:** Always explicitly deny unknown origins by returning an error (`callback(new Error('Not allowed by CORS'))`) in CORS origin functions, especially when credentials are true. Do not use permissive fallbacks in production endpoints.
