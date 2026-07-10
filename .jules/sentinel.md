@@ -1,0 +1,4 @@
+## 2024-03-05 - Insecure Default CORS Fallbacks
+**Vulnerability:** Overly permissive CORS configuration allowing any origin to access the API and WebSocket server.
+**Learning:** Developers sometimes implement a "soft allow" fallback (logging a warning but returning `true`) to avoid blocking unexpected legitimate traffic (like Chrome extensions or local dev servers) during active development, unintentionally leaving production APIs vulnerable to CSRF and unauthorized cross-origin access.
+**Prevention:** Always default to a strict `deny` for unknown origins in CORS configurations, especially when `credentials: true` is enabled. Explicitly list all required origins (including specific extension IDs if necessary) instead of using a permissive catch-all.
