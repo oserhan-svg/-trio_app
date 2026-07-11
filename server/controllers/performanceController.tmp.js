@@ -23,37 +23,32 @@ exports.getConsultantPerformance = async (req, res) => {
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
         const performanceData = await Promise.all(consultants.map(async (c) => {
-            // ⚡ Bolt: Batch independent DB counts concurrently to prevent sequential N+1 delays
+            // Count Sale listings
             const [saleCount, rentCount, newPortfolioCount, interactionCount, completedTasks] = await Promise.all([
-                // Count Sale listings
                 prisma.property.count({
                     where: {
                         assigned_user_id: c.id,
                         listing_type: 'sale'
                     }
                 }),
-                // Count Rent listings
                 prisma.property.count({
                     where: {
                         assigned_user_id: c.id,
                         listing_type: 'rent'
                     }
                 }),
-                // New portfolios (Properties assigned this month)
                 prisma.property.count({
                     where: {
                         assigned_user_id: c.id,
                         created_at: { gte: startOfMonth }
                     }
                 }),
-                // Interactions made (via clients assigned to them)
                 prisma.interaction.count({
                     where: {
                         client: { consultant_id: c.id },
                         date: { gte: startOfMonth }
                     }
                 }),
-                // Completed Agenda tasks
                 prisma.agendaItem.count({
                     where: {
                         user_id: c.id,
@@ -104,7 +99,6 @@ exports.getConsultantDetail = async (req, res) => {
         }
 
         const monthlyStats = await Promise.all(months.map(async (m) => {
-            // ⚡ Bolt: Fetch month statistics concurrently
             const [propertiesCount, interactionsCount] = await Promise.all([
                 prisma.property.count({
                     where: {
