@@ -259,6 +259,8 @@ const AppShell = ({ children }) => {
                         <button
                             onClick={() => setSidebarOpen(!sidebarOpen)}
                             className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-500 hover:text-blue-600 hover:shadow-md transition-all active:scale-90"
+                            title={"Men\u00fcy\u00fc a\u00e7/kapat"}
+                            aria-label={"Men\u00fcy\u00fc a\u00e7/kapat"}
                         >
                             <Menu size={20} />
                         </button>
@@ -274,18 +276,28 @@ const AppShell = ({ children }) => {
                     <div className="flex items-center gap-2 md:gap-4">
                         <div className="hidden sm:flex items-center gap-2 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
                             <Search size={16} className="text-slate-300" />
-                            <input type="text" placeholder="Hızlı ara..." className="bg-transparent border-none text-xs font-bold focus:ring-0 w-32 outline-none dark:text-white" />
+                            <input
+                                type="text"
+                                placeholder={"H\u0131zl\u0131 ara..."}
+                                aria-label={"H\u0131zl\u0131 ara"}
+                                className="bg-transparent border-none text-xs font-bold focus:ring-0 w-32 outline-none dark:text-white"
+                            />
                         </div>
 
                         <button
                             onClick={toggleTheme}
                             className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 hover:shadow-md transition-all active:scale-90"
-                            title={theme === 'light' ? 'Karanlık Mod' : 'Aydınlık Mod'}
+                            title={theme === 'light' ? 'Karanl\u0131k Mod' : 'Ayd\u0131nl\u0131k Mod'}
+                            aria-label={theme === 'light' ? 'Karanl\u0131k Moda Ge\u00e7' : 'Ayd\u0131nl\u0131k Moda Ge\u00e7'}
                         >
                             {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
                         </button>
 
-                        <button className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-400 hover:text-rose-500 hover:shadow-md transition-all relative group">
+                        <button
+                            className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-400 hover:text-rose-500 hover:shadow-md transition-all relative group"
+                            title={"Bildirimler"}
+                            aria-label={"Bildirimler"}
+                        >
                             <Bell size={20} className="group-hover:animate-bounce" />
                             <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-rose-500 border-2 border-white dark:border-slate-800 rounded-full"></span>
                         </button>
