@@ -1,0 +1,3 @@
+## 2025-02-12 - Prevent N+1 Prisma execution on count aggregates
+**Learning:** Making sequential `await prisma.*.count()` calls in controller logic causes an N+1 execution pattern that delays overall response time proportional to the number of individual aggregate queries, since each awaits the DB individually.
+**Action:** Always wrap independent `prisma.*.count` (or similar standalone aggregations) in a `Promise.all()` to execute them concurrently against the database pool. If conditions overlap and `contains` isn't used, prefer grouping them via `prisma.*.groupBy`, but for distinct and partial matches, `Promise.all` provides a massive execution time optimization (reducing time to just the slowest query).
