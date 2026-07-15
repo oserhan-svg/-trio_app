@@ -1,0 +1,4 @@
+## 2024-07-15 - Missing Authentication on Internal Migration Endpoint
+**Vulnerability:** The `/internal/migrate` endpoint in `server/routes/dealRoutes.js` executed `prisma migrate dev` via `child_process.exec` without any authentication or authorization checks, allowing anyone to trigger database migrations.
+**Learning:** Internal administrative routes were left unsecured, likely during development or testing, exposing critical system infrastructure to unauthenticated external actors.
+**Prevention:** Always apply authentication and role-based access control (RBAC) middleware to internal or administrative endpoints by default.
