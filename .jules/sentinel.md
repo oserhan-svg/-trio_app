@@ -1,0 +1,4 @@
+## 2025-02-14 - Fix authorization bypass in internal API
+**Vulnerability:** The `/internal/migrate` endpoint in `server/routes/dealRoutes.js` executed arbitrary shell commands (`prisma migrate dev`) without any authentication (`authenticateToken`) or authorization (`authorizeRole`), exposing critical internal operations.
+**Learning:** Routes designed for internal maintenance or development commands (like database migrations) might be added quickly without standard security middleware attached, especially if placed at the end of route files or considered "hidden".
+**Prevention:** Always enforce strict role-based access control (e.g., `authorizeRole('admin')`) on any endpoint that triggers server-side command execution or database schema changes, regardless of its "internal" naming convention.
