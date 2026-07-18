@@ -1,0 +1,3 @@
+## 2024-05-24 - Unicode Encoding in JSX Strings
+**Learning:** When injecting translated strings containing special characters (like Turkish 'ı', 'Ç', 'ş') into JSX props (like `placeholder="..."` or `aria-label="..."`) using `replace_with_git_merge_diff`, passing literal Unicode escape sequences directly in string attributes (e.g. `placeholder="\u0131"`) causes React to render the backslash literal.
+**Action:** Always wrap string literals containing Unicode escape sequences directly in JSX curly braces (e.g., `placeholder={"H\u0131zl\u0131 ara..."}`) to ensure React parses the escape sequences correctly during compilation.
