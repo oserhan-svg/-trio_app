@@ -1,0 +1,3 @@
+## 2024-07-22 - N+1 Bottleneck in Analytics & Admin Dashboards
+**Learning:** Making multiple independent `await prisma.*.count()` calls sequentially introduces an N+1 bottleneck. This codebase uses it heavily in stats computation like `server/controllers/analyticsController.js` and `server/controllers/adminController.js`. Since counting properties by different domains uses `contains` filters which aren't compatible with `groupBy`, they must remain as separate queries.
+**Action:** Always batch these independent Prisma aggregate queries using `Promise.all` to run them concurrently, significantly reducing response times.
