@@ -1,0 +1,4 @@
+## 2024-05-18 - Unauthenticated Command Execution and Error Leakage
+**Vulnerability:** The `/api/deals/internal/migrate` endpoint executed a shell command (`prisma migrate dev`) using `exec` without any authentication or authorization checks. Furthermore, the route exposed raw `stderr` output in its error response.
+**Learning:** Internal tooling routes added for convenience (like running migrations) are often overlooked during security reviews, leaving critical infrastructure exposed to unauthenticated users, and error objects in generic try-catch/callback patterns often contain stack traces or environment details.
+**Prevention:** Ensure all routes, even internal or admin-focused ones, explicitly utilize authorization middleware (e.g., `isAdmin`). Never return raw `stderr` or internal error variables in production API responses; always map them to generic user-facing messages.
