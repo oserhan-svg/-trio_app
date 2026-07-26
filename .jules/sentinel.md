@@ -1,0 +1,4 @@
+## 2024-05-23 - Unauthenticated Internal Migration and Output Leakage
+**Vulnerability:** An internal migration endpoint (`/internal/migrate`) lacked authentication/authorization, allowing anyone to trigger database migrations. In addition, the route leaked raw stderr and error message outputs from `child_process.exec`.
+**Learning:** Internal tool/utility routes are often easily overlooked during standard authentication middleware application because they might be meant for quick administrative operations but they remain publicly accessible. System outputs (stdout/stderr) from child_process expose environment internals.
+**Prevention:** Always ensure any endpoint performing state changes, especially administrative/database operations, applies appropriate role-based authorization (e.g., `isAdmin`). Always sanitize outputs of executed system commands to prevent internal information leakage.
