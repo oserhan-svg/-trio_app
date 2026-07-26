@@ -1,0 +1,3 @@
+## 2024-07-25 - Missing ARIA labels and focus indicators on icon-only carousel buttons
+**Learning:** Found that custom navigation buttons in `OpportunityCarousel.jsx` (`ChevronLeft`/`ChevronRight` icons) completely lacked `aria-label` attributes and keyboard focus styling (`focus-visible`). This makes them invisible to screen readers and difficult to use via keyboard navigation. The application UI is localized in Turkish.
+**Action:** Always add localized `aria-label` attributes (e.g., "Önceki", "Sonraki") to icon-only buttons. Add `focus-visible:outline-none focus-visible:ring-2` (matching the active theme color, e.g., `focus-visible:ring-emerald-500`) to ensure keyboard accessibility.
