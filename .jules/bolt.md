@@ -1,0 +1,3 @@
+## 2025-02-14 - Batching Prisma counts with contains
+**Learning:** Sequential Prisma queries introduce a significant N+1 bottleneck. While `prisma.groupBy` is generally the best approach for batching counts, it does not support partial text matching operators like `contains`.
+**Action:** When calculating statistics using `contains` matching (e.g. counting URLs for different external sources), batch the independent `.count()` calls using `Promise.all` to ensure concurrent execution without hitting database limitations.
