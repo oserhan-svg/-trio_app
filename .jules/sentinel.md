@@ -1,0 +1,4 @@
+## 2024-05-23 - Internal Utility Endpoint Exposing Command Output
+**Vulnerability:** The `/api/deals/internal/migrate` endpoint lacked authentication and executed a database migration command using `child_process.exec()`, leaking both `stdout` and `stderr` to the client. This is a critical security vulnerability as it allows unauthenticated users to trigger database operations and view internal system paths/errors.
+**Learning:** Internal tool endpoints or scripts occasionally slip into production routes without proper `isAdmin` middleware or output sanitization, exposing sensitive details.
+**Prevention:** Always secure internal administrative routes with robust authentication (e.g., `isAdmin`) and ensure that command executions or internal errors are sanitized before returning to the client to avoid leaking stack traces or system state.
