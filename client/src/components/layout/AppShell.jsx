@@ -259,6 +259,8 @@ const AppShell = ({ children }) => {
                         <button
                             onClick={() => setSidebarOpen(!sidebarOpen)}
                             className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-500 hover:text-blue-600 hover:shadow-md transition-all active:scale-90"
+                            title="Menüyü aç/kapat"
+                            aria-label="Menüyü aç/kapat"
                         >
                             <Menu size={20} />
                         </button>
@@ -285,7 +287,11 @@ const AppShell = ({ children }) => {
                             {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
                         </button>
 
-                        <button className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-400 hover:text-rose-500 hover:shadow-md transition-all relative group">
+                        <button
+                            className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-400 hover:text-rose-500 hover:shadow-md transition-all relative group"
+                            title="Bildirimler"
+                            aria-label="Bildirimler"
+                        >
                             <Bell size={20} className="group-hover:animate-bounce" />
                             <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-rose-500 border-2 border-white dark:border-slate-800 rounded-full"></span>
                         </button>
