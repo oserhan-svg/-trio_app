@@ -138,9 +138,12 @@ router.get('/stats', authenticateToken, async (req, res) => {
         const cacheKey = 'ai_stats:global';
 
         const stats = await CacheService.getOrSet(cacheKey, async () => {
-            const totalSessions = await prisma.aIChatSession.count();
-            const totalMessages = await prisma.aIChatMessage.count();
-            const totalKnowledge = await prisma.aIKnowledge.count();
+            // Batch independent database counts concurrently to improve performance
+            const [totalSessions, totalMessages, totalKnowledge] = await Promise.all([
+                prisma.aIChatSession.count(),
+                prisma.aIChatMessage.count(),
+                prisma.aIKnowledge.count()
+            ]);
 
             const knowledgeStats = await prisma.aIKnowledge.groupBy({
                 by: ['category'],
