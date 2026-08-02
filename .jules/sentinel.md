@@ -1,0 +1,4 @@
+## 2024-05-30 - Fix Unauthenticated Internal Command Execution
+**Vulnerability:** The `/internal/migrate` endpoint in dealRoutes allowed unauthenticated access to run a child_process `exec` command and leaked internal `stderr` to the client.
+**Learning:** Utility and migration routes need strict authentication (`isAdmin`), and shell command outputs should never be returned raw in API responses to prevent information leakage.
+**Prevention:** Always wrap internal utility endpoints with `isAdmin` middleware and sanitize error responses by catching and logging `stderr` serverside, returning generic error messages to clients.
