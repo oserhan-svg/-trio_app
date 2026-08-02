@@ -163,18 +163,19 @@ const WhatsAppSidebar = React.memo(({
                     >
                         <Activity size={20} />
                     </button>
-                    <button title="Yeni Sohbet">
+                    <button title="Yeni Sohbet" aria-label="Yeni Sohbet">
                         <MessageCircle size={20} />
                     </button>
                     <button
                         onClick={handleHardReset}
                         title="Verileri Temizle ve Tam Senkronizasyon Yap"
+                        aria-label="Verileri Temizle ve Tam Senkronizasyon Yap"
                         className="hover:text-rose-600 transition-colors relative"
                     >
                         <ShieldAlert size={20} className={isSyncing ? "animate-pulse" : ""} />
                         <span className="absolute -top-1 -right-1 w-2 h-2 bg-rose-500 rounded-full animate-ping opacity-75"></span>
                     </button>
-                    <button title="Menü">
+                    <button title="Menü" aria-label="Menü">
                         <MoreVertical size={20} />
                     </button>
                 </div>
