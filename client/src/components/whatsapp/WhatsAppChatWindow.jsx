@@ -259,7 +259,7 @@ const WhatsAppChatWindow = React.memo(({
                 >
                     <Search size={18} />
                 </button>
-                <button className="p-2.5 rounded-xl hover:bg-gray-100 text-slate-400 transition-colors">
+                <button className="p-2.5 rounded-xl hover:bg-gray-100 text-slate-400 transition-colors" title="Seçenekler" aria-label="Seçenekler">
                     <MoreVertical size={18} />
                 </button>
             </div>
@@ -426,10 +426,10 @@ const WhatsAppChatWindow = React.memo(({
 
                 <div className="flex items-center gap-3 px-2">
                     <div className="flex gap-1">
-                        <button className="p-2.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-xl transition-all active:scale-95">
+                        <button className="p-2.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-xl transition-all active:scale-95" title="Emoji Ekle" aria-label="Emoji Ekle">
                             <Smile size={24} />
                         </button>
-                        <button className="p-2.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-xl transition-all active:scale-95">
+                        <button className="p-2.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-xl transition-all active:scale-95" title="Dosya Ekle" aria-label="Dosya Ekle">
                             <Plus size={24} />
                         </button>
                     </div>
@@ -639,7 +639,7 @@ const WhatsAppChatWindow = React.memo(({
                         className="fixed inset-0 z-[200] bg-slate-900/95 backdrop-blur-sm flex items-center justify-center p-8 animate-in fade-in duration-300"
                         onClick={() => setSelectedImage(null)}
                     >
-                        <button className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors bg-white/10 p-3 rounded-full">
+                        <button className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors bg-white/10 p-3 rounded-full" title="Kapat" aria-label="Kapat">
                             <X size={32} />
                         </button>
                         <div className="relative max-w-5xl max-h-full group" onClick={e => e.stopPropagation()}>
