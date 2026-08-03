@@ -52,7 +52,7 @@ const SocialAssistantWidget = ({ property }) => {
                                 <span className="text-xs font-bold text-gray-500 uppercase tracking-wide flex items-center gap-1">
                                     <Instagram size={14} /> Gönderi Açıklaması
                                 </span>
-                                <button onClick={() => copyToClipboard(content.instagram)} className="text-gray-400 hover:text-blue-600">
+                                <button onClick={() => copyToClipboard(content.instagram)} aria-label="Instagram açıklamasını kopyala" className="text-gray-400 hover:text-blue-600">
                                     <Copy size={16} />
                                 </button>
                             </div>
@@ -67,7 +67,7 @@ const SocialAssistantWidget = ({ property }) => {
                                 <span className="text-xs font-bold text-gray-500 uppercase tracking-wide flex items-center gap-1">
                                     <Camera size={14} /> Hikaye Senaryosu
                                 </span>
-                                <button onClick={() => copyToClipboard(content.story)} className="text-gray-400 hover:text-blue-600">
+                                <button onClick={() => copyToClipboard(content.story)} aria-label="Hikaye senaryosunu kopyala" className="text-gray-400 hover:text-blue-600">
                                     <Copy size={16} />
                                 </button>
                             </div>
