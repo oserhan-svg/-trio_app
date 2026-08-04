@@ -1,0 +1,4 @@
+## 2024-05-24 - Unauthenticated Internal Migration Endpoint
+**Vulnerability:** The `/internal/migrate` endpoint in `dealRoutes.js` lacked authentication and exposed internal command execution errors (like `stderr`) to the client.
+**Learning:** Utility routes running child processes (`exec`) were left unprotected and unsanitized, likely due to being perceived as "internal only" but left publicly exposed on the web server.
+**Prevention:** Always apply the `isAdmin` middleware (which inherently handles authentication) to internal utility routes and explicitly sanitize `child_process.exec` responses to remove `stderr` or raw internal details.
