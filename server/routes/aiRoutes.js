@@ -138,20 +138,27 @@ router.get('/stats', authenticateToken, async (req, res) => {
         const cacheKey = 'ai_stats:global';
 
         const stats = await CacheService.getOrSet(cacheKey, async () => {
-            const totalSessions = await prisma.aIChatSession.count();
-            const totalMessages = await prisma.aIChatMessage.count();
-            const totalKnowledge = await prisma.aIKnowledge.count();
-
-            const knowledgeStats = await prisma.aIKnowledge.groupBy({
-                by: ['category'],
-                _count: true
-            });
-
-            const recentLearned = await prisma.aIKnowledge.findMany({
-                where: { title: { contains: 'Oto-Ders' } },
-                take: 3,
-                orderBy: { created_at: 'desc' }
-            });
+            // ⚡ Bolt: Batch independent Prisma queries to reduce sequential DB round-trips
+            const [
+                totalSessions,
+                totalMessages,
+                totalKnowledge,
+                knowledgeStats,
+                recentLearned
+            ] = await Promise.all([
+                prisma.aIChatSession.count(),
+                prisma.aIChatMessage.count(),
+                prisma.aIKnowledge.count(),
+                prisma.aIKnowledge.groupBy({
+                    by: ['category'],
+                    _count: true
+                }),
+                prisma.aIKnowledge.findMany({
+                    where: { title: { contains: 'Oto-Ders' } },
+                    take: 3,
+                    orderBy: { created_at: 'desc' }
+                })
+            ]);
 
             return {
                 totalSessions,
