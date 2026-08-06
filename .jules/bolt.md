@@ -1,0 +1,3 @@
+## 2024-08-06 - Prisma `contains` vs `groupBy` count queries
+**Learning:** In this real estate tracking app, we frequently count properties by source URL using the `contains` operator (e.g., `contains: 'sahibinden.com'`). Because `contains` is a partial string match, these queries cannot be optimized into a single `prisma.property.groupBy` call.
+**Action:** When aggregating counts across different external sources using partial matches, always batch independent `prisma.*.count` queries concurrently using `Promise.all` rather than sequential `await`s.
