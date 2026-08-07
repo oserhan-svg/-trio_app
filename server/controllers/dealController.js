@@ -198,9 +198,10 @@ const runInternalMigration = async (req, res) => {
     exec(command, (error, stdout, stderr) => {
         if (error) {
             console.error(`Migration Error: ${error.message}`);
-            return res.status(500).json({ error: error.message, stderr });
+            // Security: Sanitized error response to prevent leaking internal paths or stack traces
+            return res.status(500).json({ error: 'Internal migration failed.' });
         }
-        res.json({ message: 'Migration successful', stdout });
+        res.json({ message: 'Migration successful' });
     });
 };
 
