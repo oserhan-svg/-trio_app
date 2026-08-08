@@ -1,0 +1,3 @@
+## 2024-08-08 - Prisma GroupBy vs Promise.all
+**Learning:** Multiple sequential `prisma.property.count()` calls sharing overlapping conditions are an anti-pattern. However, when conditions use partial matching operators like `contains`, they are incompatible with Prisma's `groupBy` feature.
+**Action:** When `groupBy` cannot be used due to `contains` operators, batch the independent count queries concurrently using `Promise.all()` to prevent N+1 query bottlenecks and reduce database round-trip latency.
