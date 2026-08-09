@@ -1,0 +1,4 @@
+## 2024-05-20 - Sanitize Internal Command Execution Output and Secure Routes
+**Vulnerability:** Internal migration route `/internal/migrate` was unauthenticated and exposed internal system details (stderr/stdout) upon failure or success via `child_process.exec`.
+**Learning:** Utility routes executing shell commands can easily leak sensitive server environment data or stack traces if standard error and standard output are passed directly to client responses. Furthermore, utility endpoints without authentication present denial-of-service and unauthorized execution vectors.
+**Prevention:** Always wrap internal utility endpoints with strict administrative authentication (`isAdmin`) and explicitly sanitize error and success responses to omit `stdout`/`stderr` or detailed exception messages from client-facing JSON.
