@@ -93,7 +93,11 @@ const DailySalesActionsWidget = () => {
                                     <Send size={14} />
                                     WhatsApp ile Gönder
                                 </button>
-                                <button className="px-3 bg-white border border-gray-200 text-gray-400 hover:text-indigo-600 rounded-lg transition">
+                                <button
+                                    aria-label="Takvime Ekle"
+                                    title="Takvime Ekle"
+                                    className="px-3 bg-white border border-gray-200 text-gray-400 hover:text-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-lg transition outline-none"
+                                >
                                     <Calendar size={16} />
                                 </button>
                             </div>
