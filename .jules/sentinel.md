@@ -1,0 +1,4 @@
+## 2024-08-11 - Unauthenticated Command Execution via Migration Endpoint
+**Vulnerability:** The `/internal/migrate` endpoint in `dealRoutes.js` lacked authentication and executed shell commands (`child_process.exec`) while leaking `stderr` and `stdout` to the client.
+**Learning:** Utility endpoints running backend operations (like database migrations) are prone to missing authentication checks compared to standard CRUD routes. Furthermore, returning raw output from shell commands directly to HTTP responses leaks internal path and error details.
+**Prevention:** Always secure internal management endpoints with `isAdmin` middleware. Never pipe `stderr` or `stdout` from raw shell commands into API JSON responses; return generic error messages to clients and log details exclusively to the backend console.
