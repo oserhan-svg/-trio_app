@@ -139,7 +139,8 @@ const WhatsAppSidebar = React.memo(({
                             onClick={syncAllConversations}
                             disabled={isSyncing}
                             title={isSyncing ? "Senkronize ediliyor..." : "Konuşmaları Yenile"}
-                            className={`hover:text-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${isSyncing ? 'animate-spin text-[#00a884]' : ''}`}
+                            aria-label="Konuşmaları Yenile"
+                            className={`rounded hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${isSyncing ? 'animate-spin text-[#00a884]' : ''}`}
                         >
                             <RefreshCw size={20} />
                         </button>
@@ -152,29 +153,40 @@ const WhatsAppSidebar = React.memo(({
                     <button
                         onClick={startBulkDiscovery}
                         title="AI Müşteri Keşfi Başlat"
-                        className="hover:text-indigo-600 transition-colors"
+                        aria-label="AI Müşteri Keşfi Başlat"
+                        className="rounded hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 transition-colors"
                     >
                         <Brain size={20} />
                     </button>
                     <button
                         onClick={fetchDiagnostics}
                         title="Teknik Tanılama"
-                        className="hover:text-[#00a884] transition-colors"
+                        aria-label="Teknik Tanılama"
+                        className="rounded hover:text-[#00a884] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00a884] transition-colors"
                     >
                         <Activity size={20} />
                     </button>
-                    <button title="Yeni Sohbet">
+                    <button
+                        title="Yeni Sohbet"
+                        aria-label="Yeni Sohbet"
+                        className="rounded hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 transition-colors"
+                    >
                         <MessageCircle size={20} />
                     </button>
                     <button
                         onClick={handleHardReset}
                         title="Verileri Temizle ve Tam Senkronizasyon Yap"
-                        className="hover:text-rose-600 transition-colors relative"
+                        aria-label="Verileri Temizle ve Tam Senkronizasyon Yap"
+                        className="rounded hover:text-rose-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-600 transition-colors relative"
                     >
                         <ShieldAlert size={20} className={isSyncing ? "animate-pulse" : ""} />
                         <span className="absolute -top-1 -right-1 w-2 h-2 bg-rose-500 rounded-full animate-ping opacity-75"></span>
                     </button>
-                    <button title="Menü">
+                    <button
+                        title="Menü"
+                        aria-label="Menü"
+                        className="rounded hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 transition-colors"
+                    >
                         <MoreVertical size={20} />
                     </button>
                 </div>
