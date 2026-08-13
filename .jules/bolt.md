@@ -1,0 +1,4 @@
+## 2024-08-13 - Batched Prisma Counts
+
+**Learning:** Prisma's `groupBy` cannot be used to consolidate queries that rely on partial matching operators like `contains`. When multiple independent `.count()` calls are needed with such conditions, wrapping them in `Promise.all` prevents sequential blocking and significantly reduces total query time by allowing concurrent execution.
+**Action:** When identifying multiple sequential `prisma.*.count` calls in a controller, check if they share overlapping dimensions. If they use `contains` or other incompatible operators, batch them with `Promise.all` instead of attempting to rewrite them as a single `groupBy` query.
