@@ -256,11 +256,12 @@ const PropertyTable = ({ properties, currentSort, onSortChange, hasMore, onLoadM
         }
     };
 
-    const toggleSelectOne = (id) => {
+    // ⚡ Bolt: Wrapped toggleSelectOne in useCallback to prevent re-creating the function on every render, which prevents unnecessary re-renders of PropertyRow components wrapped in React.memo.
+    const toggleSelectOne = useCallback((id) => {
         setSelectedIds(prev =>
             prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
         );
-    };
+    }, []);
 
     const handleExport = async () => {
         const loadingToast = toast.loading('Excel hazırlanıyor...');
@@ -296,7 +297,7 @@ const PropertyTable = ({ properties, currentSort, onSortChange, hasMore, onLoadM
         }
     };
 
-    const handleGenerateStory = async (id) => {
+    const handleGenerateStory = useCallback(async (id) => {
         try {
             toast.loading('Görsel oluşturuluyor...');
             const response = await api.get(`/images/story/${id}`, { responseType: 'blob' });
@@ -311,7 +312,7 @@ const PropertyTable = ({ properties, currentSort, onSortChange, hasMore, onLoadM
             console.error('Image generation failed:', error);
             toast.error('Görsel oluşturulamadı.');
         }
-    };
+    }, []);
 
     const SortHeader = ({ label, sortKeyBase, currentSort, onSortChange }) => {
         const isCurrent = currentSort === `${sortKeyBase}_asc` || currentSort === `${sortKeyBase}_desc` || (sortKeyBase === 'date' && currentSort === 'newest');
