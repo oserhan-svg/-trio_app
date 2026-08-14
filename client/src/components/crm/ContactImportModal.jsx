@@ -20,7 +20,7 @@ const ContactImportModal = ({ isOpen, onClose, onImportSuccess }) => {
         setLoading(true);
         const BATCH_SIZE = 500;
         let totalStats = { added: 0, skipped: 0, errors: 0 };
-        // eslint-disable-next-line no-unused-vars
+
         let hasError = false;
 
         try {
