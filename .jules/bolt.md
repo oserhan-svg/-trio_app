@@ -1,0 +1,3 @@
+## 2024-08-17 - Promise.all Batching for N+1 queries
+**Learning:** Running independent Prisma queries (like counts) sequentially inside Promise.all map loops blocks the event loop and significantly increases latency. This is an N+1 query problem that should use parallel execution.
+**Action:** Use Promise.all() arrays to batch completely independent DB operations to eliminate blocking and achieve concurrency.
