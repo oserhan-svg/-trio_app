@@ -137,6 +137,7 @@ const PropertyDetail = () => {
                                         </button>
                                     </div>
                                     <button
+                                        aria-label={"Sonraki g\u00f6rsel"}
                                         onClick={() => {
                                             const currIdx = images.indexOf(selectedImage || images[0]);
                                             const nextIdx = (currIdx + 1) % images.length;
@@ -147,6 +148,7 @@ const PropertyDetail = () => {
                                         👉
                                     </button>
                                     <button
+                                        aria-label={"\u00d6nceki g\u00f6rsel"}
                                         onClick={() => {
                                             const currIdx = images.indexOf(selectedImage || images[0]);
                                             const prevIdx = (currIdx - 1 + images.length) % images.length;
