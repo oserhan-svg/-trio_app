@@ -1,0 +1,3 @@
+## 2024-06-25 - [Fixing N+1 queries in Performance Stats]
+**Learning:** In `server/controllers/performanceController.js`, `getConsultantPerformance` executed 5 separate `prisma.count` queries for *every* consultant synchronously via `Promise.all(consultants.map(...))`. This is a classic N+1 bottleneck that scales linearly with the number of users, blocking connections.
+**Action:** Always avoid running DB queries inside `.map` over entities. Instead, extract entity IDs and perform batched queries grouped by the relevant foreign key (e.g., using `prisma.groupBy` or mapping a `.findMany`), then assemble the aggregated data in memory.
