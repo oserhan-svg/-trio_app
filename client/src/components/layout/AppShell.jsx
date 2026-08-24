@@ -258,6 +258,8 @@ const AppShell = ({ children }) => {
                     <div className="flex items-center gap-4 md:gap-6">
                         <button
                             onClick={() => setSidebarOpen(!sidebarOpen)}
+                            aria-label={"Men\u00fcy\u00fc a\u00e7/kapat"}
+                            title={"Men\u00fcy\u00fc a\u00e7/kapat"}
                             className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-500 hover:text-blue-600 hover:shadow-md transition-all active:scale-90"
                         >
                             <Menu size={20} />
@@ -274,18 +276,23 @@ const AppShell = ({ children }) => {
                     <div className="flex items-center gap-2 md:gap-4">
                         <div className="hidden sm:flex items-center gap-2 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
                             <Search size={16} className="text-slate-300" />
-                            <input type="text" placeholder="Hızlı ara..." className="bg-transparent border-none text-xs font-bold focus:ring-0 w-32 outline-none dark:text-white" />
+                            <input aria-label={"H\u0131zl\u0131 ara"} type="text" placeholder="Hızlı ara..." className="bg-transparent border-none text-xs font-bold focus:ring-0 w-32 outline-none dark:text-white" />
                         </div>
 
                         <button
                             onClick={toggleTheme}
+                            aria-label={theme === 'light' ? 'Karanl\u0131k Mod' : 'Ayd\u0131nl\u0131k Mod'}
                             className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 hover:shadow-md transition-all active:scale-90"
                             title={theme === 'light' ? 'Karanlık Mod' : 'Aydınlık Mod'}
                         >
                             {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
                         </button>
 
-                        <button className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-400 hover:text-rose-500 hover:shadow-md transition-all relative group">
+                        <button
+                            aria-label="Bildirimler"
+                            title="Bildirimler"
+                            className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-400 hover:text-rose-500 hover:shadow-md transition-all relative group"
+                        >
                             <Bell size={20} className="group-hover:animate-bounce" />
                             <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-rose-500 border-2 border-white dark:border-slate-800 rounded-full"></span>
                         </button>
@@ -293,6 +300,8 @@ const AppShell = ({ children }) => {
                         <div className="hidden sm:block h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
 
                         <button
+                            aria-label={"\u00c7\u0131k\u0131\u015f"}
+                            title={"\u00c7\u0131k\u0131\u015f"}
                             className="bg-slate-900 dark:bg-blue-600 text-white h-10 px-4 rounded-xl flex items-center gap-2 shadow-lg hover:shadow-blue-500/20 hover:-translate-y-0.5 transition-all text-xs font-black uppercase tracking-widest active:translate-y-0"
                             onClick={handleLogout}
                         >
