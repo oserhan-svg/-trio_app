@@ -1,0 +1,4 @@
+## 2024-05-24 - Missing Authorization Check on Admin Route
+**Vulnerability:** The `/api/admin/stats` endpoint in `server/routes/adminRoutes.js` only checked for authentication (`authenticateToken`), but did not enforce authorization (`isAdmin`), allowing any logged-in user to access admin-level statistics.
+**Learning:** Routes under an "admin" namespace or controller don't automatically enforce admin roles; relying solely on filename conventions or general authentication middleware is a common authorization bypass risk. The `isAdmin` middleware was available but unused for this specific route.
+**Prevention:** Always verify both authentication (who the user is) and authorization (what they can do). Use role-specific middleware like `isAdmin` or `authorizeRole('admin')` for all administrative routes, and avoid assuming namespace implies access control.
