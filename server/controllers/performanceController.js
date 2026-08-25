@@ -22,61 +22,35 @@ exports.getConsultantPerformance = async (req, res) => {
         const now = new Date();
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-        const performanceData = await Promise.all(consultants.map(async (c) => {
-            // Count Sale listings
-            const saleCount = await prisma.property.count({
-                where: {
-                    assigned_user_id: c.id,
-                    listing_type: 'sale'
-                }
-            });
+        const consultantIds = consultants.map(c => c.id);
 
-            // Count Rent listings
-            const rentCount = await prisma.property.count({
-                where: {
-                    assigned_user_id: c.id,
-                    listing_type: 'rent'
-                }
-            });
+        // ⚡ Bolt: Resolved N+1 query problem by batching DB requests and grouping in memory. Reduces queries from 5*N to 5 total.
+        const [saleGroups, rentGroups, newPortfolios, interactions, agendaItems] = await Promise.all([
+            prisma.property.groupBy({ by: ['assigned_user_id'], where: { assigned_user_id: { in: consultantIds }, listing_type: 'sale' }, _count: { id: true } }),
+            prisma.property.groupBy({ by: ['assigned_user_id'], where: { assigned_user_id: { in: consultantIds }, listing_type: 'rent' }, _count: { id: true } }),
+            prisma.property.groupBy({ by: ['assigned_user_id'], where: { assigned_user_id: { in: consultantIds }, created_at: { gte: startOfMonth } }, _count: { id: true } }),
+            prisma.interaction.findMany({ where: { client: { consultant_id: { in: consultantIds } }, date: { gte: startOfMonth } }, select: { client: { select: { consultant_id: true } } } }),
+            prisma.agendaItem.groupBy({ by: ['user_id'], where: { user_id: { in: consultantIds }, status: 'completed', start_at: { gte: startOfMonth } }, _count: { id: true } })
+        ]);
 
-            // New portfolios (Properties assigned this month)
-            const newPortfolioCount = await prisma.property.count({
-                where: {
-                    assigned_user_id: c.id,
-                    created_at: { gte: startOfMonth }
-                }
-            });
+        const interactionCounts = interactions.reduce((acc, curr) => {
+            const cid = curr.client?.consultant_id;
+            if (cid) acc[cid] = (acc[cid] || 0) + 1;
+            return acc;
+        }, {});
 
-            // Interactions made (via clients assigned to them)
-            const interactionCount = await prisma.interaction.count({
-                where: {
-                    client: { consultant_id: c.id },
-                    date: { gte: startOfMonth }
-                }
-            });
-
-            // Completed Agenda tasks
-            const completedTasks = await prisma.agendaItem.count({
-                where: {
-                    user_id: c.id,
-                    status: 'completed',
-                    start_at: { gte: startOfMonth }
-                }
-            });
-
-            return {
-                id: c.id,
-                email: c.email,
-                name: c.name,
-                stats: {
-                    total_clients: c._count.clients,
-                    active_sale: saleCount,
-                    active_rent: rentCount,
-                    new_portfolio_monthly: newPortfolioCount,
-                    interactions_monthly: interactionCount,
-                    completed_tasks_monthly: completedTasks
-                }
-            };
+        const performanceData = consultants.map(c => ({
+            id: c.id,
+            email: c.email,
+            name: c.name,
+            stats: {
+                total_clients: c._count.clients,
+                active_sale: saleGroups.find(g => g.assigned_user_id === c.id)?._count.id || 0,
+                active_rent: rentGroups.find(g => g.assigned_user_id === c.id)?._count.id || 0,
+                new_portfolio_monthly: newPortfolios.find(g => g.assigned_user_id === c.id)?._count.id || 0,
+                interactions_monthly: interactionCounts[c.id] || 0,
+                completed_tasks_monthly: agendaItems.find(g => g.user_id === c.id)?._count.id || 0
+            }
         }));
 
         res.json(performanceData);
