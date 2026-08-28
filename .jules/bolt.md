@@ -1,0 +1,3 @@
+## 2024-11-20 - Batching independent contains queries
+**Learning:** Sequential Prisma `.count()` queries with `contains` clauses can cause significant performance bottlenecks when loading dashboards. Because `groupBy` does not support `contains`, these must be queried individually, but they do not depend on each other.
+**Action:** When multiple independent `.count()` or `.findMany()` queries using partial matching operators (like `contains`) are needed for a single response, always execute them concurrently using `Promise.all()` to reduce sequential blocking.
