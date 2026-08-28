@@ -198,7 +198,8 @@ const runInternalMigration = async (req, res) => {
     exec(command, (error, stdout, stderr) => {
         if (error) {
             console.error(`Migration Error: ${error.message}`);
-            return res.status(500).json({ error: error.message, stderr });
+            // 🛡️ Sentinel: Sanitize error output to prevent leaking internal error details to client
+            return res.status(500).json({ error: 'Internal migration failed' });
         }
         res.json({ message: 'Migration successful', stdout });
     });
