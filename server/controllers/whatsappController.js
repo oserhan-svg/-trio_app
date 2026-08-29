@@ -671,7 +671,8 @@ const repairGroups = async (req, res) => {
         const groups = chats.filter(c => c.isGroup);
         let updatedCount = 0;
 
-        for (const chat of groups) {
+        // ⚡ Bolt: Use Promise.all for concurrent upserts, preventing N+1 bottleneck
+        await Promise.all(groups.map(async (chat) => {
             const jid = chat.id._serialized;
             const subject = chat.name || chat.groupMetadata?.subject;
 
@@ -683,7 +684,7 @@ const repairGroups = async (req, res) => {
                 });
                 updatedCount++;
             }
-        }
+        }));
         res.json({ message: `Repaired ${updatedCount} group names.` });
     } catch (error) {
         res.status(500).json({ error: error.message });
