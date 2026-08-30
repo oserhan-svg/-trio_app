@@ -209,14 +209,19 @@ const repairNames = async (req, res) => {
         (async () => {
             console.log(`🚀 [REPAIR-NAMES] Starting repair for ${targets.length} clients...`);
             let fixedCount = 0;
-            for (const client of targets) {
-                try {
-                    const resolution = await messageHandlerService.resolveSenderName(client.phone, null, null);
-                    if (resolution.name && resolution.name !== client.name && !resolution.name.includes('WhatsApp')) {
-                        await prisma.client.update({ where: { id: client.id }, data: { name: resolution.name } });
-                        fixedCount++;
-                    }
-                } catch (err) { console.error(`❌ [REPAIR-NAMES] Error for ${client.phone}:`, err.message); }
+            // ⚡ Bolt: Use chunked Promise.all to execute db updates concurrently while preventing connection pool exhaustion
+            const chunkArray = (arr, size) => Array.from({ length: Math.ceil(arr.length / size) }, (v, i) => arr.slice(i * size, i * size + size));
+            const targetChunks = chunkArray(targets, 50);
+            for (const chunk of targetChunks) {
+                await Promise.all(chunk.map(async (client) => {
+                    try {
+                        const resolution = await messageHandlerService.resolveSenderName(client.phone, null, null);
+                        if (resolution.name && resolution.name !== client.name && !resolution.name.includes('WhatsApp')) {
+                            await prisma.client.update({ where: { id: client.id }, data: { name: resolution.name } });
+                            fixedCount++;
+                        }
+                    } catch (err) { console.error(`❌ [REPAIR-NAMES] Error for ${client.phone}:`, err.message); }
+                }));
             }
             console.log(`✅ [REPAIR-NAMES] Finished. Fixed ${fixedCount} names.`);
             socketService.emit('notification', { type: 'success', message: `${fixedCount} müşterinin ismi WhatsApp verileri ile güncellendi.` });
@@ -429,15 +434,20 @@ const cleanupAndRepair = async (req, res) => {
         });
 
         let migratedCount = 0;
-        for (const m of messagesToMigrate) {
-            const match = m.whatsapp_id.match(/_([^@\s]+@g\.us)_/);
-            if (match) {
-                await prisma.whatsAppMessage.update({
-                    where: { id: m.id },
-                    data: { from: m.from === 'system' ? 'system' : match[1], to: m.to === 'system' ? 'system' : match[1] }
-                });
-                migratedCount++;
-            }
+        // ⚡ Bolt: Use chunked Promise.all to execute db updates concurrently while preventing connection pool exhaustion
+        const chunkArray = (arr, size) => Array.from({ length: Math.ceil(arr.length / size) }, (v, i) => arr.slice(i * size, i * size + size));
+        const messageChunks = chunkArray(messagesToMigrate, 50);
+        for (const chunk of messageChunks) {
+            await Promise.all(chunk.map(async (m) => {
+                const match = m.whatsapp_id.match(/_([^@\s]+@g\.us)_/);
+                if (match) {
+                    await prisma.whatsAppMessage.update({
+                        where: { id: m.id },
+                        data: { from: m.from === 'system' ? 'system' : match[1], to: m.to === 'system' ? 'system' : match[1] }
+                    });
+                    migratedCount++;
+                }
+            }));
         }
 
         const waChats = await whatsappService.getChats();
