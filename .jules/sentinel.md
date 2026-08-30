@@ -1,0 +1,4 @@
+## 2024-08-30 - Command Injection in dealController and Unauthenticated Internal Routes
+**Vulnerability:** Found an unauthenticated route `/internal/migrate` in `server/routes/dealRoutes.js` that calls `runInternalMigration` in `server/controllers/dealController.js`. `runInternalMigration` uses `exec()` and passes the output to the client. The route is unauthenticated. Also the output includes `stderr` and the `error.message` which leaks internal file paths/stack traces.
+**Learning:** This exposes the app to potential path traversal, information disclosure, and unauthenticated state mutation.
+**Prevention:** Always authenticate internal routes. Sanitize error responses in internal/utility routes (e.g., executing commands via `child_process.exec`) by removing `stderr` or raw command output to prevent leaking internal stack traces or environment details to clients.
