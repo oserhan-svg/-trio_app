@@ -429,15 +429,19 @@ const cleanupAndRepair = async (req, res) => {
         });
 
         let migratedCount = 0;
-        for (const m of messagesToMigrate) {
-            const match = m.whatsapp_id.match(/_([^@\s]+@g\.us)_/);
-            if (match) {
-                await prisma.whatsAppMessage.update({
-                    where: { id: m.id },
-                    data: { from: m.from === 'system' ? 'system' : match[1], to: m.to === 'system' ? 'system' : match[1] }
-                });
-                migratedCount++;
-            }
+        // ⚡ Bolt: Execute database updates concurrently in chunks of 50 to resolve N+1 performance bottleneck without exhausting connection pool
+        for (let i = 0; i < messagesToMigrate.length; i += 50) {
+            const chunk = messagesToMigrate.slice(i, i + 50);
+            await Promise.all(chunk.map(async (m) => {
+                const match = m.whatsapp_id.match(/_([^@\s]+@g\.us)_/);
+                if (match) {
+                    await prisma.whatsAppMessage.update({
+                        where: { id: m.id },
+                        data: { from: m.from === 'system' ? 'system' : match[1], to: m.to === 'system' ? 'system' : match[1] }
+                    });
+                    migratedCount++;
+                }
+            }));
         }
 
         const waChats = await whatsappService.getChats();
