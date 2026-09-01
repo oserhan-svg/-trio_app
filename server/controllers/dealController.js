@@ -187,27 +187,11 @@ const getDealSummaryLetter = async (req, res) => {
     }
 };
 
-const runInternalMigration = async (req, res) => {
-    const { exec } = require('child_process');
-    const path = require('path');
-
-    // Attempt multiple paths for prisma
-    const prismaPath = path.join(__dirname, '../node_modules/.bin/prisma');
-    const command = `"${prismaPath}" migrate dev --name add_deals_model --skip-generate`;
-
-    exec(command, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Migration Error: ${error.message}`);
-            return res.status(500).json({ error: error.message, stderr });
-        }
-        res.json({ message: 'Migration successful', stdout });
-    });
-};
+// 🛡️ Sentinel: Removed runInternalMigration to prevent arbitrary command execution vulnerabilities.
 
 module.exports = {
     getDeals,
     createDeal,
     getFinancialStats,
-    getDealSummaryLetter,
-    runInternalMigration
+    getDealSummaryLetter
 };
