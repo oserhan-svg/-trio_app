@@ -1,0 +1,3 @@
+## 2024-05-24 - N+1 Bottleneck in Sequential Upserts
+**Learning:** Unbounded Promise.all on large database operation loops can exhaust the database connection pool, while sequential operations create severe N+1 bottlenecks.
+**Action:** Refactor sequential database operation loops into chunk-based concurrent executions (e.g., batches of 20) using Promise.all to balance throughput and connection pool stability safely.
