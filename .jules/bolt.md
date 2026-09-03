@@ -1,0 +1,3 @@
+## 2024-09-03 - Chunk-based concurrency for Prisma loops
+**Learning:** Sequential Prisma operations inside `for...of` loops cause severe N+1 bottlenecks. Unbounded `Promise.all` on large arrays exhausts the database connection pool.
+**Action:** Use chunk-based concurrency (e.g., slicing arrays into batches of 20-50) and `await Promise.all()` within a chunk loop to safely utilize the connection pool.

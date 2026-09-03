@@ -235,34 +235,39 @@ const syncExtension = async (req, res) => {
 
         console.log(`📥 [EXT-SYNC] Processing ${messages.length} from ${partnerName}`);
 
-        for (const msg of messages) {
-            const chatId = msg.chatId || (partnerName.includes('@') ? partnerName : null);
-            if (!chatId) continue;
-            const phoneNumber = chatId.split('@')[0];
-            const isGroup = chatId.endsWith('@g.us');
+        // ⚡ Bolt: Replaced sequential N+1 database operations with chunk-based concurrency for faster execution while preserving connection pool limits.
+        const chunkSize = 20;
+        for (let i = 0; i < messages.length; i += chunkSize) {
+            const chunk = messages.slice(i, i + chunkSize);
+            await Promise.all(chunk.map(async (msg) => {
+                const chatId = msg.chatId || (partnerName.includes('@') ? partnerName : null);
+                if (!chatId) return;
+                const phoneNumber = chatId.split('@')[0];
+                const isGroup = chatId.endsWith('@g.us');
 
-            let client = await prisma.client.findFirst({ where: { phone: isGroup ? chatId : phoneNumber } });
+                let client = await prisma.client.findFirst({ where: { phone: isGroup ? chatId : phoneNumber } });
 
-            if (client && req.body.profilePicUrl && !client.profile_pic_url) {
-                await prisma.client.update({ where: { id: client.id }, data: { profile_pic_url: req.body.profilePicUrl } });
-            }
-
-            await prisma.whatsAppMessage.upsert({
-                where: { whatsapp_id: msg.id },
-                update: { client_id: client?.id || undefined },
-                create: {
-                    whatsapp_id: msg.id,
-                    from: msg.isOutgoing ? 'system' : chatId,
-                    to: msg.isOutgoing ? chatId : 'system',
-                    content: msg.content,
-                    sender_name: msg.isOutgoing ? 'Trio Emlak' : (partnerName || phoneNumber),
-                    timestamp: new Date(),
-                    client_id: client?.id,
-                    metadata: { is_group: isGroup, synced_via: 'extension' }
+                if (client && req.body.profilePicUrl && !client.profile_pic_url) {
+                    await prisma.client.update({ where: { id: client.id }, data: { profile_pic_url: req.body.profilePicUrl } });
                 }
-            });
 
-            // Note: Trigger AI logic if NOT outgoing logic needs to be handled via service ideally
+                await prisma.whatsAppMessage.upsert({
+                    where: { whatsapp_id: msg.id },
+                    update: { client_id: client?.id || undefined },
+                    create: {
+                        whatsapp_id: msg.id,
+                        from: msg.isOutgoing ? 'system' : chatId,
+                        to: msg.isOutgoing ? chatId : 'system',
+                        content: msg.content,
+                        sender_name: msg.isOutgoing ? 'Trio Emlak' : (partnerName || phoneNumber),
+                        timestamp: new Date(),
+                        client_id: client?.id,
+                        metadata: { is_group: isGroup, synced_via: 'extension' }
+                    }
+                });
+
+                // Note: Trigger AI logic if NOT outgoing logic needs to be handled via service ideally
+            }));
         }
 
         socketService.emit('whatsapp_extension_sync', { partnerName, count: messages.length, timestamp: new Date() });
