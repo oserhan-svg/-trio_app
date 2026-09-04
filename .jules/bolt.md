@@ -1,0 +1,3 @@
+## 2024-05-24 - N+1 Bottlenecks in Prisma Upserts
+**Learning:** Sequential Prisma `upsert` or `update` operations inside `for...of` loops cause N+1 bottlenecks. Unbounded `Promise.all` on large arrays can cause database connection pool exhaustion.
+**Action:** Refactor loops to use chunk-based concurrency (e.g., slicing arrays into batches of 20-50) and `await Promise.all()` within a chunk loop to safely utilize the connection pool.
