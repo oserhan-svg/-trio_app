@@ -1,0 +1,3 @@
+## 2024-09-04 - Chunked Concurrency for N+1 Prisma Queries
+**Learning:** Resolving N+1 bottlenecks by refactoring sequential `for...of` Prisma queries into unbounded `Promise.all` arrays can cause database connection pool exhaustion.
+**Action:** Always use chunk-based concurrency (e.g., slicing arrays into batches of 20-50) with `await Promise.all()` within a chunk loop to safely utilize the DB connection pool.
