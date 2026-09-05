@@ -1,0 +1,4 @@
+## 2024-05-18 - Missing Authentication and Information Disclosure in Internal Migration Route
+**Vulnerability:** The `/internal/migrate` route in `dealRoutes.js` lacked authentication and authorization middleware, exposing a `child_process.exec` command. Additionally, when migration failed, the `stderr` and internal error messages were returned to the user in the HTTP response.
+**Learning:** Internal routes meant for admin operations are sometimes mistakenly left exposed during development without the `isAdmin` or `authenticateToken` middleware. Even on protected internal routes, leaking `stderr` from an `exec` command can disclose sensitive local path structures or internal stack traces.
+**Prevention:** Always ensure internal or maintenance routes are wrapped with strict authorization (`isAdmin`). Avoid returning raw exception messages or standard error streams (`stderr`) directly in API responses.
