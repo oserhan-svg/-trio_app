@@ -1,0 +1,3 @@
+## 2023-10-25 - Prevent Prisma Connection Pool Exhaustion in Loop Optimizations
+**Learning:** Resolving N+1 sequential bottlenecks with unbounded `Promise.all` on large arrays of Prisma operations (like `upsert` or `update`) can exhaust the database connection pool in this app.
+**Action:** Use chunk-based concurrency (slicing arrays into batches of 20-50) and `await Promise.all()` within a chunk loop to safely utilize the connection pool.

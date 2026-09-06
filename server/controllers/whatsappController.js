@@ -671,18 +671,25 @@ const repairGroups = async (req, res) => {
         const groups = chats.filter(c => c.isGroup);
         let updatedCount = 0;
 
-        for (const chat of groups) {
-            const jid = chat.id._serialized;
-            const subject = chat.name || chat.groupMetadata?.subject;
+        // ⚡ Bolt: Use chunk-based concurrency for database upserts to resolve N+1 sequential bottleneck without exhausting connection pool
+        const chunkSize = 20;
+        for (let i = 0; i < groups.length; i += chunkSize) {
+            const chunk = groups.slice(i, i + chunkSize);
+            const results = await Promise.all(chunk.map(async (chat) => {
+                const jid = chat.id._serialized;
+                const subject = chat.name || chat.groupMetadata?.subject;
 
-            if (subject && subject !== 'WhatsApp Grup') {
-                await prisma.client.upsert({
-                    where: { phone: jid },
-                    update: { name: subject, type: 'group' },
-                    create: { name: subject, phone: jid, type: 'group', status: 'New' }
-                });
-                updatedCount++;
-            }
+                if (subject && subject !== 'WhatsApp Grup') {
+                    await prisma.client.upsert({
+                        where: { phone: jid },
+                        update: { name: subject, type: 'group' },
+                        create: { name: subject, phone: jid, type: 'group', status: 'New' }
+                    });
+                    return 1;
+                }
+                return 0;
+            }));
+            updatedCount += results.reduce((sum, val) => sum + val, 0);
         }
         res.json({ message: `Repaired ${updatedCount} group names.` });
     } catch (error) {
