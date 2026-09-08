@@ -1,0 +1,3 @@
+## 2024-05-24 - N+1 bottleneck in sequential Prisma operations
+**Learning:** Sequential Prisma operations inside loops (`for...of`) can cause N+1 bottlenecks. Using unbounded `Promise.all` on large arrays can cause database connection pool exhaustion.
+**Action:** Use chunk-based concurrency (e.g., slicing arrays into batches of 20-50) and `await Promise.all()` within a chunk loop to safely utilize the connection pool and reduce database hits.
