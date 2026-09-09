@@ -1,0 +1,10 @@
+
+> trio-app-client@0.0.0 dev /app/client
+> vite
+
+
+  VITE v7.3.6  ready in 352 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://192.168.0.2:5173/
+ ELIFECYCLE  Command failed with exit code 143.
