@@ -47,7 +47,7 @@ const MobileNav = ({ user, handleScrape, handleLogout, propertiesCount }) => {
                         {/* Header */}
                         <div className="p-5 border-b flex justify-between items-center bg-gray-50">
                             <span className="text-xl font-bold text-blue-600">TrioApp</span>
-                            <button onClick={closeMenu} className="text-gray-500">
+                            <button onClick={closeMenu} className="text-gray-500" aria-label="Kapat">
                                 <X size={24} />
                             </button>
                         </div>
