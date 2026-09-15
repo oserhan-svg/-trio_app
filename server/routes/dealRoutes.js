@@ -7,6 +7,6 @@ router.get('/', authenticateToken, dealController.getDeals);
 router.post('/', authenticateToken, dealController.createDeal);
 router.get('/stats', authenticateToken, dealController.getFinancialStats);
 router.get('/stats/summary/:id', authenticateToken, dealController.getDealSummaryLetter);
-router.get('/internal/migrate', dealController.runInternalMigration);
+// 🛡️ Sentinel: Removed unauthenticated internal migrate route to prevent remote code execution
 
 module.exports = router;
