@@ -1,0 +1,3 @@
+## 2024-05-24 - Resolve N+1 sequential Prisma upserts
+**Learning:** Using sequential database operations like `prisma.client.upsert` inside a `for...of` loop creates an N+1 performance bottleneck. Unbounded `Promise.all` on large arrays can exhaust the database connection pool.
+**Action:** Refactor sequential database loops into chunk-based concurrency (e.g., slicing arrays into batches of 20-50) and use `await Promise.all()` within a chunk loop to safely utilize the connection pool.
