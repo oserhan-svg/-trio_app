@@ -1,0 +1,4 @@
+## 2024-05-18 - Missing Authentication on Shell Execution Endpoint
+**Vulnerability:** The `/internal/migrate` endpoint in `server/routes/dealRoutes.js` lacked authentication or authorization checks. It directly invoked `dealController.runInternalMigration`, which uses `child_process.exec` to run `prisma migrate dev`. Any unauthenticated user could trigger this endpoint.
+**Learning:** Even internal utility or debugging endpoints mapped in production routers must be explicitly protected with authentication and authorization (e.g., `isAdmin`). The omission of auth middleware on administrative endpoints executing shell commands creates a critical vulnerability.
+**Prevention:** Always verify that every endpoint in a router chain has the appropriate authentication middleware, especially routes triggering internal operations or shell commands. Use `grep` or automated security linters to find routes missing authentication wrappers.
