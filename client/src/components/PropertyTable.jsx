@@ -354,7 +354,7 @@ const PropertyTable = ({ properties, currentSort, onSortChange, hasMore, onLoadM
                     {selectedIds.length > 0 && (
                         <div className="flex items-center gap-3 bg-blue-600 text-white px-4 py-2 rounded-2xl text-xs font-black shadow-lg shadow-blue-500/20 animate-in zoom-in duration-300 uppercase tracking-widest">
                             {selectedIds.length} DOSYA SEÇİLİ
-                            <button onClick={() => setSelectedIds([])} className="p-1 hover:bg-white/20 rounded-lg transition-colors">
+                            <button aria-label="Seçimleri temizle" onClick={() => setSelectedIds([])} className="p-1 hover:bg-white/20 rounded-lg transition-colors">
                                 <X size={14} strokeWidth={3} />
                             </button>
                         </div>
