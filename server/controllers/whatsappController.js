@@ -759,23 +759,29 @@ async function syncAllData(isDeep = false) {
                 }
 
                 const messages = await chat.fetchMessages({ limit: isDeep ? 100 : 30 });
-                for (const msg of messages) {
-                    if (!['chat', 'image', 'video', 'audio', 'document', 'ptt'].includes(msg.type)) continue;
-                    const authorId = isGroup ? (msg.author || msg.from).split('@')[0] : phoneNumber;
-                    await prisma.whatsAppMessage.upsert({
-                        where: { whatsapp_id: msg.id._serialized },
-                        update: {},
-                        create: {
-                            whatsapp_id: msg.id._serialized,
-                            from: msg.fromMe ? 'system' : chatId,
-                            to: msg.fromMe ? chatId : 'system',
-                            content: msg.body,
-                            sender_name: msg.fromMe ? 'Trio Emlak' : (isGroup ? (msg._data?.notifyName || resolvedName) : (resolvedName || phoneNumber)),
-                            timestamp: new Date(msg.timestamp * 1000),
-                            client_id: client?.id,
-                            metadata: { author: authorId, is_group: isGroup }
-                        }
-                    });
+                const validMessages = messages.filter(msg => ['chat', 'image', 'video', 'audio', 'document', 'ptt'].includes(msg.type));
+
+                // ⚡ Bolt: Resolving N+1 query bottleneck by using chunk-based concurrency for database upserts safely without exhausting DB connection pool
+                const chunkSize = 20;
+                for (let j = 0; j < validMessages.length; j += chunkSize) {
+                    const chunk = validMessages.slice(j, j + chunkSize);
+                    await Promise.all(chunk.map(async (msg) => {
+                        const authorId = isGroup ? (msg.author || msg.from).split('@')[0] : phoneNumber;
+                        await prisma.whatsAppMessage.upsert({
+                            where: { whatsapp_id: msg.id._serialized },
+                            update: {},
+                            create: {
+                                whatsapp_id: msg.id._serialized,
+                                from: msg.fromMe ? 'system' : chatId,
+                                to: msg.fromMe ? chatId : 'system',
+                                content: msg.body,
+                                sender_name: msg.fromMe ? 'Trio Emlak' : (isGroup ? (msg._data?.notifyName || resolvedName) : (resolvedName || phoneNumber)),
+                                timestamp: new Date(msg.timestamp * 1000),
+                                client_id: client?.id,
+                                metadata: { author: authorId, is_group: isGroup }
+                            }
+                        });
+                    }));
                 }
             }));
             const progress = Math.min(100, Math.round(((i + 5) / targetChats.length) * 100));
