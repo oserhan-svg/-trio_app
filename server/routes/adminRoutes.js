@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { getDashboardStats } = require('../controllers/adminController');
-const { authenticateToken } = require('../middleware/authMiddleware');
+const { isAdmin } = require('../middleware/authMiddleware');
 
-router.get('/stats', authenticateToken, getDashboardStats);
+// 🛡️ Sentinel: Enforce admin authorization on admin stats route to prevent data leakage
+router.get('/stats', isAdmin, getDashboardStats);
 
 module.exports = router;
