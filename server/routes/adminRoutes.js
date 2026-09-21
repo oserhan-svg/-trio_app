@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { getDashboardStats } = require('../controllers/adminController');
-const { authenticateToken } = require('../middleware/authMiddleware');
+const { isAdmin } = require('../middleware/authMiddleware');
 
-router.get('/stats', authenticateToken, getDashboardStats);
+// 🛡️ Sentinel: Secure admin stats endpoint to prevent unauthorized data access
+router.get('/stats', isAdmin, getDashboardStats);
 
 module.exports = router;
