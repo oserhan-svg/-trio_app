@@ -84,7 +84,7 @@ const PropertyDetailModal = ({ property, onClose }) => {
                             <span className="font-semibold text-gray-700">İlan No: {property.external_id?.split('block')[0]}</span>
                         </p>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500">
+                    <button onClick={onClose} aria-label="Kapat" className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500">
                         <X size={24} />
                     </button>
                 </div>
