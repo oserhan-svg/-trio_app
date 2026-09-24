@@ -1,0 +1,3 @@
+## 2024-09-24 - Resolve sequential database query waterfalls in performanceController
+**Learning:** Sequential await loops using `.count()` operations in standard controllers (like `performanceController.js`) block execution, generating independent database queries in waterfall instead of utilizing concurrent roundtrips, degrading endpoint latency drastically as the user/data scales.
+**Action:** When executing independent database aggregations within loops, utilize `Promise.all()` to batch the `count()` queries per user context to execute them concurrently against the connection pool instead of blocking sequentially.
