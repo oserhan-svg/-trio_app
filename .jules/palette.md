@@ -1,0 +1,3 @@
+## 2024-05-24 - Missing ARIA Labels on Icon-only Buttons
+**Learning:** Found that the topbar `Menu` and `Bell` (Notifications) buttons in the `AppShell` component do not have `aria-label` attributes. This pattern is often missed in this application for icon-only buttons. The `Moon`/`Sun` theme toggle has a `title`, but no `aria-label` explicitly, though `title` is often read by screen readers. The `Menu` toggle and `Bell` notification buttons are completely silent for screen readers unless guessed. Also the search input lacks an `aria-label`.
+**Action:** When adding icon-only buttons, always ensure they have an `aria-label` attribute translated into Turkish (e.g., "Menüyü aç/kapat" or "Bildirimler").
