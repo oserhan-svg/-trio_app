@@ -1,0 +1,3 @@
+## 2024-05-20 - Add ARIA labels to icon-only navigation buttons in AppShell
+**Learning:** Icon-only buttons used for primary navigation and app-wide interactions (like menu toggles, theme switchers, notifications, and logout) lacked `aria-label` attributes, which significantly degraded the experience for screen reader users relying on these core controls. Turkish localization was required for the labels (e.g., 'Menüyü aç/kapat').
+**Action:** Always ensure that any icon-only button, especially those in core layout components like `AppShell`, includes a localized `aria-label` attribute to clearly describe its function to assistive technologies.
