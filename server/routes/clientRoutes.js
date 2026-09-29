@@ -5,8 +5,10 @@ const { addDemand, deleteClient } = require('../controllers/clientController');
 const { authenticateToken } = require('../middleware/authMiddleware');
 const validate = require('../middleware/validate');
 const { clientSchema, demandSchema } = require('../utils/schemas');
+const { apiLimiter } = require('../middleware/rateLimiter');
 
-router.post('/public/lead', clientController.createPublicLead);
+// 🛡️ Sentinel: Prevent DoS/spam by rate limiting public lead creation
+router.post('/public/lead', apiLimiter, clientController.createPublicLead);
 
 // Protect all CRM routes
 router.use(authenticateToken);
