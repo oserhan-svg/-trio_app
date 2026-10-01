@@ -25,7 +25,8 @@ router.post('/trigger', authenticateToken, async (req, res) => {
  * POST /api/scraper/import
  * Import listings from Chrome Extension (Trio Assistant)
  */
-router.post('/import', async (req, res) => {
+// 🛡️ Sentinel: Added authenticateToken to prevent unauthenticated scraper imports
+router.post('/import', authenticateToken, async (req, res) => {
     try {
         let { listings, provider } = req.body;
 
