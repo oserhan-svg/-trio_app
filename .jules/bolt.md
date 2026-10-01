@@ -1,0 +1,3 @@
+## 2023-10-01 - Prisma N+1 Array Batching
+**Learning:** When resolving sequential database writes in `for...of` loops using Prisma, using `Promise.all` directly with query operations (e.g., `findFirst` + `update`) causes race conditions, redundant writes, and connection pool exhaustion since it just executes queries simultaneously, not as a batch.
+**Action:** Always rewrite sequential loop database updates by collecting operations into an array of Prisma promises (`operations.push(prisma.model.update(...))`) and executing them safely in chunks using `prisma.$transaction(operationsChunk)` to achieve true batch processing and avoid connection/race issues.
