@@ -429,14 +429,24 @@ const cleanupAndRepair = async (req, res) => {
         });
 
         let migratedCount = 0;
+        const operations = [];
         for (const m of messagesToMigrate) {
             const match = m.whatsapp_id.match(/_([^@\s]+@g\.us)_/);
             if (match) {
-                await prisma.whatsAppMessage.update({
+                operations.push(prisma.whatsAppMessage.update({
                     where: { id: m.id },
                     data: { from: m.from === 'system' ? 'system' : match[1], to: m.to === 'system' ? 'system' : match[1] }
-                });
+                }));
                 migratedCount++;
+            }
+        }
+
+        // ⚡ Bolt: Resolve N+1 query bottleneck by batching sequential updates into a single transaction
+        if (operations.length > 0) {
+            // Process transactions in chunks to prevent connection pool exhaustion on very large migrations
+            const CHUNK_SIZE = 50;
+            for (let i = 0; i < operations.length; i += CHUNK_SIZE) {
+                await prisma.$transaction(operations.slice(i, i + CHUNK_SIZE));
             }
         }
 
