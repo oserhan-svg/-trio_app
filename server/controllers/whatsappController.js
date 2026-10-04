@@ -235,19 +235,33 @@ const syncExtension = async (req, res) => {
 
         console.log(`📥 [EXT-SYNC] Processing ${messages.length} from ${partnerName}`);
 
+        // ⚡ Bolt: Resolve N+1 query bottleneck by fetching clients once and chunking operations
+        const phoneNumbers = [...new Set(messages.map(msg => {
+            const chatId = msg.chatId || (partnerName.includes('@') ? partnerName : null);
+            return chatId ? (chatId.endsWith('@g.us') ? chatId : chatId.split('@')[0]) : null;
+        }).filter(Boolean))];
+
+        const clients = await prisma.client.findMany({
+            where: { phone: { in: phoneNumbers } }
+        });
+        const clientMap = new Map(clients.map(c => [c.phone, c]));
+        const operations = [];
+
         for (const msg of messages) {
             const chatId = msg.chatId || (partnerName.includes('@') ? partnerName : null);
             if (!chatId) continue;
             const phoneNumber = chatId.split('@')[0];
             const isGroup = chatId.endsWith('@g.us');
 
-            let client = await prisma.client.findFirst({ where: { phone: isGroup ? chatId : phoneNumber } });
+            const phoneToMatch = isGroup ? chatId : phoneNumber;
+            const client = clientMap.get(phoneToMatch);
 
             if (client && req.body.profilePicUrl && !client.profile_pic_url) {
-                await prisma.client.update({ where: { id: client.id }, data: { profile_pic_url: req.body.profilePicUrl } });
+                client.profile_pic_url = req.body.profilePicUrl;
+                operations.push(prisma.client.update({ where: { id: client.id }, data: { profile_pic_url: req.body.profilePicUrl } }));
             }
 
-            await prisma.whatsAppMessage.upsert({
+            operations.push(prisma.whatsAppMessage.upsert({
                 where: { whatsapp_id: msg.id },
                 update: { client_id: client?.id || undefined },
                 create: {
@@ -260,9 +274,13 @@ const syncExtension = async (req, res) => {
                     client_id: client?.id,
                     metadata: { is_group: isGroup, synced_via: 'extension' }
                 }
-            });
+            }));
 
             // Note: Trigger AI logic if NOT outgoing logic needs to be handled via service ideally
+        }
+
+        for (let i = 0; i < operations.length; i += 50) {
+            await prisma.$transaction(operations.slice(i, i + 50));
         }
 
         socketService.emit('whatsapp_extension_sync', { partnerName, count: messages.length, timestamp: new Date() });
