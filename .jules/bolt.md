@@ -1,0 +1,3 @@
+## 2024-05-24 - Resolve N+1 query bottleneck in sequential Prisma operations
+**Learning:** When dealing with sequential Prisma `upsert` or `update` operations inside loops (e.g., fetching multiple messages and syncing them), executing them sequentially with `await` creates an N+1 query bottleneck. Attempting to use `Promise.all()` to execute them concurrently does not batch the queries and can introduce race conditions.
+**Action:** Always push the individual operations (e.g., `prisma.model.upsert(...)` without `await`) into an array of operations. Then, slice the array into chunks of 50 and use `await prisma.$transaction(chunk)` to execute them as batched transactions, significantly reducing database roundtrips and event loop blocking.
