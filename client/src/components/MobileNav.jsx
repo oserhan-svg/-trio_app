@@ -28,7 +28,8 @@ const MobileNav = ({ user, handleScrape, handleLogout, propertiesCount }) => {
             <button
                 onClick={toggleMenu}
                 className="p-2 text-gray-600 hover:text-blue-600 focus:outline-none"
-                aria-label="Menu"
+                aria-label="Menüyü aç/kapat"
+                title="Menüyü aç/kapat"
             >
                 {isOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
@@ -47,7 +48,12 @@ const MobileNav = ({ user, handleScrape, handleLogout, propertiesCount }) => {
                         {/* Header */}
                         <div className="p-5 border-b flex justify-between items-center bg-gray-50">
                             <span className="text-xl font-bold text-blue-600">TrioApp</span>
-                            <button onClick={closeMenu} className="text-gray-500">
+                            <button
+                                onClick={closeMenu}
+                                className="text-gray-500"
+                                aria-label="Kapat"
+                                title="Kapat"
+                            >
                                 <X size={24} />
                             </button>
                         </div>
