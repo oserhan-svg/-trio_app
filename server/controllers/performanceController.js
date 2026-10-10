@@ -22,47 +22,15 @@ exports.getConsultantPerformance = async (req, res) => {
         const now = new Date();
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
+        // ⚡ Bolt: Resolved N+1 query bottleneck by batching independent count queries to avoid blocking iteration
         const performanceData = await Promise.all(consultants.map(async (c) => {
-            // Count Sale listings
-            const saleCount = await prisma.property.count({
-                where: {
-                    assigned_user_id: c.id,
-                    listing_type: 'sale'
-                }
-            });
-
-            // Count Rent listings
-            const rentCount = await prisma.property.count({
-                where: {
-                    assigned_user_id: c.id,
-                    listing_type: 'rent'
-                }
-            });
-
-            // New portfolios (Properties assigned this month)
-            const newPortfolioCount = await prisma.property.count({
-                where: {
-                    assigned_user_id: c.id,
-                    created_at: { gte: startOfMonth }
-                }
-            });
-
-            // Interactions made (via clients assigned to them)
-            const interactionCount = await prisma.interaction.count({
-                where: {
-                    client: { consultant_id: c.id },
-                    date: { gte: startOfMonth }
-                }
-            });
-
-            // Completed Agenda tasks
-            const completedTasks = await prisma.agendaItem.count({
-                where: {
-                    user_id: c.id,
-                    status: 'completed',
-                    start_at: { gte: startOfMonth }
-                }
-            });
+            const [saleCount, rentCount, newPortfolioCount, interactionCount, completedTasks] = await Promise.all([
+                prisma.property.count({ where: { assigned_user_id: c.id, listing_type: 'sale' } }),
+                prisma.property.count({ where: { assigned_user_id: c.id, listing_type: 'rent' } }),
+                prisma.property.count({ where: { assigned_user_id: c.id, created_at: { gte: startOfMonth } } }),
+                prisma.interaction.count({ where: { client: { consultant_id: c.id }, date: { gte: startOfMonth } } }),
+                prisma.agendaItem.count({ where: { user_id: c.id, status: 'completed', start_at: { gte: startOfMonth } } })
+            ]);
 
             return {
                 id: c.id,
@@ -104,20 +72,12 @@ exports.getConsultantDetail = async (req, res) => {
             });
         }
 
+        // ⚡ Bolt: Resolved N+1 query bottleneck by batching independent count queries to avoid blocking iteration
         const monthlyStats = await Promise.all(months.map(async (m) => {
-            const propertiesCount = await prisma.property.count({
-                where: {
-                    assigned_user_id: consultantId,
-                    created_at: { gte: m.start, lte: m.end }
-                }
-            });
-
-            const interactionsCount = await prisma.interaction.count({
-                where: {
-                    client: { consultant_id: consultantId },
-                    date: { gte: m.start, lte: m.end }
-                }
-            });
+            const [propertiesCount, interactionsCount] = await Promise.all([
+                prisma.property.count({ where: { assigned_user_id: consultantId, created_at: { gte: m.start, lte: m.end } } }),
+                prisma.interaction.count({ where: { client: { consultant_id: consultantId }, date: { gte: m.start, lte: m.end } } })
+            ]);
 
             return {
                 name: m.name,
