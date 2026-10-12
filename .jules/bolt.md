@@ -1,0 +1,3 @@
+## 2025-02-27 - Batch Prisma Queries in Loops
+**Learning:** When executing multiple independent database queries inside a `for...of` loop (e.g., sequential `prisma.model.upsert` or `.update` operations), using sequential `await` calls causes severe N+1 query bottlenecks and slows down sync processes. Moreover, directly wrapping these operations in `Promise.all()` introduces potential race conditions and doesn't batch queries effectively at the database level.
+**Action:** Always map operations into an array of Prisma promises and execute them in chunked transaction blocks using `await prisma.$transaction(operationsChunk)` to significantly reduce database round-trips while maintaining safety.
