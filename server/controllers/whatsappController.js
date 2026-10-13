@@ -429,15 +429,20 @@ const cleanupAndRepair = async (req, res) => {
         });
 
         let migratedCount = 0;
+        const migrateOps = [];
         for (const m of messagesToMigrate) {
             const match = m.whatsapp_id.match(/_([^@\s]+@g\.us)_/);
             if (match) {
-                await prisma.whatsAppMessage.update({
+                // ⚡ Bolt: Batch sequential database operations to fix N+1 bottleneck
+                migrateOps.push(prisma.whatsAppMessage.update({
                     where: { id: m.id },
                     data: { from: m.from === 'system' ? 'system' : match[1], to: m.to === 'system' ? 'system' : match[1] }
-                });
+                }));
                 migratedCount++;
             }
+        }
+        for (let i = 0; i < migrateOps.length; i += 50) {
+            await prisma.$transaction(migrateOps.slice(i, i + 50));
         }
 
         const waChats = await whatsappService.getChats();
@@ -759,10 +764,12 @@ async function syncAllData(isDeep = false) {
                 }
 
                 const messages = await chat.fetchMessages({ limit: isDeep ? 100 : 30 });
+                const upsertOps = [];
                 for (const msg of messages) {
                     if (!['chat', 'image', 'video', 'audio', 'document', 'ptt'].includes(msg.type)) continue;
                     const authorId = isGroup ? (msg.author || msg.from).split('@')[0] : phoneNumber;
-                    await prisma.whatsAppMessage.upsert({
+                    // ⚡ Bolt: Batch sequential database operations to fix N+1 bottleneck
+                    upsertOps.push(prisma.whatsAppMessage.upsert({
                         where: { whatsapp_id: msg.id._serialized },
                         update: {},
                         create: {
@@ -775,7 +782,10 @@ async function syncAllData(isDeep = false) {
                             client_id: client?.id,
                             metadata: { author: authorId, is_group: isGroup }
                         }
-                    });
+                    }));
+                }
+                for (let j = 0; j < upsertOps.length; j += 50) {
+                    await prisma.$transaction(upsertOps.slice(j, j + 50));
                 }
             }));
             const progress = Math.min(100, Math.round(((i + 5) / targetChats.length) * 100));
