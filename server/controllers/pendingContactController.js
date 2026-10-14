@@ -88,13 +88,20 @@ const bulkApprove = async (req, res) => {
         let added = 0;
         let skipped = 0;
 
-        for (const t of targets) {
-            const existing = await prisma.client.findFirst({
-                where: { phone: t.phone, consultant_id: req.user.id }
-            });
+        // ⚡ Bolt Optimization: Resolved N+1 database queries by batching findFirst and create
+        const existingPhones = await prisma.client.findMany({
+            where: {
+                phone: { in: targets.map(t => t.phone) },
+                consultant_id: req.user.id
+            },
+            select: { phone: true }
+        }).then(clients => clients.map(c => c.phone));
 
-            if (!existing) {
-                await prisma.client.create({
+        const operations = [];
+
+        for (const t of targets) {
+            if (!existingPhones.includes(t.phone)) {
+                operations.push(prisma.client.create({
                     data: {
                         name: t.name,
                         phone: t.phone,
@@ -103,11 +110,17 @@ const bulkApprove = async (req, res) => {
                         type: 'buyer',
                         consultant_id: req.user.id
                     }
-                });
+                }));
+                // Add to existing to prevent duplicate creations if targets array has duplicates
+                existingPhones.push(t.phone);
                 added++;
             } else {
                 skipped++;
             }
+        }
+
+        if (operations.length > 0) {
+            await prisma.$transaction(operations);
         }
 
         // Delete processed
