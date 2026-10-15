@@ -143,7 +143,7 @@ const SalesPipeline = () => {
                                 <h3 className="font-black text-slate-700 uppercase tracking-widest text-xs">{column.status}</h3>
                                 <span className="text-[10px] font-black bg-slate-200 text-slate-500 px-2 py-0.5 rounded-full">{column.count}</span>
                             </div>
-                            <button className="text-slate-400 hover:text-slate-600"><MoreHorizontal size={18} /></button>
+                            <button className="text-slate-400 hover:text-slate-600" aria-label="Seçenekler" title="Seçenekler"><MoreHorizontal size={18} /></button>
                         </div>
 
                         {/* Column Content */}
@@ -179,12 +179,16 @@ const SalesPipeline = () => {
                                             <button
                                                 onClick={() => window.open(`https://wa.me/${client.phone?.replace(/\D/g, '')}`, '_blank')}
                                                 className="p-1.5 hover:bg-emerald-50 text-slate-400 hover:text-emerald-600 rounded-lg transition-colors"
+                                                aria-label="WhatsApp mesajı gönder"
+                                                title="WhatsApp mesajı gönder"
                                             >
                                                 <MessageCircle size={16} />
                                             </button>
                                             <button
                                                 onClick={() => window.location.href = `/clients/${client.id}`}
                                                 className="p-1.5 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors"
+                                                aria-label="Müşteri detaylarını görüntüle"
+                                                title="Müşteri detayları"
                                             >
                                                 <ChevronRight size={16} />
                                             </button>
