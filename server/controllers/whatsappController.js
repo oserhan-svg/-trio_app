@@ -235,6 +235,8 @@ const syncExtension = async (req, res) => {
 
         console.log(`📥 [EXT-SYNC] Processing ${messages.length} from ${partnerName}`);
 
+        const messageOps = [];
+
         for (const msg of messages) {
             const chatId = msg.chatId || (partnerName.includes('@') ? partnerName : null);
             if (!chatId) continue;
@@ -247,7 +249,7 @@ const syncExtension = async (req, res) => {
                 await prisma.client.update({ where: { id: client.id }, data: { profile_pic_url: req.body.profilePicUrl } });
             }
 
-            await prisma.whatsAppMessage.upsert({
+            messageOps.push(prisma.whatsAppMessage.upsert({
                 where: { whatsapp_id: msg.id },
                 update: { client_id: client?.id || undefined },
                 create: {
@@ -260,9 +262,18 @@ const syncExtension = async (req, res) => {
                     client_id: client?.id,
                     metadata: { is_group: isGroup, synced_via: 'extension' }
                 }
-            });
+            }));
+
+            if (messageOps.length >= 50) {
+                await prisma.$transaction(messageOps);
+                messageOps.length = 0;
+            }
 
             // Note: Trigger AI logic if NOT outgoing logic needs to be handled via service ideally
+        }
+
+        if (messageOps.length > 0) {
+            await prisma.$transaction(messageOps);
         }
 
         socketService.emit('whatsapp_extension_sync', { partnerName, count: messages.length, timestamp: new Date() });
@@ -759,10 +770,11 @@ async function syncAllData(isDeep = false) {
                 }
 
                 const messages = await chat.fetchMessages({ limit: isDeep ? 100 : 30 });
+                    const messageOps = [];
                 for (const msg of messages) {
                     if (!['chat', 'image', 'video', 'audio', 'document', 'ptt'].includes(msg.type)) continue;
                     const authorId = isGroup ? (msg.author || msg.from).split('@')[0] : phoneNumber;
-                    await prisma.whatsAppMessage.upsert({
+                        messageOps.push(prisma.whatsAppMessage.upsert({
                         where: { whatsapp_id: msg.id._serialized },
                         update: {},
                         create: {
@@ -775,7 +787,11 @@ async function syncAllData(isDeep = false) {
                             client_id: client?.id,
                             metadata: { author: authorId, is_group: isGroup }
                         }
-                    });
+                        }));
+                    }
+
+                    for (let i = 0; i < messageOps.length; i += 50) {
+                        await prisma.$transaction(messageOps.slice(i, i + 50));
                 }
             }));
             const progress = Math.min(100, Math.round(((i + 5) / targetChats.length) * 100));
