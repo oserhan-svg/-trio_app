@@ -199,6 +199,7 @@ const PropertyRow = React.memo(({ prop, isSelected, onToggleSelect, onGenerateSt
                     <button
                         onClick={() => navigate(`/property/${prop.id}`)}
                         className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white dark:hover:text-white hover:border-blue-600 dark:hover:border-blue-600 transition-all active:scale-90"
+                        aria-label="Derinlemesine Analiz"
                         title="Derinlemesine Analiz"
                     >
                         <Eye size={18} strokeWidth={2.5} />
@@ -206,6 +207,7 @@ const PropertyRow = React.memo(({ prop, isSelected, onToggleSelect, onGenerateSt
                     <button
                         onClick={() => navigate(`/property-listing/${prop.id}`)}
                         className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white dark:hover:text-white hover:border-indigo-600 dark:hover:border-indigo-600 transition-all active:scale-90"
+                        aria-label={"Müşteri Sunumu Hazırla"}
                         title="Müşteri Sunumu Hazırla"
                     >
                         <FileText size={18} strokeWidth={2.5} />
@@ -213,6 +215,7 @@ const PropertyRow = React.memo(({ prop, isSelected, onToggleSelect, onGenerateSt
                     <button
                         onClick={() => onGenerateStory(prop.id)}
                         className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-rose-600 dark:hover:bg-rose-600 hover:text-white dark:hover:text-white hover:border-rose-600 dark:hover:border-rose-600 transition-all active:scale-90"
+                        aria-label={"Hızlı Reklam (Story)"}
                         title="Hızlı Reklam (Story)"
                     >
                         <Instagram size={18} strokeWidth={2.5} />
@@ -222,6 +225,7 @@ const PropertyRow = React.memo(({ prop, isSelected, onToggleSelect, onGenerateSt
                         target="_blank"
                         rel="noopener noreferrer"
                         className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-slate-900 dark:hover:bg-slate-100 hover:text-white dark:hover:text-slate-900 hover:border-slate-900 dark:hover:border-slate-100 transition-all active:scale-90"
+                        aria-label={"Kaynağı Görüntüle"}
                         title="Kaynağı Görüntüle"
                     >
                         <ExternalLink size={18} strokeWidth={2.5} />
@@ -354,7 +358,7 @@ const PropertyTable = ({ properties, currentSort, onSortChange, hasMore, onLoadM
                     {selectedIds.length > 0 && (
                         <div className="flex items-center gap-3 bg-blue-600 text-white px-4 py-2 rounded-2xl text-xs font-black shadow-lg shadow-blue-500/20 animate-in zoom-in duration-300 uppercase tracking-widest">
                             {selectedIds.length} DOSYA SEÇİLİ
-                            <button onClick={() => setSelectedIds([])} className="p-1 hover:bg-white/20 rounded-lg transition-colors">
+                            <button onClick={() => setSelectedIds([])} className="p-1 hover:bg-white/20 rounded-lg transition-colors" aria-label={"Seçimi Temizle"}>
                                 <X size={14} strokeWidth={3} />
                             </button>
                         </div>
