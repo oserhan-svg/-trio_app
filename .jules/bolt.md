@@ -1,0 +1,3 @@
+## 2024-05-24 - N+1 in Count Queries
+**Learning:** Prisma's `groupBy` cannot group by fields on related models (e.g., `client.consultant_id`). However, when resolving N+1 bottlenecks involving `COUNT` operations, NEVER replace efficient database `count()` calls with `findMany` just to fetch full records and calculate array lengths in Node.js memory, as this causes massive RAM/network overhead. Instead, parallelize the independent `.count()` queries concurrently inside the loop using `Promise.all()`.
+**Action:** Always prefer DB-level `count()` with `Promise.all()` for multiple counts over pulling data into memory if `groupBy` is not possible.
