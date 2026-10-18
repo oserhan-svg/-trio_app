@@ -259,6 +259,7 @@ const AppShell = ({ children }) => {
                         <button
                             onClick={() => setSidebarOpen(!sidebarOpen)}
                             className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-500 hover:text-blue-600 hover:shadow-md transition-all active:scale-90"
+                            aria-label="Menüyü aç/kapat"
                         >
                             <Menu size={20} />
                         </button>
