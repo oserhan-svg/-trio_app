@@ -76,6 +76,7 @@ const AppShell = ({ children }) => {
                         </div>
                         <div className="flex border-l border-slate-800">
                             <button
+                                aria-label="Kapat"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     toast.dismiss(t.id);
@@ -257,6 +258,7 @@ const AppShell = ({ children }) => {
                 <header className="h-20 flex items-center justify-between px-4 md:px-8 relative shrink-0 z-40">
                     <div className="flex items-center gap-4 md:gap-6">
                         <button
+                            aria-label="Menüyü aç/kapat"
                             onClick={() => setSidebarOpen(!sidebarOpen)}
                             className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-500 hover:text-blue-600 hover:shadow-md transition-all active:scale-90"
                         >
@@ -278,6 +280,7 @@ const AppShell = ({ children }) => {
                         </div>
 
                         <button
+                            aria-label={theme === 'light' ? 'Karanlık Mod' : 'Aydınlık Mod'}
                             onClick={toggleTheme}
                             className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 hover:shadow-md transition-all active:scale-90"
                             title={theme === 'light' ? 'Karanlık Mod' : 'Aydınlık Mod'}
