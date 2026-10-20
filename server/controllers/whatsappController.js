@@ -759,10 +759,12 @@ async function syncAllData(isDeep = false) {
                 }
 
                 const messages = await chat.fetchMessages({ limit: isDeep ? 100 : 30 });
+                const operations = [];
                 for (const msg of messages) {
                     if (!['chat', 'image', 'video', 'audio', 'document', 'ptt'].includes(msg.type)) continue;
                     const authorId = isGroup ? (msg.author || msg.from).split('@')[0] : phoneNumber;
-                    await prisma.whatsAppMessage.upsert({
+                    // ⚡ Bolt Optimization: Batch upserts in array instead of awaiting sequentially
+                    operations.push(prisma.whatsAppMessage.upsert({
                         where: { whatsapp_id: msg.id._serialized },
                         update: {},
                         create: {
@@ -775,7 +777,11 @@ async function syncAllData(isDeep = false) {
                             client_id: client?.id,
                             metadata: { author: authorId, is_group: isGroup }
                         }
-                    });
+                    }));
+                }
+                // Execute promises concurrently in chunks of 50 to resolve N+1 bottleneck
+                for (let j = 0; j < operations.length; j += 50) {
+                    await prisma.$transaction(operations.slice(j, j + 50));
                 }
             }));
             const progress = Math.min(100, Math.round(((i + 5) / targetChats.length) * 100));
