@@ -671,18 +671,25 @@ const repairGroups = async (req, res) => {
         const groups = chats.filter(c => c.isGroup);
         let updatedCount = 0;
 
+        const operations = [];
         for (const chat of groups) {
             const jid = chat.id._serialized;
             const subject = chat.name || chat.groupMetadata?.subject;
 
             if (subject && subject !== 'WhatsApp Grup') {
-                await prisma.client.upsert({
+                operations.push(prisma.client.upsert({
                     where: { phone: jid },
                     update: { name: subject, type: 'group' },
                     create: { name: subject, phone: jid, type: 'group', status: 'New' }
-                });
+                }));
                 updatedCount++;
             }
+        }
+
+        // ⚡ Bolt: Execute upserts in batched chunks using $transaction to resolve N+1 latency
+        // Impact: Reduces DB round-trips from O(N) to O(N/50), dramatically speeding up processing
+        for (let i = 0; i < operations.length; i += 50) {
+            await prisma.$transaction(operations.slice(i, i + 50));
         }
         res.json({ message: `Repaired ${updatedCount} group names.` });
     } catch (error) {
