@@ -1,0 +1,3 @@
+## 2024-05-18 - Missing ARIA Labels in AppShell
+**Learning:** Icon-only buttons in the main navigation (Menu toggle, Notifications) lack aria-labels, which severely impacts screen reader accessibility. Also, localized string literals with special characters (like Turkish letters) need proper handling in JSX to avoid octal literal issues or render problems.
+**Action:** Always verify icon-only buttons have descriptive aria-labels. When adding localized Turkish text, use the actual UTF-8 characters directly in standard double quotes (e.g., `aria-label="Menüyü aç/kapat"`), or if forced to use escape sequences, wrap the string in curly braces.
