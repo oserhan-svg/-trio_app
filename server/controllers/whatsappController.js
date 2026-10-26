@@ -235,6 +235,7 @@ const syncExtension = async (req, res) => {
 
         console.log(`📥 [EXT-SYNC] Processing ${messages.length} from ${partnerName}`);
 
+        const upsertOperations = [];
         for (const msg of messages) {
             const chatId = msg.chatId || (partnerName.includes('@') ? partnerName : null);
             if (!chatId) continue;
@@ -247,7 +248,7 @@ const syncExtension = async (req, res) => {
                 await prisma.client.update({ where: { id: client.id }, data: { profile_pic_url: req.body.profilePicUrl } });
             }
 
-            await prisma.whatsAppMessage.upsert({
+            upsertOperations.push(prisma.whatsAppMessage.upsert({
                 where: { whatsapp_id: msg.id },
                 update: { client_id: client?.id || undefined },
                 create: {
@@ -260,9 +261,14 @@ const syncExtension = async (req, res) => {
                     client_id: client?.id,
                     metadata: { is_group: isGroup, synced_via: 'extension' }
                 }
-            });
+            }));
 
             // Note: Trigger AI logic if NOT outgoing logic needs to be handled via service ideally
+        }
+
+        // ⚡ Bolt: Execute upserts in chunks using $transaction to resolve N+1 bottleneck
+        for (let i = 0; i < upsertOperations.length; i += 50) {
+            await prisma.$transaction(upsertOperations.slice(i, i + 50));
         }
 
         socketService.emit('whatsapp_extension_sync', { partnerName, count: messages.length, timestamp: new Date() });
@@ -429,15 +435,21 @@ const cleanupAndRepair = async (req, res) => {
         });
 
         let migratedCount = 0;
+        const updateOperations = [];
         for (const m of messagesToMigrate) {
             const match = m.whatsapp_id.match(/_([^@\s]+@g\.us)_/);
             if (match) {
-                await prisma.whatsAppMessage.update({
+                updateOperations.push(prisma.whatsAppMessage.update({
                     where: { id: m.id },
                     data: { from: m.from === 'system' ? 'system' : match[1], to: m.to === 'system' ? 'system' : match[1] }
-                });
+                }));
                 migratedCount++;
             }
+        }
+
+        // ⚡ Bolt: Execute updates in chunks using $transaction to resolve N+1 bottleneck
+        for (let i = 0; i < updateOperations.length; i += 50) {
+            await prisma.$transaction(updateOperations.slice(i, i + 50));
         }
 
         const waChats = await whatsappService.getChats();
@@ -759,10 +771,11 @@ async function syncAllData(isDeep = false) {
                 }
 
                 const messages = await chat.fetchMessages({ limit: isDeep ? 100 : 30 });
+                const upsertOperations = [];
                 for (const msg of messages) {
                     if (!['chat', 'image', 'video', 'audio', 'document', 'ptt'].includes(msg.type)) continue;
                     const authorId = isGroup ? (msg.author || msg.from).split('@')[0] : phoneNumber;
-                    await prisma.whatsAppMessage.upsert({
+                    upsertOperations.push(prisma.whatsAppMessage.upsert({
                         where: { whatsapp_id: msg.id._serialized },
                         update: {},
                         create: {
@@ -775,7 +788,12 @@ async function syncAllData(isDeep = false) {
                             client_id: client?.id,
                             metadata: { author: authorId, is_group: isGroup }
                         }
-                    });
+                    }));
+                }
+
+                // ⚡ Bolt: Execute upserts in chunks using $transaction to resolve N+1 bottleneck
+                for (let j = 0; j < upsertOperations.length; j += 50) {
+                    await prisma.$transaction(upsertOperations.slice(j, j + 50));
                 }
             }));
             const progress = Math.min(100, Math.round(((i + 5) / targetChats.length) * 100));
