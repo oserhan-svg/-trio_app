@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, X, RefreshCw, Users, FileText, LogOut, Home } from 'lucide-react';
+import { Menu, X, RefreshCw, Users, FileText, LogOut, Home, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const MobileNav = ({ user, handleScrape, handleLogout, propertiesCount }) => {
@@ -28,7 +28,7 @@ const MobileNav = ({ user, handleScrape, handleLogout, propertiesCount }) => {
             <button
                 onClick={toggleMenu}
                 className="p-2 text-gray-600 hover:text-blue-600 focus:outline-none"
-                aria-label="Menu"
+                aria-label={isOpen ? 'Menüyü Kapat' : 'Menüyü Aç'}
             >
                 {isOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
@@ -47,7 +47,7 @@ const MobileNav = ({ user, handleScrape, handleLogout, propertiesCount }) => {
                         {/* Header */}
                         <div className="p-5 border-b flex justify-between items-center bg-gray-50">
                             <span className="text-xl font-bold text-blue-600">TrioApp</span>
-                            <button onClick={closeMenu} className="text-gray-500">
+                            <button onClick={closeMenu} className="text-gray-500" aria-label="Kapat">
                                 <X size={24} />
                             </button>
                         </div>
