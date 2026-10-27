@@ -1,0 +1,3 @@
+## 2025-05-15 - [Performance Optimization of Analytics and Performance Endpoints]
+**Learning:** The `getConsultantPerformance` endpoint suffered from a classic N+1 query problem, executing $5N+1$ queries where $N$ is the number of consultants. Aggregating these into bulk `groupBy` and `$queryRaw` operations reduced this to $O(1)$ complexity. Additionally, sequential `await` calls in `getStats` were causing unnecessary latency.
+**Action:** Always look for loops containing database queries and replace them with bulk operations. Use `Promise.all` for independent I/O tasks to leverage Node.js concurrency.
