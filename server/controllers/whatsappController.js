@@ -429,15 +429,20 @@ const cleanupAndRepair = async (req, res) => {
         });
 
         let migratedCount = 0;
+        const operations = [];
         for (const m of messagesToMigrate) {
             const match = m.whatsapp_id.match(/_([^@\s]+@g\.us)_/);
             if (match) {
-                await prisma.whatsAppMessage.update({
+                operations.push(prisma.whatsAppMessage.update({
                     where: { id: m.id },
                     data: { from: m.from === 'system' ? 'system' : match[1], to: m.to === 'system' ? 'system' : match[1] }
-                });
+                }));
                 migratedCount++;
             }
+        }
+
+        for (let i = 0; i < operations.length; i += 50) {
+            await prisma.$transaction(operations.slice(i, i + 50));
         }
 
         const waChats = await whatsappService.getChats();
@@ -670,20 +675,26 @@ const repairGroups = async (req, res) => {
         const chats = await whatsappService.client.getChats();
         const groups = chats.filter(c => c.isGroup);
         let updatedCount = 0;
+        const operations = [];
 
         for (const chat of groups) {
             const jid = chat.id._serialized;
             const subject = chat.name || chat.groupMetadata?.subject;
 
             if (subject && subject !== 'WhatsApp Grup') {
-                await prisma.client.upsert({
+                operations.push(prisma.client.upsert({
                     where: { phone: jid },
                     update: { name: subject, type: 'group' },
                     create: { name: subject, phone: jid, type: 'group', status: 'New' }
-                });
+                }));
                 updatedCount++;
             }
         }
+
+        for (let i = 0; i < operations.length; i += 50) {
+            await prisma.$transaction(operations.slice(i, i + 50));
+        }
+
         res.json({ message: `Repaired ${updatedCount} group names.` });
     } catch (error) {
         res.status(500).json({ error: error.message });
