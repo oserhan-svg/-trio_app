@@ -7,7 +7,7 @@ export async function onRequest(context) {
       { id: 3, name: 'Satılık Arsa', count: 8 },
       { id: 4, name: 'Kiralık Daire', count: 23 }
     ]
-  }, {
+  }), {
     headers: {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*',
