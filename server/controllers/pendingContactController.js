@@ -88,26 +88,45 @@ const bulkApprove = async (req, res) => {
         let added = 0;
         let skipped = 0;
 
-        for (const t of targets) {
-            const existing = await prisma.client.findFirst({
-                where: { phone: t.phone, consultant_id: req.user.id }
-            });
+        // ⚡ Bolt Optimization: Fix N+1 query bottleneck by fetching existing clients in one batch
+        // and executing create operations using Prisma transactions in chunks.
+        const targetPhones = targets.map(t => t.phone).filter(Boolean);
+        const existingClients = await prisma.client.findMany({
+            where: {
+                phone: { in: targetPhones },
+                consultant_id: req.user.id
+            },
+            select: { phone: true }
+        });
 
-            if (!existing) {
-                await prisma.client.create({
-                    data: {
-                        name: t.name,
-                        phone: t.phone,
-                        email: t.email,
-                        notes: t.notes,
-                        type: 'buyer',
-                        consultant_id: req.user.id
-                    }
-                });
+        const existingPhoneSet = new Set(existingClients.map(c => c.phone));
+        const operations = [];
+
+        for (const t of targets) {
+            if (!existingPhoneSet.has(t.phone)) {
+                operations.push(
+                    prisma.client.create({
+                        data: {
+                            name: t.name,
+                            phone: t.phone,
+                            email: t.email,
+                            notes: t.notes,
+                            type: 'buyer',
+                            consultant_id: req.user.id
+                        }
+                    })
+                );
                 added++;
+                existingPhoneSet.add(t.phone); // Prevent duplicates if targets contain same phone multiple times
             } else {
                 skipped++;
             }
+        }
+
+        // Execute creates in chunks to avoid blocking and respect connection limits
+        const chunkSize = 50;
+        for (let i = 0; i < operations.length; i += chunkSize) {
+            await prisma.$transaction(operations.slice(i, i + chunkSize));
         }
 
         // Delete processed
