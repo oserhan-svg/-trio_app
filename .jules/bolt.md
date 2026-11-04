@@ -1,0 +1,3 @@
+## 2026-11-04 - Resolving N+1 Database Bottleneck in Bulk Operations
+**Learning:** The bulk approval function in pendingContactController.js was performing sequential database reads (findFirst) and writes (create) inside a loop. This is a classic N+1 query pattern that scales poorly and blocks the event loop on large datasets, causing severe latency degradation when consultants batch-import leads.
+**Action:** When handling bulk operations or loops containing database calls, always pre-fetch existing target records using `findMany` with an `in` filter, construct a Set for O(1) in-memory lookups, and execute a single batch insert using `createMany` to reduce query complexity from O(N) to O(1).

@@ -88,26 +88,39 @@ const bulkApprove = async (req, res) => {
         let added = 0;
         let skipped = 0;
 
-        for (const t of targets) {
-            const existing = await prisma.client.findFirst({
-                where: { phone: t.phone, consultant_id: req.user.id }
-            });
+        // Fetch all existing clients in a single query
+        const existingClients = await prisma.client.findMany({
+            where: {
+                phone: { in: targets.map(t => t.phone) },
+                consultant_id: req.user.id
+            },
+            select: { phone: true }
+        });
 
-            if (!existing) {
-                await prisma.client.create({
-                    data: {
-                        name: t.name,
-                        phone: t.phone,
-                        email: t.email,
-                        notes: t.notes,
-                        type: 'buyer',
-                        consultant_id: req.user.id
-                    }
+        const existingPhones = new Set(existingClients.map(c => c.phone));
+        const newClientsData = [];
+
+        for (const t of targets) {
+            if (!existingPhones.has(t.phone)) {
+                newClientsData.push({
+                    name: t.name,
+                    phone: t.phone,
+                    email: t.email,
+                    notes: t.notes,
+                    type: 'buyer',
+                    consultant_id: req.user.id
                 });
                 added++;
             } else {
                 skipped++;
             }
+        }
+
+        if (newClientsData.length > 0) {
+            await prisma.client.createMany({
+                data: newClientsData,
+                skipDuplicates: true // Just in case
+            });
         }
 
         // Delete processed
