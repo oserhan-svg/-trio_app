@@ -258,7 +258,9 @@ const AppShell = ({ children }) => {
                     <div className="flex items-center gap-4 md:gap-6">
                         <button
                             onClick={() => setSidebarOpen(!sidebarOpen)}
-                            className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-500 hover:text-blue-600 hover:shadow-md transition-all active:scale-90"
+                            aria-label={"Men\u00FCy\u00FC a\u00E7/kapat"}
+                            title={"Men\u00FCy\u00FC a\u00E7/kapat"}
+                            className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-slate-500 hover:text-blue-600 hover:shadow-md transition-all active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                         >
                             <Menu size={20} />
                         </button>
