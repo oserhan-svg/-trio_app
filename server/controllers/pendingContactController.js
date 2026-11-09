@@ -88,27 +88,38 @@ const bulkApprove = async (req, res) => {
         let added = 0;
         let skipped = 0;
 
-        for (const t of targets) {
-            const existing = await prisma.client.findFirst({
-                where: { phone: t.phone, consultant_id: req.user.id }
-            });
+        // ⚡ Bolt: Bulk insert optimization to fix N+1 problem
+        const existingClients = await prisma.client.findMany({
+            where: {
+                phone: { in: targets.map(t => t.phone) },
+                consultant_id: req.user.id
+            },
+            select: { phone: true }
+        });
+        const existingPhones = new Set(existingClients.map(c => c.phone));
 
-            if (!existing) {
-                await prisma.client.create({
-                    data: {
-                        name: t.name,
-                        phone: t.phone,
-                        email: t.email,
-                        notes: t.notes,
-                        type: 'buyer',
-                        consultant_id: req.user.id
-                    }
+        const newClients = [];
+        for (const t of targets) {
+            if (!existingPhones.has(t.phone)) {
+                existingPhones.add(t.phone);
+                newClients.push({
+                    name: t.name,
+                    phone: t.phone,
+                    email: t.email,
+                    notes: t.notes,
+                    type: 'buyer',
+                    consultant_id: req.user.id
                 });
-                added++;
-            } else {
-                skipped++;
             }
         }
+
+        if (newClients.length > 0) {
+            const result = await prisma.client.createMany({
+                data: newClients
+            });
+            added = result.count;
+        }
+        skipped = targets.length - added;
 
         // Delete processed
         await prisma.pendingContact.deleteMany({
