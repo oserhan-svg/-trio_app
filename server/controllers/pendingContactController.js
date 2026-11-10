@@ -85,29 +85,41 @@ const bulkApprove = async (req, res) => {
             }
         });
 
-        let added = 0;
-        let skipped = 0;
+        // Optimization: Resolve N+1 query problem by batch fetching and creating records
+        const targetPhones = targets.map(t => t.phone);
+        const existingClients = await prisma.client.findMany({
+            where: {
+                phone: { in: targetPhones },
+                consultant_id: req.user.id
+            },
+            select: { phone: true }
+        });
 
+        const existingPhoneSet = new Set(existingClients.map(c => c.phone));
+
+        const clientsToCreate = [];
         for (const t of targets) {
-            const existing = await prisma.client.findFirst({
-                where: { phone: t.phone, consultant_id: req.user.id }
-            });
-
-            if (!existing) {
-                await prisma.client.create({
-                    data: {
-                        name: t.name,
-                        phone: t.phone,
-                        email: t.email,
-                        notes: t.notes,
-                        type: 'buyer',
-                        consultant_id: req.user.id
-                    }
+            if (!existingPhoneSet.has(t.phone)) {
+                clientsToCreate.push({
+                    name: t.name,
+                    phone: t.phone,
+                    email: t.email,
+                    notes: t.notes,
+                    type: 'buyer',
+                    consultant_id: req.user.id
                 });
-                added++;
-            } else {
-                skipped++;
+                existingPhoneSet.add(t.phone);
             }
+        }
+
+        let added = 0;
+        let skipped = targets.length - clientsToCreate.length;
+
+        if (clientsToCreate.length > 0) {
+            const createResult = await prisma.client.createMany({
+                data: clientsToCreate
+            });
+            added = createResult.count;
         }
 
         // Delete processed
