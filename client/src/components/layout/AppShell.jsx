@@ -274,7 +274,7 @@ const AppShell = ({ children }) => {
                     <div className="flex items-center gap-2 md:gap-4">
                         <div className="hidden sm:flex items-center gap-2 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
                             <Search size={16} className="text-slate-300" />
-                            <input type="text" placeholder="Hızlı ara..." className="bg-transparent border-none text-xs font-bold focus:ring-0 w-32 outline-none dark:text-white" />
+                            <input type="text" aria-label="Arama yap" placeholder="Hızlı ara..." className="bg-transparent border-none text-xs font-bold focus:ring-0 w-32 outline-none dark:text-white" />
                         </div>
 
                         <button
